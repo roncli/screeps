@@ -14,7 +14,7 @@ Pickup.prototype.canAssign = function(creep, tasks) {
     // Get creep range to the resource.
     
     
-    if (!this.resource || creep.memory.role !== "worker" || _.sum(creep.carry[RESOURCE_ENERGY])) {
+    if (!this.resource || _.sum(creep.carry[RESOURCE_ENERGY])) {
         return false;
     }
     

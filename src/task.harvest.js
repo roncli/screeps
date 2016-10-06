@@ -12,7 +12,7 @@ Harvest.prototype.constructor = Harvest;
 Harvest.prototype.canAssign = function(creep, tasks) {
     var source = Cache.getObjectById(creep.memory.home);
 
-    if (creep.memory.role !== "worker" || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
         return false;
     }
     

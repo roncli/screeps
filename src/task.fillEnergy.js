@@ -12,7 +12,7 @@ FillEnergy.prototype = Object.create(Task.prototype);
 FillEnergy.prototype.constructor = FillEnergy;
 
 FillEnergy.prototype.canAssign = function(creep, tasks) {
-    if (creep.memory.role !== "worker" || creep.carry[RESOURCE_ENERGY] === 0) {
+    if (creep.carry[RESOURCE_ENERGY] === 0) {
         return false;
     }
     

@@ -36,7 +36,7 @@ var Cache = require("cache"),
             }
 
             // If we have less than max collectors, spawn a collector.
-            count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.home === source.id).length;
+            count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.home === sources[0].id).length;
             if (count < Memory.sources[sources[0].id].empty) {
                 Worker.spawn(room, sources[0].id);
             }

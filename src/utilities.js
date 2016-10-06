@@ -38,12 +38,12 @@ var utilities = {
             for (y = pos.y - 1; y < pos.y + 2; y++) {
                 // Don't need to check the origin.
                 if (x === pos.x && y === pos.y) {
-                    break;
+                    continue;
                 }
 
                 checkPos = new RoomPosition(x, y, pos.roomName);
                 if (checkPos) {
-                    count += _.filter(checkPos.look(), (o) => o.type === "terrain" && o.type !== "wall").length;
+                    count += _.filter(checkPos.look(), (o) => o.type === "terrain" && o.terrain !== "wall").length;
                 }
             }
         }

@@ -26,14 +26,14 @@ var Cache = require("cache"),
                     return;
                 }
 
-                if (!Memory.sources || !Memory.sources[sources[0].id] || !Memory.sources[sources[0].id].empty) {
+                if (!Memory.sources || !Memory.sources[source.id] || !Memory.sources[source.id].empty) {
                     // Initialize.
                     if (!Memory.sources) {
                         Memory.sources = {};
                     }
                     
-                    if (!Memory.sources[sources[0].id]) {
-                        Memory.sources[sources[0].id] = {};
+                    if (!Memory.sources[source.id]) {
+                        Memory.sources[source.id] = {};
                     }
 
                     // Count the empty squares around the source.

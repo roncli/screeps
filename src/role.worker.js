@@ -85,6 +85,8 @@ var Cache = require("cache"),
         },
 
         assignTasks: (room, creepTasks) => {
+            var tasks;
+
             // Check for critical controllers to upgrade.
             _.forEach(TaskUpgradeController.getCriticalTasks(room), (task) => {
                 console.log("Controller is critical, TTL: " + task.controller.ticksToDowngrade);
@@ -171,7 +173,7 @@ var Cache = require("cache"),
                 if (Cache.hostilesInRoom(room).length === 0) {
                     _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
                         towerFired = true;
-                        tower.repair(task[0].structure);
+                        tower.repair(tasks[0].structure);
                     });
                 }
             }
@@ -219,7 +221,7 @@ var Cache = require("cache"),
                 if (Cache.hostilesInRoom(room).length === 0) {
                     _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
                         towerFired = true;
-                        tower.repair(task[0].structure);
+                        tower.repair(tasks[0].structure);
                     });
                 }
             }

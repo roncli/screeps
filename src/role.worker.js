@@ -87,7 +87,7 @@ var Cache = require("cache"),
 
         assignTasks: (room) => {
             // Check for critical controllers to upgrade.
-            _.forEach(TaskUpgrade.getCriticalTasks(room), (task) => {
+            _.forEach(TaskUpgradeController.getCriticalTasks(room), (task) => {
                 console.log("Controller is critical, TTL: " + task.controller.ticksToDowngrade);
                 if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "upgradeController", room: task.room}).length === 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), room.controller), (creep) => {
@@ -240,7 +240,7 @@ var Cache = require("cache"),
             })
             
             // Check for controllers to upgrade.
-            _.forEach(TaskUpgrade.getTasks(room), (task) => {
+            _.forEach(TaskUpgradeController.getTasks(room), (task) => {
                 if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "upgradeController", room: room.name}).length === 0) {
                     _.forEach(Utilities.creepsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), room.controller), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {

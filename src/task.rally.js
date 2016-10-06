@@ -91,7 +91,7 @@ Rally.getAttackerTasks = function(room) {
 };
 
 Rally.getHarvesterTasks = function(creeps) {
-    return _.map(creeps, (c) => new Rally(c.memory.home, c));
+    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.home, c));
 };
 
 module.exports = Rally;

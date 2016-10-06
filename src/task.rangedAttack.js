@@ -1,8 +1,10 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Ranged = function(id) {
         Task.call(this);
 
         this.type = "rangedAttack";
+        this.id = id;
         this.enemy = Game.getObjectById(id);
     };
     
@@ -42,19 +44,23 @@ Ranged.prototype.canComplete = function(creep) {
     return false;
 };
 
-Ranged.fromObj = function(creep) {
-    return new Ranged(creep.memory.currentTask.id);
-};
-
 Ranged.prototype.toObj = function(creep) {
     if (this.enemy) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.enemy.id
+            id: this.id
         }
     } else {
         delete creep.memory.currentTask;
     }
+};
+
+Ranged.fromObj = function(creep) {
+    return new Ranged(creep.memory.currentTask.id);
+};
+
+Ranged.getTasks = function(room) {
+    return _.map(_.sortBy(Cache.hostilesInRoom(room), (h) => h.hits), (h) => new Ranged(h.id));
 };
 
 module.exports = Ranged;

@@ -80,4 +80,16 @@ Rally.getHealerTasks = function(room) {
     }
 };
 
+Rally.getAttackerTasks = function(room) {
+    var flags = Cache.flagsInRoom(room);
+
+    // If there are no flags, there is nothing for anyone to rally to.
+    if (flags.length === 0) {
+        return [];
+    }
+
+    // Return the rally point.
+    return [new Rally(flags[0].name)];
+};
+
 module.exports = Rally;

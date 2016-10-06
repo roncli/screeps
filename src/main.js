@@ -10,7 +10,8 @@ var profiler = require("screeps-profiler"),
         loop: () => {
             profiler.wrap(() => {
                 var towerFired = false,
-                    name, count, creep, room, tasks, creepTasks, closestCreeps;
+                    creepTasks = {},
+                    name, count, creep, room, tasks, closestCreeps;
 
                 // Reset the cache.
                 Cache.reset();
@@ -30,18 +31,6 @@ var profiler = require("screeps-profiler"),
                         delete Memory.creeps[name];
                     }
                 }
-                
-                // Spawn new ranged attackers.
-                count = _.filter(Game.creeps, (creep) => creep.memory.role === "rangedAttack").length;
-                if (count < Memory.maxCreeps.rangedAttack) {
-                    name = Game.spawns["Spawn1"].createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, RANGED_ATTACK, RANGED_ATTACK], undefined, {role: "rangedAttack"});
-                    if (typeof name !== "number") {
-                        console.log("Spawning new ranged attacker " + name);
-                    }
-                }
-                console.log("Ranged Attackers: " + count.toString() + "/" + Memory.maxCreeps.rangedAttack.toString());
-                
-                creepTasks = {};
                 
                 // Loop through each creep to deserialize their task and see if it is completed.
                 _.forEach(Game.creeps, (creep) => {

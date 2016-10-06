@@ -177,7 +177,7 @@ var Cache = require("cache"),
                     });
                 }
             }
-            _forEach(tasks, (task) => {
+            _.forEach(tasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.object), (creep) => {
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep, creepTasks)) {
@@ -225,7 +225,7 @@ var Cache = require("cache"),
                     });
                 }
             }
-            _forEach(tasks, (task) => {
+            _.forEach(tasks, (task) => {
                 var hitsMissing = task.object.progressCapacity - task.object.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.object), (creep) => {

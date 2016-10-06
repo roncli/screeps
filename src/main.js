@@ -1,8 +1,8 @@
 var profiler = require("screeps-profiler"),
     Cache = require("cache"),
+    RoleHealer = require("role.healer"),
     RoleWorker = require("role.worker"),
     taskDeserialization = require("taskDeserialization"),
-    TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
     

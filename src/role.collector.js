@@ -43,7 +43,7 @@ var Cache = require("cache"),
                 max += Memory.sources[source.id].empty;
 
                 // If we have less than max collectors, spawn a collector.
-                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.home === source.id).length;
+                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.home === source.id).length;
                 if (count < Memory.maxCreeps.collector) {
                     Collector.spawn(room, source.id);
                 }

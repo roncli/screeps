@@ -1,5 +1,5 @@
 var Cache = require("cache"),
-    Utilities = require("Utilities"),
+    Utilities = require("utilities"),
     TaskBuild = require("task.build"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),

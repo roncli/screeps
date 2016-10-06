@@ -17,7 +17,7 @@ var Cache = require("cache"),
 
             // If there are no energy sources, ignore the room.
             sources = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0]);
-            if (souces.length === 0) {
+            if (sources.length === 0) {
                 return;
             }
 

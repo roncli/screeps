@@ -20,7 +20,7 @@ Harvest.prototype.canAssign = function(creep, tasks) {
 
 Harvest.prototype.run = function(creep) {
     // Find the closest source, accounting for sources that are out of energy.
-    var sources = _.sortBy(Cache.energySourcesInRoom(room), (s) => s.pos.getRangeTo(creep) * 3 + (s.energy === 0 ? s.ticksToRegeneration : 0));
+    var sources = _.sortBy(Cache.energySourcesInRoom(creep.room), (s) => s.pos.getRangeTo(creep) * 3 + (s.energy === 0 ? s.ticksToRegeneration : 0));
     
     // No sources found, complete task.
     if (sources.length === 0) {

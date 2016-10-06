@@ -18,9 +18,7 @@ var Cache = require("cache"),
             // If we have less than max workers, spawn a worker.
             count = Cache.creepsInRoom("worker", room).length;
             if (count < Memory.maxCreeps.worker) {
-                if (Worker.spawn(room)) {
-                    count++;
-                }
+                Worker.spawn(room);
             }
 
             // Output worker count in the report.
@@ -186,8 +184,8 @@ var Cache = require("cache"),
                         }
                     }
                 });
-            })
-            
+            });
+
             // Check for construction sites.
             tasks = TaskBuild.getTasks(room);
             if (tasks.length > 0) {
@@ -238,8 +236,8 @@ var Cache = require("cache"),
                         }
                     });
                 }
-            })
-            
+            });
+
             // Check for controllers to upgrade.
             _.forEach(TaskUpgradeController.getTasks(room), (task) => {
                 if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "upgradeController", room: room.name}).length === 0) {

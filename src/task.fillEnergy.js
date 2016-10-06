@@ -65,11 +65,11 @@ FillEnergy.getFillExtensionTasks = function(room) {
 };
 
 FillEnergy.getFillSpawnTasks = function(room) {
-    return _.map(_.filter(Cache.spawnsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
+    return _.map(_.filter(Cache.spawnsInRoom(room), (s) => s.energy < s.energyCapacity), (s) => new FillEnergy(s.id));
 };
 
 FillEnergy.getFillTowerTasks = function(room) {
-    return _.map(_.filter(Cache.towersInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
+    return _.map(_.filter(Cache.towersInRoom(room), (t) => t.energy < t.energyCapacity), (t) => new FillEnergy(t.id));
 };
 
 module.exports = FillEnergy;

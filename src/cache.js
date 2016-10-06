@@ -9,6 +9,19 @@ var creeps = {},
     hostilesInRoom = {};
 
 var cache = {
+    // Reset the cache.
+    reset: () => {
+        creeps = {};
+        creepsInRoom = {};
+        spawnsInRoom = {};
+        extensionsInRoom = {};
+        towersInRoom = {};
+        repairableStructuresInRoom = {};
+        constructionSitesInRoom = {};
+        energySourcesInRoom = {};
+        hostilesInRoom = {};
+    },
+
     // Returns all creeps of a certain type.
     creeps: (type) => {
         return creeps[type] ? creeps[type] : (creeps[type] = _.filter(Game.creeps, (c) => type === "all" || c.memory.role === "worker"));

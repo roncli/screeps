@@ -12,6 +12,9 @@ var profiler = require("screeps-profiler"),
                 var towerFired = false,
                     name, count, creep, room, tasks, creepTasks, closestCreeps;
 
+                // Reset the cache.
+                Cache.reset();
+
                 // Export global objects to Game.cmd for use from console.
                 Game.cmd = {
                     Cache: Cache,

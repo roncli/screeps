@@ -65,6 +65,13 @@ var profiler = require("screeps-profiler"),
 
                 // Loop through each room to determine the required tasks for the room.
                 _.forEach(_.uniq(_.map(Game.creeps, (creep) => creep.room)), (room) => {
+                    console.log(room.name + " Status");
+                    
+                    // Update controller.
+                    if (room.controller) {
+                        console.log("Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                    }
+                    
                     // Spawn new creeps.
                     RoleWorker.checkSpawn(room);
                     //RoleRangedAttack.checkSpawn(room);

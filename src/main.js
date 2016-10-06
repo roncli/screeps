@@ -5,7 +5,6 @@ var profiler = require("screeps-profiler"),
     TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
-    Utilities = require("utilities"),
     
     main = {
         loop: () => {

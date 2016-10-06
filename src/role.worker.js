@@ -270,7 +270,7 @@ var Cache = require("cache"),
             });
             
             // Attempt to assign harvest task to remaining creeps.
-            _.forEach(Utilites.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (creep) => {
+            _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (creep) => {
                 task = new TaskHarvest();
                 if (task.canAssign(creep, creepTasks)) {
                     creep.say("Harvesting");

@@ -36,6 +36,7 @@ Rally.prototype.run = function(creep) {
 };
 
 Rally.prototype.canComplete = function(creep) {
+    Task.prototype.complete.call(this, creep);
     return true;
 };
 

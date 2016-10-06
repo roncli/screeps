@@ -164,7 +164,7 @@ var Cache = require("cache"),
             tasks = TaskRepair.getCriticalTasks(room);
             if (tasks.length > 0) {
                 console.log("Critical repairs required: " + tasks.length);
-                _.forEach(_.take(task, 5), (task) => {
+                _.forEach(_.take(tasks, 5), (task) => {
                     console.log("  " + task.object.pos.x + "," + task.object.pos.y + " " + task.object.hits + "/" + task.object.hitsMax + " " + (100 * task.object.hits / task.object.hitsMax).toFixed(3) + "%");
                 });
 
@@ -212,7 +212,7 @@ var Cache = require("cache"),
             tasks = TaskRepair.getTasks(room);
             if (tasks.length > 0) {
                 console.log("Repairs required: " + tasks.length);
-                _.forEach(_.take(task, 5), (task) => {
+                _.forEach(_.take(tasks, 5), (task) => {
                     console.log("  " + task.object.pos.x + "," + task.object.pos.y + " " + task.object.hits + "/" + task.object.hitsMax + " " + (100 * task.object.hits / task.object.hitsMax).toFixed(3) + "%");
                 });
 

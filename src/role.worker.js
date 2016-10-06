@@ -35,14 +35,14 @@ var Cache = require("cache"),
                 Memory.sources[sources[0].id].empty = Utilities.getEmptyPosAroundPos(sources[0].pos);
             }
 
-            // If we have less than max collectors, spawn a collector.
-            count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.home === sources[0].id).length;
+            // If we have less than max workers, spawn a worker.
+            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.home === sources[0].id).length;
             if (count < Memory.sources[sources[0].id].empty) {
                 Worker.spawn(room, sources[0].id);
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count + "/" +Memory.sources[sources[0].id].empty);        
+            console.log("    Workers: " + count + "/" + Memory.sources[sources[0].id].empty);        
         },
         
         spawn: (room) => {

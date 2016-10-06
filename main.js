@@ -67,7 +67,7 @@ profiler.wrap(() => {
             // Spawn new workers.
             count = _.filter(Game.creeps, (creep) => creep.memory.role === "worker").length;
             if (count < Memory.maxCreeps.worker) {
-                name = Game.spawns["Spawn1"].createCreep([WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE], undefined, {role: "worker"});
+                name = Game.spawns["Spawn1"].createCreep([WORK, CARRY, CARRY, MOVE, MOVE], undefined, {role: "worker"});
                 if (typeof name !== "number") {
                     console.log("Spawning new worker " + name);
                 }

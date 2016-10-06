@@ -9,9 +9,7 @@ var profiler = require("screeps-profiler"),
     main = {
         loop: () => {
             profiler.wrap(() => {
-                var towerFired = false,
-                    creepTasks = {},
-                    name, count, creep, room, tasks, closestCreeps;
+                var creepTasks = {};
 
                 // Reset the cache.
                 Cache.reset();
@@ -26,11 +24,11 @@ var profiler = require("screeps-profiler"),
                 console.log(new Date());
 
                 // Clear old memory.
-                for (name in Memory.creeps) {
-                    if (!Game.creeps[name]) {
+                _.forEach(Memory.creeps, (c) => {
+                    if (!Game.creeps[c.name]) {
                         delete Memory.creeps[name];
                     }
-                }
+                });
                 
                 // Loop through each creep to deserialize their task and see if it is completed.
                 _.forEach(Game.creeps, (creep) => {
@@ -44,45 +42,21 @@ var profiler = require("screeps-profiler"),
 
                 // Loop through each room to determine the required tasks for the room.
                 _.forEach(_.uniq(_.map(Game.creeps, (creep) => creep.room)), (room) => {
-                    console.log(room.name + " Status");
+                    console.log("  " + room.name + " Status");
                     
                     // Update controller.
                     if (room.controller) {
-                        console.log("Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                        console.log("    Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
                     }
                     
                     // Spawn new creeps.
                     RoleWorker.checkSpawn(room);
-                    //RoleRangedAttack.checkSpawn(room);
+                    RoleRangedAttack.checkSpawn(room);
                     RoleHealer.checkSpawn(room);
                     
                     RoleWorker.assignTasks(room, creepTasks);
-                    //RoleRangedAttack.assignTasks(room, creepTasks);
+                    RoleRangedAttack.assignTasks(room, creepTasks);
                     RoleHealer.assignTasks(room, creepTasks);
-                    
-                    // Find enemies to attack.
-                    if (Cache.hostilesInRoom(room).length > 0) {
-                        targets = _.sortBy(Cache.hostilesInRoom(room), (t) => t.hits);
-
-                        // Kill with tower if possible.
-                        _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
-                            tower.attack(targets[0]);
-                        });
-
-                        console.log("Targets to kill: " + targets.length);
-                        _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.role === "rangedAttack" && (!c.memory.currentTask || c.memory.currentTask.type === "rally")), (creep) => {
-                            task = new TaskRangedAttack(targets[0].id);
-                            if (task.canAssign(creep, creepTasks)) {
-                                creep.say("Die!", true);
-                            }
-                        });
-                    }
-                    
-                    // Rally the troops!
-                    _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.role == "rangedAttack" && (!c.memory.currentTask || c.memory.currentTask.type === "rally")), (creep) => {
-                        task = new TaskRally("rallyPoint");
-                        task.canAssign(creep, creepTasks);
-                    });
                 });
                 
                 // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
@@ -99,12 +73,11 @@ var profiler = require("screeps-profiler"),
                         // RIP & Pepperonis :(
                         delete creep.memory.currentTask;
                         if (creep.ticksToLive && creep.ticksToLive < 150) {
-                            console.log("RIP & Pepperonis, " + creep.name + " :(");
+                            console.log("  RIP & Pepperonis, " + creep.name + " :(");
                             creep.suicide();
                         }
                     }
                 });
-                console.log("--------------------");
             });
         }
     };

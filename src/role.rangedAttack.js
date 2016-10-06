@@ -19,7 +19,7 @@ var Cache = require("cache"),
             }
 
             // Output ranged attacker count in the report.
-            console.log("Ranged Attackers: " + count.toString() + "/" + Memory.maxCreeps.rangedAttack.toString());        
+            console.log("    Ranged Attackers: " + count.toString() + "/" + Memory.maxCreeps.rangedAttack.toString());        
         },
         
         spawn: (room) => {
@@ -91,8 +91,7 @@ var Cache = require("cache"),
 
             // If successful, log it, and set spawning to true so it's not used this turn.
             if (typeof name !== "number") {
-                console.log("Spawning new ranged attacker " + name);
-                spawnToUse.spawning = true;
+                console.log("    Spawning new ranged attacker " + name);
                 return true;
             }
 
@@ -105,7 +104,10 @@ var Cache = require("cache"),
             // Find hostiles to attack.
             tasks = TaskRangedAttack.getTasks(room);
             if (tasks.length > 0) {
-                console.log("Hostiles: " + tasks.length);
+                console.log("    Hostiles: " + tasks.length);
+                _.forEach(_.take(tasks, 5), (task) => {
+                    console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "%");
+                });
             }
             _.forEach(tasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {

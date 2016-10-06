@@ -19,7 +19,7 @@ var Cache = require("cache"),
             }
 
             // Output healer count in the report.
-            console.log("Healers: " + count.toString() + "/" + Memory.maxCreeps.healer.toString());        
+            console.log("    Healers: " + count.toString() + "/" + Memory.maxCreeps.healer.toString());        
         },
         
         spawn: (room) => {
@@ -95,8 +95,7 @@ var Cache = require("cache"),
 
             // If successful, log it, and set spawning to true so it's not used this turn.
             if (typeof name !== "number") {
-                console.log("Spawning new healer " + name);
-                spawnToUse.spawning = true;
+                console.log("    Spawning new healer " + name);
                 return true;
             }
 
@@ -109,7 +108,10 @@ var Cache = require("cache"),
             // Find allies to heal.
             tasks = TaskHeal.getTasks(room);
             if (tasks.length > 0) {
-                console.log("Creeps to heal: " + tasks.length);
+                console.log("    Creeps to heal: " + tasks.length);
+                _.forEach(_.take(tasks, 5), (task) => {
+                    console.log("      " + task.ally.pos.x + "," + task.ally.pos.y + " " + task.ally.hits + "/" + task.ally.hitsMax + " " + (100 * task.ally.hits / task.ally.hitsMax).toFixed(3) + "%");
+                });
             }
             _.forEach(tasks, (task) => {
                 var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("healer", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);

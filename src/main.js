@@ -26,7 +26,7 @@ var profiler = require("screeps-profiler"),
                 // Clear old memory.
                 _.forEach(Memory.creeps, (c) => {
                     if (!Game.creeps[c.name]) {
-                        delete Memory.creeps[name];
+                        delete Memory.creeps[c.name];
                     }
                 });
                 

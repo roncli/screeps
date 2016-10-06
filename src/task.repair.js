@@ -57,11 +57,11 @@ Repair.fromObj = function(creep) {
 };
 
 Repair.getCriticalTasks = function(room) {
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(room.id)), (s) => s.hits);
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(s.id)), (s) => s.hits);
 };
 
 Repair.getTasks = function(room) {
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9), (s) => new Repair(room.id)), (s) => s.hits / s.hitsMax);
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9), (s) => new Repair(s.id)), (s) => s.hits / s.hitsMax);
 };
 
 module.exports = Repair;

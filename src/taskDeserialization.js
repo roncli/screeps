@@ -1,7 +1,5 @@
 var TaskBuild = require("task.build"),
-    TaskFillExtension = require("task.fillExtension"),
-    TaskFillSpawn = require("task.fillSpawn"),
-    TaskFillTower = require("task.fillTower"),
+    TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
@@ -13,14 +11,8 @@ var TaskBuild = require("task.build"),
             case "build":
                 creepTasks[creep.name] = TaskBuild.fromObj(creep);
                 break;
-            case "fillExtension":
-                creepTasks[creep.name] = TaskFillExtension.fromObj(creep);
-                break;
-            case "fillSpawn":
-                creepTasks[creep.name] = TaskFillSpawn.fromObj(creep);
-                break;
-            case "fillTower":
-                creepTasks[creep.name] = TaskFillTower.fromObj(creep);
+            case "fillEnergy":
+                creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
                 break;
             case "harvest":
                 creepTasks[creep.name] = TaskHarvest.fromObj(creep);

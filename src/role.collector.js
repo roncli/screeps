@@ -2,6 +2,7 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
+    TaskRally = require("task.rally"),
 
     Collector = {
         checkSpawn: (room) => {

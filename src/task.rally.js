@@ -1,11 +1,12 @@
 var Task = require("task"),
     Cache = require("cache"),
     Utilities = require("utilities"),
-    Rally = function(id) {
+    Rally = function(id, creep) {
         Task.call(this);
 
         this.type = "rally";
         this.id = id;
+        this.creep = creep;
         this.rallyPoint = Cache.getObjectById(id);
         if (!this.rallyPoint) {
             this.rallyPoint = Game.flags[id];
@@ -93,7 +94,7 @@ Rally.getAttackerTasks = function(room) {
 };
 
 Rally.getHarvesterTasks = function(creeps) {
-    return _.map(creeps, (c) => new Rally(c.memory.home));
+    return _.map(creeps, (c) => new Rally(c.memory.home, c));
 };
 
 module.exports = Rally;

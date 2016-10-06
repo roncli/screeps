@@ -75,11 +75,11 @@ var profiler = require("screeps-profiler"),
                     // Spawn new creeps.
                     RoleWorker.checkSpawn(room);
                     //RoleRangedAttack.checkSpawn(room);
-                    //RoleHealer.checkSpawn(room);
+                    RoleHealer.checkSpawn(room);
                     
                     RoleWorker.assignTasks(room, creepTasks);
                     //RoleRangedAttack.assignTasks(room, creepTasks);
-                    //RoleHealer.assignTasks(room, creepTasks);
+                    RoleHealer.assignTasks(room, creepTasks);
                     
                     // Find enemies to attack.
                     if (Cache.hostilesInRoom(room).length > 0) {
@@ -99,34 +99,9 @@ var profiler = require("screeps-profiler"),
                         });
                     }
                     
-                    // Find allies to heal.
-                    targets = room.find(FIND_MY_CREEPS, {
-                        filter: (target) => target.hits < target.hitsMax && _.filter(Cache.creepsInRoom("all", room), (creep) => creep.memory.currentTask && creep.memory.currentTask.type === "heal" && creep.memory.currentTask.id === target.id).length === 0
-                    });
-                    if (targets.length > 0) {
-                        console.log("Targets to heal: " + targets.length);
-                        targets = _.sortBy(targets, (target) => target.hits / target.hitsMax);
-
-                        _.forEach(targets, (target) => {
-                            task = new TaskHeal(target.id);
-
-                            _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.role === "healer" && (!c.memory.currentTask || c.memory.currentTask.type === "rally")), (creep) => {
-                                if (task.canAssign(creep, creepTasks)) {
-                                    creep.say("Healing");
-                                    return false;
-                                }
-                            });
-                        });
-                    }
-
                     // Rally the troops!
-                    _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => ["rangedAttack", "healer"].indexOf(c.memory.role) !== -1 && (!c.memory.currentTask || c.memory.currentTask.type === "rally")), (creep) => {
-                        rangedAttackers = _.filter(Cache.creepsInRoom("all", room), (c) => c.memory.role === "rangedAttack");
-                        if (creep.memory.role === "healer" && rangedAttackers.length > 0) {
-                            task = new TaskRally(rangedAttackers[0].id);
-                        } else {
-                            task = new TaskRally("rallyPoint");
-                        }
+                    _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.role == "rangedAttack" && (!c.memory.currentTask || c.memory.currentTask.type === "rally")), (creep) => {
+                        task = new TaskRally("rallyPoint");
                         task.canAssign(creep, creepTasks);
                     });
                 });

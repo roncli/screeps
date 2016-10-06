@@ -1,8 +1,10 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Heal = function(id) {
         Task.call(this);
         
         this.type = "heal";
+        this.id = id;
         this.ally = Game.getObjectById(id);
     };
     
@@ -37,19 +39,23 @@ Heal.prototype.canComplete = function(creep) {
     return false;
 };
 
-Heal.fromObj = function(creep) {
-    return new Heal(creep.memory.currentTask.id);
-};
-
 Heal.prototype.toObj = function(creep) {
     if (this.ally) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.ally.id
+            id: this.ally
         }
     } else {
         delete creep.memory.currentTask;
     }
+};
+
+Heal.fromObj = function(creep) {
+    return new Heal(creep.memory.currentTask.id);
+};
+
+Heal.getTasks = function(room) {
+    return _.map(_.sortBy(_.filter(Cache.creepsInRoom("all", room), (c) => c.hits < c.hitsMax), (c) => c.hits), new Heal(c.id));
 };
 
 module.exports = Heal;

@@ -1,4 +1,6 @@
 var Task = require("task"),
+    Cache = require("cache"),
+    Utilities = require("utilities"),
     Rally = function(id) {
         Task.call(this);
 
@@ -23,26 +25,21 @@ Rally.prototype.canAssign = function(creep, tasks) {
 }
 
 Rally.prototype.run = function(creep) {
-    var pos = this.rallyPoint.pos;
-    
+    // If the rally point doesn't exist, complete the task.
     if (!this.rallyPoint) {
         Task.prototype.complete.call(this, creep);
-        return true;
+        return;
     }
+
     // Rally to the rally point.
-    creep.moveTo(pos.x + Math.floor(Math.random() * 7 - 3), pos.y + Math.floor(Math.random() * 7 - 3), {reusePath: Math.floor(Math.random() * 2)});
+    creep.moveTo(this.rallyPoint.pos.x + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.y + Math.floor(Math.random() * 7 - 3), {reusePath: Math.floor(Math.random() * 2)});
+
+    // Always complete the task.
+    Task.prototype.complete.call(this, creep);
 };
 
 Rally.prototype.canComplete = function(creep) {
-    if (!this.rallyPoint) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
-};
-
-Rally.fromObj = function(creep) {
-    return new Rally(creep.memory.currentTask.id);
+    return true;
 };
 
 Rally.prototype.toObj = function(creep) {
@@ -53,6 +50,33 @@ Rally.prototype.toObj = function(creep) {
         }
     } else {
         delete creep.memory.currentTask;
+    }
+};
+
+Rally.fromObj = function(creep) {
+    return new Rally(creep.memory.currentTask.id);
+};
+
+Rally.getHealerTasks = function(room) {
+    var flags = Cache.flagsInRoom(room),
+        targets, rallyPoint;
+    
+    // If there are no flags, there is nothing for anyone to rally to.
+    if (flags.length === 0) {
+        return [];
+    }
+
+    // Find a rally target.
+    targets = Cache.creepsInRoom("rangedAttack", room);
+    if (targets.length === 0) {
+        targets = Cache.creepsInRoom("meleeAttack", room);
+    }
+
+    // Return the rally point.
+    if (targets.length === 0) {
+        return [new TaskRally(flags[0].name)];
+    } else {
+        return [new TaskRally(Utilities.objectsClosestToObj(targets, flags[0]).id)];
     }
 };
 

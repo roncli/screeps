@@ -6,6 +6,7 @@ var creeps = {},
     repairableStructuresInRoom = {},
     constructionSitesInRoom = {},
     energySourcesInRoom = {},
+    flagsInRoom = {},
     hostilesInRoom = {};
 
 var cache = {
@@ -19,6 +20,7 @@ var cache = {
         repairableStructuresInRoom = {};
         constructionSitesInRoom = {};
         energySourcesInRoom = {};
+        flagsInRoom = {};
         hostilesInRoom = {};
     },
 
@@ -62,7 +64,12 @@ var cache = {
 
     // Returns all energy sources in the current room.
     energySourcesInRoom: (room) => {
-        return energySourcesInRoom[room.name] ? energySourcesInRoom[room.name] : energySourcesInRoom[room.name] = room.find(FIND_SOURCES);
+        return energySourcesInRoom[room.name] ? energySourcesInRoom[room.name] : (energySourcesInRoom[room.name] = room.find(FIND_SOURCES));
+    },
+
+    // Returns all flags in the current room.
+    flagsInRoom: (room) => {
+        return flagsInRoom[room.name] ? flagsInRoom[room.name] : (flagsInRoom[room.name] = _.filter(Game.flags, (f) => f.room.name === room.name));
     },
 
     // Return all hostile creeps in the current room.

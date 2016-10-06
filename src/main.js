@@ -23,9 +23,9 @@ var profiler = require("screeps-profiler"),
                 console.log(new Date());
 
                 // Clear old memory.
-                _.forEach(Memory.creeps, (c) => {
-                    if (!Game.creeps[c.name]) {
-                        delete Memory.creeps[c.name];
+                _.forEach(Memory.creeps, (creep, name) => {
+                    if (!Game.creeps[name]) {
+                        delete Memory.creeps[name];
                     }
                 });
                 
@@ -77,6 +77,8 @@ var profiler = require("screeps-profiler"),
                         }
                     }
                 });
+                console.log("  CPU: " + Game.cpu.getUsed().toFixed(2) + "/" + Game.cpu.limit);
+                console.log("  Bucket: " + Game.cpu.bucket);
             });
         }
     };

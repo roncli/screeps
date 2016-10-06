@@ -21,8 +21,12 @@ var Cache = require("cache"),
                 return;
             }
 
-            if (!Memory.sources[sources[0].id] && !Memory.sources[sources[0].id].empty) {
+            if (!Memory.sources || !Memory.sources[sources[0].id] || !Memory.sources[sources[0].id].empty) {
                 // Initialize.
+                if (!Memory.sources) {
+                    Memory.sources = {};
+                }
+                
                 if (!Memory.sources[sources[0].id]) {
                     Memory.sources[sources[0].id] = {};
                 }

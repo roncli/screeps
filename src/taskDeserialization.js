@@ -6,7 +6,7 @@ var TaskBuild = require("task.build"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController"),
-    deserialization = (creep) => {
+    deserialization = (creep, creepTasks) => {
         switch (creep.memory.currentTask.type) {
             case "build":
                 creepTasks[creep.name] = TaskBuild.fromObj(creep);

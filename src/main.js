@@ -54,7 +54,7 @@ var profiler = require("screeps-profiler"),
                 // Loop through each creep to deserialize their task and see if it is completed.
                 _.forEach(Game.creeps, (creep) => {
                     if (creep.memory.currentTask) {
-                        taskDeserialization(creep);
+                        taskDeserialization(creep, creepTasks);
                         if (creepTasks[creep.name]) {
                             creepTasks[creep.name].canComplete(creep);
                         }

@@ -41,7 +41,7 @@ var utilities = {
                     break;
                 }
 
-                checkPos = new RoomPosition(x, y, room.name);
+                checkPos = new RoomPosition(x, y, pos.roomName);
                 if (checkPos) {
                     count += _.filter(checkPos.look(), (o) => o.type === "terrain" && o.type !== "wall").length;
                 }

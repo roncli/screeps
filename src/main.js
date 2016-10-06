@@ -31,16 +31,6 @@ var profiler = require("screeps-profiler"),
                     }
                 }
                 
-                // Spawn new healers.
-                count = _.filter(Game.creeps, (creep) => creep.memory.role === "healer").length;
-                if (count < Memory.maxCreeps.healer) {
-                    name = Game.spawns["Spawn1"].createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, HEAL], undefined, {role: "healer"});
-                    if (typeof name !== "number") {
-                        console.log("Spawning new healer " + name);
-                    }
-                }
-                console.log("Healers: " + count.toString() + "/" + Memory.maxCreeps.healer.toString());
-                
                 // Spawn new ranged attackers.
                 count = _.filter(Game.creeps, (creep) => creep.memory.role === "rangedAttack").length;
                 if (count < Memory.maxCreeps.rangedAttack) {

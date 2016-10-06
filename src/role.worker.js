@@ -26,13 +26,13 @@ var Cache = require("cache"),
                 if (!Memory.sources) {
                     Memory.sources = {};
                 }
-                
+
                 if (!Memory.sources[sources[0].id]) {
                     Memory.sources[sources[0].id] = {};
                 }
 
                 // Count the empty squares around the source.
-                Memory.sources[sources[0].id].empty = Utilities.getEmptyPosAroundPos(source.pos);
+                Memory.sources[sources[0].id].empty = Utilities.getEmptyPosAroundPos(sources[0].pos);
             }
 
             // If we have less than max collectors, spawn a collector.

@@ -55,7 +55,7 @@ Heal.fromObj = function(creep) {
 };
 
 Heal.getTasks = function(room) {
-    return _.map(_.sortBy(_.filter(Cache.creepsInRoom("all", room), (c) => c.hits < c.hitsMax), (c) => c.hits), new Heal(c.id));
+    return _.map(_.sortBy(_.filter(Cache.creepsInRoom("all", room), (c) => c.hits < c.hitsMax), (c) => c.hits), (c) => new Heal(c.id));
 };
 
 module.exports = Heal;

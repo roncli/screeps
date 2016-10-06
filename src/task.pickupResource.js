@@ -1,9 +1,10 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Pickup = function(id) {
         Task.call(this);
 
         this.type = "pickupResource";
-        this.resource = Game.getObjectById(id);
+        this.resource = Cache.getObjectById(id);
     };
     
 Pickup.prototype = Object.create(Task.prototype);

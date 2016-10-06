@@ -19,23 +19,24 @@ Harvest.prototype.canAssign = function(creep, tasks) {
 }
 
 Harvest.prototype.run = function(creep) {
-    // Find the closest source, accounting for sources that are out of energy.
-    var sources = _.sortBy(Cache.energySourcesInRoom(creep.room), (s) => s.pos.getRangeTo(creep) * 3 + (s.energy === 0 ? s.ticksToRegeneration : 0));
+    var source = Cache.getObjectById(creep.memory.home);
     
-    // No sources found, complete task.
-    if (sources.length === 0) {
+    // No sources found or the source is drained, complete task.
+    if (!source || source.energy === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
     
     // Harvest the source, or move closer to it if not in range.
-    if (creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(sources[0], {reusePath: Math.floor(Math.random() * 2)});
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2)});
     }
 };
 
 Harvest.prototype.canComplete = function(creep) {
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
+    var source = Cache.getObjectById(creep.memory.home);
+
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

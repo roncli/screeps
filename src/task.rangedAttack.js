@@ -5,7 +5,7 @@ var Task = require("task"),
 
         this.type = "rangedAttack";
         this.id = id;
-        this.enemy = Game.getObjectById(id);
+        this.enemy = Cache.getObjectById(id);
     };
     
 Ranged.prototype = Object.create(Task.prototype);

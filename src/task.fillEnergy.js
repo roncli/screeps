@@ -5,7 +5,7 @@ var Task = require("task"),
 
         this.type = "fillEnergy";
         this.id = id;
-        this.object = Game.getObjectById(id);
+        this.object = Cache.getObjectById(id);
     };
     
 FillEnergy.prototype = Object.create(Task.prototype);

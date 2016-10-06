@@ -5,7 +5,7 @@ var Task = require("task"),
         
         this.type = "heal";
         this.id = id;
-        this.ally = Game.getObjectById(id);
+        this.ally = Cache.getObjectById(id);
     };
     
 Heal.prototype = Object.create(Task.prototype);

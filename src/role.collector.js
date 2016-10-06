@@ -135,11 +135,16 @@ var Cache = require("cache"),
             });
 
             // Attempt to assign harvest task to remaining creeps.
-            _.forEach(_.filter(Cache.creepsInRoom("collector", room), (c) => !c.memory.currentTask), (creep) => {
+            _.forEach(Utilites.creepsWithNoTask(Cache.creepsInRoom("collector", room)), (creep) => {
                 task = new TaskHarvest();
                 if (task.canAssign(creep, creepTasks)) {
                     creep.say("Harvesting");
                 }
+            });
+
+            // Rally remaining creeps.
+            _.forEach(TaskRally.getHarvesterTasks(Utilites.creepsWithNoTask(Cache.creepsInRoom("collector", room))), (task) => {
+                task.canAssign(creep, creepTasks);
             });
         }
     };

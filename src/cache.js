@@ -8,7 +8,8 @@ var creeps = {},
     constructionSitesInRoom = {},
     energySourcesInRoom = {},
     flagsInRoom = {},
-    hostilesInRoom = {};
+    hostilesInRoom = {},
+    objects = {};
 
 var cache = {
     // Reset the cache.
@@ -24,6 +25,7 @@ var cache = {
         energySourcesInRoom = {};
         flagsInRoom = {};
         hostilesInRoom = {};
+        objects = {};
     },
 
     // Returns all creeps of a certain type.
@@ -82,6 +84,11 @@ var cache = {
     // Return all hostile creeps in the current room.
     hostilesInRoom: (room) => {
         return hostilesInRoom[room.name] ? hostilesInRoom[room.name] : (hostilesInRoom[room.name] = room.find(FIND_HOSTILE_CREEPS));
+    },
+
+    // Get object by ID.
+    getObjectById: (id) => {
+        return objects[id] ? objects[id] : (objects[id] = Game.getObjectById(id));
     }
 };
 

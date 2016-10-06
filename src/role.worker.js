@@ -3,6 +3,7 @@ var Cache = require("cache"),
     TaskBuild = require("task.build"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
+    TaskRally = require("task.rally"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController"),
 
@@ -269,11 +270,16 @@ var Cache = require("cache"),
             });
             
             // Attempt to assign harvest task to remaining creeps.
-            _.forEach(_.filter(Cache.creepsInRoom("worker", room), (c) => !c.memory.currentTask), (creep) => {
+            _.forEach(Utilites.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (creep) => {
                 task = new TaskHarvest();
                 if (task.canAssign(creep, creepTasks)) {
                     creep.say("Harvesting");
                 }
+            });
+
+            // Rally remaining creeps.
+            _.forEach(TaskRally.getHarvesterTasks(Utilites.creepsWithNoTask(Cache.creepsInRoom("worker", room))), (task) => {
+                task.canAssign(creep, creepTasks);
             });
         }
     };

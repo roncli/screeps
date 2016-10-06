@@ -54,7 +54,7 @@ var cache = {
 
     // Returns all repairable structures in the current room.
     repairableStructuresInRoom: (room) => {
-        return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1)}));
+        return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || [STRUCTURE_WALL, STRUCTURE_ROAD, STRUCTURE_CONTAINER].indexOf(s.structureType) !== -1)}));
     },
 
     // Return all construction sites in the current room.

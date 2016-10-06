@@ -3,6 +3,7 @@ var creeps = {},
     spawnsInRoom = {},
     extensionsInRoom = {},
     towersInRoom = {},
+    collectorsInRoom = {},
     repairableStructuresInRoom = {},
     constructionSitesInRoom = {},
     energySourcesInRoom = {},
@@ -17,6 +18,7 @@ var cache = {
         spawnsInRoom = {};
         extensionsInRoom = {};
         towersInRoom = {};
+        collectorsInRoom = {};
         repairableStructuresInRoom = {};
         constructionSitesInRoom = {};
         energySourcesInRoom = {};
@@ -50,6 +52,11 @@ var cache = {
     // Returns all towers in the current room.
     towersInRoom: (room) => {
         return towersInRoom[room.name] ? towersInRoom[room.name] : (towersInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s.structureType === STRUCTURE_TOWER));
+    },
+
+    // Returns all collectors in the current room.
+    collectorsInRoom: (room) => {
+        return collectorsInRoom[room.name] ? collectorsInRoom[room.name] : (collectorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_CONTAINER}));
     },
 
     // Returns all repairable structures in the current room.

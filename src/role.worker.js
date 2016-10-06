@@ -8,21 +8,37 @@ var Cache = require("cache"),
 
     Worker = {
         checkSpawn: (room) => {
-            var count;
+            var count, source;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
                 return;
             }
 
-            // If we have less than max workers, spawn a worker.
-            count = Cache.creepsInRoom("worker", room).length;
-            if (count < Memory.maxCreeps.worker) {
-                Worker.spawn(room);
+            // If there are no energy sources, ignore the room.
+            sources = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0]);
+            if (souces.length === 0) {
+                return;
+            }
+
+            if (!Memory.sources[sources[0].id] && !Memory.sources[sources[0].id].empty) {
+                // Initialize.
+                if (!Memory.sources[sources[0].id]) {
+                    Memory.sources[sources[0].id] = {};
+                }
+
+                // Count the empty squares around the source.
+                Memory.sources[sources[0].id].empty = Utilities.getEmptyPosAroundPos(source.pos);
+            }
+
+            // If we have less than max collectors, spawn a collector.
+            count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.home === source.id).length;
+            if (count < Memory.sources[sources[0].id].empty) {
+                Worker.spawn(room, source.id);
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count.toString() + "/" + Memory.maxCreeps.worker.toString());        
+            console.log("    Workers: " + count + "/" +Memory.sources[sources[0].id].empty);        
         },
         
         spawn: (room) => {

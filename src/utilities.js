@@ -29,6 +29,27 @@ var utilities = {
         
         return _.map(objList, (o) => o.object);
     },
+
+    getEmptyPosAroundPos: (pos) => {
+        var count = 0,
+            x, y, checkPos;
+
+        for (x = pos.x - 1; x < pos.x + 2; x++) {
+            for (y = pos.y - 1; y < pos.y + 2; y++) {
+                // Don't need to check the origin.
+                if (x === pos.x && y === pos.y) {
+                    break;
+                }
+
+                checkPos = new RoomPosition(x, y, room.name);
+                if (checkPos) {
+                    count += _.filter(checkPos.look(), (o) => o.type === "terrain" && o.type !== "wall").length;
+                }
+            }
+        }
+
+        return count;
+    }
 };
 
 module.exports = utilities;

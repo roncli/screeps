@@ -11,7 +11,7 @@ var creeps = {},
 var cache = {
     // Returns all creeps of a certain type.
     creeps: (type) => {
-        return creeps[type] ? creeps[type] : (creeps[type] = _.filter(Game.creeps, (c) => c.memory.role === "worker"));
+        return creeps[type] ? creeps[type] : (creeps[type] = _.filter(Game.creeps, (c) => type === "all" || c.memory.role === "worker"));
     },
     
     // Returns all creeps of a certain in the current room.

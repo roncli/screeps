@@ -1,8 +1,10 @@
 var profiler = require("screeps-profiler"),
     Cache = require("cache"),
+    Utilities = require("utilities"),
+    RoleCollector = require("role.collector"),
     RoleHealer = require("role.healer"),
-    RoleWorker = require("role.worker"),
     RoleRangedAttack = require("role.rangedAttack"),
+    RoleWorker = require("role.worker"),
     taskDeserialization = require("taskDeserialization"),
     
     main = {
@@ -16,6 +18,10 @@ var profiler = require("screeps-profiler"),
                 // Export global objects to Game.cmd for use from console.
                 Game.cmd = {
                     Cache: Cache,
+                    Collector: RoleCollector,
+                    Healer: RoleHealer,
+                    RangedAttack: RoleRangedAttack,
+                    Utilities: Utilities,
                     Worker: RoleWorker
                 };
 
@@ -50,10 +56,12 @@ var profiler = require("screeps-profiler"),
                     
                     // Spawn new creeps.
                     RoleWorker.checkSpawn(room);
+                    RoleCollector.checkSpawn(room);
                     RoleRangedAttack.checkSpawn(room);
                     RoleHealer.checkSpawn(room);
                     
                     RoleWorker.assignTasks(room, creepTasks);
+                    RoleCollector.assignTasks(room, creepTasks);
                     RoleRangedAttack.assignTasks(room, creepTasks);
                     RoleHealer.assignTasks(room, creepTasks);
                 });

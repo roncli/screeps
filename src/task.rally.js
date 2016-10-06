@@ -17,10 +17,6 @@ Rally.prototype = Object.create(Task.prototype);
 Rally.prototype.constructor = Rally;
 
 Rally.prototype.canAssign = function(creep, tasks) {
-    if (["rangedAttack", "healer"].indexOf(creep.memory.role) === -1) {
-        return false;
-    }
-
     Task.prototype.assign.call(this, creep, tasks);
     return true;
 }

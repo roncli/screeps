@@ -61,15 +61,15 @@ FillEnergy.fromObj = function(creep) {
 };
 
 FillEnergy.getFillExtensionTasks = function(room) {
-    _.map(_.filter(Cache.extensionsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
+    return _.map(_.filter(Cache.extensionsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
 };
 
 FillEnergy.getFillSpawnTasks = function(room) {
-    _.map(_.filter(Cache.spawnsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
+    return _.map(_.filter(Cache.spawnsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
 };
 
 FillEnergy.getFillTowerTasks = function(room) {
-    _.map(_.filter(Cache.towersInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
+    return _.map(_.filter(Cache.towersInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
 };
 
 module.exports = FillEnergy;

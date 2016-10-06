@@ -1,8 +1,10 @@
 var Task = require("task"),
+    Utilities = require("utilities"),
     Build = function(id) {
         Task.call(this);
 
         this.type = "build";
+        this.id = id;
         this.constructionSite = Game.getObjectById(id);
     };
     
@@ -10,7 +12,7 @@ Build.prototype = Object.create(Task.prototype);
 Build.prototype.constructor = Build;
 
 Build.prototype.canAssign = function(creep, tasks) {
-    if (creep.memory.role !== "worker" || creep.carry.energy === 0) {
+    if (creep.memory.role !== "worker" || creep.carry[RESOURCE_ENERGY] === 0) {
         return false;
     }
     
@@ -32,26 +34,30 @@ Build.prototype.run = function(creep) {
 };
 
 Build.prototype.canComplete = function(creep) {
-    if (creep.carry.energy === 0 || !this.constructionSite) {
+    if (creep.carry[RESOURCE_ENERGY] === 0 || !this.constructionSite) {
         Task.prototype.complete.call(this, creep);
         return true;
     }
     return false;
 };
 
-Build.fromObj = function(creep) {
-    return new Build(creep.memory.currentTask.id);
-};
-
 Build.prototype.toObj = function(creep) {
     if (this.constructionSite) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.constructionSite.id
+            id: this.id
         }
     } else {
         delete creep.memory.currentTask;
     }
+};
+
+Build.fromObj = function(creep) {
+    return new Build(creep.memory.currentTask.id);
+};
+
+Build.getTasks = function(room) {
+    return Utilities.objectsClosestToObj(_.map(Cache.constructionSitesInRoom(room), (s) => new Build(room.id)), Cache.spawnsInRoom[0] || Cache.energySourcesInRoom[0]);
 };
 
 module.exports = Build;

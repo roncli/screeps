@@ -1,4 +1,5 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Harvest = function() {
         Task.call(this);
         
@@ -19,12 +20,7 @@ Harvest.prototype.canAssign = function(creep, tasks) {
 
 Harvest.prototype.run = function(creep) {
     // Find the closest source, accounting for sources that are out of energy.
-    var sources = creep.room.find(FIND_SOURCES),
-        source;
-    
-    sources.sort((a, b) => {
-        return (a.pos.getRangeTo(creep) * 3 + (a.energy === 0 ? a.ticksToRegeneration : 0)) - (b.pos.getRangeTo(creep) * 3 + (b.energy === 0 ? b.ticksToRegeneration : 0));
-    });
+    var sources = _.sortBy(Cache.energySourcesInRoom(room), (s) => s.pos.getRangeTo(creep) * 3 + (s.energy === 0 ? s.ticksToRegeneration : 0));
     
     // No sources found, complete task.
     if (sources.length === 0) {
@@ -33,9 +29,8 @@ Harvest.prototype.run = function(creep) {
     }
     
     // Harvest the source, or move closer to it if not in range.
-    source = sources[0];
-    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2)});
+    if (creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(sources[0], {reusePath: Math.floor(Math.random() * 2)});
     }
 };
 
@@ -47,14 +42,14 @@ Harvest.prototype.canComplete = function(creep) {
     return false;
 };
 
-Harvest.fromObj = function(creep) {
-    return new Harvest();
-};
-
 Harvest.prototype.toObj = function(creep) {
     creep.memory.currentTask = {
         type: this.type
     }
+};
+
+Harvest.fromObj = function(creep) {
+    return new Harvest();
 };
 
 module.exports = Harvest;

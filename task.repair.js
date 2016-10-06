@@ -3,6 +3,7 @@ var Task = require("task"),
         Task.call(this);
 
         this.type = "repair";
+        this.id = id;
         this.structure = Game.getObjectById(id);
     };
     
@@ -10,7 +11,7 @@ Repair.prototype = Object.create(Task.prototype);
 Repair.prototype.constructor = Repair;
 
 Repair.prototype.canAssign = function(creep, tasks) {
-    if (creep.memory.role !== "worker" || creep.carry.energy === 0) {
+    if (creep.memory.role !== "worker" || creep.carry[RESOURCE_ENERGY] === 0) {
         return false;
     }
     
@@ -32,15 +33,11 @@ Repair.prototype.run = function(creep) {
 };
 
 Repair.prototype.canComplete = function(creep) {
-    if (creep.carry.energy === 0 || !this.structure || this.structure.hits === this.structure.hitsMax) {
+    if (creep.carry[RESOURCE_ENERGY] === 0 || !this.structure || this.structure.hits === this.structure.hitsMax) {
         Task.prototype.complete.call(this, creep);
         return true;
     }
     return false;
-};
-
-Repair.fromObj = function(creep) {
-    return new Repair(creep.memory.currentTask.id);
 };
 
 Repair.prototype.toObj = function(creep) {
@@ -52,6 +49,18 @@ Repair.prototype.toObj = function(creep) {
     } else {
         delete creep.memory.currentTask;
     }
+};
+
+Repair.fromObj = function(creep) {
+    return new Repair(creep.memory.currentTask.id);
+};
+
+Repair.getCriticalTasks = function(room) {
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(room.id)), (s) => s.hits);
+};
+
+Repair.getTasks = function(room) {
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9), (s) => new Repair(room.id)), (s) => s.hits / s.hitsMax);
 };
 
 module.exports = Repair;

@@ -1,5 +1,4 @@
 var profiler = require("screeps-profiler"),
-    cache = require("cache"),
     TaskBuild = require("task.build"),
     TaskFillExtension = require("task.fillExtension"),
     TaskFillSpawn = require("task.fillSpawn"),
@@ -32,7 +31,6 @@ var profiler = require("screeps-profiler"),
     
     main = {
         loop: () => {
-        Game.Cache = cache;
 profiler.wrap(() => {
             var towerFired = false,
                 name, count, creep, room, roomCreeps, creepTasks, closestCreeps, hostiles;

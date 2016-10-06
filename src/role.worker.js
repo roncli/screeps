@@ -45,7 +45,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room.
-            energy = _.sumBy(structures, (s) => s.energy);
+            energy = _.reduce(structures, function(sum, s) {return sum + s.energy;}, 0);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {

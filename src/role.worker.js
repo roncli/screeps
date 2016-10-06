@@ -165,7 +165,7 @@ var Cache = require("cache"),
             if (tasks.length > 0) {
                 console.log("Critical repairs required: " + tasks.length);
                 _.forEach(_.take(tasks, 5), (task) => {
-                    console.log("  " + task.object.pos.x + "," + task.object.pos.y + " " + task.object.hits + "/" + task.object.hitsMax + " " + (100 * task.object.hits / task.object.hitsMax).toFixed(3) + "%");
+                    console.log("  " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
                 });
 
                 // Repair with tower if possible.
@@ -194,7 +194,7 @@ var Cache = require("cache"),
                 console.log("Construction sites: " + tasks.length.toString());
             }
             _.forEach(tasks, (task) => {
-                var progressMissing = task.object.progressCapacity - task.object.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var progressMissing = task.constructionSite.progressCapacity - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
@@ -213,7 +213,7 @@ var Cache = require("cache"),
             if (tasks.length > 0) {
                 console.log("Repairs required: " + tasks.length);
                 _.forEach(_.take(tasks, 5), (task) => {
-                    console.log("  " + task.object.pos.x + "," + task.object.pos.y + " " + task.object.hits + "/" + task.object.hitsMax + " " + (100 * task.object.hits / task.object.hitsMax).toFixed(3) + "%");
+                    console.log("  " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
                 });
 
                 // Repair with tower if possible.

@@ -86,7 +86,7 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, creepTasks) => {
             // Check for critical controllers to upgrade.
             _.forEach(TaskUpgradeController.getCriticalTasks(room), (task) => {
                 console.log("Controller is critical, TTL: " + task.controller.ticksToDowngrade);

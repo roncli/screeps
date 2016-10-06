@@ -67,9 +67,9 @@ var profiler = require("screeps-profiler"),
                     //RoleRangedAttack.checkSpawn(room);
                     //RoleHealer.checkSpawn(room);
                     
-                    RoleWorker.assignTasks(room);
-                    //RoleRangedAttack.assignTasks(room);
-                    //RoleHealer.assignTasks(room);
+                    RoleWorker.assignTasks(room, creepTasks);
+                    //RoleRangedAttack.assignTasks(room, creepTasks);
+                    //RoleHealer.assignTasks(room, creepTasks);
                     
                     // Find enemies to attack.
                     if (Cache.hostilesInRoom(room).length > 0) {

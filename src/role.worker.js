@@ -191,7 +191,7 @@ var Cache = require("cache"),
             // Check for construction sites.
             tasks = TaskBuild.getTasks(room);
             if (tasks.length > 0) {
-                console.log("Construction sites: " + targets.length.toString());
+                console.log("Construction sites: " + tasks.length.toString());
             }
             _.forEach(tasks, (task) => {
                 var progressMissing = task.object.progressCapacity - task.object.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)

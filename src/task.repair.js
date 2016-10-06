@@ -1,4 +1,5 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Repair = function(id) {
         Task.call(this);
 

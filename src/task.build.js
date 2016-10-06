@@ -1,4 +1,5 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Utilities = require("utilities"),
     Build = function(id) {
         Task.call(this);

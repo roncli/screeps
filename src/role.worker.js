@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
+    TaskCollectEnergy = require("task.collectEnergy"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
     TaskRally = require("task.rally"),
@@ -266,6 +267,15 @@ var Cache = require("cache"),
                 if (task.canAssign(creep, creepTasks)) {
                     creep.say("Harvesting");
                 }
+            });
+
+            // Attempt to get energy from containers.
+            _.forEach(TaskCollectEnergy.getTasks(room), (task) => {
+                _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (creep) => {
+                    if (task.canAssign(creep, creepTasks)) {
+                        creep.say("Collecting");
+                    }
+                });
             });
 
             // Rally remaining creeps.

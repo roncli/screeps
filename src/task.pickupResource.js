@@ -64,4 +64,5 @@ Pickup.prototype.toObj = function(creep) {
     }
 };
 
+require("screeps-profiler").registerObject(Pickup, "TaskPickupResource");
 module.exports = Pickup;

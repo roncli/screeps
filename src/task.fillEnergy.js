@@ -81,4 +81,5 @@ FillEnergy.getFillContainerTasks = function(room) {
     return _.map(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (t) => (t.store[RESOURCE_ENERGY] || 0) < t.storeCapacity), (t) => new FillEnergy(t.id));
 };
 
+require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
 module.exports = FillEnergy;

@@ -63,4 +63,5 @@ Ranged.getTasks = function(room) {
     return _.map(_.sortBy(Cache.hostilesInRoom(room), (h) => h.hits), (h) => new Ranged(h.id));
 };
 
+require("screeps-profiler").registerObject(Ranged, "TaskRangedAttack");
 module.exports = Ranged;

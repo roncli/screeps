@@ -286,4 +286,5 @@ var Cache = require("cache"),
         }
     };
 
+require("screeps-profiler").registerObject(Collector, "RoleCollector");
 module.exports = Collector;

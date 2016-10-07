@@ -44,4 +44,5 @@ var TaskBuild = require("task.build"),
         }
     };
 
+require("screeps-profiler").registerObject(deserialization, "TaskDeserialization");
 module.exports = deserialization;

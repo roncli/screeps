@@ -11,4 +11,5 @@ Task.prototype.complete = function(creep) {
 
 Task.prototype.run = function(creep) {};
 
+require("screeps-profiler").registerObject(Task, "Task");
 module.exports = Task;

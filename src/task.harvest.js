@@ -55,4 +55,5 @@ Harvest.fromObj = function(creep) {
     return new Harvest();
 };
 
+require("screeps-profiler").registerObject(Harvest, "TaskHarvest");
 module.exports = Harvest;

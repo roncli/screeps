@@ -127,4 +127,5 @@ var Cache = require("cache"),
         }
     };
 
+require("screeps-profiler").registerObject(Ranged, "RoleRangedAttack");
 module.exports = Ranged;

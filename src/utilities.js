@@ -85,4 +85,5 @@ var Cache = require("cache"),
         }
     };
 
+require("screeps-profiler").registerObject(utilities, "Utilities");
 module.exports = utilities;

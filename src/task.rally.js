@@ -94,4 +94,5 @@ Rally.getHarvesterTasks = function(creeps) {
     return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.home, c));
 };
 
+require("screeps-profiler").registerObject(Rally, "TaskRally");
 module.exports = Rally;

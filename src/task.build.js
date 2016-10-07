@@ -61,4 +61,5 @@ Build.getTasks = function(room) {
     return Utilities.objectsClosestToObj(_.map(Cache.constructionSitesInRoom(room), (s) => new Build(s.id)), Cache.spawnsInRoom[0] || Cache.energySourcesInRoom[0]);
 };
 
+require("screeps-profiler").registerObject(Build, "TaskBuild");
 module.exports = Build;

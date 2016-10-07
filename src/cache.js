@@ -92,4 +92,5 @@ var cache = {
     }
 };
 
+require("screeps-profiler").registerObject(cache, "Cache");
 module.exports = cache;

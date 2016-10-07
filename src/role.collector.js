@@ -25,7 +25,7 @@ var Cache = require("cache"),
             }
 
             // Determine the max creep adjustment to use.
-            adjustment = Math.max((5000 - Utilities.getEnergyCapacityInRoom(room) / 5000, 1), 0.1); 
+            adjustment = Math.max(((5000 - Utilities.getEnergyCapacityInRoom(room)) / 5000, 1), 0.1); 
 
             //  Loop through sources to see if we have anything we need to spawn.
             _.forEach(sources, (source, index) => {

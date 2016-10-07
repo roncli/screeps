@@ -241,18 +241,23 @@ var Cache = require("cache"),
                 });
             }
             _.forEach(tasks, (task) => {
-                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100
+                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,
+                    assigned = false;
+                
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.structure), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Repair");
                             hitsMissing -= (creep.carry[RESOURCE_ENERGY] || 0) * 100;
+                            assigned = true;
                             if (hitsMissing <= 0) {
                                 return false;
                             }
                         }
                     });
                 }
+
+                return assigned;
             });
 
             // Check for controllers to upgrade.

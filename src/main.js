@@ -73,7 +73,7 @@ var profiler = require("screeps-profiler"),
                         creep.say("TTL " + (creep.ticksToLive - 1).toString());
                     }
 
-                    if (creep.memory.currentTask) {
+                    if (creep.memory.currentTask && creepTasks[creep.name]) {
                         creepTasks[creep.name].run(creep);
                         creepTasks[creep.name].toObj(creep);
                     } else {

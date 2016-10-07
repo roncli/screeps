@@ -64,6 +64,24 @@ var Cache = require("cache"),
         getEnergyCapacityInRoom: (room) => {
             var structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
             return _.reduce(structures, function(sum, s) {return sum + s.energyCapacity;}, 0);
+        },
+
+        // Set a number of creeps to deliver energy from a specific location.
+        deliverEnergy: (fromId, fromX, fromY, fromRoomName, toRoom, maxCreeps) => {
+            if (!Memory.maxCreeps.delivery) {
+                Memory.maxCreeps.delivery = []
+            };
+
+            Memory.maxCreeps.delivery.push({
+                fromId: fromId,
+                fromPos: {
+                    x: fromX,
+                    y: fromY,
+                    roomName: fromRoomName
+                },
+                toRoom: toRoom,
+                maxCreeps: maxCreeps
+            });
         }
     };
 

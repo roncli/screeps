@@ -13,7 +13,7 @@ Build.prototype = Object.create(Task.prototype);
 Build.prototype.constructor = Build;
 
 Build.prototype.canAssign = function(creep, tasks) {
-    if (creep.carry[RESOURCE_ENERGY] === 0) {
+    if (!creep.carry[RESOURCE_ENERGY]) {
         return false;
     }
     
@@ -35,7 +35,7 @@ Build.prototype.run = function(creep) {
 };
 
 Build.prototype.canComplete = function(creep) {
-    if (creep.carry[RESOURCE_ENERGY] === 0 || !this.constructionSite) {
+    if (!creep.carry[RESOURCE_ENERGY] || !this.constructionSite) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

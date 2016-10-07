@@ -11,7 +11,7 @@ Upgrade.prototype = Object.create(Task.prototype);
 Upgrade.prototype.constructor = Upgrade;
 
 Upgrade.prototype.canAssign = function(creep, tasks) {
-    if (creep.carry[RESOURCE_ENERGY] === 0) {
+    if (!creep.carry[RESOURCE_ENERGY]) {
         return false;
     }
     
@@ -33,7 +33,7 @@ Upgrade.prototype.run = function(creep) {
 };
 
 Upgrade.prototype.canComplete = function(creep) {
-    if (creep.carry[RESOURCE_ENERGY] === 0) {
+    if (!creep.carry[RESOURCE_ENERGY]) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

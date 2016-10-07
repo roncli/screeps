@@ -12,7 +12,7 @@ Repair.prototype = Object.create(Task.prototype);
 Repair.prototype.constructor = Repair;
 
 Repair.prototype.canAssign = function(creep, tasks) {
-    if (creep.carry[RESOURCE_ENERGY] === 0) {
+    if (!creep.carry[RESOURCE_ENERGY]) {
         return false;
     }
     
@@ -34,7 +34,7 @@ Repair.prototype.run = function(creep) {
 };
 
 Repair.prototype.canComplete = function(creep) {
-    if (creep.carry[RESOURCE_ENERGY] === 0 || !this.structure || this.structure.hits === this.structure.hitsMax) {
+    if (!creep.carry[RESOURCE_ENERGY] || !this.structure || this.structure.hits === this.structure.hitsMax) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

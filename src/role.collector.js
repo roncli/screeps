@@ -79,7 +79,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room.
-            energy = Utilities.getAvailableEnergyInRoom;
+            energy = Utilities.getAvailableEnergyInRoom(room);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {

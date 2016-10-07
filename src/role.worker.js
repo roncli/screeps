@@ -127,7 +127,7 @@ var Cache = require("cache"),
                 console.log("    Unfilled extensions: " + tasks.length);
             }
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
@@ -147,7 +147,7 @@ var Cache = require("cache"),
                 console.log("    Unfilled spawns: " + tasks.length);
             }
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
@@ -167,7 +167,7 @@ var Cache = require("cache"),
                 console.log("    Unfilled towers: " + tasks.length);
             }
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
@@ -215,7 +215,7 @@ var Cache = require("cache"),
                 console.log("    Construction sites: " + tasks.length.toString());
             }
             _.forEach(tasks, (task) => {
-                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.constructionSite), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
@@ -238,7 +238,7 @@ var Cache = require("cache"),
                 });
             }
             _.forEach(tasks, (task) => {
-                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0) * 100
+                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0) * 100
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), task.structure), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {

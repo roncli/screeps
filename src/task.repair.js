@@ -12,7 +12,7 @@ Repair.prototype = Object.create(Task.prototype);
 Repair.prototype.constructor = Repair;
 
 Repair.prototype.canAssign = function(creep, tasks) {
-    if (creep.memory.role !== "worker" || creep.carry[RESOURCE_ENERGY] === 0) {
+    if (creep.carry[RESOURCE_ENERGY] === 0) {
         return false;
     }
     

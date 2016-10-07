@@ -38,7 +38,7 @@ FillEnergy.prototype.run = function(creep) {
 };
 
 FillEnergy.prototype.canComplete = function(creep) {
-    if (creep.carry[RESOURCE_ENERGY] === 0 || this.object.energy === this.object.energyCapacity) {
+    if (creep.carry[RESOURCE_ENERGY] === 0 || (this.object.energy || this.object.store) === (this.object.energyCapacity || this.object.storeCapacity)) {
         Task.prototype.complete.call(this, creep);
         return true;
     }
@@ -72,8 +72,8 @@ FillEnergy.getFillTowerTasks = function(room) {
     return _.map(_.filter(Cache.towersInRoom(room), (t) => t.energy < t.energyCapacity), (t) => new FillEnergy(t.id));
 };
 
-FillEnergy.getFillCollectorTasks = function(room) {
-    return _.map(_.filter(Cache.collectorsInRoom(room), (t) => t.energy < t.energyCapacity), (t) => new FillEnergy(t.id));
+FillEnergy.getFillContainerTasks = function(room) {
+    return _.map(_.filter(Cache.containersInRoom(room), (t) => t.store < t.storeCapacity), (t) => new FillEnergy(t.id));
 };
 
 module.exports = FillEnergy;

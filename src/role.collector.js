@@ -115,17 +115,17 @@ var Cache = require("cache"),
         assignTasks: (room, creepTasks) => {
             var tasks;
 
-            // Check for unfilled collectors.
+            // Check for unfilled containers.
             tasks = TaskFillEnergy.getFillCollectorTasks(room);
             if (tasks.length > 0) {
-                console.log("    Unfilled collectors: " + tasks.length);
+                console.log("    Unfilled containers: " + tasks.length);
             }
             _.forEach(tasks, (task) => {
                 var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("collector", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
-                            creep.say("Extension");
+                            creep.say("Container");
                             energyMissing -= creep.carry[RESOURCE_ENERGY];
                             if (energyMissing <= 0) {
                                 return false;

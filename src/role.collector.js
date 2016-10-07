@@ -116,7 +116,7 @@ var Cache = require("cache"),
             var tasks;
 
             // Check for unfilled containers.
-            tasks = TaskFillEnergy.getFillCollectorTasks(room);
+            tasks = TaskFillEnergy.getFillContainerTasks(room);
             if (tasks.length > 0) {
                 console.log("    Unfilled containers: " + tasks.length);
             }

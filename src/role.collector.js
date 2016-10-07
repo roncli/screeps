@@ -11,7 +11,7 @@ var Cache = require("cache"),
     Collector = {
         checkSpawn: (room) => {
             var max = 0,
-                count, sources;
+                count, sources, capacity, adjustment;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -23,6 +23,9 @@ var Cache = require("cache"),
             if (sources.length <= 1) {
                 return;
             }
+
+            // Determine the max creep adjustment to use.
+            adjustment = Math.min(Math.max((5000 - Utilities.getEnergyCapacityInRoom(room)) / 5000, 1), 0.1); 
 
             //  Loop through sources to see if we have anything we need to spawn.
             _.forEach(sources, (source, index) => {
@@ -45,11 +48,11 @@ var Cache = require("cache"),
                     Memory.sources[source.id].empty = Utilities.getEmptyPosAroundPos(source.pos);
                 }
 
-                max += Memory.sources[source.id].empty;
+                max += Math.ceil(Memory.sources[source.id].empty * adjustment);
 
                 // If we have less than max collectors, spawn a collector.
                 count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.home === source.id).length;
-                if (count < Memory.sources[source.id].empty) {
+                if (count < Math.ceil(Memory.sources[source.id].empty * adjustment)) {
                     Collector.spawn(room, source.id);
                 }
             });
@@ -76,7 +79,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room.
-            energy = _.reduce(structures, function(sum, s) {return sum + s.energy;}, 0);
+            energy = Utilities.getAvailableEnergyInRoom;
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {

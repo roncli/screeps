@@ -10,7 +10,7 @@ var Cache = require("cache"),
 
     Worker = {
         checkSpawn: (room) => {
-            var count, source;
+            var count, sources, adjustment;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -22,6 +22,9 @@ var Cache = require("cache"),
             if (sources.length === 0) {
                 return;
             }
+
+            // Determine the max creep adjustment to use.
+            adjustment = Math.min(Math.max((5000 - Utilities.getEnergyCapacityInRoom(room)) / 5000, 1), 0.1); 
 
             if (!Memory.sources || !Memory.sources[sources[0].id] || !Memory.sources[sources[0].id].empty) {
                 // Initialize.
@@ -39,12 +42,12 @@ var Cache = require("cache"),
 
             // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
-            if (count < Memory.sources[sources[0].id].empty) {
+            if (count < Math.ceil(Memory.sources[sources[0].id].empty * adjustment)) {
                 Worker.spawn(room, sources[0].id);
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count + "/" + Memory.sources[sources[0].id].empty);        
+            console.log("    Workers: " + count + "/" + Math.ceil(Memory.sources[sources[0].id].empty * adjustment));        
         },
         
         spawn: (room) => {
@@ -65,7 +68,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room.
-            energy = _.reduce(structures, function(sum, s) {return sum + s.energy;}, 0);
+            energy = Utilities.getAvailableEnergyInRoom;
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {

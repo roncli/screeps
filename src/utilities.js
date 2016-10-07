@@ -49,6 +49,19 @@ var utilities = {
         }
 
         return count;
+    },
+
+
+    // Get available energy in room.
+    getAvailableEnergyInRoom: (room) => {
+        var structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
+        return _.reduce(structures, function(sum, s) {return sum + s.energy;}, 0);
+    },
+
+    // Get energy capacity in room.
+    getEnergyCapacityInRoom: (room) => {
+        var structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
+        return _.reduce(structures, function(sum, s) {return sum + s.energyCapacity;}, 0);
     }
 };
 

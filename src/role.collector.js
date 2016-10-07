@@ -133,7 +133,7 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Container");
-                            energyMissing -= (creep.carry[RESOURCE_ENERGY] || 0);
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
@@ -162,7 +162,7 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Extension");
-                            energyMissing -= creep.carry[RESOURCE_ENERGY];
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
@@ -174,12 +174,12 @@ var Cache = require("cache"),
             // Check for unfilled spawns.
             tasks = TaskFillEnergy.getFillSpawnTasks(room);
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Spawn");
-                            energyMissing -= creep.carry[RESOURCE_ENERGY];
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
@@ -191,12 +191,12 @@ var Cache = require("cache"),
             // Check for unfilled towers.
             tasks = TaskFillEnergy.getFillTowerTasks(room);
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.object), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Tower");
-                            energyMissing -= creep.carry[RESOURCE_ENERGY];
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
@@ -231,12 +231,12 @@ var Cache = require("cache"),
             // Check for construction sites.
             tasks = TaskBuild.getTasks(room);
             _.forEach(tasks, (task) => {
-                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "build", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0)
+                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "build", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.constructionSite), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Build");
-                            progressMissing -= creep.carry[RESOURCE_ENERGY];
+                            progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (progressMissing <= 0) {
                                 return false;
                             }
@@ -248,12 +248,12 @@ var Cache = require("cache"),
             // Check for repairs.
             tasks = TaskRepair.getTasks(room);
             _.forEach(tasks, (task) => {
-                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + c.carry[RESOURCE_ENERGY];}, 0) * 100
+                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)), task.structure), (creep) => {
                         if (task.canAssign(creep, creepTasks)) {
                             creep.say("Repair");
-                            hitsMissing -= creep.carry[RESOURCE_ENERGY] * 100;
+                            hitsMissing -= (creep.carry[RESOURCE_ENERGY] || 0) * 100;
                             if (hitsMissing <= 0) {
                                 return false;
                             }

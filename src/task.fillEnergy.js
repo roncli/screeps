@@ -78,7 +78,7 @@ FillEnergy.getFillTowerTasks = function(room) {
 };
 
 FillEnergy.getFillContainerTasks = function(room) {
-    return _.map(_.filter([].concat.apply([], [Cache.containersInRoom(room)], room.storage ? [room.storage] : []), (t) => (t.store[RESOURCE_ENERGY] || 0) < t.storeCapacity), (t) => new FillEnergy(t.id));
+    return _.map(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (t) => (t.store[RESOURCE_ENERGY] || 0) < t.storeCapacity), (t) => new FillEnergy(t.id));
 };
 
 module.exports = FillEnergy;

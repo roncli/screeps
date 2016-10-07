@@ -38,7 +38,12 @@ FillEnergy.prototype.run = function(creep) {
 };
 
 FillEnergy.prototype.canComplete = function(creep) {
-    if (creep.carry[RESOURCE_ENERGY] === 0 || (this.object.energy || this.object.store[RESOURCE_ENERGY]) === (this.object.energyCapacity || this.object.storeCapacity)) {
+    var energy = this.object.energy;
+    if (energy === undefined) {
+        energy = this.object.store[RESOURCE_ENERGY];
+    }
+
+    if (creep.carry[RESOURCE_ENERGY] === 0 || energy === (this.object.energyCapacity || this.object.storeCapacity)) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

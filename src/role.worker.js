@@ -24,7 +24,7 @@ var Cache = require("cache"),
             }
 
             // Determine the max creep adjustment to use.
-            adjustment = Math.max((5000 - Utilities.getEnergyCapacityInRoom) / 5000, 0.1);
+            adjustment = Math.max((5000 - Utilities.getEnergyCapacityInRoom(room)) / 5000, 0.1);
 
             if (!Memory.sources || !Memory.sources[sources[0].id] || !Memory.sources[sources[0].id].empty) {
                 // Initialize.

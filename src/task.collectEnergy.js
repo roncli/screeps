@@ -12,7 +12,7 @@ CollectEnergy.prototype = Object.create(Task.prototype);
 CollectEnergy.prototype.constructor = CollectEnergy;
 
 CollectEnergy.prototype.canAssign = function(creep, tasks) {
-    if (_.sum(creep.carry) === creep.carryCapacity) {
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     
@@ -38,8 +38,8 @@ CollectEnergy.prototype.run = function(creep) {
 };
 
 CollectEnergy.prototype.canComplete = function(creep) {
-    // If the object doesn't exist, complete.
-    if (!this.object) {
+    // If the creep is about to die or if the object doesn't exist, complete.
+    if (creep.ticksToLive < 150 || !this.object) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

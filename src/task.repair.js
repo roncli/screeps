@@ -57,7 +57,7 @@ Repair.fromObj = function(creep) {
 };
 
 Repair.getCriticalTasks = function(room) {
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(s.id)), (s) => s.structure.hits);
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 100000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(s.id)), (s) => s.structure.hits);
 };
 
 Repair.getTasks = function(room) {

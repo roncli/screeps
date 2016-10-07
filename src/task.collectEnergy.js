@@ -38,12 +38,20 @@ CollectEnergy.prototype.run = function(creep) {
 };
 
 CollectEnergy.prototype.canComplete = function(creep) {
+    // If the object doesn't exist, complete.
+    if (!this.object) {
+        Task.prototype.complete.call(this, creep);
+        return true;
+    }
+
+    // Check the object's energy.
     var energy = this.object.energy;
     if (energy === undefined) {
         energy = this.object.store[RESOURCE_ENERGY];
     }
 
-    if (creep.carry[RESOURCE_ENERGY] === 0 || energy === this.object.energyCapacity) {
+    // If the creep is full on capacity or the energy is empty, complete.
+    if (_.sum(creep.carry) === creep.carryCapacity || energy === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

@@ -29,6 +29,8 @@ var cache = {
         flagsInRoom = {};
         hostilesInRoom = {};
         objects = {};
+        this.creepTasks = {};
+        this.spawning = {};
     },
 
     // Returns all creeps of a certain type.

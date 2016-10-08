@@ -12,6 +12,8 @@ var creeps = {},
     objects = {};
 
 var cache = {
+    creepTasks: {},
+
     // Reset the cache.
     reset: () => {
         creeps = {};

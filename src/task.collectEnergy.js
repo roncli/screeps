@@ -11,12 +11,12 @@ var Task = require("task"),
 CollectEnergy.prototype = Object.create(Task.prototype);
 CollectEnergy.prototype.constructor = CollectEnergy;
 
-CollectEnergy.prototype.canAssign = function(creep, tasks) {
+CollectEnergy.prototype.canAssign = function(creep) {
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     
-    Task.prototype.assign.call(this, creep, tasks);
+    Task.prototype.assign.call(this, creep);
     return true;
 }
 

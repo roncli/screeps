@@ -9,14 +9,14 @@ var Task = require("task"),
 Harvest.prototype = Object.create(Task.prototype);
 Harvest.prototype.constructor = Harvest;
 
-Harvest.prototype.canAssign = function(creep, tasks) {
+Harvest.prototype.canAssign = function(creep) {
     var source = Cache.getObjectById(creep.memory.home);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
         return false;
     }
     
-    Task.prototype.assign.call(this, creep, tasks);
+    Task.prototype.assign.call(this, creep);
     return true;
 }
 

@@ -102,7 +102,7 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room, creepTasks) => {
+        assignTasks: (room) => {
             var tasks;
 
             // Find allies to heal.
@@ -117,7 +117,7 @@ var Cache = require("cache"),
                 var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("healer", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), task.id), (creep) => {
-                        if (task.canAssign(creep, creepTasks)) {
+                        if (task.canAssign(creep)) {
                             creep.say("Heal");
                             hitsMissing -= c.getActiveBodyparts(HEAL) * 12;
                             if (hitsMissing <= 0) {
@@ -132,7 +132,7 @@ var Cache = require("cache"),
             tasks = TaskRally.getHealerTasks(room);
             _.forEach(tasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), (creep) => {
-                    task.canAssign(creep, creepTasks);
+                    task.canAssign(creep);
                 });
             });
         }

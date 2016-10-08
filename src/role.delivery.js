@@ -90,13 +90,13 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room, creepTasks) => {
+        assignTasks: (room) => {
             // Check for unfilled containers.
             _.forEach(TaskFillEnergy.getFillContainerTasks(room), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.object), (creep) => {
-                        if (task.canAssign(creep, creepTasks)) {
+                        if (task.canAssign(creep)) {
                             creep.say("Container");
                             energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
@@ -110,14 +110,14 @@ var Cache = require("cache"),
             // Attempt to assign harvest task to remaining creeps.
             _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (creep) => {
                 task = new TaskHarvest();
-                if (task.canAssign(creep, creepTasks)) {
+                if (task.canAssign(creep)) {
                     creep.say("Harvesting");
                 }
             });
 
             // Rally remaining creeps.
             _.forEach(TaskRally.getHarvesterTasks(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name))), (task) => {
-                task.canAssign(task.creep, creepTasks);
+                task.canAssign(task.creep);
             });
         }
     };

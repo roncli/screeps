@@ -98,7 +98,7 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room, creepTasks) => {
+        assignTasks: (room) => {
             var tasks;
 
             // Find hostiles to attack.
@@ -111,7 +111,7 @@ var Cache = require("cache"),
             }
             _.forEach(tasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {
-                    if (task.canAssign(creep, creepTasks)) {
+                    if (task.canAssign(creep)) {
                         creep.say("Die!", true);
                     }
                 });
@@ -121,7 +121,7 @@ var Cache = require("cache"),
             tasks = TaskRally.getAttackerTasks(room);
             _.forEach(tasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {
-                    task.canAssign(creep, creepTasks);
+                    task.canAssign(creep);
                 });
             });
         }

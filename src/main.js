@@ -11,8 +11,6 @@ var profiler = require("screeps-profiler"),
     main = {
         loop: () => {
             profiler.wrap(() => {
-                var creepTasks = {};
-
                 // Reset the cache.
                 Cache.reset();
 
@@ -39,9 +37,9 @@ var profiler = require("screeps-profiler"),
                 // Loop through each creep to deserialize their task and see if it is completed.
                 _.forEach(Game.creeps, (creep) => {
                     if (creep.memory.currentTask) {
-                        taskDeserialization(creep, creepTasks);
-                        if (creepTasks[creep.name]) {
-                            creepTasks[creep.name].canComplete(creep);
+                        taskDeserialization(creep);
+                        if (Cache.creepTasks[creep.name]) {
+                            Cache.creepTasks[creep.name].canComplete(creep);
                         }
                     }
                 });
@@ -62,11 +60,11 @@ var profiler = require("screeps-profiler"),
                     RoleHealer.checkSpawn(room);
                     RoleDelivery.checkSpawn(room);
                     
-                    RoleWorker.assignTasks(room, creepTasks);
-                    RoleCollector.assignTasks(room, creepTasks);
-                    RoleRangedAttack.assignTasks(room, creepTasks);
-                    RoleHealer.assignTasks(room, creepTasks);
-                    RoleDelivery.assignTasks(room, creepTasks);
+                    RoleWorker.assignTasks(room);
+                    RoleCollector.assignTasks(room);
+                    RoleRangedAttack.assignTasks(room);
+                    RoleHealer.assignTasks(room);
+                    RoleDelivery.assignTasks(room);
                 });
                 
                 // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
@@ -76,11 +74,11 @@ var profiler = require("screeps-profiler"),
                         creep.say("TTL " + (creep.ticksToLive - 1).toString());
                     }
 
-                    if (creep.memory.currentTask && creepTasks[creep.name]) {
-                        creepTasks[creep.name].run(creep);
+                    if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
+                        Cache.creepTasks[creep.name].run(creep);
                         // Only serialize if the task wasn't completed.
-                        if (creep.memory.currentTask && creepTasks[creep.name]) {
-                            creepTasks[creep.name].toObj(creep);
+                        if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
+                            Cache.creepTasks[creep.name].toObj(creep);
                         }
                     } else {
                         // RIP & Pepperonis :(

@@ -66,7 +66,7 @@ FillEnergy.fromObj = function(creep) {
 };
 
 FillEnergy.getFillExtensionTasks = function(room) {
-    return _.map(_.filter(Cache.extensionsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => new FillEnergy(e.id));
+    return _.map(_.sortBy(_.filter(Cache.extensionsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => 50 * e.pos.x + e.pos.y), (e) => new FillEnergy(e.id));
 };
 
 FillEnergy.getFillSpawnTasks = function(room) {

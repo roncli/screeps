@@ -75,7 +75,10 @@ var profiler = require("screeps-profiler"),
 
                     if (creep.memory.currentTask && creepTasks[creep.name]) {
                         creepTasks[creep.name].run(creep);
-                        creepTasks[creep.name].toObj(creep);
+                        // Only serialize if the task wasn't completed.
+                        if (creep.memory.currentTask && creepTasks[creep.name]) {
+                            creepTasks[creep.name].toObj(creep);
+                        }
                     } else {
                         // RIP & Pepperonis :(
                         delete creep.memory.currentTask;

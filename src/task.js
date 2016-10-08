@@ -2,7 +2,7 @@ var Cache = require("cache"),
     Task = function() {};
 
 Task.prototype.assign = function(creep) {
-    Cache.tasks[creep.name] = this;
+    Cache.creepTasks[creep.name] = this;
     this.toObj(creep);
 }
 

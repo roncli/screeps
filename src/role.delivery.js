@@ -17,7 +17,7 @@ var Cache = require("cache"),
             // Loop through the room deliveries to see if we need to spawn a creep.
             if (Memory.maxCreeps.delivery) {
                 _.forEach(Memory.maxCreeps.delivery[room.name], (value, toId) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name && c.memory.home === toId);
+                    var count = _.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name && c.memory.home === toId).length;
 
                     num += count;
                     max += value.maxCreeps;

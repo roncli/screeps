@@ -12,7 +12,7 @@ Harvest.prototype.constructor = Harvest;
 Harvest.prototype.canAssign = function(creep) {
     var source = Cache.getObjectById(creep.memory.home);
 
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0)) {
         return false;
     }
     
@@ -21,24 +21,30 @@ Harvest.prototype.canAssign = function(creep) {
 }
 
 Harvest.prototype.run = function(creep) {
-    var source = Cache.getObjectById(creep.memory.home);
+    var source = Cache.getObjectById(creep.memory.home),
+        pos;
     
     // No sources found or the source is drained, complete task.
-    if (!source || source.energy === 0) {
+    if ((!source && creep.memory.role !== "delivery") || (source && source.energy === 0)) {
         Task.prototype.complete.call(this, creep);
         return;
     }
     
     // Harvest the source, or move closer to it if not in range.
-    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2)});
+    if (source) {
+        if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2)});
+        }
+    } else {
+        pos = Memory.maxCreeps[creep.memory.deliver][creep.memory.home].fromPos;
+        creep.moveTo(new RoomPosition(pos.x, pos.y, pos.roomName));
     }
 };
 
 Harvest.prototype.canComplete = function(creep) {
     var source = Cache.getObjectById(creep.memory.home);
 
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0)) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

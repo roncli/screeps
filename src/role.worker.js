@@ -255,9 +255,9 @@ var Cache = require("cache"),
                             }
                         }
                     });
-                }
 
-                return assigned;
+                    return assigned;
+                }
             });
 
             // Check for controllers to upgrade.

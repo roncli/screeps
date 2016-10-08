@@ -36,7 +36,7 @@ Harvest.prototype.run = function(creep) {
             creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2)});
         }
     } else {
-        pos = Memory.maxCreeps[creep.memory.deliver][creep.memory.home].fromPos;
+        pos = Memory.maxCreeps.delivery[creep.memory.deliver][creep.memory.home].fromPos;
         creep.moveTo(new RoomPosition(pos.x, pos.y, pos.roomName));
     }
 };

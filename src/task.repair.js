@@ -12,7 +12,7 @@ Repair.prototype = Object.create(Task.prototype);
 Repair.prototype.constructor = Repair;
 
 Repair.prototype.canAssign = function(creep) {
-    if (!creep.carry[RESOURCE_ENERGY]) {
+    if (!creep.carry[RESOURCE_ENERGY] || (_.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150)) {
         return false;
     }
     

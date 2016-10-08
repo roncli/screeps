@@ -10,12 +10,12 @@ var Task = require("task"),
 Upgrade.prototype = Object.create(Task.prototype);
 Upgrade.prototype.constructor = Upgrade;
 
-Upgrade.prototype.canAssign = function(creep, tasks) {
+Upgrade.prototype.canAssign = function(creep) {
     if (!creep.carry[RESOURCE_ENERGY]) {
         return false;
     }
     
-    Task.prototype.assign.call(this, creep, tasks);
+    Task.prototype.assign.call(this, creep);
     return true;
 }
 

@@ -74,7 +74,7 @@ Rally.getHealerTasks = function(room) {
     if (targets.length === 0) {
         return [new Rally(flags[0].name)];
     } else {
-        return [new Rally(Utilities.objectsClosestToObj(targets, flags[0]).id)];
+        return [new Rally(Utilities.objectsClosestToObj(targets, flags[0])[0].id)];
     }
 };
 

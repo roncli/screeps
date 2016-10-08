@@ -80,6 +80,7 @@ var Cache = require("cache"),
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning)[0];
             name = spawnToUse.createCreep(body, undefined, {role: "delivery", deliver: room.name, home: id});
+            spawnToUse.spawning = true;
 
             // If successful, log it, and set spawning to true so it's not used this turn.
             if (typeof name !== "number") {

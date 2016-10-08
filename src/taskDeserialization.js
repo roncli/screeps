@@ -1,4 +1,4 @@
-var Cache = require("Cache"),
+var Cache = require("cache"),
     TaskBuild = require("task.build"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskFillEnergy = require("task.fillEnergy"),

@@ -61,7 +61,7 @@ Repair.getCriticalTasks = function(room) {
 };
 
 Repair.getTasks = function(room) {
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9), (s) => new Repair(s.id)), (s) => s.structure.hits / s.structure.hitsMax);
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9), (s) => new Repair(s.id)), (s) => s.structure.hits);
 };
 
 require("screeps-profiler").registerObject(Repair, "TaskRepair");

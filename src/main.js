@@ -2,6 +2,7 @@ var profiler = require("screeps-profiler"),
     Cache = require("cache"),
     Utilities = require("utilities"),
     RoleCollector = require("role.collector"),
+    RoleDelivery = require("role.delivery"),
     RoleHealer = require("role.healer"),
     RoleRangedAttack = require("role.rangedAttack"),
     RoleWorker = require("role.worker"),
@@ -59,11 +60,13 @@ var profiler = require("screeps-profiler"),
                     RoleCollector.checkSpawn(room);
                     RoleRangedAttack.checkSpawn(room);
                     RoleHealer.checkSpawn(room);
+                    RoleDelivery.checkSpawn(room);
                     
                     RoleWorker.assignTasks(room, creepTasks);
                     RoleCollector.assignTasks(room, creepTasks);
                     RoleRangedAttack.assignTasks(room, creepTasks);
                     RoleHealer.assignTasks(room, creepTasks);
+                    RoleDelivery.assignTasks(room, creepTasks);
                 });
                 
                 // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.

@@ -69,19 +69,25 @@ var Cache = require("cache"),
         // Set a number of creeps to deliver energy from a specific location.
         deliverEnergy: (fromId, fromX, fromY, fromRoomName, toRoom, maxCreeps) => {
             if (!Memory.maxCreeps.delivery) {
-                Memory.maxCreeps.delivery = []
-            };
+                Memory.maxCreeps.delivery = {}
+            }
 
-            Memory.maxCreeps.delivery.push({
-                fromId: fromId,
-                fromPos: {
-                    x: fromX,
-                    y: fromY,
-                    roomName: fromRoomName
-                },
-                toRoom: toRoom,
-                maxCreeps: maxCreeps
-            });
+            if (!Memory.maxCreeps.delivery[toRoom]) {
+                Memory.maxCreeps.delivery[toRoom] = {}
+            }
+
+            if (maxCreeps === 0) {
+                delete Memory.maxCreeps.delivery[toRoom][fromId];
+            } else {
+                Memory.maxCreeps.delivery[toRoom][fromId] = {
+                    fromPos: {
+                        x: fromX,
+                        y: fromY,
+                        roomName: fromRoomName
+                    },
+                    maxCreeps: maxCreeps
+                };
+            }
         }
     };
 

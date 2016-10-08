@@ -11,12 +11,12 @@ var Task = require("task"),
 Ranged.prototype = Object.create(Task.prototype);
 Ranged.prototype.constructor = Ranged;
 
-Ranged.prototype.canAssign = function(creep, tasks) {
+Ranged.prototype.canAssign = function(creep) {
     if (creep.memory.role !== "rangedAttack") {
         return false;
     }
     
-    Task.prototype.assign.call(this, creep, tasks);
+    Task.prototype.assign.call(this, creep);
     return true;
 }
 

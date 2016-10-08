@@ -10,7 +10,7 @@ var Task = require("task"),
 Pickup.prototype = Object.create(Task.prototype);
 Pickup.prototype.constructor = Pickup;
 
-Pickup.prototype.canAssign = function(creep, tasks) {
+Pickup.prototype.canAssign = function(creep) {
     // Get creep range to the resource.
     
     
@@ -18,7 +18,7 @@ Pickup.prototype.canAssign = function(creep, tasks) {
         return false;
     }
     
-    Task.prototype.assign.call(this, creep, tasks);
+    Task.prototype.assign.call(this, creep);
     return true;
 }
 

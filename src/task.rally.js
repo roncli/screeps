@@ -16,8 +16,8 @@ var Task = require("task"),
 Rally.prototype = Object.create(Task.prototype);
 Rally.prototype.constructor = Rally;
 
-Rally.prototype.canAssign = function(creep, tasks) {
-    Task.prototype.assign.call(this, creep, tasks);
+Rally.prototype.canAssign = function(creep) {
+    Task.prototype.assign.call(this, creep);
     return true;
 }
 

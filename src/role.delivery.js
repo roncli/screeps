@@ -91,14 +91,8 @@ var Cache = require("cache"),
         },
 
         assignTasks: (room, creepTasks) => {
-            var tasks;
-
             // Check for unfilled containers.
-            tasks = TaskFillEnergy.getFillContainerTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Unfilled containers: " + tasks.length);
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(TaskFillEnergy.getFillContainerTasks(room), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.object), (creep) => {

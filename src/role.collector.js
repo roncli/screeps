@@ -94,7 +94,7 @@ var Cache = require("cache"),
                 body.push(CARRY);
             }
 
-            if (energy % 100 >= 100 && energy % 200 < 150) {
+            if (energy % 200 >= 100 && energy % 200 < 150) {
                 body.push(CARRY);
             }
 

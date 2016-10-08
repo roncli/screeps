@@ -109,6 +109,13 @@ var Cache = require("cache"),
                 _.forEach(_.take(tasks, 5), (task) => {
                     console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "%");
                 });
+
+                // Attack with tower if possible.
+                // TODO: Break this out into a role & task.
+                _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
+                    towerFired = true;
+                    tower.attack(tasks[0].enemy);
+                });
             }
             _.forEach(tasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {

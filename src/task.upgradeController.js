@@ -11,7 +11,7 @@ Upgrade.prototype = Object.create(Task.prototype);
 Upgrade.prototype.constructor = Upgrade;
 
 Upgrade.prototype.canAssign = function(creep) {
-    if (!creep.carry[RESOURCE_ENERGY]) {
+    if (!creep.carry[RESOURCE_ENERGY] || (_.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150 && this.controller >= 1000)) {
         return false;
     }
     

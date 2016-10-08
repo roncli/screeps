@@ -55,7 +55,7 @@ var Cache = require("cache"),
                 structures, energy, count;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning).length === 0) {
+            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
@@ -96,9 +96,9 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning)[0];
+            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
             name = spawnToUse.createCreep(body, undefined, {role: "worker", home: Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0])[0].id});
-            spawnToUse.spawning = true;
+            Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it, and set spawning to true so it's not used this turn.
             if (typeof name !== "number") {

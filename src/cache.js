@@ -13,6 +13,7 @@ var creeps = {},
 
 var cache = {
     creepTasks: {},
+    spawning: {},
 
     // Reset the cache.
     reset: () => {

@@ -38,7 +38,7 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                structures, energy, count, spawnToUse;
+                structures, energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -116,7 +116,7 @@ var Cache = require("cache"),
 
             // Attempt to assign harvest task to remaining creeps.
             _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (creep) => {
-                task = new TaskHarvest();
+                var task = new TaskHarvest();
                 if (task.canAssign(creep)) {
                     creep.say("Harvesting");
                 }

@@ -11,9 +11,11 @@ Pickup.prototype = Object.create(Task.prototype);
 Pickup.prototype.constructor = Pickup;
 
 Pickup.prototype.canAssign = function(creep) {
+    "use strict";
+
     // Get creep range to the resource.
-    
-    
+
+
     if (!this.resource || _.sum(creep.carry[RESOURCE_ENERGY])) {
         return false;
     }
@@ -23,6 +25,8 @@ Pickup.prototype.canAssign = function(creep) {
 }
 
 Pickup.prototype.run = function(creep) {
+    "use strict";
+
     // Resource is gone.
     if (!this.resource) {
         Task.prototype.complete.call(this, creep);
@@ -42,6 +46,8 @@ Pickup.prototype.run = function(creep) {
 };
 
 Pickup.prototype.canComplete = function(creep) {
+    "use strict";
+
     if (!this.resource) {
         Task.prototype.complete.call(this, creep);
         return true;
@@ -50,10 +56,14 @@ Pickup.prototype.canComplete = function(creep) {
 };
 
 Pickup.fromObj = function(creep) {
+    "use strict";
+
     return new Pickup(creep.memory.currentTask.id);
 };
 
 Pickup.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.resource) {
         creep.memory.currentTask = {
             type: this.type,

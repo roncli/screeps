@@ -6,6 +6,8 @@ var Cache = require("cache"),
 
     Delivery = {
         checkSpawn: (room) => {
+            "use strict";
+
             var num = 0, max = 0,
                 count, sources, capacity;
             
@@ -33,8 +35,10 @@ var Cache = require("cache"),
         },
         
         spawn: (room, id) => {
+            "use strict";
+
             var body = [],
-                structures, energy, count;
+                structures, energy, count, spawnToUse;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -92,6 +96,8 @@ var Cache = require("cache"),
         },
 
         assignTasks: (room) => {
+            "use strict";
+
             // Check for unfilled containers.
             _.forEach(TaskFillEnergy.getFillContainerTasks(room), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)

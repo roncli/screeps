@@ -10,6 +10,8 @@ var profiler = require("screeps-profiler"),
     
     main = {
         loop: () => {
+            "use strict";
+
             profiler.wrap(() => {
                 // Reset the cache.
                 Cache.reset();

@@ -5,6 +5,8 @@ var Cache = require("cache"),
 
     Healer = {
         checkSpawn: (room) => {
+            "use strict";
+
             var count;
             
             // If there are no spawns in the room, ignore the room.
@@ -23,8 +25,10 @@ var Cache = require("cache"),
         },
         
         spawn: (room) => {
+            "use strict";
+
             var body = [],
-                structures, energy, count;
+                structures, energy, count, spawnToUse;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -104,6 +108,8 @@ var Cache = require("cache"),
         },
 
         assignTasks: (room) => {
+            "use strict";
+
             var tasks;
 
             // Find allies to heal.

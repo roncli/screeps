@@ -12,6 +12,8 @@ Ranged.prototype = Object.create(Task.prototype);
 Ranged.prototype.constructor = Ranged;
 
 Ranged.prototype.canAssign = function(creep) {
+    "use strict";
+
     if (creep.memory.role !== "rangedAttack") {
         return false;
     }
@@ -21,7 +23,8 @@ Ranged.prototype.canAssign = function(creep) {
 }
 
 Ranged.prototype.run = function(creep) {
-    console.log(this.enemy);
+    "use strict";
+
     // If enemy is gone, we're done.
     if (!this.enemy) {
         creep.say("Get Rekt!", true);
@@ -35,6 +38,8 @@ Ranged.prototype.run = function(creep) {
 };
 
 Ranged.prototype.canComplete = function(creep) {
+    "use strict";
+
     if (!this.enemy) {
         console.log(this.enemy);
         creep.say("Get Rekt!", true);
@@ -45,6 +50,8 @@ Ranged.prototype.canComplete = function(creep) {
 };
 
 Ranged.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.enemy) {
         creep.memory.currentTask = {
             type: this.type,
@@ -56,10 +63,14 @@ Ranged.prototype.toObj = function(creep) {
 };
 
 Ranged.fromObj = function(creep) {
+    "use strict";
+
     return new Ranged(creep.memory.currentTask.id);
 };
 
 Ranged.getTasks = function(room) {
+    "use strict";
+
     return _.map(_.sortBy(Cache.hostilesInRoom(room), (h) => h.hits), (h) => new Ranged(h.id));
 };
 

@@ -12,6 +12,8 @@ FillEnergy.prototype = Object.create(Task.prototype);
 FillEnergy.prototype.constructor = FillEnergy;
 
 FillEnergy.prototype.canAssign = function(creep) {
+    "use strict";
+
     if (!creep.carry[RESOURCE_ENERGY]) {
         return false;
     }
@@ -21,6 +23,8 @@ FillEnergy.prototype.canAssign = function(creep) {
 }
 
 FillEnergy.prototype.run = function(creep) {
+    "use strict";
+
     // Object not found, complete task.
     if (!this.object) {
         Task.prototype.complete.call(this, creep);
@@ -38,6 +42,8 @@ FillEnergy.prototype.run = function(creep) {
 };
 
 FillEnergy.prototype.canComplete = function(creep) {
+    "use strict";
+
     var energy = this.object.energy;
     if (energy === undefined) {
         energy = this.object.store[RESOURCE_ENERGY] || 0;
@@ -51,6 +57,8 @@ FillEnergy.prototype.canComplete = function(creep) {
 };
 
 FillEnergy.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.object) {
         creep.memory.currentTask = {
             type: this.type,
@@ -62,22 +70,32 @@ FillEnergy.prototype.toObj = function(creep) {
 };
 
 FillEnergy.fromObj = function(creep) {
+    "use strict";
+
     return new FillEnergy(creep.memory.currentTask.id);
 };
 
 FillEnergy.getFillExtensionTasks = function(room) {
+    "use strict";
+
     return _.map(_.sortBy(_.filter(Cache.extensionsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => 50 * e.pos.x + e.pos.y), (e) => new FillEnergy(e.id));
 };
 
 FillEnergy.getFillSpawnTasks = function(room) {
+    "use strict";
+
     return _.map(_.filter(Cache.spawnsInRoom(room), (s) => s.energy < s.energyCapacity), (s) => new FillEnergy(s.id));
 };
 
 FillEnergy.getFillTowerTasks = function(room) {
+    "use strict";
+
     return _.map(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8), (t) => new FillEnergy(t.id));
 };
 
 FillEnergy.getFillContainerTasks = function(room) {
+    "use strict";
+
     return _.map(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (t) => (t.store[RESOURCE_ENERGY] || 0) < t.storeCapacity), (t) => new FillEnergy(t.id));
 };
 

@@ -11,6 +11,8 @@ var Cache = require("cache"),
     TaskUpgradeController = require("task.upgradeController"),
     
     deserialization = (creep) => {
+        "use strict";
+
         switch (creep.memory.currentTask.type) {
             case "build":
                 Cache.creepTasks[creep.name] = TaskBuild.fromObj(creep);

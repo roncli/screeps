@@ -12,6 +12,8 @@ CollectEnergy.prototype = Object.create(Task.prototype);
 CollectEnergy.prototype.constructor = CollectEnergy;
 
 CollectEnergy.prototype.canAssign = function(creep) {
+    "use strict";
+
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
@@ -21,6 +23,8 @@ CollectEnergy.prototype.canAssign = function(creep) {
 }
 
 CollectEnergy.prototype.run = function(creep) {
+    "use strict";
+
     // Object not found, complete task.
     if (!this.object) {
         Task.prototype.complete.call(this, creep);
@@ -38,6 +42,8 @@ CollectEnergy.prototype.run = function(creep) {
 };
 
 CollectEnergy.prototype.canComplete = function(creep) {
+    "use strict";
+
     // If the creep is about to die or if the object doesn't exist, complete.
     if (creep.ticksToLive < 150 || !this.object) {
         Task.prototype.complete.call(this, creep);
@@ -59,6 +65,8 @@ CollectEnergy.prototype.canComplete = function(creep) {
 };
 
 CollectEnergy.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.object) {
         creep.memory.currentTask = {
             type: this.type,
@@ -70,10 +78,14 @@ CollectEnergy.prototype.toObj = function(creep) {
 };
 
 CollectEnergy.fromObj = function(creep) {
+    "use strict";
+
     return new CollectEnergy(creep.memory.currentTask.id);
 };
 
 CollectEnergy.getTasks = function(room) {
+    "use strict";
+
     return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => -c.store[RESOURCE_ENERGY]), (c) => new CollectEnergy(c.id));
 };
 

@@ -17,11 +17,15 @@ Rally.prototype = Object.create(Task.prototype);
 Rally.prototype.constructor = Rally;
 
 Rally.prototype.canAssign = function(creep) {
+    "use strict";
+
     Task.prototype.assign.call(this, creep);
     return true;
 }
 
 Rally.prototype.run = function(creep) {
+    "use strict";
+
     // If the rally point doesn't exist, complete the task.
     if (!this.rallyPoint) {
         Task.prototype.complete.call(this, creep);
@@ -36,11 +40,15 @@ Rally.prototype.run = function(creep) {
 };
 
 Rally.prototype.canComplete = function(creep) {
+    "use strict";
+
     Task.prototype.complete.call(this, creep);
     return true;
 };
 
 Rally.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.rallyPoint) {
         creep.memory.currentTask = {
             type: this.type,
@@ -52,10 +60,14 @@ Rally.prototype.toObj = function(creep) {
 };
 
 Rally.fromObj = function(creep) {
+    "use strict";
+
     return new Rally(creep.memory.currentTask.id);
 };
 
 Rally.getHealerTasks = function(room) {
+    "use strict";
+
     var flags = Cache.flagsInRoom(room),
         targets, rallyPoint;
     
@@ -79,6 +91,8 @@ Rally.getHealerTasks = function(room) {
 };
 
 Rally.getAttackerTasks = function(room) {
+    "use strict";
+
     var flags = Cache.flagsInRoom(room);
 
     // If there are no flags, there is nothing for anyone to rally to.
@@ -91,6 +105,8 @@ Rally.getAttackerTasks = function(room) {
 };
 
 Rally.getHarvesterTasks = function(creeps) {
+    "use strict";
+
     return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.home, c));
 };
 

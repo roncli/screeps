@@ -10,6 +10,8 @@ Harvest.prototype = Object.create(Task.prototype);
 Harvest.prototype.constructor = Harvest;
 
 Harvest.prototype.canAssign = function(creep) {
+    "use strict";
+
     var source = Cache.getObjectById(creep.memory.home);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0)) {
@@ -21,6 +23,8 @@ Harvest.prototype.canAssign = function(creep) {
 }
 
 Harvest.prototype.run = function(creep) {
+    "use strict";
+
     var source = Cache.getObjectById(creep.memory.home),
         pos;
     
@@ -42,6 +46,8 @@ Harvest.prototype.run = function(creep) {
 };
 
 Harvest.prototype.canComplete = function(creep) {
+    "use strict";
+
     var source = Cache.getObjectById(creep.memory.home);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0)) {
@@ -52,12 +58,16 @@ Harvest.prototype.canComplete = function(creep) {
 };
 
 Harvest.prototype.toObj = function(creep) {
+    "use strict";
+
     creep.memory.currentTask = {
         type: this.type
     }
 };
 
 Harvest.fromObj = function(creep) {
+    "use strict";
+
     return new Harvest();
 };
 

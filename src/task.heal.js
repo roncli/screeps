@@ -12,6 +12,8 @@ Heal.prototype = Object.create(Task.prototype);
 Heal.prototype.constructor = Heal;
 
 Heal.prototype.canAssign = function(creep, tasks) {
+    "use strict";
+
     if (creep.memory.role !== "healer") {
         return false;
     }
@@ -20,6 +22,8 @@ Heal.prototype.canAssign = function(creep, tasks) {
 }
 
 Heal.prototype.run = function(creep) {
+    "use strict";
+
     // If ally is gone or at full health, we're done.
     if (!this.ally || this.ally.hits === this.ally.hitsMax) {
         Task.prototype.complete.call(this, creep);
@@ -32,6 +36,8 @@ Heal.prototype.run = function(creep) {
 };
 
 Heal.prototype.canComplete = function(creep) {
+    "use strict";
+
     if (!this.ally || this.ally.hits === this.ally.hitsMax) {
         Task.prototype.complete.call(this, creep);
         return true;
@@ -40,6 +46,8 @@ Heal.prototype.canComplete = function(creep) {
 };
 
 Heal.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.ally) {
         creep.memory.currentTask = {
             type: this.type,
@@ -51,10 +59,14 @@ Heal.prototype.toObj = function(creep) {
 };
 
 Heal.fromObj = function(creep) {
+    "use strict";
+
     return new Heal(creep.memory.currentTask.id);
 };
 
 Heal.getTasks = function(room) {
+    "use strict";
+
     return _.map(_.sortBy(_.filter(Cache.creepsInRoom("all", room), (c) => c.hits < c.hitsMax), (c) => c.hits), (c) => new Heal(c.id));
 };
 

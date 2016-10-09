@@ -2,14 +2,20 @@ var Cache = require("cache"),
 
     Utilities = {
         creepsWithTask: (creeps, task) => {
+            "use strict";
+
             return _.filter(creeps, (c) => c.memory.currentTask && _.isMatch(c.memory.currentTask, task));
         },
 
         creepsWithNoTask: (creeps) => {
+            "use strict";
+
             return _.filter(creeps, (c) => !c.memory.currentTask);
         },
 
         objectsClosestToObj: (objects, obj) => {
+            "use strict";
+
             if (objects.length === 0) {
                 return [];
             }
@@ -33,6 +39,8 @@ var Cache = require("cache"),
         },
 
         getEmptyPosAroundPos: (pos) => {
+            "use strict";
+
             var count = 0,
                 x, y, checkPos;
 
@@ -56,18 +64,24 @@ var Cache = require("cache"),
 
         // Get available energy in room.
         getAvailableEnergyInRoom: (room) => {
+            "use strict";
+
             var structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
             return _.reduce(structures, function(sum, s) {return sum + s.energy;}, 0);
         },
 
         // Get energy capacity in room.
         getEnergyCapacityInRoom: (room) => {
+            "use strict";
+
             var structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
             return _.reduce(structures, function(sum, s) {return sum + s.energyCapacity;}, 0);
         },
 
         // Set a number of creeps to deliver energy from a specific location.
         deliverEnergy: (fromId, fromX, fromY, fromRoomName, toRoom, maxCreeps) => {
+            "use strict";
+
             if (!Memory.maxCreeps.delivery) {
                 Memory.maxCreeps.delivery = {}
             }

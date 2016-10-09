@@ -12,6 +12,8 @@ Repair.prototype = Object.create(Task.prototype);
 Repair.prototype.constructor = Repair;
 
 Repair.prototype.canAssign = function(creep) {
+    "use strict";
+
     if (!creep.carry[RESOURCE_ENERGY] || (_.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150)) {
         return false;
     }
@@ -21,6 +23,8 @@ Repair.prototype.canAssign = function(creep) {
 }
 
 Repair.prototype.run = function(creep) {
+    "use strict";
+
     // Check for destroyed structure.
     if (!this.structure) {
         Task.prototype.complete.call(this, creep);
@@ -34,6 +38,8 @@ Repair.prototype.run = function(creep) {
 };
 
 Repair.prototype.canComplete = function(creep) {
+    "use strict";
+
     if (!creep.carry[RESOURCE_ENERGY] || !this.structure || this.structure.hits === this.structure.hitsMax) {
         Task.prototype.complete.call(this, creep);
         return true;
@@ -42,6 +48,8 @@ Repair.prototype.canComplete = function(creep) {
 };
 
 Repair.prototype.toObj = function(creep) {
+    "use strict";
+
     if (this.structure) {
         creep.memory.currentTask = {
             type: this.type,
@@ -53,14 +61,20 @@ Repair.prototype.toObj = function(creep) {
 };
 
 Repair.fromObj = function(creep) {
+    "use strict";
+
     return new Repair(creep.memory.currentTask.id);
 };
 
 Repair.getCriticalTasks = function(room) {
+    "use strict";
+
     return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 100000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(s.id)), (s) => s.structure.hits);
 };
 
 Repair.getTasks = function(room) {
+    "use strict";
+
     return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9), (s) => new Repair(s.id)), (s) => s.structure.hits);
 };
 

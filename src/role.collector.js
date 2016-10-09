@@ -10,6 +10,8 @@ var Cache = require("cache"),
 
     Collector = {
         checkSpawn: (room) => {
+            "use strict";
+
             var max = 0,
                 count, sources, capacity, adjustment;
             
@@ -62,8 +64,10 @@ var Cache = require("cache"),
         },
         
         spawn: (room, id) => {
+            "use strict";
+
             var body = [],
-                structures, energy, count;
+                structures, energy, count, spawnToUse;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -121,6 +125,8 @@ var Cache = require("cache"),
         },
 
         assignTasks: (room) => {
+            "use strict";
+
             var tasks;
 
             // Check for unfilled containers.

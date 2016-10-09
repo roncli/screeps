@@ -126,7 +126,7 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), task.ally), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Heal");
-                            hitsMissing -= c.getActiveBodyparts(HEAL) * 12;
+                            hitsMissing -= creep.getActiveBodyparts(HEAL) * 12;
                             if (hitsMissing <= 0) {
                                 return false;
                             }

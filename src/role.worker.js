@@ -289,7 +289,7 @@ var Cache = require("cache"),
             }
             _.forEach(tasks, (task) => {
                 var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,
-                    assigned = false;
+                    taskAssigned = false;
                 
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
@@ -297,7 +297,7 @@ var Cache = require("cache"),
                             creep.say("Repair");
                             assigned.push(creep.name);
                             hitsMissing -= (creep.carry[RESOURCE_ENERGY] || 0) * 100;
-                            assigned = true;
+                            taskAssigned = true;
                             if (hitsMissing <= 0) {
                                 return false;
                             }
@@ -306,7 +306,7 @@ var Cache = require("cache"),
                     _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
                     assigned = [];
 
-                    return assigned;
+                    return taskAssigned;
                 }
             });
 

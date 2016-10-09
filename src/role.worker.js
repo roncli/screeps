@@ -118,6 +118,7 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)),
+                assigned = [];
                 tasks;
 
             if (creepsWithNoTask.length === 0) {
@@ -131,10 +132,12 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("CritCntrlr");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             return false;
                         }
                     });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 }
             });
 
@@ -153,13 +156,15 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Extension");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
                         }
                     });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 }
             });
 
@@ -178,13 +183,15 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Spawn");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
                         }
                     });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 }
             });
 
@@ -203,13 +210,15 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Tower");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
                         }
                     });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 }
             });
             
@@ -230,11 +239,13 @@ var Cache = require("cache"),
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             return false;
                         }
                     }
                 });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
             });
 
             if (creepsWithNoTask.length === 0) {
@@ -252,13 +263,15 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Build");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (progressMissing <= 0) {
                                 return false;
                             }
                         }
                     });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 }
             });
 
@@ -282,7 +295,7 @@ var Cache = require("cache"),
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Repair");
-                            _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                            assigned.push(creep.name);
                             hitsMissing -= (creep.carry[RESOURCE_ENERGY] || 0) * 100;
                             assigned = true;
                             if (hitsMissing <= 0) {
@@ -290,6 +303,8 @@ var Cache = require("cache"),
                             }
                         }
                     });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
 
                     return assigned;
                 }
@@ -304,9 +319,11 @@ var Cache = require("cache"),
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Controller");
-                        _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                        assigned.push(creep.name);
                     }
                 });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
             });
             
             if (creepsWithNoTask.length === 0) {
@@ -318,9 +335,11 @@ var Cache = require("cache"),
                 var task = new TaskHarvest();
                 if (task.canAssign(creep)) {
                     creep.say("Harvesting");
-                    _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                    assigned.push(creep.name);
                 }
             });
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;
@@ -331,9 +350,11 @@ var Cache = require("cache"),
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
-                        _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                        assigned.push(creep.name);
                     }
                 });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
             });
 
             if (creepsWithNoTask.length === 0) {
@@ -343,8 +364,10 @@ var Cache = require("cache"),
             // Rally remaining creeps.
             _.forEach(TaskRally.getHarvesterTasks(creepsWithNoTask), (task) => {
                 task.canAssign(task.creep);
-                _.remove(creepsWithNoTask, (c) => c.name === creep.name);
+                assigned.push(creep.name);
             });
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
         }
     };
 

@@ -29,7 +29,7 @@ Repair.prototype.run = function(creep) {
     
     // Repair the structure, or move closer to it if not in range.
     if (creep.repair(this.structure) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.structure, {reusePath: Math.floor(Math.random() * 2)});
+        creep.moveTo(this.structure, {reusePath: Math.floor(Math.random() * 2) + 1});
     }
 };
 

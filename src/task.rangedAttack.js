@@ -30,7 +30,7 @@ Ranged.prototype.run = function(creep) {
     }
     
     if (creep.rangedAttack(this.enemy) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.enemy, {reusePath: Math.floor(Math.random() * 2)});
+        creep.moveTo(this.enemy, {reusePath: Math.floor(Math.random() * 2) + 1});
     }
 };
 

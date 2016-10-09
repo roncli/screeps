@@ -30,7 +30,7 @@ Build.prototype.run = function(creep) {
     
     // Build the site, or move closer to it if not in range.
     if (creep.build(this.constructionSite, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.constructionSite, {reusePath: Math.floor(Math.random() * 2)});
+        creep.moveTo(this.constructionSite, {reusePath: Math.floor(Math.random() * 2) + 1});
     }
 };
 

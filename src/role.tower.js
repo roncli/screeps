@@ -7,6 +7,8 @@ var Cache = require("cache"),
         assignTasks: (room) => {
             "use strict";
 
+            var tasks;
+
             // Find hostiles to attack.
             tasks = TaskRangedAttack.getTasks(room);
             if (tasks.length > 0) {

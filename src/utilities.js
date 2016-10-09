@@ -1,6 +1,6 @@
 var Cache = require("cache"),
 
-    utilities = {
+    Utilities = {
         creepsWithTask: (creeps, task) => {
             return _.filter(creeps, (c) => c.memory.currentTask && _.isMatch(c.memory.currentTask, task));
         },
@@ -91,5 +91,5 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(utilities, "Utilities");
-module.exports = utilities;
+require("screeps-profiler").registerObject(Utilities, "Utilities");
+module.exports = Utilities;

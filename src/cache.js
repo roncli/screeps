@@ -11,7 +11,7 @@ var creeps = {},
     hostilesInRoom = {},
     objects = {};
 
-var cache = {
+var Cache = {
     creepTasks: {},
     spawning: {},
 
@@ -43,7 +43,7 @@ var cache = {
         if (!creepsInRoom[room.name]) {
             creepsInRoom[room.name] = {};
         }
-        return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(cache.creeps(type), (c) => c.room.name === room.name));
+        return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(Cache.creeps(type), (c) => c.room.name === room.name));
     },
 
     // Returns all spawns in the current room.    
@@ -97,5 +97,5 @@ var cache = {
     }
 };
 
-require("screeps-profiler").registerObject(cache, "Cache");
-module.exports = cache;
+require("screeps-profiler").registerObject(Cache, "Cache");
+module.exports = Cache;

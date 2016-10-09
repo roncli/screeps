@@ -118,7 +118,7 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)),
-                assigned = [];
+                assigned = [],
                 tasks;
 
             if (creepsWithNoTask.length === 0) {

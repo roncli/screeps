@@ -123,7 +123,7 @@ var Cache = require("cache"),
             _.forEach(tasks, (task) => {
                 var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("healer", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);
                 if (hitsMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), task.id), (creep) => {
+                    _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), task.ally), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Heal");
                             hitsMissing -= c.getActiveBodyparts(HEAL) * 12;

@@ -119,7 +119,6 @@ var Cache = require("cache"),
                 // Attack with tower if possible.
                 // TODO: Break this out into a role & task.
                 _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
-                    towerFired = true;
                     tower.attack(tasks[0].enemy);
                 });
             }

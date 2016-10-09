@@ -204,7 +204,6 @@ var Cache = require("cache"),
                 // TODO: Break this out into a role & task.
                 if (Cache.hostilesInRoom(room).length === 0) {
                     _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
-                        towerFired = true;
                         tower.repair(tasks[0].structure);
                     });
                 }
@@ -253,7 +252,6 @@ var Cache = require("cache"),
                 if (Cache.hostilesInRoom(room).length === 0) {
                     _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
                         if (tasks[0].structure.hits < 5000) {
-                            towerFired = true;
                             tower.repair(tasks[0].structure);
                         }
                     });

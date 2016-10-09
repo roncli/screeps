@@ -1,12 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskBuild = require("task.build"),
-    TaskCollectEnergy = require("task.collectEnergy"),
-    TaskFillEnergy = require("task.fillEnergy"),
-    TaskHarvest = require("task.harvest"),
-    TaskRally = require("task.rally"),
+    TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
-    TaskUpgradeController = require("task.upgradeController"),
 
     Worker = {
         assignTasks: (room) => {

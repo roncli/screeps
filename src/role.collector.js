@@ -360,10 +360,7 @@ var Cache = require("cache"),
             // Rally remaining creeps.
             _.forEach(TaskRally.getHarvesterTasks(creepsWithNoTask), (task) => {
                 task.canAssign(task.creep);
-                assigned.push(creep.name);
             });
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
         }
     };
 

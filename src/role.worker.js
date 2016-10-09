@@ -224,14 +224,6 @@ var Cache = require("cache"),
                 _.forEach(_.take(tasks, 5), (task) => {
                     console.log("      " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
                 });
-
-                // Repair with tower if possible.
-                // TODO: Break this out into a role & task.
-                if (Cache.hostilesInRoom(room).length === 0) {
-                    _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
-                        tower.repair(tasks[0].structure);
-                    });
-                }
             }
             _.forEach(tasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
@@ -281,16 +273,6 @@ var Cache = require("cache"),
                 _.forEach(_.take(tasks, 5), (task) => {
                     console.log("      " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
                 });
-
-                // Repair with tower if possible and under 5000 hits.
-                // TODO: Break this out into a role & task.
-                if (Cache.hostilesInRoom(room).length === 0) {
-                    _.forEach(room.find(FIND_MY_STRUCTURES, {filter: (structure) => structure.structureType === STRUCTURE_TOWER}), (tower) => {
-                        if (tasks[0].structure.hits < 5000) {
-                            tower.repair(tasks[0].structure);
-                        }
-                    });
-                }
             }
             _.forEach(tasks, (task) => {
                 var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,

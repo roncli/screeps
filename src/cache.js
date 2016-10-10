@@ -7,6 +7,8 @@ var creeps = {},
     repairableStructuresInRoom = {},
     constructionSitesInRoom = {},
     energySourcesInRoom = {},
+    mineralsInRoom = {},
+    extractorsInRoom = {},
     flagsInRoom = {},
     hostilesInRoom = {},
     objects = {};
@@ -28,6 +30,8 @@ var Cache = {
         repairableStructuresInRoom = {};
         constructionSitesInRoom = {};
         energySourcesInRoom = {};
+        mineralsInRoom = {};
+        extractorsInRoom = {};
         flagsInRoom = {};
         hostilesInRoom = {};
         objects = {};
@@ -99,6 +103,20 @@ var Cache = {
         "use strict";
 
         return energySourcesInRoom[room.name] ? energySourcesInRoom[room.name] : (energySourcesInRoom[room.name] = room.find(FIND_SOURCES));
+    },
+
+    // Returns all minerals in the current room.
+    mineralsInRoom: (room) => {
+        "use strict";
+
+        return mineralsInRoom[room.name] ? mineralsInRoom[room.name] : (mineralsInRoom[room.name] = room.find(FIND_MINERALS));
+    },
+
+    // Returns all extractors in the current room.
+    extractorsInRoom: (room) => {
+        "use strict";
+
+        return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : (extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.structureType === STRUCTURE_EXTRACTOR)}));
     },
 
     // Returns all flags in the current room.

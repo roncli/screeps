@@ -192,6 +192,12 @@ var Cache = require("cache"),
                         // Build the structure.
                         room.createConstructionSite(x, y, structureType);
                         structuresToBuild--;
+                        if (structuresToBuild === 0) {
+                            break;
+                        }
+                    }
+                    if (structuresToBuild === 0) {
+                        break;
                     }
                 }
 

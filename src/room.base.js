@@ -47,7 +47,7 @@ var Cache = require("cache"),
 
             // Build containers by source.
             _.forEach(Cache.energySourcesInRoom(room), (source) => {
-                var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(room)[0].pos}, {swampCost: 1}).path[0];
+                var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {swampCost: 1}).path[0];
 
                 if (
                     _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
@@ -93,7 +93,7 @@ var Cache = require("cache"),
             // At RCL6, build containers by minerals.
             if (room.controller.level >= 6) {
                 _.forEach(Cache.mineralsInRoom(room), (mineral) => {
-                    var location = PathFinder.search(mineral.pos, {pos: Cache.spawnsInRoom(room)[0].pos}, {swampCost: 1}).path[0];
+                    var location = PathFinder.search(mineral.pos, {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {swampCost: 1}).path[0];
 
                     if (
                         _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&

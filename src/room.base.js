@@ -43,7 +43,7 @@ var Cache = require("cache"),
             // Build more extensions if they are available.
             if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][room.controller.level - 1] - Cache.extensionsInRoom(room).length + _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_EXTENSION)) > 0) {
                 // Build the needed structures.
-                Utilities.buildStructures(STRUCTURE_EXTENSION, extensionsToBuild, Cache.spawnsInRoom(room)[0]);
+                Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, Cache.spawnsInRoom(room)[0]);
             }
 
             // Build containers by source.
@@ -66,17 +66,17 @@ var Cache = require("cache"),
 
             // At RCL3, build first tower.
             if (room.controller.level >= 3 && Cache.towersInRoom(room).length === 0) {
-                Utilities.buildStructures(STRUCTURE_TOWER, 1, Cache.spawnsInRoom(room)[0]);
+                Utilities.buildStructures(room, STRUCTURE_TOWER, 1, Cache.spawnsInRoom(room)[0]);
             }
 
             // At RCL4, build storage.
             if (room.controller.level >= 4 && !room.storage && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_STORAGE).length === 0) {
-                Utilities.buildStructures(STRUCTURE_STORAGE, 1, Cache.spawnsInRoom(room)[0]);
+                Utilities.buildStructures(room, STRUCTURE_STORAGE, 1, Cache.spawnsInRoom(room)[0]);
             }
 
             // At RCL6, build terminal.
-            if (room.controller.level >= 6 && !room.terminal && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_TERMINAL).length === 0) {
-                Utilities.buildStructures(STRUCTURE_TERMINAL, 1, Cache.spawnsInRoom(room)[0]);
+            if (room.controller.level >= 6 && room.storage && !room.terminal && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_TERMINAL).length === 0) {
+                Utilities.buildStructures(room, STRUCTURE_TERMINAL, 1, room.storage);
             }
 
             // At RCL6, build extractor.

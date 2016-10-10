@@ -158,9 +158,9 @@ var Cache = require("cache"),
             return structures;
         },
 
-        buildStructures: (structureType, structuresToBuild, buildAroundObj) => {
+        buildStructures: (room, structureType, structuresToBuild, buildAroundObj) => {
             var distanceFromSpawn = 1,
-                siteIsClear, x, y;
+                x, y, siteIsClear;
 
             while (structuresToBuild > 0 && distanceFromSpawn < 50) {
                 for (x = buildAroundObj.pos.x - distanceFromSpawn; x <= buildAroundObj.pos.x + distanceFromSpawn; x += 2) {

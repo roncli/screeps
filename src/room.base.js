@@ -46,27 +46,29 @@ var Cache = require("cache"),
                 Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, Cache.spawnsInRoom(room)[0]);
             }
 
-            // Build containers by source.
-            _.forEach(Cache.energySourcesInRoom(room), (source) => {
-                var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {swampCost: 1}).path[0];
-
-                if (
-                    _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
-                    _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === location.x && s.pos.y === location.y && s.structureType === STRUCTURE_CONTAINER).length === 0
-                ) {
-                    // Destroy roads and walls at this location.
-                    _.forEach(_.filter(location.lookFor(LOOK_STRUCTURES), (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
-                        structure.destroy();
-                    });
-
-                    // Build the container.
-                    room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
-                }
-            });
-
             // At RCL3, build first tower.
             if (room.controller.level >= 3 && Cache.towersInRoom(room).length === 0) {
                 Utilities.buildStructures(room, STRUCTURE_TOWER, 1, Cache.spawnsInRoom(room)[0]);
+            }
+
+            // At RC3, build containers by source.
+            if (room.controller.level >= 3) {
+                _.forEach(Cache.energySourcesInRoom(room), (source) => {
+                    var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {swampCost: 1}).path[0];
+
+                    if (
+                        _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
+                        _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === location.x && s.pos.y === location.y && s.structureType === STRUCTURE_CONTAINER).length === 0
+                    ) {
+                        // Destroy roads and walls at this location.
+                        _.forEach(_.filter(location.lookFor(LOOK_STRUCTURES), (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
+                            structure.destroy();
+                        });
+
+                        // Build the container.
+                        room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
+                    }
+                });
             }
 
             // At RCL4, build storage.

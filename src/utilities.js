@@ -108,7 +108,7 @@ var Cache = require("cache"),
             "use strict";
 
             var siteClear = true,
-                room = new Room(pos.roomName),
+                room = Game.rooms[pos.roomName],
                 structures;
             
             // Cannot be a wall, or be next to a wall horizontally or vertically.
@@ -165,7 +165,7 @@ var Cache = require("cache"),
 
             while (structuresToBuild > 0 && distanceFromSpawn < 50) {
                 for (x = buildAroundObj.pos.x - distanceFromSpawn; x <= buildAroundObj.pos.x + distanceFromSpawn; x += 2) {
-                    for (y = buildAroundObj.pos.y - distanceFromSpawn; x <= buildAroundObj.pos.y + distanceFromSpawn; y += (Math.abs(buildAroundObj.pos.x - x) === distanceFromSpawn ? 2 : 2 * distanceFromSpawn)) {
+                    for (y = buildAroundObj.pos.y - distanceFromSpawn; y <= buildAroundObj.pos.y + distanceFromSpawn; y += (Math.abs(buildAroundObj.pos.x - x) === distanceFromSpawn ? 2 : 2 * distanceFromSpawn)) {
                         // Don't check outside of the room.
                         if (x < 1 || x > 48 || y < 1 || y > 48) {
                             continue;

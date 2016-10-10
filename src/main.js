@@ -108,6 +108,7 @@ var profiler = require("screeps-profiler"),
         }
     };
 
+profiler.registerObject(main, "main");
 profiler.enable();
 
 module.exports = main;

@@ -129,5 +129,6 @@ var Cache = require("cache"),
         }
     };
 
-module.exports = Base;
 
+require("screeps-profiler").registerObject(Base, "RoomBase");
+module.exports = Base;

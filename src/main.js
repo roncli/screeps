@@ -20,12 +20,26 @@ var profiler = require("screeps-profiler"),
                 // Export global objects to Game.cmd for use from console.
                 Game.cmd = {
                     Cache: Cache,
-                    Collector: RoleCollector,
-                    Healer: RoleHealer,
-                    RangedAttack: RoleRangedAttack,
-                    Utilities: Utilities,
-                    Worker: RoleWorker
+                    Role: {
+                        Collector: RoleCollector,
+                        Healer: RoleHealer,
+                        RangedAttack: RoleRangedAttack,
+                        Worker: RoleWorker
+                    },
+                    Room: {
+                        Base: RoomBase
+                    },
+                    Utilities: Utilities
                 };
+                
+                // Initialize max creeps.
+                if (!Memory.maxCreeps) {
+                    Memory.maxCreeps = {
+                        healer: 0,
+                        meleeAttack: 0,
+                        rangedAttack: 0
+                    };
+                }
 
                 // Log date.
                 console.log(new Date());
@@ -48,7 +62,7 @@ var profiler = require("screeps-profiler"),
                 });
 
                 // Loop through each room to determine the required tasks for the room.
-                _.forEach(_.uniq(_.map(Game.creeps, (creep) => creep.room)), (room) => {
+                _.forEach(Game.rooms, (room) => {
                     console.log("  " + room.name + " Status");
                     
                     // Update controller.

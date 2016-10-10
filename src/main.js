@@ -23,8 +23,10 @@ var profiler = require("screeps-profiler"),
                     Cache: Cache,
                     Role: {
                         Collector: RoleCollector,
+                        Delivery: RoleDelivery,
                         Healer: RoleHealer,
                         RangedAttack: RoleRangedAttack,
+                        Tower: RoleTower,
                         Worker: RoleWorker
                     },
                     Room: {
@@ -79,16 +81,16 @@ var profiler = require("screeps-profiler"),
                     
                     // Spawn new creeps.
                     RoleWorker.checkSpawn(room);
-                    RoleCollector.checkSpawn(room);
                     RoleRangedAttack.checkSpawn(room);
                     RoleHealer.checkSpawn(room);
+                    RoleCollector.checkSpawn(room);
                     RoleDelivery.checkSpawn(room);
 
                     // Assign tasks to creeps.                    
                     RoleWorker.assignTasks(room);
-                    RoleCollector.assignTasks(room);
                     RoleRangedAttack.assignTasks(room);
                     RoleHealer.assignTasks(room);
+                    RoleCollector.assignTasks(room);
                     RoleDelivery.assignTasks(room);
 
                     // Assign tasks to towers.

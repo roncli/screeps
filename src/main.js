@@ -7,6 +7,7 @@ var profiler = require("screeps-profiler"),
     RoleRangedAttack = require("role.rangedAttack"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
+    RoomBase = require("room.base"),
     taskDeserialization = require("taskDeserialization"),
     
     main = {

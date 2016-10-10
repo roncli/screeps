@@ -51,7 +51,7 @@ Heal.prototype.toObj = function(creep) {
     if (this.ally) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.ally
+            id: this.ally.id
         }
     } else {
         delete creep.memory.currentTask;

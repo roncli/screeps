@@ -44,8 +44,9 @@ var profiler = require("screeps-profiler"),
                     };
                 }
 
-                // Log date.
+                // Log date & GCL.
                 console.log(new Date());
+                console.log("  Global level " + Game.gcl.level + " " + game.gcl.progress + "/" + game.gcl.progressTotal + " " + (100 * game.gcl.progress / game.gcl.progressTotal).toFixed(3) + "%");
 
                 // Clear old memory.
                 _.forEach(Memory.creeps, (creep, name) => {

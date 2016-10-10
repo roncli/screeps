@@ -108,6 +108,7 @@ var Cache = require("cache"),
             "use strict";
 
             var siteClear = true,
+                room = new Room(pos.roomName),
                 structures;
             
             // Cannot be a wall, or be next to a wall horizontally or vertically.

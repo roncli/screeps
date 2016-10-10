@@ -27,6 +27,7 @@ If RCL >= 6:
 */
 
 var Cache = require("cache"),
+    Utilities = require("utilities"),
 
     Base = {
         manage: (room) => {

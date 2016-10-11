@@ -128,7 +128,25 @@ var Cache = require("cache"),
             }
 
             // At RCL4, build roads from containers to storage.
-            // TODO
+            if (room.controller.level >= 4 && room.storage) {
+                _.forEach(Cache.containersInRoom(room), (container) => {
+                    _.forEach(PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path, (pos) => {
+                        var structures = pos.lookFor(LOOK_STRUCTURES);
+                        if (
+                            _.filter(structures, (s) => s.structureType !== STRUCTURE_RAMPART).length > 0 ||
+                            _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType !== STRUCTURE_RAMPART).length === 0
+                        ) {
+                            return;
+                        }
+                        if (
+                            _.filter(structures, (s) => s.structureType === STRUCTURE_ROAD).length === 0 &&
+                            _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType === STRUCTURE_ROAD).length === 0
+                        ) {
+                            room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
+                        }
+                   });
+                });
+            }
         }
     };
 

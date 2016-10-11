@@ -47,7 +47,7 @@ var Cache = require("cache"),
             }
 
             // At RCL3, build first tower.
-            if (room.controller.level >= 3 && Cache.towersInRoom(room).length === 0) {
+            if (room.controller.level >= 3 && Cache.towersInRoom(room).length === 0 && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_TOWER).length === 0) {
                 Utilities.buildStructures(room, STRUCTURE_TOWER, 1, Cache.spawnsInRoom(room)[0]);
             }
 

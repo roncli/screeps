@@ -203,6 +203,18 @@ var Cache = require("cache"),
 
                 distanceFromSpawn++;
             }
+        },
+
+        setRoomType: (room, type) => {
+            if (!Memory.rooms) {
+                Memory.rooms = {};
+            }
+
+            if (type) {
+                Memory.rooms[room] = type;
+            } else {
+                delete Memory.rooms[room];
+            }
         }
     };
 

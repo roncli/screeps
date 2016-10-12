@@ -58,7 +58,7 @@ var profiler = require("screeps-profiler"),
                         delete Memory.creeps[name];
                     }
                 });
-                
+
                 // Loop through each creep to deserialize their task and see if it is completed.
                 _.forEach(Game.creeps, (creep) => {
                     if (creep.memory.currentTask) {
@@ -73,6 +73,12 @@ var profiler = require("screeps-profiler"),
                 _.forEach(Game.rooms, (room) => {
                     console.log("  " + room.name + " Status");
                     
+                    // Manage room every 100 turns.
+                    if (Game.time % 100 === 0) {
+                        RoomBase.manage(room);
+                        console.log("    Room managed");
+                    }
+
                     // Update controller.
                     if (room.controller) {
                         if (room.controller.my) {

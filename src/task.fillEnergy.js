@@ -101,7 +101,7 @@ FillEnergy.getFillTowerTasks = function(room) {
 FillEnergy.getFillContainerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity), (c) => c.structureType === STRUCTURE_STORAGE ? 1 : 2), (c) => new FillEnergy(c.id));
+    return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity)), (c) => c.structureType === STRUCTURE_STORAGE ? 1 : 2), (c) => new FillEnergy(c.id));
 };
 
 FillEnergy.getFillStorageTasks = function(room) {

@@ -2,9 +2,13 @@ var profiler = require("screeps-profiler"),
     Cache = require("cache"),
     Utilities = require("utilities"),
     RoleCollector = require("role.collector"),
+    RoleDefender = require("role.defender"),
     RoleDelivery = require("role.delivery"),
     RoleHealer = require("role.healer"),
+    RoleMiner = require("role.miner"),
     RoleRangedAttack = require("role.rangedAttack"),
+    RoleReserver = require("role.reserver"),
+    RoleStorer = require("role.storer"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
     RoomBase = require("room.base"),
@@ -74,7 +78,7 @@ var profiler = require("screeps-profiler"),
                     console.log("  " + room.name + " Status");
                     
                     // Manage room every 100 turns.
-                    if (Game.time % 100 === 0) {
+                    if (Game.time % 100 === 0 && Memory.rooms && Memory.rooms[room.name] === "base") {
                         RoomBase.manage(room);
                         console.log("    Room managed");
                     }

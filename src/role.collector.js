@@ -183,23 +183,20 @@ var Cache = require("cache"),
 
             // Check for unfilled extensions.
             tasks = TaskFillEnergy.getFillExtensionTasks(room);
-            _.forEach(tasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+            _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
+                _.forEach(_.sortBy(tasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
+                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                    if (energyMissing > 0) {
                         if (task.canAssign(creep)) {
                             creep.say("Extension");
                             assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
+                            return false;
                         }
-                    });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
+                    }
+                });
             });
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

@@ -10,8 +10,8 @@ var Cache = require("cache"),
             var max = 0,
                 count, capacity, adjustment;
             
-            // If there are no spawns or containers in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0) {
+            // If there are no spawns, containers, or storages in the room, ignore the room.
+            if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0 || !room.storage) {
                 return;
             }
 

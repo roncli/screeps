@@ -1,7 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskCollectEnergy = require("task.collectEnergy"),
     TaskFillEnergy = require("task.fillEnergy"),
-    TaskMine = require("task.mine"),
 
     Storer = {
         checkSpawn: (room) => {

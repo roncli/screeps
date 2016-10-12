@@ -103,7 +103,7 @@ FillEnergy.getFillStorageTasks = function(room) {
     "use strict";
 
     if (room.storage) {
-        return [FillEnergy(room.storage.id)];
+        return [new FillEnergy(room.storage.id)];
     } else {
         return [];
     }

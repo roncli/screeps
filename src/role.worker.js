@@ -12,7 +12,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var count, sources, adjustment, max;
+            var count, sources;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -25,18 +25,14 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Determine the max creep adjustment to use.
-            adjustment = Math.min(Math.max((4500 - Utilities.getEnergyCapacityInRoom(room)) / 4500, 0.1), 1);
-
-            // If we have less than max workers, spawn a worker.
+            // If we have less than 3 workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
-            max = Math.max(Math.ceil(5 * adjustment), 3);
-            if (count < max) {
+            if (count < 3) {
                 Worker.spawn(room, sources[0].id);
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count + "/" + max);        
+            console.log("    Workers: " + count + "/" + 3);        
         },
         
         spawn: (room) => {

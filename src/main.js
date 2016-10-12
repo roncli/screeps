@@ -86,7 +86,11 @@ var profiler = require("screeps-profiler"),
                     // Update controller.
                     if (room.controller) {
                         if (room.controller.my) {
-                            console.log("    Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                            if (room.controller.level === 8) {
+                                console.log("    Controller level " + room.controller.level);
+                            } else {
+                                console.log("    Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                            }
                         } else if (room.controller.level === 0) {
                             console.log("    Controller unowned");
                         } else {

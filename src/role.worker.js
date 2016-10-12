@@ -327,7 +327,7 @@ var Cache = require("cache"),
             }
 
             // If there are no containers in the room, attempt to assign harvest task to remaining creeps.
-            if (Cache.containersInRoom(room).length !== 0 && room.storage) {
+            if (Cache.containersInRoom(room).length !== 0 && !room.storage) {
                 // Attempt to assign harvest task to remaining creeps.
                 _.forEach(creepsWithNoTask, (creep) => {
                     var task = new TaskHarvest();

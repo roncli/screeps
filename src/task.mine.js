@@ -41,7 +41,7 @@ Mine.prototype.run = function(creep) {
 
     // If we are at the container, get the source closest to the creep and attempt to harvest it.
     if (container.pos.getRangeTo(creep) === 0) {
-        creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(container.room), Cache.mineralsInRoom(container.room)]), creep));
+        creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(container.room), Cache.mineralsInRoom(container.room)]), creep)[0]);
     }
 };
 

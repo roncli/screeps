@@ -15,20 +15,16 @@ var Cache = require("cache"),
                 return;
             }
 
-            _.forEach(Cache.containersInRoom(room), (container) => {
-                max++;
-
-                // If we don't have a storer for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.memory.container === container.id).length === 0) {
-                    Storer.spawn(room, container.id);
-                }
-            });
+            // If we don't have a storer for each container, spawn one.
+            if (Cache.containersInRoom(room).length < Cache.creepsInRoom("storer", room).length) {
+                Storer.spawn(room);
+            }
 
             // Output storer count in the report.
-            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + max);        
+            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Cache.containersInRoom(room).length);        
         },
         
-        spawn: (room, id) => {
+        spawn: (room) => {
             "use strict";
 
             var body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],

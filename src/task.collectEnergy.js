@@ -92,7 +92,7 @@ CollectEnergy.getTasks = function(room) {
 CollectEnergy.getStorerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => c.structureType === STRUCTURE_CONTAINER ? 1 : 2), (c) => new CollectEnergy(c.id));
+    return _.map(_.sortBy(_.filter(Cache.containersInRoom(room), (c) => _.sum(c.store[RESOURCE_ENERGY]) > 0), (c) => -_.sum(c.store[RESOURCE_ENERGY])), (c) => new CollectEnergy(c.id));
 };
 
 require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");

@@ -14,10 +14,14 @@ var Cache = require("cache"),
                 return;
             }
 
-            // If we don't have a storer for this container, spawn one.
-            if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.memory.container === container.id).length === 0) {
-                Storer.spawn(room, container.id);
-            }
+            _.forEach(Cache.containersInRoom(room), (container) => {
+                max++;
+
+                // If we don't have a storer for this container, spawn one.
+                if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.memory.container === container.id).length === 0) {
+                    Storer.spawn(room, container.id);
+                }
+            });
 
             // Output storer count in the report.
             console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + max);        
@@ -71,13 +75,13 @@ var Cache = require("cache"),
                 console.log("    Unfilled Storage: " + tasks.length);
             }
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
+                var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Storage");
                             assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            energyMissing -= _.sum(creep.carry);
                             if (energyMissing <= 0) {
                                 return false;
                             }
@@ -94,11 +98,24 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(TaskCollectEnergy.getStorerTasks(room), (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                    }
-                });
+                if (!task.object.store[RESOURCE_ENERGY]) {
+                    return;
+                }
+                var energy = _.sum(task.object.store) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "collectEnergy", id: task.id}), function(sum, c) {return sum + (c.carryCapacity - _.sum(c.carry));}, 0);
+                if (energy > 0) {
+                    _.forEach(creepsWithNoTask, (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Collecting");
+                            assigned.push(creep.name);
+                            energy -= (creep.carryCapacity - _.sum(creep.carry));
+                            if (energy <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
             });
 
         }

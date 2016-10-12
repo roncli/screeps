@@ -16,7 +16,7 @@ var Cache = require("cache"),
             }
 
             // If we don't have a storer for each container, spawn one.
-            if (Cache.containersInRoom(room).length < Cache.creepsInRoom("storer", room).length) {
+            if (Cache.containersInRoom(room).length > Cache.creepsInRoom("storer", room).length) {
                 Storer.spawn(room);
             }
 

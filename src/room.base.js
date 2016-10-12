@@ -108,7 +108,7 @@ var Cache = require("cache"),
                         });
 
                         // Build the container.
-                        room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
+                        room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
                     }
                 });
             }

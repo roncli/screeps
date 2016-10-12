@@ -48,6 +48,8 @@ Mine.prototype.run = function(creep) {
 Mine.prototype.canComplete = function(creep) {
     "use strict";
 
+    var container = Cache.getObjectById(creep.memory.container);
+
     if (!container) {
         return true;
     }

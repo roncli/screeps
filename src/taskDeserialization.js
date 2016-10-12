@@ -4,6 +4,7 @@ var Cache = require("cache"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
+    TaskMine = require("task.mine"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
@@ -28,6 +29,9 @@ var Cache = require("cache"),
                 break;
             case "heal":
                 Cache.creepTasks[creep.name] = TaskHeal.fromObj(creep);
+                break;
+            case "mine":
+                Cache.creepTasks[creep.name] = TaskMine.fromObj(creep);
                 break;
             case "pickupResource":
                 Cache.creepTasks[creep.name] = TaskPickupResource.fromObj(creep);

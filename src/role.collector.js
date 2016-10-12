@@ -1,7 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
-    TaskCollectEnergy = require("task.collectEnergy"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
     TaskRally = require("task.rally"),
@@ -15,6 +14,11 @@ var Cache = require("cache"),
             var max = 0,
                 count, sources, capacity, adjustment;
             
+            // If there is storage and containers in the room, ignore the room.
+            if (Cache.containersInRoom(room).length !== 0 && room.storage) {
+                return;
+            }
+
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
                 return;
@@ -82,8 +86,8 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room.
-            energy = Utilities.getAvailableEnergyInRoom(room);
+            // Get the total energy in the room, limited to 3200.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 3200);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {

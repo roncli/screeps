@@ -28,28 +28,14 @@ var Cache = require("cache"),
             // Determine the max creep adjustment to use.
             adjustment = Math.min(Math.max((4500 - Utilities.getEnergyCapacityInRoom(room)) / 4500, 0.1), 1);
 
-            if (!Memory.sources || !Memory.sources[sources[0].id] || !Memory.sources[sources[0].id].empty) {
-                // Initialize.
-                if (!Memory.sources) {
-                    Memory.sources = {};
-                }
-
-                if (!Memory.sources[sources[0].id]) {
-                    Memory.sources[sources[0].id] = {};
-                }
-
-                // Count the empty squares around the source.
-                Memory.sources[sources[0].id].empty = Utilities.getEmptyPosAroundPos(sources[0].pos);
-            }
-
             // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
-            if (count < Math.ceil(Memory.sources[sources[0].id].empty * adjustment)) {
+            if (count < 5 * adjustment) {
                 Worker.spawn(room, sources[0].id);
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count + "/" + Math.ceil(Memory.sources[sources[0].id].empty * adjustment));        
+            console.log("    Workers: " + count + "/" + Math.ceil(5 * adjustment));        
         },
         
         spawn: (room) => {
@@ -71,8 +57,8 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room.
-            energy = Utilities.getAvailableEnergyInRoom(room);
+            // Get the total energy in the room, limited to 3200.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 3200);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {
@@ -326,21 +312,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Attempt to assign harvest task to remaining creeps.
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskHarvest();
-                if (task.canAssign(creep)) {
-                    creep.say("Harvesting");
-                    assigned.push(creep.name);
-                }
-            });
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Attempt to get energy from containers.
             _.forEach(TaskCollectEnergy.getTasks(room), (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
@@ -355,6 +326,24 @@ var Cache = require("cache"),
 
             if (creepsWithNoTask.length === 0) {
                 return;
+            }
+
+            // If there are no containers in the room, attempt to assign harvest task to remaining creeps.
+            if (Cache.containersInRoom(room).length !== 0 && room.storage) {
+                // Attempt to assign harvest task to remaining creeps.
+                _.forEach(creepsWithNoTask, (creep) => {
+                    var task = new TaskHarvest();
+                    if (task.canAssign(creep)) {
+                        creep.say("Harvesting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             }
 
             // Rally remaining creeps.

@@ -23,9 +23,13 @@ var profiler = require("screeps-profiler"),
                     Cache: Cache,
                     Role: {
                         Collector: RoleCollector,
+                        Defender: RoleDefender,
                         Delivery: RoleDelivery,
                         Healer: RoleHealer,
+                        Miner: RoleMiner,
                         RangedAttack: RoleRangedAttack,
+                        Reserver: RoleReserver,
+                        Storer: RoleStorer,
                         Tower: RoleTower,
                         Worker: RoleWorker
                     },
@@ -84,6 +88,8 @@ var profiler = require("screeps-profiler"),
                     RoleWorker.checkSpawn(room);
                     RoleRangedAttack.checkSpawn(room);
                     RoleHealer.checkSpawn(room);
+                    RoleMiner.checkSpawn(room);
+                    RoleStorer.checkSpawn(room);
                     RoleCollector.checkSpawn(room);
                     RoleDelivery.checkSpawn(room);
 
@@ -91,6 +97,8 @@ var profiler = require("screeps-profiler"),
                     RoleWorker.assignTasks(room);
                     RoleRangedAttack.assignTasks(room);
                     RoleHealer.assignTasks(room);
+                    RoleMiner.assignTasks(room);
+                    RoleStorer.assignTasks(room);
                     RoleCollector.assignTasks(room);
                     RoleDelivery.assignTasks(room);
 

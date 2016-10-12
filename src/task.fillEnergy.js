@@ -99,5 +99,15 @@ FillEnergy.getFillContainerTasks = function(room) {
     return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (c.store[RESOURCE_ENERGY] || 0) < c.storeCapacity), (c) => c.structureType === STRUCTURE_STORAGE ? 1 : 2), (c) => new FillEnergy(c.id));
 };
 
+FillEnergy.getFillStorageTasks = function(room) {
+    "use strict";
+
+    if (room.storage) {
+        return [FillEnergy(room.storage.id)];
+    } else {
+        return [];
+    }
+};
+
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
 module.exports = FillEnergy;

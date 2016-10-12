@@ -12,7 +12,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var count, sources, adjustment;
+            var count, sources, adjustment, max;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -30,12 +30,13 @@ var Cache = require("cache"),
 
             // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
-            if (count < 5 * adjustment) {
+            max = Math.min(Math.ceil(5 * adjustment), 3);
+            if (count < max) {
                 Worker.spawn(room, sources[0].id);
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count + "/" + Math.ceil(5 * adjustment));        
+            console.log("    Workers: " + count + "/" + max);        
         },
         
         spawn: (room) => {

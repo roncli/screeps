@@ -75,27 +75,25 @@ var profiler = require("screeps-profiler"),
 
                 // Loop through each room to determine the required tasks for the room.
                 _.forEach(Game.rooms, (room) => {
-                    console.log("  " + room.name + " Status");
-                    
+                    // Log room status.
+                    if (room.controller) {
+                        if (room.controller.my) {
+                            if (room.controller.level === 8) {
+                                console.log("  " + room.name + "Controller level " + room.controller.level);
+                            } else {
+                                console.log("  " + room.name + "Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                            }
+                        } else if (room.controller.level === 0) {
+                            console.log("  " + room.name + "Controller unowned");
+                        } else {
+                            console.log("  " + room.name + "Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
+                        }
+                    }
+
                     // Manage room every 100 turns.
                     if (Game.time % 100 === 0 && Memory.rooms && Memory.rooms[room.name] === "base") {
                         RoomBase.manage(room);
                         console.log("    Room managed");
-                    }
-
-                    // Update controller.
-                    if (room.controller) {
-                        if (room.controller.my) {
-                            if (room.controller.level === 8) {
-                                console.log("    Controller level " + room.controller.level);
-                            } else {
-                                console.log("    Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
-                            }
-                        } else if (room.controller.level === 0) {
-                            console.log("    Controller unowned");
-                        } else {
-                            console.log("    Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
-                        }
                     }
                     
                     // Spawn new creeps.

@@ -134,7 +134,7 @@ var Cache = require("cache"),
                         var structures = pos.lookFor(LOOK_STRUCTURES);
                         if (
                             _.filter(structures, (s) => s.structureType !== STRUCTURE_RAMPART).length > 0 ||
-                            _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType !== STRUCTURE_RAMPART).length === 0
+                            _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType !== STRUCTURE_RAMPART).length > 0
                         ) {
                             return;
                         }

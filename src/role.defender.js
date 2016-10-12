@@ -1,6 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskDefender = require("task.defender"),
     TaskRally = require("task.rally"),
 
     Defender = {
@@ -122,7 +121,7 @@ var Cache = require("cache"),
             var tasks;
 
             // Find hostiles to attack.
-            tasks = TaskDefender.getTasks(room);
+            tasks = TaskRangedAttack.getTasks(room);
             if (tasks.length > 0) {
                 console.log("    Hostiles: " + tasks.length);
                 _.forEach(_.take(tasks, 5), (task) => {
@@ -135,6 +134,29 @@ var Cache = require("cache"),
                         creep.say("Die!", true);
                     }
                 });
+            });
+
+            // Find allies to heal.
+            tasks = TaskHeal.getTasks(room);
+            if (tasks.length > 0) {
+                console.log("    Creeps to heal: " + tasks.length);
+                _.forEach(_.take(tasks, 5), (task) => {
+                    console.log("      " + task.ally.pos.x + "," + task.ally.pos.y + " " + task.ally.hits + "/" + task.ally.hitsMax + " " + (100 * task.ally.hits / task.ally.hitsMax).toFixed(3) + "%");
+                });
+            }
+            _.forEach(tasks, (task) => {
+                var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("defender", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);
+                if (hitsMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)), task.ally), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Heal");
+                            hitsMissing -= creep.getActiveBodyparts(HEAL) * 12;
+                            if (hitsMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                }
             });
 
             // Rally the troops!

@@ -13,7 +13,7 @@ var Cache = require("cache"),
                 return;
             }
 
-            //  Loop through containers to see if we have anything we need to spawn.
+            // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
                 max += 1;
 

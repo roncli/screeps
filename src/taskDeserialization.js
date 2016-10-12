@@ -1,7 +1,9 @@
 var Cache = require("cache"),
     TaskBuild = require("task.build"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    TaskCollectMinerals = require("task.collectMinerals"),
     TaskFillEnergy = require("task.fillEnergy"),
+    TaskFillMinerals = require("task.fillMinerals"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
     TaskMine = require("task.mine"),
@@ -21,8 +23,14 @@ var Cache = require("cache"),
             case "collectEnergy":
                 Cache.creepTasks[creep.name] = TaskCollectEnergy.fromObj(creep);
                 break;
+            case "collectMinerals":
+                Cache.creepTasks[creep.name] = TaskCollectMinerals.fromObj(creep);
+                break;
             case "fillEnergy":
                 Cache.creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
+                break;
+            case "fillMinerals":
+                Cache.creepTasks[creep.name] = TaskFillMinerals.fromObj(creep);
                 break;
             case "harvest":
                 Cache.creepTasks[creep.name] = TaskHarvest.fromObj(creep);

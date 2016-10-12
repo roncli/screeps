@@ -1,7 +1,9 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    TaskCollectMinerals = require("task.collectMinerals"),
     TaskFillEnergy = require("task.fillEnergy"),
+    TaskFillMinerals = require("task.fillMinerals"),
 
     Storer = {
         checkSpawn: (room) => {
@@ -66,12 +68,12 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled containers.
-            tasks = TaskFillEnergy.getFillStorageTasks(room);
+            tasks = [].concat.apply([], [TaskFillEnergy.getFillStorageTasks(room), TaskFillMinerals.getFillStorageTasks(room)]);
             if (tasks.length > 0) {
                 console.log("    Unfilled Storage: " + tasks.length);
             }
             _.forEach(tasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: task.type, id: task.id}), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
@@ -93,11 +95,11 @@ var Cache = require("cache"),
             }
 
             // Attempt to get energy from containers.
-            _.forEach(TaskCollectEnergy.getStorerTasks(room), (task) => {
-                if (!task.object.store[RESOURCE_ENERGY]) {
+            _.forEach([].concat.apply([], [TaskCollectEnergy.getStorerTasks(room), TaskCollectMinerals.getStorerTasks(room)]), (task) => {
+                if (!_.sum(task.object.store)) {
                     return;
                 }
-                var energy = _.sum(task.object.store) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "collectEnergy", id: task.id}), function(sum, c) {return sum + (c.carryCapacity - _.sum(c.carry));}, 0);
+                var energy = _.sum(task.object.store) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: task.type, id: task.id}), function(sum, c) {return sum + (c.carryCapacity - _.sum(c.carry));}, 0);
                 if (energy > 0) {
                     _.forEach(creepsWithNoTask, (creep) => {
                         if (task.canAssign(creep)) {

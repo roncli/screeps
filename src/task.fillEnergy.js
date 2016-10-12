@@ -44,9 +44,14 @@ FillEnergy.prototype.run = function(creep) {
 FillEnergy.prototype.canComplete = function(creep) {
     "use strict";
 
+    if (!this.object) {
+        Task.prototype.complete.call(this, creep);
+        return true;
+    }
+
     var energy = this.object.energy;
     if (energy === undefined) {
-        energy = this.object.store[RESOURCE_ENERGY] || 0;
+        energy = _.sum(this.object.store);
     }
 
     if (!creep.carry[RESOURCE_ENERGY] || energy === (this.object.energyCapacity || this.object.storeCapacity)) {
@@ -96,13 +101,13 @@ FillEnergy.getFillTowerTasks = function(room) {
 FillEnergy.getFillContainerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (c.store[RESOURCE_ENERGY] || 0) < c.storeCapacity), (c) => c.structureType === STRUCTURE_STORAGE ? 1 : 2), (c) => new FillEnergy(c.id));
+    return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity), (c) => c.structureType === STRUCTURE_STORAGE ? 1 : 2), (c) => new FillEnergy(c.id));
 };
 
 FillEnergy.getFillStorageTasks = function(room) {
     "use strict";
 
-    if (room.storage) {
+    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
         return [new FillEnergy(room.storage.id)];
     } else {
         return [];

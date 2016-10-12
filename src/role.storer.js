@@ -30,12 +30,12 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            if (Math.ceil(length / 45) > _.filter(Cache.creepsInRoom("storer", room), (c) => !c.ticksToLive || c.ticksToLive >= 150).length) {
+            if (Math.ceil(2 * length / 45) > _.filter(Cache.creepsInRoom("storer", room), (c) => !c.ticksToLive || c.ticksToLive >= 150).length) {
                 Storer.spawn(room);
             }
 
             // Output storer count in the report.
-            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Math.ceil(length / 45));        
+            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Math.ceil(2 * length / 45));        
         },
         
         spawn: (room) => {

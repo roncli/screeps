@@ -28,23 +28,20 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                structures, energy, count, spawnToUse, name;
+                energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
-            // Get the spawns and extensions in the room.
-            structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
+            // Get the total energy in the room, limited to 2400.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 2400);
 
-            // Fail if any of the structures aren't full.
-            if (_.filter(structures, (s) => s.energy !== s.energyCapacity).length !== 0) {
-                return false;
+            // If we're not at 2400 and energy is not at capacity, bail.
+            if (energy < 2400 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+                return;
             }
-
-            // Get the total energy in the room.
-            energy = _.reduce(structures, function(sum, s) {return sum + s.energy;}, 0);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 450); count++) {

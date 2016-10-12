@@ -31,18 +31,15 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-                structures, spawnToUse, name;
+                spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
-            // Get the spawns and extensions in the room.
-            structures = [].concat.apply([], [Cache.spawnsInRoom(room), Cache.extensionsInRoom(room)]);
-
-            // Fail if any of the structures aren't full.
-            if (_.filter(structures, (s) => s.energy !== s.energyCapacity).length !== 0) {
+            // Fail under 550 energy.
+            if (Utilities.getAvailableEnergyInRoom(room) < 550) {
                 return false;
             }
 

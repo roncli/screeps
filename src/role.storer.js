@@ -9,21 +9,33 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var max = 0,
-                count, capacity, adjustment;
+            var length = 0;
             
             // If there are no spawns, containers, or storages in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0 || !room.storage) {
                 return;
             }
 
+            // Init road length cache.
+            if (!Memory.lengthToStorage) {
+                Memory.lengthToStorage = {};
+            }
+
+            // Determine the number storers needed.
+            _.forEach(Cache.containersInRoom(room), (container) => {
+                if (!Memory.lengthToStorage[container.id]) {
+                    Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
+                }
+                length += Memory.lengthToStorage[container.id];
+            });
+
             // If we don't have a storer for each container, spawn one.
-            if (Cache.containersInRoom(room).length > _.filter(Cache.creepsInRoom("storer", room), (c) => !c.ticksToLive || c.ticksToLive >= 150).length) {
+            if (Math.ceil(length / 45) > _.filter(Cache.creepsInRoom("storer", room), (c) => !c.ticksToLive || c.ticksToLive >= 150).length) {
                 Storer.spawn(room);
             }
 
             // Output storer count in the report.
-            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Cache.containersInRoom(room).length);        
+            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Math.ceil(length / 45));        
         },
         
         spawn: (room) => {

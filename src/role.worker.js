@@ -30,7 +30,7 @@ var Cache = require("cache"),
 
             // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
-            max = Math.min(Math.ceil(5 * adjustment), 3);
+            max = Math.max(Math.ceil(5 * adjustment), 3);
             if (count < max) {
                 Worker.spawn(room, sources[0].id);
             }

@@ -142,8 +142,7 @@ var profiler = require("screeps-profiler"),
                         }
                     }
                 });
-                console.log("  CPU: " + Game.cpu.getUsed().toFixed(2) + "/" + Game.cpu.limit);
-                console.log("  Bucket: " + Game.cpu.bucket);
+                console.log("  CPU: " + Game.cpu.getUsed().toFixed(2) + "/" + Game.cpu.limit + " Bucket: " + Game.cpu.bucket + " Tick: " + Game.time);
             });
         }
     };

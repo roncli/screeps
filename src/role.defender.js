@@ -1,6 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskHealer = require("task.healer"),
+    TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
 
@@ -165,7 +165,7 @@ var Cache = require("cache"),
 
             // Find allies to heal.
             _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.ally), (creep) => {
-                var task = new TaskHealer.getDefenderTask(creep);
+                var task = new TaskHeal.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     creep.say("Heal");
                     assigned.push(creep.name);

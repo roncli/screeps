@@ -169,10 +169,6 @@ var Cache = require("cache"),
                 if (task && task.canAssign(creep)) {
                     creep.say("Heal");
                     assigned.push(creep.name);
-                    hitsMissing -= creep.getActiveBodyparts(HEAL) * 12;
-                    if (hitsMissing <= 0) {
-                        return false;
-                    }
                 }
             });
 
@@ -184,7 +180,7 @@ var Cache = require("cache"),
             }
 
             // Rally the troops!
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.defending), (creep) => {
                 var task = new TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);

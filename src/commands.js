@@ -6,11 +6,11 @@ var Cache = require("cache"),
             "use strict";
 
             if (!Memory.maxCreeps.delivery) {
-                Memory.maxCreeps.delivery = {}
+                Memory.maxCreeps.delivery = {};
             }
 
             if (!Memory.maxCreeps.delivery[toRoom]) {
-                Memory.maxCreeps.delivery[toRoom] = {}
+                Memory.maxCreeps.delivery[toRoom] = {};
             }
 
             if (maxCreeps === 0) {
@@ -38,6 +38,27 @@ var Cache = require("cache"),
                     Memory.rooms[name] = {};
                 }
                 Memory.rooms[name].roomType = options;
+            }
+        },
+
+        // Defend a room.
+        defendRoom: (fromRoom, toRoom, maxCreeps) => {
+            "use strict";
+
+            if (!Memory.maxCreeps.defender) {
+                Memory.maxCreeps.defender = {};
+            }
+
+            if (!Memory.maxCreeps.defender[fromRoom]) {
+                Memory.maxCreeps.defender[fromRoom] = {};
+            }
+            
+            if (maxCreeps === 0) {
+                delete Memory.maxCreeps.defender[fromRoom][toRoom];
+            } else {
+                Memory.maxCreeps.defender[fromRoom][toRoom] = {
+                    maxCreeps: maxCreeps
+                };
             }
         }
     };

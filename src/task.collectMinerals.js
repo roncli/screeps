@@ -25,6 +25,8 @@ CollectMinerals.prototype.canAssign = function(creep) {
 CollectMinerals.prototype.run = function(creep) {
     "use strict";
 
+    var minerals;
+
     // Object not found, complete task.
     if (!this.object) {
         Task.prototype.complete.call(this, creep);

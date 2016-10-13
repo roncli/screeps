@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskRally = require("task.rally"),
 
     Defender = {
         checkSpawn: (room) => {

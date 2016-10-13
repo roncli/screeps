@@ -122,7 +122,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "defender" && !c.memory.currentTask)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "defender" && c.memory.home === room.name && !c.memory.currentTask)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

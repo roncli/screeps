@@ -6,7 +6,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var max = 0;
+            var max = 0,
+                source;
 
             // If there are no spawns or containers in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0) {
@@ -15,6 +16,13 @@ var Cache = require("cache"),
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
+                // If this container is for a mineral, check to make sure it has resources.
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), Cache.getObjectById(id))[0]) instanceof Mineral) {
+                    if (source.mineralAmount === 0) {
+                        return;
+                    }
+                }
+
                 max += 1;
 
                 // If we don't have a miner for this container, spawn one.

@@ -24,7 +24,12 @@ var Cache = require("cache"),
             // Determine the number storers needed.
             _.forEach(Cache.containersInRoom(room), (container) => {
                 if (!Memory.lengthToStorage[container.id]) {
-                    Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
+                    // Since minerals produce up to half as much as sources, count the length for half.
+                    if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0] instanceof Mineral) {
+                        Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length / 2;
+                    } else {
+                        Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
+                    }
                 }
                 length += Memory.lengthToStorage[container.id];
             });

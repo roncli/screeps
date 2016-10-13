@@ -1,5 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskRally = require("task.rally"),
+    TaskReserve = require("task.reserve"),
 
     Reserver = {
         checkSpawn: (room) => {

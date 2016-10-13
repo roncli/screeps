@@ -136,17 +136,14 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled containers.
-            tasks = TaskFillEnergy.getFillContainerTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Unfilled containers: " + tasks.length);
-            }
+            // Check for unfilled storage.
+            tasks = TaskFillEnergy.getFillStorageTasks(room);
             _.forEach(tasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
-                            creep.say("Container");
+                            creep.say("Storage");
                             assigned.push(creep.name);
                             energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {

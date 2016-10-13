@@ -38,8 +38,8 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the energy available.
-            energy = Utilities.getAvailableEnergyInRoom(room);
+            // Get the energy available, limiting to 4450.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 4450);
 
             // Fail under 550 energy.
             if (energy < 550) {

@@ -107,7 +107,7 @@ var Cache = require("cache"),
             }
 
             // Attempt to get energy from containers.
-            _.forEach([].concat.apply([], [TaskCollectEnergy.getStorerTasks(room), TaskCollectMinerals.getStorerTasks(room)]), (task) => {
+            _.forEach(_.sortBy([].concat.apply([], [TaskCollectEnergy.getStorerTasks(room), TaskCollectMinerals.getStorerTasks(room)]), (t) => -_.sum(t.object.store)), (task) => {
                 if (!_.sum(task.object.store)) {
                     return;
                 }

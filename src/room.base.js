@@ -167,6 +167,7 @@ Base.prototype.run = function(room) {
     RoleStorer.checkSpawn(room);
     RoleCollector.checkSpawn(room);
     RoleDelivery.checkSpawn(room);
+    RoleReserver.checkSpawn(room);
 
     // Get the tasks needed for this room.
     tasks = {
@@ -257,6 +258,7 @@ Base.prototype.run = function(room) {
     RoleStorer.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleDelivery.assignTasks(room, tasks);
+    RoleReserver.assignTasks(room, tasks);
 
     // Assign tasks to towers.
     RoleTower.assignTasks(room, tasks);

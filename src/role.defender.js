@@ -134,7 +134,7 @@ var Cache = require("cache"),
 
             // If the creeps are not in the room, rally them.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
-                var task = TaskRally.getDefenderTask(creep);
+                var task = TaskRally.getRoamerTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
                 };
@@ -149,7 +149,7 @@ var Cache = require("cache"),
             
             // Find hostiles to attack.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskRangedAttack.getRoamerTask(creep);
+                var task = TaskRangedAttack.getDefenderTask(creep);
                 if (task && task.canAssign(creep)) {
                     creep.say("Die!", true);
                     assigned.push(creep.name);

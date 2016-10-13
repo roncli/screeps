@@ -79,14 +79,14 @@ var profiler = require("screeps-profiler"),
                     if (room.controller) {
                         if (room.controller.my) {
                             if (room.controller.level === 8) {
-                                console.log("  " + room.name + "Controller level " + room.controller.level);
+                                console.log("  " + room.name + " Controller level " + room.controller.level);
                             } else {
-                                console.log("  " + room.name + "Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                                console.log("  " + room.name + " Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
                             }
                         } else if (room.controller.level === 0) {
-                            console.log("  " + room.name + "Controller unowned");
+                            console.log("  " + room.name + " Controller unowned");
                         } else {
-                            console.log("  " + room.name + "Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
+                            console.log("  " + room.name + " Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
                         }
                     }
 

@@ -100,7 +100,7 @@ var Cache = require("cache"),
             }
 
             // Reserve the controller.
-            _.forEach(creepWithNoTask, (creep) => {
+            _.forEach(creepsWithNoTask, (creep) => {
                 var task = TaskReserve.getTask(creep);
                 if (task.canAssign(creep)) {
                     console.log("Reserving");

@@ -75,9 +75,9 @@ var Cache = require("cache"),
             }
             
             if (reserve) {
-                delete Memory.maxCreeps.reserver[fromRoom][toRoom];
-            } else {
                 Memory.maxCreeps.reserver[fromRoom][toRoom] = true;
+            } else {
+                delete Memory.maxCreeps.reserver[fromRoom][toRoom];
             }
         }
     };

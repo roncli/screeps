@@ -1,5 +1,6 @@
 var profiler = require("screeps-profiler"),
     Cache = require("cache"),
+    Commands = require("commands"),
     Utilities = require("utilities"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),

@@ -164,7 +164,7 @@ var Cache = require("cache"),
             }
 
             // Find allies to heal.
-            _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.ally), (creep) => {
+            _.forEach(creepsWithNoTask, (creep) => {
                 var task = TaskHeal.getDefenderTask(creep);
                 if (task && task.canAssign(creep)) {
                     creep.say("Heal");

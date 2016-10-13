@@ -10,7 +10,7 @@ var Room = require("room"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
     Base = function() {
-        room.call(this);
+        Room.call(this);
 
         this.type = "base";
     };

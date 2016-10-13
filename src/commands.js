@@ -63,7 +63,7 @@ var Cache = require("cache"),
         },
 
         // Reserve a room.
-        reserveRoom: (fromRoom, toRoom) => {
+        reserveRoom: (fromRoom, toRoom, reserve) => {
             "use strict";
 
             if (!Memory.maxCreeps.reserver) {
@@ -74,7 +74,7 @@ var Cache = require("cache"),
                 Memory.maxCreeps.reserver[fromRoom] = {};
             }
             
-            if (maxCreeps === 0) {
+            if (reserve) {
                 delete Memory.maxCreeps.reserver[fromRoom][toRoom];
             } else {
                 Memory.maxCreeps.reserver[fromRoom][toRoom] = true;

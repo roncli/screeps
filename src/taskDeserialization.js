@@ -11,6 +11,7 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
+    TaskReserve = require("task.reserve"),
     TaskUpgradeController = require("task.upgradeController"),
     
     deserialization = (creep) => {
@@ -52,6 +53,9 @@ var Cache = require("cache"),
                 break;
             case "repair":
                 Cache.creepTasks[creep.name] = TaskRepair.fromObj(creep);
+                break;
+            case "reserve":
+                Cache.creepTasks[creep.name] = TaskReserve.fromObj(creep);
                 break;
             case "upgradeController":
                 Cache.creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);

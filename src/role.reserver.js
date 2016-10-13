@@ -103,7 +103,7 @@ var Cache = require("cache"),
             _.forEach(creepsWithNoTask, (creep) => {
                 var task = TaskReserve.getTask(creep);
                 if (task.canAssign(creep)) {
-                    console.log("Reserving");
+                    creep.say("Reserving");
                     assigned.push(creep.name);
                 };
             });

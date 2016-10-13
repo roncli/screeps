@@ -14,7 +14,7 @@ FillMinerals.prototype.constructor = FillMinerals;
 FillMinerals.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY] || creep.carry[RESOURCE_ENERGY] === creep.carryCapacity) {
+    if (_.sum(creep.carry) > 0 && creep.carry[RESOURCE_ENERGY] !== _.sum(creep.carry)) {
         return false;
     }
     

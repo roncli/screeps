@@ -1,4 +1,4 @@
-var Room = require("room"),
+var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Utilities = require("utilities"),
     RoleCollector = require("role.collector"),
@@ -10,12 +10,12 @@ var Room = require("room"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
     Base = function() {
-        Room.call(this);
+        RoomObj.call(this);
 
         this.type = "base";
     };
 
-Base.prototype = Object.create(Room.prototype);
+Base.prototype = Object.create(RoomObj.prototype);
 Base.prototype.constructor = Base;
 
 Base.prototype.manage = function(room) {

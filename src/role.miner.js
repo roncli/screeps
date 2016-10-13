@@ -31,16 +31,57 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-                spawnToUse, name;
+                energy, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
+            // Get the energy available.
+            energy = Utilities.getAvailableEnergyInRoom(room);
+
             // Fail under 550 energy.
-            if (Utilities.getAvailableEnergyInRoom(room) < 550) {
+            if (energy < 550) {
                 return false;
+            }
+
+            // Do something different for minerals.
+            if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(container.room), Cache.mineralsInRoom(container.room)]), Cache.getObjectById(id))[0] instanceof Mineral) {
+                body = [];
+
+                // Create the body based on the energy.
+                for (count = 0; count < Math.floor(energy / 550); count++) {
+                    body.push(MOVE);
+                }
+
+                if (energy % 550 >= 50) {
+                    body.push(MOVE);
+                }
+
+                for (count = 0; count < Math.floor(energy / 550); count++) {
+                    body.push(WORK);
+                    body.push(WORK);
+                    body.push(WORK);
+                    body.push(WORK);
+                    body.push(WORK);
+                }
+
+                if (energy % 550 >= 150) {
+                    body.push(WORK);
+                }
+
+                if (energy % 550 >= 250) {
+                    body.push(WORK);
+                }
+
+                if (energy % 550 >= 350) {
+                    body.push(WORK);
+                }
+
+                if (energy % 550 >= 450) {
+                    body.push(WORK);
+                }
             }
 
             // Create the creep from the first listed spawn that is available.

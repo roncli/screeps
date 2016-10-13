@@ -34,7 +34,7 @@ CollectMinerals.prototype.run = function(creep) {
     }
 
     // Get the resource we're going to use.
-    minerals = _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0);
+    minerals = _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0);
 
     // We're out of minerals, complete task.
     if (minerals.length === 0) {
@@ -49,7 +49,7 @@ CollectMinerals.prototype.run = function(creep) {
     }
 
     // If we're full or there are no more minerals, complete task.
-    if (_.sum(creep.carry) === creep.carryCapacity || _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
+    if (_.sum(creep.carry) === creep.carryCapacity || _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) {
         Task.prototype.complete.call(this, creep);
     }
 };

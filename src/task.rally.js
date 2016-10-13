@@ -117,7 +117,7 @@ Rally.getHarvesterTasks = function(creeps) {
     return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.home, c));
 };
 
-Rally.getDefenderTask = function(creep) {
+Rally.getRoamerTask = function(creep) {
     "use strict";
 
     return new Rally(creep.memory.defending, creep);

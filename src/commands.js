@@ -60,6 +60,25 @@ var Cache = require("cache"),
                     maxCreeps: maxCreeps
                 };
             }
+        },
+
+        // Reserve a room.
+        reserveRoom: (fromRoom, toRoom) => {
+            "use strict";
+
+            if (!Memory.maxCreeps.reserver) {
+                Memory.maxCreeps.reserver = {};
+            }
+
+            if (!Memory.maxCreeps.reserver[fromRoom]) {
+                Memory.maxCreeps.reserver[fromRoom] = {};
+            }
+            
+            if (maxCreeps === 0) {
+                delete Memory.maxCreeps.reserver[fromRoom][toRoom];
+            } else {
+                Memory.maxCreeps.reserver[fromRoom][toRoom] = true;
+            }
         }
     };
 

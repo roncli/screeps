@@ -41,7 +41,6 @@ Ranged.prototype.canComplete = function(creep) {
     "use strict";
 
     if (!this.enemy) {
-        console.log(this.enemy);
         creep.say("Get Rekt!", true);
         Task.prototype.complete.call(this, creep);
         return true;

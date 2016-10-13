@@ -5,8 +5,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var num = 0, max = 0,
-                count, sources, capacity;
+            var num = 0, max = 0;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -16,13 +15,13 @@ var Cache = require("cache"),
             // Loop through the room reservers to see if we need to spawn a creep.
             if (Memory.maxCreeps.reserver) {
                 _.forEach(Memory.maxCreeps.reserver[room.name], (value, toRoom) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.reserve === toRoom).length;
+                    var count = _.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && c.memory.reserve === toRoom).length;
 
                     num += count;
-                    max += value.maxCreeps;
+                    max += 1;
 
                     if (count === 0) {
-                        Reserver.spawn(room, toId);
+                        Reserver.spawn(room, toRoom);
                     }
                 });
             }
@@ -31,7 +30,7 @@ var Cache = require("cache"),
             console.log("    Reservers: " + num + "/" + max);        
         },
         
-        spawn: (room, id) => {
+        spawn: (room, toRoom) => {
             "use strict";
 
             var body = [],
@@ -61,7 +60,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "reserver", reserve: room.name, home: id});
+            name = spawnToUse.createCreep(body, undefined, {role: "reserver", home: room.name, reserve: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it, and set spawning to true so it's not used this turn.
@@ -76,8 +75,36 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            // Attempt to reserve controller.
-            // TODO
+            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "defender" && c.memory.home === room.name && !c.memory.currentTask)),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // If the creeps are not in the room, rally them.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+                var task = TaskRally.getRoamerTask(creep);
+                if (task.canAssign(creep)) {
+                    assigned.push(creep.name);
+                };
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Reserve the controller.
+            _.forEach(creepWithNoTask, (creep) => {
+                var task = TaskReserve.getTask(creep);
+                if (task.canAssign(creep)) {
+                    console.log("Reserving");
+                    assigned.push(creep.name);
+                };
+            });
         }
     };
 

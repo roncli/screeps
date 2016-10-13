@@ -27,7 +27,7 @@ var Cache = require("cache"),
             }
 
             // Output defender count in the report.
-            console.log("    Defenders: " + num.toString() + "/" + Memory.maxCreeps.defender.toString());        
+            console.log("    Defenders: " + num + "/" + max);        
         },
         
         spawn: (room, toRoom) => {

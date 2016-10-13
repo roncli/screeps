@@ -86,7 +86,7 @@ var Cache = require("cache"),
 
             // If the creeps are not in the room, rally them.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.reserve), (creep) => {
-                var task = TaskRally.getRoamerTask(creep);
+                var task = TaskRally.getReserverTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
                 };

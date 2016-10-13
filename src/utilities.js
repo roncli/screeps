@@ -78,32 +78,6 @@ var Cache = require("cache"),
             return _.reduce(structures, function(sum, s) {return sum + s.energyCapacity;}, 0);
         },
 
-        // Set a number of creeps to deliver energy from a specific location.
-        deliverEnergy: (fromId, fromX, fromY, fromRoomName, toRoom, maxCreeps) => {
-            "use strict";
-
-            if (!Memory.maxCreeps.delivery) {
-                Memory.maxCreeps.delivery = {}
-            }
-
-            if (!Memory.maxCreeps.delivery[toRoom]) {
-                Memory.maxCreeps.delivery[toRoom] = {}
-            }
-
-            if (maxCreeps === 0) {
-                delete Memory.maxCreeps.delivery[toRoom][fromId];
-            } else {
-                Memory.maxCreeps.delivery[toRoom][fromId] = {
-                    fromPos: {
-                        x: fromX,
-                        y: fromY,
-                        roomName: fromRoomName
-                    },
-                    maxCreeps: maxCreeps
-                };
-            }
-        },
-
         checkSiteIsClear: (pos) => {
             "use strict";
 
@@ -202,18 +176,6 @@ var Cache = require("cache"),
                 }
 
                 distanceFromSpawn++;
-            }
-        },
-
-        setRoomType: (room, type) => {
-            if (!Memory.rooms) {
-                Memory.rooms = {};
-            }
-
-            if (type) {
-                Memory.rooms[room] = type;
-            } else {
-                delete Memory.rooms[room];
             }
         }
     };

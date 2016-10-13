@@ -15,6 +15,7 @@ var creeps = {},
 
 var Cache = {
     creepTasks: {},
+    roomTypes: {},
     spawning: {},
 
     // Reset the cache.
@@ -36,6 +37,7 @@ var Cache = {
         hostilesInRoom = {};
         objects = {};
         Cache.creepTasks = {};
+        Cache.roomTypes = {};
         Cache.spawning = {};
     },
 

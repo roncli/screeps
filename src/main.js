@@ -13,6 +13,7 @@ var profiler = require("screeps-profiler"),
     RoleWorker = require("role.worker"),
     RoomBase = require("room.base"),
     taskDeserialization = require("taskDeserialization"),
+    roomDeserialization = require("roomDeserialization"),
     
     main = {
         loop: () => {
@@ -25,6 +26,7 @@ var profiler = require("screeps-profiler"),
                 // Export global objects to Game.cmd for use from console.
                 Game.cmd = {
                     Cache: Cache,
+                    Commands: Commands,
                     Role: {
                         Collector: RoleCollector,
                         Defender: RoleDefender,
@@ -73,6 +75,13 @@ var profiler = require("screeps-profiler"),
                     }
                 });
 
+                // Lop through each room in memory to deserialize their type.
+                _.forEach(Memory.rooms, (roomMemory, name) => {
+                    if (roomMemory && roomMemory.roomType) {
+                        roomDeserialization(roomMemory, name);
+                    }
+                });
+
                 // Loop through each room to determine the required tasks for the room.
                 _.forEach(Game.rooms, (room) => {
                     // Log room status.
@@ -90,32 +99,9 @@ var profiler = require("screeps-profiler"),
                         }
                     }
 
-                    // Manage room every 100 turns.
-                    if (Game.time % 100 === 0 && Memory.rooms && Memory.rooms[room.name] === "base") {
-                        RoomBase.manage(room);
-                        console.log("    Room managed");
+                    if (Cache.roomTypes[room.name]) {
+                        Cache.roomTypes[room.name].run(room);
                     }
-                    
-                    // Spawn new creeps.
-                    RoleWorker.checkSpawn(room);
-                    RoleRangedAttack.checkSpawn(room);
-                    RoleHealer.checkSpawn(room);
-                    RoleMiner.checkSpawn(room);
-                    RoleStorer.checkSpawn(room);
-                    RoleCollector.checkSpawn(room);
-                    RoleDelivery.checkSpawn(room);
-
-                    // Assign tasks to creeps.                    
-                    RoleWorker.assignTasks(room);
-                    RoleRangedAttack.assignTasks(room);
-                    RoleHealer.assignTasks(room);
-                    RoleMiner.assignTasks(room);
-                    RoleStorer.assignTasks(room);
-                    RoleCollector.assignTasks(room);
-                    RoleDelivery.assignTasks(room);
-
-                    // Assign tasks to towers.
-                    RoleTower.assignTasks(room);
                 });
                 
                 // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.

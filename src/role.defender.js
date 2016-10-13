@@ -149,7 +149,7 @@ var Cache = require("cache"),
             
             // Find hostiles to attack.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskRangedAttack.getDefenderTask(creep);
+                var task = TaskRangedAttack.getDefenderTask(creep);
                 if (task && task.canAssign(creep)) {
                     creep.say("Die!", true);
                     assigned.push(creep.name);
@@ -165,7 +165,7 @@ var Cache = require("cache"),
 
             // Find allies to heal.
             _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.ally), (creep) => {
-                var task = new TaskHeal.getDefenderTask(creep);
+                var task = TaskHeal.getDefenderTask(creep);
                 if (task && task.canAssign(creep)) {
                     creep.say("Heal");
                     assigned.push(creep.name);

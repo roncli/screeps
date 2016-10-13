@@ -1,8 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskFillEnergy = require("task.fillEnergy"),
-    TaskHarvest = require("task.harvest"),
-    TaskRally = require("task.rally"),
 
     Reserver = {
         checkSpawn: (room) => {
@@ -76,7 +73,7 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
             // Attempt to reserve controller.

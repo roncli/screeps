@@ -1,7 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskRangedAttack = require("task.rangedAttack"),
-    TaskRally = require("task.rally"),
 
     Ranged = {
         checkSpawn: (room) => {
@@ -100,20 +98,11 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
-            var tasks;
-
             // Find hostiles to attack.
-            tasks = TaskRangedAttack.getTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Hostiles: " + tasks.length);
-                _.forEach(_.take(tasks, 5), (task) => {
-                    console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "%");
-                });
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.rangedAttack.tasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Die!", true);
@@ -122,8 +111,7 @@ var Cache = require("cache"),
             });
 
             // Rally the troops!
-            tasks = TaskRally.getAttackerTasks(room);
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.rally.attackerTasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {
                     task.canAssign(creep);
                 });

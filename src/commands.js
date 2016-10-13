@@ -29,6 +29,8 @@ var Cache = require("cache"),
 
         // Set the room type.  Options should be an object containing at least a type key.
         setRoomType: (name, options) => {
+            "use strict";
+
             if (options === undefined) {
                 delete Memory.rooms[name];
             } else {

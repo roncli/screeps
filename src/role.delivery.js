@@ -1,6 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
     TaskRally = require("task.rally"),
 
@@ -92,11 +91,11 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
             // Check for unfilled containers.
-            _.forEach(TaskFillEnergy.getFillContainerTasks(room), (task) => {
+            _.forEach(tasks.fillEnergy.fillContainerTasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.object), (creep) => {

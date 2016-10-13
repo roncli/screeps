@@ -1,9 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskCollectEnergy = require("task.collectEnergy"),
-    TaskCollectMinerals = require("task.collectMinerals"),
-    TaskFillEnergy = require("task.fillEnergy"),
-    TaskFillMinerals = require("task.fillMinerals"),
 
     Storer = {
         checkSpawn: (room) => {
@@ -73,23 +69,18 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
             var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("storer", room)),
-                assigned = [],
-                tasks;
+                assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;
             }
 
             // Check for unfilled containers.
-            tasks = [].concat.apply([], [TaskFillEnergy.getFillStorageTasks(room), TaskFillMinerals.getFillStorageTasks(room)]);
-            if (tasks.length > 0) {
-                console.log("    Unfilled Storage: " + tasks.length);
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: task.type, id: task.id}), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
@@ -112,7 +103,7 @@ var Cache = require("cache"),
             }
 
             // Attempt to get energy from containers.
-            _.forEach(_.sortBy([].concat.apply([], [TaskCollectEnergy.getStorerTasks(room), TaskCollectMinerals.getStorerTasks(room)]), (t) => -_.sum(t.object.store)), (task) => {
+            _.forEach(_.sortBy([].concat.apply([], [tasks.collectEnergy.storerTasks, tasks.collectMinerals.storerTasks]), (t) => -_.sum(t.object.store)), (task) => {
                 if (!_.sum(task.object.store)) {
                     return;
                 }

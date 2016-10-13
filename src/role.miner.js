@@ -106,7 +106,7 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
             var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("miner", room));
@@ -115,7 +115,7 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Attempt to assign harvest task to remaining creeps.
+            // Attempt to assign mine tasks.
             _.forEach(creepsWithNoTask, (creep) => {
                 var task = new TaskMine();
                 if (task.canAssign(creep)) {

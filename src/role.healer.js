@@ -1,7 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskHeal = require("task.heal"),
-    TaskRally = require("task.rally"),
 
     Healer = {
         checkSpawn: (room) => {
@@ -104,20 +102,11 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
-            var tasks;
-
             // Find allies to heal.
-            tasks = TaskHeal.getTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Creeps to heal: " + tasks.length);
-                _.forEach(_.take(tasks, 5), (task) => {
-                    console.log("      " + task.ally.pos.x + "," + task.ally.pos.y + " " + task.ally.hits + "/" + task.ally.hitsMax + " " + (100 * task.ally.hits / task.ally.hitsMax).toFixed(3) + "%");
-                });
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.heal.tasks, (task) => {
                 var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("healer", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);
                 if (hitsMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), task.ally), (creep) => {
@@ -133,8 +122,7 @@ var Cache = require("cache"),
             });
 
             // Rally the troops!
-            tasks = TaskRally.getHealerTasks(room);
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.rally.healerTasks, (task) => {
                 _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("healer", room)), (creep) => {
                     task.canAssign(creep);
                 });

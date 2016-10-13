@@ -1,12 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskBuild = require("task.build"),
-    TaskCollectEnergy = require("task.collectEnergy"),
-    TaskFillEnergy = require("task.fillEnergy"),
     TaskHarvest = require("task.harvest"),
     TaskRally = require("task.rally"),
-    TaskRepair = require("task.repair"),
-    TaskUpgradeController = require("task.upgradeController"),
 
     Worker = {
         checkSpawn: (room) => {
@@ -93,20 +88,18 @@ var Cache = require("cache"),
             return false;
         },
 
-        assignTasks: (room) => {
+        assignTasks: (room, tasks) => {
             "use strict";
 
             var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)),
-                assigned = [],
-                tasks;
+                assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;
             }
 
             // Check for critical controllers to upgrade.
-            _.forEach(TaskUpgradeController.getCriticalTasks(room), (task) => {
-                console.log("    Controller is critical, TTL: " + task.controller.ticksToDowngrade);
+            _.forEach(tasks.upgradeController.criticalTasks, (task) => {
                 if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "upgradeController", room: task.room}).length === 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
                         if (task.canAssign(creep)) {
@@ -125,12 +118,8 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled extensions.
-            tasks = TaskFillEnergy.getFillExtensionTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Unfilled extensions: " + tasks.length);
-            }
             _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
-                _.forEach(_.sortBy(tasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
+                _.forEach(_.sortBy(tasks.fillEnergy.fillExtensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
                     var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                     if (energyMissing > 0) {
                         if (task.canAssign(creep)) {
@@ -149,11 +138,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled spawns.
-            tasks = TaskFillEnergy.getFillSpawnTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Unfilled spawns: " + tasks.length);
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.fillEnergy.fillSpawnTasks, (task) => {
                 var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
@@ -176,11 +161,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled towers.
-            tasks = TaskFillEnergy.getFillTowerTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Unfilled towers: " + tasks.length);
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.fillEnergy.fillTowerTasks, (task) => {
                 var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
@@ -203,14 +184,7 @@ var Cache = require("cache"),
             }
 
             // Check for critical repairs.
-            tasks = TaskRepair.getCriticalTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Critical repairs required: " + tasks.length);
-                _.forEach(_.take(tasks, 5), (task) => {
-                    console.log("      " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
-                });
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.repair.criticalTasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
@@ -229,11 +203,7 @@ var Cache = require("cache"),
             }
 
             // Check for construction sites.
-            tasks = TaskBuild.getTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Construction sites: " + tasks.length.toString());
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.build.tasks, (task) => {
                 var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "build", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
@@ -256,14 +226,7 @@ var Cache = require("cache"),
             }
 
             // Check for repairs.
-            tasks = TaskRepair.getTasks(room);
-            if (tasks.length > 0) {
-                console.log("    Repairs required: " + tasks.length);
-                _.forEach(_.take(tasks, 5), (task) => {
-                    console.log("      " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
-                });
-            }
-            _.forEach(tasks, (task) => {
+            _.forEach(tasks.repair.tasks, (task) => {
                 var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,
                     taskAssigned = false;
                 
@@ -291,7 +254,7 @@ var Cache = require("cache"),
             }
 
             // Check for controllers to upgrade.
-            _.forEach(TaskUpgradeController.getTasks(room), (task) => {
+            _.forEach(tasks.upgradeController.tasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Controller");
@@ -307,7 +270,7 @@ var Cache = require("cache"),
             }
 
             // Attempt to get energy from containers.
-            _.forEach(TaskCollectEnergy.getTasks(room), (task) => {
+            _.forEach(tasks.collectEnergy.tasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");

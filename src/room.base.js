@@ -9,6 +9,16 @@ var RoomObj = require("roomObj"),
     RoleStorer = require("role.storer"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
+    TaskBuild = require("task.build"),
+    TaskCollectEnergy = require("task.collectEnergy"),
+    TaskCollectMinerals = require("task.collectMinerals"),
+    TaskFillEnergy = require("task.fillEnergy"),
+    TaskFillMinerals = require("task.fillMinerals"),
+    TaskHeal = require("task.heal"),
+    TaskRally = require("task.rally"),
+    TaskRangedAttack = require("task.rangedAttack"),
+    TaskRepair = require("task.repair"),
+    TaskUpgradeController = require("task.upgradeController"),
     Base = function() {
         RoomObj.call(this);
 
@@ -138,6 +148,10 @@ Base.prototype.manage = function(room) {
 };
 
 Base.prototype.run = function(room) {
+    "use strict";
+
+    var tasks;
+
     // Manage room.
     if (Game.time % 100 === 0) {
         this.manage(room);
@@ -153,20 +167,96 @@ Base.prototype.run = function(room) {
     RoleDelivery.checkSpawn(room);
 
     // Get the tasks needed for this room.
+    tasks = {
+        build: {
+            tasks: TaskBuild.getTasks(room)
+        },
+        collectEnergy: {
+            tasks: TaskCollectEnergy.getTasks(room),
+            storerTasks: TaskCollectEnergy.getStorerTasks(room)
+        },
+        collectMinerals: {
+            storerTasks: TaskCollectMinerals.getStorerTasks(room)
+        },
+        fillEnergy: {
+            fillExtensionTasks: TaskFillEnergy.getFillExtensionTasks(room),
+            fillSpawnTasks: TaskFillEnergy.getFillSpawnTasks(room),
+            fillTowerTasks: TaskFillEnergy.getFillTowerTasks(room),
+            fillStorageTasks: TaskFillEnergy.getFillStorageTasks(room),
+            fillContainerTasks: TaskFillEnergy.getFillContainerTasks(room)
+        },
+        fillMinerals: {
+            fillStorageTasks: TaskFillMinerals.getFillStorageTasks(room)
+        },
+        heal: {
+            tasks: TaskHeal.getTasks(room)
+        },
+        rally: {
+            attackerTasks: TaskRally.getAttackerTasks(room),
+            healerTasks: TaskRally.getHealerTasks(room)
+        },
+        rangedAttack: {
+            tasks: TaskRangedAttack.getTasks(room)
+        },
+        repair: {
+            tasks: TaskRepair.getTasks(room),
+            criticalTasks: TaskRepair.getCriticalTasks(room)
+        },
+        upgradeController: {
+            tasks: TaskUpgradeController.getTasks(room),
+            criticalTasks: TaskUpgradeController.getCriticalTasks(room)
+        }
+    };
 
     // Output room report.
+    if (tasks.fillEnergy.fillExtensionTasks.length > 0) {
+        console.log("    Extensions to fill: " + tasks.fillEnergy.fillExtensionTasks.length);
+    }
+    if (tasks.fillEnergy.fillSpawnTasks.length > 0) {
+        console.log("    Spawns to fill: " + tasks.fillEnergy.fillSpawnTasks.length);
+    }
+    if (tasks.fillEnergy.fillTowerTasks.length > 0) {
+        console.log("    Towers to fill: " + tasks.fillEnergy.fillTowerTasks.length);
+    }
+    if (tasks.build.tasks.length > 0) {
+        console.log("    Structures to build: " + tasks.build.tasks.length);
+    }
+    if (tasks.repair.criticalTasks.length > 0) {
+        console.log("    Critical repairs needed: " + tasks.repair.criticalTasks.length);
+        _.forEach(_.take(tasks.repair.criticalTasks, 5), (task) => {
+            console.log("      " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
+        });
+    }
+    if (tasks.repair.tasks.length > 0) {
+        console.log("    Repairs needed: " + tasks.repair.tasks.length);
+        _.forEach(_.take(tasks.repair.tasks, 5), (task) => {
+            console.log("      " + task.structure.structureType + " " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
+        });
+    }
+    if (tasks.rangedAttack.tasks.length > 0) {
+        console.log("    Hostiles: " + tasks.rangedAttack.tasks.length);
+        _.forEach(_.take(tasks.rangedAttack.tasks, 5), (task) => {
+            console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "%");
+        });
+    }
+    if (tasks.heal.tasks.length > 0) {
+        console.log("    Creeps to heal: " + tasks.heal.tasks.length);
+        _.forEach(_.take(tasks.heal.tasks, 5), (task) => {
+            console.log("      " + task.ally.pos.x + "," + task.ally.pos.y + " " + task.ally.hits + "/" + task.ally.hitsMax + " " + (100 * task.ally.hits / task.ally.hitsMax).toFixed(3) + "%");
+        });
+    }
 
     // Assign tasks to creeps.                    
-    RoleWorker.assignTasks(room);
-    RoleRangedAttack.assignTasks(room);
-    RoleHealer.assignTasks(room);
-    RoleMiner.assignTasks(room);
-    RoleStorer.assignTasks(room);
-    RoleCollector.assignTasks(room);
-    RoleDelivery.assignTasks(room);
+    RoleWorker.assignTasks(room, tasks);
+    RoleRangedAttack.assignTasks(room, tasks);
+    RoleHealer.assignTasks(room, tasks);
+    RoleMiner.assignTasks(room, tasks);
+    RoleStorer.assignTasks(room, tasks);
+    RoleCollector.assignTasks(room, tasks);
+    RoleDelivery.assignTasks(room, tasks);
 
     // Assign tasks to towers.
-    RoleTower.assignTasks(room);
+    RoleTower.assignTasks(room, tasks);
 };
 
 Base.prototype.toObj = function(room) {

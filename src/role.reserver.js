@@ -75,7 +75,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "defender" && c.memory.home === room.name && !c.memory.currentTask)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && !c.memory.currentTask)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -83,7 +83,7 @@ var Cache = require("cache"),
             }
 
             // If the creeps are not in the room, rally them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.reserve), (creep) => {
                 var task = TaskRally.getRoamerTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);

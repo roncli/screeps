@@ -47,7 +47,7 @@ var Cache = require("cache"),
             }
 
             // Do something different for minerals.
-            if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(container.room), Cache.mineralsInRoom(container.room)]), Cache.getObjectById(id))[0] instanceof Mineral) {
+            if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), Cache.getObjectById(id))[0] instanceof Mineral) {
                 body = [];
 
                 // Create the body based on the energy.

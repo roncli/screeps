@@ -11,6 +11,9 @@ var Task = require("task"),
         if (!this.rallyPoint) {
             this.rallyPoint = Game.flags[id];
         }
+        if (!this.rallyPoint) {
+            this.rallyPoint = new RoomPosition(25, 25, id);
+        }
     };
     
 Rally.prototype = Object.create(Task.prototype);
@@ -108,6 +111,12 @@ Rally.getHarvesterTasks = function(creeps) {
     "use strict";
 
     return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.home, c));
+};
+
+Rally.getDefenderTask = function(creep) {
+    "use strict";
+
+    return new Rally(creep.memory.defending, creep);
 };
 
 require("screeps-profiler").registerObject(Rally, "TaskRally");

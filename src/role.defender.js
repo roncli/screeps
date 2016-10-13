@@ -5,24 +5,32 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var count;
+            var num = 0, max = 0;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
                 return;
             }
 
-            // If we have less than max defenders, spawn a defender.
-            count = Cache.creepsInRoom("defender", room).length;
-            if (count < Memory.maxCreeps.defender) {
-                Defender.spawn(room);
+            // Loop through the room defenders to see if we need to spawn a creep.
+            if (Memory.maxCreeps.defender) {
+                _.forEach(Memory.maxCreeps.defender[room.name], (value, toRoom) => {
+                    var count = _.filter(Game.creeps, (c) => c.memory.role === "defender" && c.memory.home === room.name && c.memory.defend === toRoom).length;
+
+                    num += count;
+                    max += value.maxCreeps;
+
+                    if (count < value.maxCreeps) {
+                        Defender.spawn(room, toRoom);
+                    }
+                });
             }
 
             // Output defender count in the report.
             console.log("    Defenders: " + count.toString() + "/" + Memory.maxCreeps.defender.toString());        
         },
         
-        spawn: (room) => {
+        spawn: (room, toRoom) => {
             "use strict";
 
             var body = [],
@@ -99,7 +107,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "defender"});
+            name = spawnToUse.createCreep(body, undefined, {role: "defender", home: room.name, defending: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it, and set spawning to true so it's not used this turn.
@@ -114,22 +122,53 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
+            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "defender" && !c.memory.currentTask)),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // If the creeps are not in the room, rally them.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+                var task = new TaskRally.getDefenderTask(creep);
+                if (task.canAssign(creep)) {
+                    assigned.push(creep.name);
+                };
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            
             // Find hostiles to attack.
             _.forEach(tasks.rangedAttack.tasks, (task) => {
-                _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)), (creep) => {
+                _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Die!", true);
+                        assigned.push(creep.name);
                     }
                 });
             });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
 
             // Find allies to heal.
             _.forEach(tasks.heal.tasks, (task) => {
                 var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("defender", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);
                 if (hitsMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)), task.ally), (creep) => {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.ally), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Heal");
+                            assigned.push(creep.name);
                             hitsMissing -= creep.getActiveBodyparts(HEAL) * 12;
                             if (hitsMissing <= 0) {
                                 return false;
@@ -139,9 +178,16 @@ var Cache = require("cache"),
                 }
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Rally the troops!
-            _.forEach(tasks.rally.attackerTasks, (task) => {
-                _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)), (creep) => {
+            _.forEach(tasks.rally.defenderTasks, (task) => {
+                _.forEach(Utilities.creepsWithNoTask(creepsWithNoTask, (creep) => {
                     task.canAssign(creep);
                 });
             });

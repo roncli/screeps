@@ -7,8 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var num = 0, max = 0,
-                count, sources, capacity;
+            var num = 0, max = 0;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {

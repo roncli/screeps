@@ -1,6 +1,8 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskHealer = require("task.healer"),
     TaskRally = require("task.rally"),
+    TaskRangedAttack = require("task.rangedAttack"),
 
     Defender = {
         checkSpawn: (room) => {
@@ -146,13 +148,12 @@ var Cache = require("cache"),
             }
             
             // Find hostiles to attack.
-            _.forEach(tasks.rangedAttack.tasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Die!", true);
-                        assigned.push(creep.name);
-                    }
-                });
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task = new TaskRangedAttack.getDefenderTask(creep);
+                if (task.canAssign(creep)) {
+                    creep.say("Die!", true);
+                    assigned.push(creep.name);
+                }
             });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -163,19 +164,15 @@ var Cache = require("cache"),
             }
 
             // Find allies to heal.
-            _.forEach(tasks.heal.tasks, (task) => {
-                var hitsMissing = task.ally.hitsMax - task.ally.hits - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("defender", room), {type: "heal", id: task.id}), function(sum, c) {return sum + c.getActiveBodyparts(HEAL) * 12;}, 0);
-                if (hitsMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.ally), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Heal");
-                            assigned.push(creep.name);
-                            hitsMissing -= creep.getActiveBodyparts(HEAL) * 12;
-                            if (hitsMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
+            _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.ally), (creep) => {
+                var task = new TaskHealer.getDefenderTask(creep);
+                if (task.canAssign(creep)) {
+                    creep.say("Heal");
+                    assigned.push(creep.name);
+                    hitsMissing -= creep.getActiveBodyparts(HEAL) * 12;
+                    if (hitsMissing <= 0) {
+                        return false;
+                    }
                 }
             });
 

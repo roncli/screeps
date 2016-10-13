@@ -70,5 +70,11 @@ Heal.getTasks = function(room) {
     return _.map(_.sortBy(_.filter(Cache.creepsInRoom("all", room), (c) => c.hits < c.hitsMax), (c) => c.hits), (c) => new Heal(c.id));
 };
 
+Heal.getDefenderTask = function(creep) {
+    "use strict";
+
+    return _.map(_.sortBy(_.filter(Cache.creepsInRoom("all", creep.room), (c) => c.hits < c.hitsMax), (c) => c.hits), (c) => new Heal(c.id))[0];
+};
+
 require("screeps-profiler").registerObject(Heal, "TaskHeal");
 module.exports = Heal;

@@ -186,10 +186,11 @@ var Cache = require("cache"),
             }
 
             // Rally the troops!
-            _.forEach(tasks.rally.defenderTasks, (task) => {
-                _.forEach(Utilities.creepsWithNoTask(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+                var task = new TaskRally.getDefenderTask(creep);
+                if (task.canAssign(creep)) {
+                    assigned.push(creep.name);
+                };
             });
         }
     };

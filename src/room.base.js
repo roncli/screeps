@@ -2,6 +2,7 @@ var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Utilities = require("utilities"),
     RoleCollector = require("role.collector"),
+    RoleDefender = require("role.defender"),
     RoleDelivery = require("role.delivery"),
     RoleHealer = require("role.healer"),
     RoleMiner = require("role.miner"),
@@ -161,6 +162,7 @@ Base.prototype.run = function(room) {
     RoleWorker.checkSpawn(room);
     RoleRangedAttack.checkSpawn(room);
     RoleHealer.checkSpawn(room);
+    RoleDefender.checkSpawn(room);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
     RoleCollector.checkSpawn(room);
@@ -250,6 +252,7 @@ Base.prototype.run = function(room) {
     RoleWorker.assignTasks(room, tasks);
     RoleRangedAttack.assignTasks(room, tasks);
     RoleHealer.assignTasks(room, tasks);
+    RoleDefender.assignTasks(room, tasks);
     RoleMiner.assignTasks(room, tasks);
     RoleStorer.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);

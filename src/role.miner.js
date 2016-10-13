@@ -17,7 +17,7 @@ var Cache = require("cache"),
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
                 // If this container is for a mineral, check to make sure it has resources.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), Cache.getObjectById(id))[0]) instanceof Mineral) {
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
                     if (source.mineralAmount === 0) {
                         return;
                     }

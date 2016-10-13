@@ -28,7 +28,7 @@ Reserve.prototype.run = function(creep) {
         return;
     }
     
-    if (creep.reserve(creep.room.controller) === ERR_NOT_IN_RANGE) {
+    if (creep.reserveController(creep.room.controller) === ERR_NOT_IN_RANGE) {
         creep.moveTo(creep.room.controller, {reusePath: Math.floor(Math.random() * 2) + 1});
     }
 };

@@ -95,7 +95,7 @@ var Cache = require("cache"),
             "use strict";
 
             // Check for construction sites if we're in the destination room.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === Cache.getObjectById(c.memory.home).room.name), (creep) => {
+            _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (c) => c.room.name === Cache.getObjectById(c.memory.home).room.name), (creep) => {
                 if (Cache.constructionSitesInRoom(creep.room).length > 0) {
                     var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
                     if (task.canAssign(creep)) {

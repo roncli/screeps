@@ -103,7 +103,7 @@ CollectEnergy.getStorerTasks = function(room) {
         }
     }
     
-    return _.sortBy(tasks, (t) => -(t.object.energy || _.sum(t.object.store) || 0));
+    return tasks;
 };
 
 require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");

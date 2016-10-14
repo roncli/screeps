@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Utilities = require("utilities"),
     CollectEnergy = function(id) {
         Task.call(this);
 

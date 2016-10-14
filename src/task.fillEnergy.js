@@ -114,5 +114,18 @@ FillEnergy.getFillStorageTasks = function(room) {
     }
 };
 
+FillEnergy.getFillLinkTask = function(room) {
+    "use strict";
+
+    if (Cache.spawnsInRoom(room).length > 0) {
+        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom[0]);
+        if (links.length > 0 && links[1].energy < links[1].energyCapacity) {
+            return new CollectEnergy(links[1].id);
+        }
+    }
+
+    return null;
+}
+
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
 module.exports = FillEnergy;

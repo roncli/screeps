@@ -104,6 +104,15 @@ var Cache = require("cache"),
                 }
             });
 
+            // Check for unfilled links.
+            if (tasks.fillEnergy.fillLinkTask) {
+                _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (c) => c.energy > 0), (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Link");
+                    }
+                });
+            }
+
             // Check for unfilled containers.
             _.forEach(tasks.fillEnergy.fillContainerTasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)

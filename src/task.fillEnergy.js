@@ -121,7 +121,7 @@ FillEnergy.getFillLinkTask = function(room) {
     var links;
 
     if (Cache.spawnsInRoom(room).length > 0) {
-        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom[0]);
+        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         if (links.length > 0 && links[1].energy < links[1].energyCapacity) {
             return new FillEnergy(links[1].id);
         }

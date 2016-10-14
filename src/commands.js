@@ -93,7 +93,7 @@ var Cache = require("cache"),
                 Memory.maxCreeps.claimer[fromRoom] = {};
             }
             
-            if (claimer) {
+            if (claim) {
                 Memory.maxCreeps.claimer[fromRoom][toRoom] = true;
             } else {
                 delete Memory.maxCreeps.claimer[fromRoom][toRoom];

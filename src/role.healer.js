@@ -59,14 +59,6 @@ var Cache = require("cache"),
             }
 
             for (count = 0; count < Math.floor(energy / 450); count++) {
-                body.push(HEAL);
-            }
-
-            if (energy % 450 >= 300) {
-                body.push(HEAL);
-            }
-
-            for (count = 0; count < Math.floor(energy / 450); count++) {
                 body.push(MOVE);
                 body.push(MOVE);
                 body.push(MOVE);
@@ -86,6 +78,14 @@ var Cache = require("cache"),
 
             if (energy % 450 >= 250 && energy % 450 < 300) {
                 body.push(MOVE);
+            }
+
+            for (count = 0; count < Math.floor(energy / 450); count++) {
+                body.push(HEAL);
+            }
+
+            if (energy % 450 >= 300) {
+                body.push(HEAL);
             }
 
             // Create the creep from the first listed spawn that is available.

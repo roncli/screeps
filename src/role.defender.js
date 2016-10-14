@@ -70,22 +70,6 @@ var Cache = require("cache"),
             }
 
             for (count = 0; count < Math.floor(energy / 650); count++) {
-                body.push(RANGED_ATTACK);
-            }
-
-            if (energy % 650 >= 200) {
-                body.push(RANGED_ATTACK);
-            }
-
-            for (count = 0; count < Math.floor(energy / 650); count++) {
-                body.push(HEAL);
-            }
-
-            if (energy % 650 >= 450) {
-                body.push(HEAL);
-            }
-
-            for (count = 0; count < Math.floor(energy / 650); count++) {
                 body.push(MOVE);
                 body.push(MOVE);
                 body.push(MOVE);
@@ -106,6 +90,22 @@ var Cache = require("cache"),
 
             if ((energy % 650 >= 400 && energy % 650 < 450) || (energy % 650 >= 600)) {
                 body.push(MOVE);
+            }
+
+            for (count = 0; count < Math.floor(energy / 650); count++) {
+                body.push(RANGED_ATTACK);
+            }
+
+            if (energy % 650 >= 200) {
+                body.push(RANGED_ATTACK);
+            }
+
+            for (count = 0; count < Math.floor(energy / 650); count++) {
+                body.push(HEAL);
+            }
+
+            if (energy % 650 >= 450) {
+                body.push(HEAL);
             }
 
             // Create the creep from the first listed spawn that is available.

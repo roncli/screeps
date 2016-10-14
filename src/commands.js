@@ -79,6 +79,25 @@ var Cache = require("cache"),
             } else {
                 delete Memory.maxCreeps.reserver[fromRoom][toRoom];
             }
+        },
+
+        // Claim a room.
+        claimRoom: (fromRoom, toRoom, claim) => {
+            "use strict";
+
+            if (!Memory.maxCreeps.claimer) {
+                Memory.maxCreeps.claimer = {};
+            }
+
+            if (!Memory.maxCreeps.claimer[fromRoom]) {
+                Memory.maxCreeps.claimer[fromRoom] = {};
+            }
+            
+            if (claimer) {
+                Memory.maxCreeps.claimer[fromRoom][toRoom] = true;
+            } else {
+                delete Memory.maxCreeps.claimer[fromRoom][toRoom];
+            }
         }
     };
 

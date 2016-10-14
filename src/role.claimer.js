@@ -1,9 +1,10 @@
 var Cache = require("cache"),
+    Commands = require("commands"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally"),
-    TaskReserve = require("task.reserve"),
+    TaskClaim = require("task.claim"),
 
-    Reserver = {
+    Claimer = {
         checkSpawn: (room) => {
             "use strict";
 
@@ -14,22 +15,22 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Loop through the room reservers to see if we need to spawn a creep.
-            if (Memory.maxCreeps.reserver) {
-                _.forEach(Memory.maxCreeps.reserver[room.name], (value, toRoom) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && c.memory.reserve === toRoom).length;
+            // Loop through the room claimers to see if we need to spawn a creep.
+            if (Memory.maxCreeps.claimer) {
+                _.forEach(Memory.maxCreeps.claimer[room.name], (value, toRoom) => {
+                    var count = _.filter(Game.creeps, (c) => c.memory.role === "claimer" && c.memory.home === room.name && c.memory.claim === toRoom).length;
 
                     num += count;
                     max += 1;
 
                     if (count === 0) {
-                        Reserver.spawn(room, toRoom);
+                        Claimer.spawn(room, toRoom);
                     }
                 });
             }
 
-            // Output reserver count in the report.
-            console.log("    Reservers: " + num + "/" + max);        
+            // Output claimer count in the report.
+            console.log("    Claimers: " + num + "/" + max);        
         },
         
         spawn: (room, toRoom) => {
@@ -43,11 +44,11 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room, limited to 16250.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 16250);
+            // Get the total energy in the room, limited to 650.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 650);
 
-            // If we're not at 16250 and energy is not at capacity, bail.
-            if (energy < 16250 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            // If we're not at 650 and energy is not at capacity, bail.
+            if (energy < 650 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
                 return;
             }
 
@@ -62,12 +63,12 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "reserver", home: room.name, reserve: toRoom});
+            name = spawnToUse.createCreep(body, undefined, {role: "claimer", home: room.name, claim: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it, and set spawning to true so it's not used this turn.
             if (typeof name !== "number") {
-                console.log("    Spawning new reserver " + name);
+                console.log("    Spawning new claimer " + name);
                 return true;
             }
 
@@ -77,7 +78,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && !c.memory.currentTask)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "claimer" && c.memory.home === room.name && !c.memory.currentTask)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -85,8 +86,8 @@ var Cache = require("cache"),
             }
 
             // If the creeps are not in the room, rally them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.reserve), (creep) => {
-                var task = TaskRally.getReserverTask(creep);
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.claim), (creep) => {
+                var task = TaskRally.getClaimerTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
                 };
@@ -99,32 +100,32 @@ var Cache = require("cache"),
                 return;
             }
 
-            // If we have claimed the controller, stop trying to reserve the room and suicide any remaining creeps.
+            // Claim the controller.
             _.forEach(creepsWithNoTask, (creep) => {
-                if (creep.room.name === creep.memory.reserve && creep.room.controller.my) {
+                var task = TaskClaim.getTask(creep);
+                if (task.canAssign(creep)) {
+                    creep.say("Claiming");
                     assigned.push(creep.name);
-                    Commands.reserveRoom(creep.memory.home, creep.room.name, false);
+                };
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // If we have claimed, set the room as a base, stop trying to claim the room, and suicide any remaining creeps.
+            _.forEach(creepsWithNoTask, (creep) => {
+                if (creep.room.name === creep.memory.claim && creep.room.controller.my) {
+                    Commands.setRoomType(creep.room.name, {type: "base"});
+                    Commands.claimRoom(creep.memory.home, creep.room.name, false);
                     creep.suicide();
                 }
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Reserve the controller.
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskReserve.getTask(creep);
-                if (task.canAssign(creep)) {
-                    creep.say("Reserving");
-                    assigned.push(creep.name);
-                };
             });
         }
     };
 
-require("screeps-profiler").registerObject(Reserver, "RoleReserver");
-module.exports = Reserver;
+require("screeps-profiler").registerObject(Claimer, "RoleClaimer");
+module.exports = Claimer;

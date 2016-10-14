@@ -1,6 +1,7 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Utilities = require("utilities"),
+    RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
     RoleDelivery = require("role.delivery"),
@@ -169,6 +170,7 @@ Base.prototype.run = function(room) {
     RoleCollector.checkSpawn(room);
     RoleDelivery.checkSpawn(room);
     RoleReserver.checkSpawn(room);
+    RoleClaimer.checkSpawn(room);
 
     // Get the tasks needed for this room.
     tasks = {
@@ -260,6 +262,7 @@ Base.prototype.run = function(room) {
     RoleCollector.assignTasks(room, tasks);
     RoleDelivery.assignTasks(room, tasks);
     RoleReserver.assignTasks(room, tasks);
+    RoleClaimer.assignTasks(room, tasks);
 
     // Assign tasks to towers.
     RoleTower.assignTasks(room, tasks);

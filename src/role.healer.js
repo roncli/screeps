@@ -19,7 +19,9 @@ var Cache = require("cache"),
             }
 
             // Output healer count in the report.
-            console.log("    Healers: " + count.toString() + "/" + Memory.maxCreeps.healer.toString());        
+            if (Memory.maxCreeps.healer > 0) {
+                console.log("    Healers: " + count + "/" + Memory.maxCreeps.healer);
+            }        
         },
         
         spawn: (room) => {

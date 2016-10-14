@@ -32,7 +32,9 @@ var Cache = require("cache"),
             });
 
             // Output miner count in the report.
-            console.log("    Miners: " + Cache.creepsInRoom("miner", room).length + "/" + max);        
+            if (max > 0) {
+                console.log("    Miners: " + Cache.creepsInRoom("miner", room).length + "/" + max);
+            }        
         },
         
         spawn: (room, id) => {

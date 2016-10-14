@@ -30,7 +30,9 @@ var Cache = require("cache"),
             }
 
             // Output defender count in the report.
-            console.log("    Defenders: " + num + "/" + max);        
+            if (max > 0) {
+                console.log("    Defenders: " + num + "/" + max);
+            }        
         },
         
         spawn: (room, toRoom) => {

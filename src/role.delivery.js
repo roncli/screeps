@@ -30,7 +30,9 @@ var Cache = require("cache"),
             }
 
             // Output delivery count in the report.
-            console.log("    Deliveries: " + num + "/" + max);        
+            if (max > 0) {
+                console.log("    Deliveries: " + num + "/" + max);
+            }        
         },
         
         spawn: (room, id) => {

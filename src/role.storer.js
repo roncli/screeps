@@ -36,7 +36,9 @@ var Cache = require("cache"),
             }
 
             // Output storer count in the report.
-            console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Math.ceil(2 * length / 45));        
+            if (Math.ceil(2 * length / 45) > 0) {
+                console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Math.ceil(2 * length / 45));
+            }        
         },
         
         spawn: (room) => {

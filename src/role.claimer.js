@@ -30,7 +30,9 @@ var Cache = require("cache"),
             }
 
             // Output claimer count in the report.
-            console.log("    Claimers: " + num + "/" + max);        
+            if (max > 0) {
+                console.log("    Claimers: " + num + "/" + max);
+            }        
         },
         
         spawn: (room, toRoom) => {

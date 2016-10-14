@@ -19,7 +19,9 @@ var Cache = require("cache"),
             }
 
             // Output ranged attacker count in the report.
-            console.log("    Ranged Attackers: " + count.toString() + "/" + Memory.maxCreeps.rangedAttack.toString());        
+            if (Memory.maxCreeps.rangedAttack > 0) {
+                console.log("    Ranged Attackers: " + count + "/" + Memory.maxCreeps.rangedAttack);
+            }        
         },
         
         spawn: (room) => {

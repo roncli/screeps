@@ -60,7 +60,9 @@ var Cache = require("cache"),
             });
 
             // Output collector count in the report.
-            console.log("    Collectors: " + Cache.creepsInRoom("collector", room).length + "/" + max);        
+            if (max > 0) {
+                console.log("    Collectors: " + Cache.creepsInRoom("collector", room).length + "/" + max);
+            }        
         },
         
         spawn: (room, id) => {

@@ -30,7 +30,9 @@ var Cache = require("cache"),
             }
 
             // Output reserver count in the report.
-            console.log("    Reservers: " + num + "/" + max);        
+            if (max > 0) {
+                console.log("    Reservers: " + num + "/" + max);
+            }        
         },
         
         spawn: (room, toRoom) => {

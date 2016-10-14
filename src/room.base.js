@@ -153,11 +153,19 @@ Base.prototype.manage = function(room) {
 Base.prototype.run = function(room) {
     "use strict";
 
-    var tasks;
+    var tasks, links;
 
     // Manage room.
     if (Game.time % 100 === 0) {
         this.manage(room);
+    }
+
+    // Transfer energy from far link to near link.
+    if (Cache.spawnsInRoom(room).length > 0) {
+        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom[0]);
+        if (links.length > 1 && !links[1].cooldown && links[1].energy > 0) {
+            links[1].transferEnergy(links[0]);
+        }
     }
 
     // Spawn new creeps.

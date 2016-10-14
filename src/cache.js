@@ -4,6 +4,7 @@ var creeps = {},
     extensionsInRoom = {},
     towersInRoom = {},
     containersInRoom = {},
+    linksInRoom = {},
     repairableStructuresInRoom = {},
     constructionSitesInRoom = {},
     energySourcesInRoom = {},
@@ -28,6 +29,7 @@ var Cache = {
         extensionsInRoom = {};
         towersInRoom = {};
         containersInRoom = {};
+        linksInRoom = {};
         repairableStructuresInRoom = {};
         constructionSitesInRoom = {};
         energySourcesInRoom = {};
@@ -84,6 +86,13 @@ var Cache = {
         "use strict";
 
         return containersInRoom[room.name] ? containersInRoom[room.name] : (containersInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_CONTAINER}));
+    },
+
+    // Returns all links in the current room.
+    linksInRoom: (room) => {
+        "use strict";
+
+        return linksInRoom[room.name] ? linksInRoom[room.name] : (linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK}));
     },
 
     // Returns all repairable structures in the current room.

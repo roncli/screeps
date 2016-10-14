@@ -100,7 +100,6 @@ var Cache = require("cache"),
                     var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
                     if (task.canAssign(creep)) {
                         creep.say("Build");
-                        assigned.push(creep.name);
                     }
                 }
             });

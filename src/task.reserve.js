@@ -12,7 +12,7 @@ Reserve.prototype.constructor = Reserve;
 Reserve.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.memory.role !== "reserver" || !creep.room.controller) {
+    if (creep.memory.role !== "reserver" || !creep.room.controller || creep.room.controller.my) {
         return false;
     }
     
@@ -36,7 +36,7 @@ Reserve.prototype.run = function(creep) {
 Reserve.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!creep.room.controller) {
+    if (!creep.room.controller || creep.room.controller.my) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

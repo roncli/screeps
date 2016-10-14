@@ -92,7 +92,16 @@ CollectEnergy.getTasks = function(room) {
 CollectEnergy.getStorerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => -_.sum(c.store)), (c) => new CollectEnergy(c.id));
+    var tasks = _.map(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => new CollectEnergy(c.id));
+
+    if (Cache.spawnsInRoom(room).length > 0) {
+        var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom[0]);
+        if (links.length > 0 && links[0].energy > 0) {
+            tasks.push(new CollectEnergy(links[0].id));
+        }
+    }
+    
+    return _.sortBy(tasks, (t) => -(t.energy || _.sum(t.store) || 0));
 };
 
 require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");

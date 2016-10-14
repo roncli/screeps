@@ -129,5 +129,11 @@ Rally.getReserverTask = function(creep) {
     return new Rally(creep.memory.reserve, creep);
 };
 
+Rally.getClaimerTask = function(creep) {
+    "use strict";
+
+    return new Rally(creep.memory.claim, creep);
+};
+
 require("screeps-profiler").registerObject(Rally, "TaskRally");
 module.exports = Rally;

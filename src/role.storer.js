@@ -104,10 +104,10 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(_.sortBy([].concat.apply([], [tasks.collectEnergy.storerTasks, tasks.collectMinerals.storerTasks]), (t) => -(t.object.energy || _.sum(t.object.store) || 0)), (task) => {
-                if (!_.sum(task.object.store)) {
+                if (!task.object.energy && !_.sum(task.object.store)) {
                     return;
                 }
-                var energy = _.sum(task.object.store) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: task.type, id: task.id}), function(sum, c) {return sum + (c.carryCapacity - _.sum(c.carry));}, 0);
+                var energy = (task.object.energy || _.sum(task.object.store) || 0) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: task.type, id: task.id}), function(sum, c) {return sum + (c.carryCapacity - _.sum(c.carry));}, 0);
                 if (energy > 0) {
                     _.forEach(creepsWithNoTask, (creep) => {
                         if (task.canAssign(creep)) {

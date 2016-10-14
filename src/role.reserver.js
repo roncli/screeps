@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    Commands = require("commands"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally"),
     TaskReserve = require("task.reserve"),

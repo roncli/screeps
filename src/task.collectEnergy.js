@@ -97,7 +97,7 @@ CollectEnergy.getStorerTasks = function(room) {
         links;
 
     if (Cache.spawnsInRoom(room).length > 0) {
-        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom[0]);
+        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         if (links.length > 0 && links[0].energy > 0) {
             tasks.push(new CollectEnergy(links[0].id));
         }

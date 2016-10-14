@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskBuild = require("task.build"),
     TaskHarvest = require("task.harvest"),
     TaskRally = require("task.rally"),
 
@@ -92,6 +93,23 @@ var Cache = require("cache"),
 
         assignTasks: (room, tasks) => {
             "use strict";
+
+            // Check for construction sites if we're in the destination room.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === Cache.getObjectById(c.memory.home).room.name), (creep) => {
+                if (Cache.constructionSitesInRoom(creep.room).length > 0) {
+                    var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
+                    if (task.canAssign(creep)) {
+                        creep.say("Build");
+                        assigned.push(creep.name);
+                    }
+                }
+            });
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
 
             // Check for unfilled containers.
             _.forEach(tasks.fillEnergy.fillContainerTasks, (task) => {

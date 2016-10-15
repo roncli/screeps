@@ -102,18 +102,11 @@ var Cache = require("cache"),
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
-                            assigned.push(creep.name);
                             return false;
                         }
                     }
                 });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
             });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
 
             // Check for construction sites if we're not in the home room.
             _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (c) => c.room.name !== c.memory.deliver), (creep) => {

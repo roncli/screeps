@@ -14,7 +14,7 @@ Heal.prototype.constructor = Heal;
 Heal.prototype.canAssign = function(creep, tasks) {
     "use strict";
 
-    if (creep.getActitveBodyparts(HEAL) === 0) {
+    if (creep.getActiveBodyparts(HEAL) === 0) {
         return false;
     }
 

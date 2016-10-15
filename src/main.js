@@ -58,6 +58,7 @@ var profiler = require("screeps-profiler"),
                 }
 
                 // Log date & GCL.
+                console.log("");
                 console.log(new Date());
                 console.log("Global level " + Game.gcl.level + " " + Game.gcl.progress + "/" + Game.gcl.progressTotal.toFixed(0) + " " + (100 * Game.gcl.progress / Game.gcl.progressTotal).toFixed(3) + "%");
 

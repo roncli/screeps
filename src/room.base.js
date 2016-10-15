@@ -239,7 +239,7 @@ Base.prototype.run = function(room) {
     if (tasks.repair.criticalTasks.length > 0) {
         console.log("    Critical repairs needed: " + tasks.repair.criticalTasks.length);
         _.forEach(_.take(tasks.repair.criticalTasks, 5), (task) => {
-            console.log("      " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
+            console.log("      " + task.structure.structureType + " " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
         });
     }
     if (tasks.repair.tasks.length > 0) {

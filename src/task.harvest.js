@@ -14,7 +14,7 @@ Harvest.prototype.canAssign = function(creep) {
 
     var source = Cache.getObjectById(creep.memory.home);
 
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0) || creep.getActiveBodyParts(WORK) === 0) {
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0) || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     

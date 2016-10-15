@@ -15,7 +15,7 @@ Build.prototype.constructor = Build;
 Build.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyParts(WORK) === 0) {
+    if (!creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     

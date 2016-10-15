@@ -15,7 +15,7 @@ Mine.prototype.canAssign = function(creep) {
 
     var container = Cache.getObjectById(creep.memory.container);
 
-    if (!container || creep.getActiveBodyParts(WORK) === 0) {
+    if (!container || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     

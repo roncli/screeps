@@ -12,7 +12,7 @@ Reserve.prototype.constructor = Reserve;
 Reserve.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.memory.role !== "reserver" || !creep.room.controller || creep.room.controller.my || creep.getActiveBodyParts(CLAIM) === 0) {
+    if (creep.memory.role !== "reserver" || !creep.room.controller || creep.room.controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
         return false;
     }
     

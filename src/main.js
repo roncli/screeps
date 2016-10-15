@@ -101,6 +101,8 @@ var profiler = require("screeps-profiler"),
                         } else {
                             console.log("  " + room.name + " Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
                         }
+                    } else {
+                        console.log("  " + room.name);
                     }
 
                     if (Cache.roomTypes[room.name]) {

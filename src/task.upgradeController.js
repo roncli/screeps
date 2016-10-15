@@ -13,7 +13,7 @@ Upgrade.prototype.constructor = Upgrade;
 Upgrade.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY] || (_.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150 && this.controller.ticksToDowngrade >= 1000)) {
+    if (!creep.carry[RESOURCE_ENERGY] || (_.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150 && this.controller.ticksToDowngrade >= 1000) || creep.getActiveBodyParts(WORK) === 0) {
         return false;
     }
     

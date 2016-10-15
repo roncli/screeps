@@ -16,7 +16,7 @@ Pickup.prototype.canAssign = function(creep) {
     // Get creep range to the resource.
 
 
-    if (!this.resource || _.sum(creep.carry[RESOURCE_ENERGY])) {
+    if (!this.resource || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     

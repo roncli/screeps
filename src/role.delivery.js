@@ -96,6 +96,25 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
+            // Check for critical if we're not in the home room.
+            _.forEach(tasks.repair.criticalTasks, (task) => {
+                _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.structure), (creep) => {
+                    if (Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}).length === 0) {
+                        if (task.canAssign(creep)) {
+                            creep.say("CritRepair");
+                            assigned.push(creep.name);
+                            return false;
+                        }
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for construction sites if we're not in the home room.
             _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (c) => c.room.name !== c.memory.deliver), (creep) => {
                 if (Cache.constructionSitesInRoom(creep.room).length > 0) {

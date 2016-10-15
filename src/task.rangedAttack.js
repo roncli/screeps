@@ -14,9 +14,9 @@ Ranged.prototype.constructor = Ranged;
 Ranged.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.memory.role !== "rangedAttack") {
-        return false;
-    }
+    // if (creep.memory.role !== "rangedAttack") {
+    //     return false;
+    // }
     
     Task.prototype.assign.call(this, creep);
     return true;

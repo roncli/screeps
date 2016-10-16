@@ -4,6 +4,7 @@ var Cache = require("cache"),
     TaskHarvest = require("task.harvest"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
+    TaskRepair = require("task.repair"),
 
     Delivery = {
         checkSpawn: (room) => {
@@ -97,9 +98,9 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            // Check for critical if we're not in the home room.
-            _.forEach(tasks.repair.criticalTasks, (task) => {
-                _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.structure), (creep) => {
+            // Check for roads under half if we're not in the home room.
+            _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.structure), (creep) => {
+                _.forEach(TaskRepair.GetDeliveryTasks(creep.room), (task) => {
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");

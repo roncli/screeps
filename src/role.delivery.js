@@ -100,7 +100,7 @@ var Cache = require("cache"),
 
             // Check for roads under half if we're not in the home room.
             _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (creep) => {
-                _.forEach(TaskRepair.GetDeliveryTasks(creep.room), (task) => {
+                _.forEach(TaskRepair.getDeliveryTasks(creep.room), (task) => {
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");

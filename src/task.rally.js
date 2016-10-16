@@ -120,7 +120,7 @@ Rally.getHarvesterTasks = function(creeps) {
 Rally.getDeliveryTasks = function(creeps) {
     "use strict";
 
-    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.deliver, c));
+    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(Cache.getObjectById(c.memory.home) ? c.memory.home : Memory.maxCreeps.delivery[c.memory.deliver][c.memory.home].fromPos.roomName, c));
 };
 
 Rally.getDefenderTask = function(creep) {

@@ -2,6 +2,7 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
     TaskHarvest = require("task.harvest"),
+    TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
 
     Delivery = {
@@ -128,8 +129,8 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled containers.
-            _.forEach(tasks.fillEnergy.fillContainerTasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
+                var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.object), (creep) => {
                         if (task.canAssign(creep)) {
@@ -141,6 +142,19 @@ var Cache = require("cache"),
                         }
                     });
                 }
+            });
+
+            // Check for dropped resources in current room.
+            _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery")), (c) => c.room.name != c.memory.delivery), (creep) => {
+                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                    if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length === 0) {
+                        return;
+                    }
+                    if (task.canAssign(creep)) {
+                        creep.say("Pickup");
+                        return false;
+                    }
+                });
             });
 
             // Attempt to assign harvest task to remaining creeps.

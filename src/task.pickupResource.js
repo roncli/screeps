@@ -4,6 +4,7 @@ var Task = require("task"),
         Task.call(this);
 
         this.type = "pickupResource";
+        this.id = id;
         this.resource = Cache.getObjectById(id);
     };
     
@@ -12,9 +13,6 @@ Pickup.prototype.constructor = Pickup;
 
 Pickup.prototype.canAssign = function(creep) {
     "use strict";
-
-    // Get creep range to the resource.
-
 
     if (!this.resource || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
@@ -72,6 +70,12 @@ Pickup.prototype.toObj = function(creep) {
     } else {
         delete creep.memory.currentTask;
     }
+};
+
+Pickup.getTasks = function(room) {
+    "use strict";
+    
+    return _.map(Cache.resourcesInRoom(room), (r) => new Pickup(r.id));
 };
 
 require("screeps-profiler").registerObject(Pickup, "TaskPickupResource");

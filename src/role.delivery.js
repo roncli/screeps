@@ -145,7 +145,7 @@ var Cache = require("cache"),
             });
 
             // Check for dropped resources in current room.
-            _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery")), (c) => c.room.name != c.memory.delivery), (creep) => {
+            _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery")), (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
                     if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length === 0) {
                         return;

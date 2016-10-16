@@ -19,14 +19,22 @@ var Cache = require("cache"),
 
             // Determine the number storers needed.
             _.forEach(Cache.containersInRoom(room), (container) => {
+                var closest = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0];
+
                 if (!Memory.lengthToStorage[container.id]) {
                     // Since minerals produce up to half as much as sources, count the length for half.
-                    if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0] instanceof Mineral) {
+                    if (closest instanceof Mineral) {
                         Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length / 2;
                     } else {
                         Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
                     }
                 }
+
+                // Do not count completely mined up minerals.
+                if (closest instanceof Mineral && closest.mineralAmount === 0) {
+                    return;
+                }
+
                 length += Memory.lengthToStorage[container.id];
             });
 

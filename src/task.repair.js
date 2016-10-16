@@ -14,7 +14,7 @@ Repair.prototype.constructor = Repair;
 Repair.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY] || (_.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150) || creep.getActiveBodyparts(WORK) === 0) {
+    if (!creep.carry[RESOURCE_ENERGY] || creep.carry[RESOURCE_ENERGY] === 0 || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     

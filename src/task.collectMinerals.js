@@ -44,7 +44,7 @@ CollectMinerals.prototype.run = function(creep) {
 
     // Collect from the object, or move closer to it if not in range.
     if (creep.withdraw(this.object, minerals[0]) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 4});
         return;
     }
 

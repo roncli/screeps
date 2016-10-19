@@ -37,9 +37,9 @@ Rally.prototype.run = function(creep) {
 
     // Rally to the rally point.
     if (this.rallyPoint instanceof RoomPosition) {
-        creep.moveTo(this.rallyPoint, {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(this.rallyPoint, {reusePath: Math.floor(Math.random() * 2) + 4});
     } else {
-        creep.moveTo(this.rallyPoint.pos.x + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.y + Math.floor(Math.random() * 7 - 3), {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(this.rallyPoint.pos.x + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.y + Math.floor(Math.random() * 7 - 3), {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 
     // Always complete the task.

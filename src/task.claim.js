@@ -29,7 +29,7 @@ Claim.prototype.run = function(creep) {
     }
     
     if (creep.claimController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(creep.room.controller, {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(creep.room.controller, {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 };
 

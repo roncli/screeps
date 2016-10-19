@@ -34,7 +34,7 @@ FillEnergy.prototype.run = function(creep) {
 
     // Fill the object, or move closer to it if not in range.
     if (creep.transfer(this.object, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 4});
         return;
     }
 

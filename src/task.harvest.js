@@ -37,11 +37,11 @@ Harvest.prototype.run = function(creep) {
     // Harvest the source, or move closer to it if not in range.
     if (source) {
         if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2) + 1});
+            creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2) + 4});
         }
     } else {
         pos = Memory.maxCreeps.delivery[creep.memory.deliver][creep.memory.home].fromPos;
-        creep.moveTo(new RoomPosition(pos.x, pos.y, pos.roomName));
+        creep.moveTo(new RoomPosition(pos.x, pos.y, pos.roomName), {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 };
 

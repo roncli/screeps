@@ -34,7 +34,7 @@ Pickup.prototype.run = function(creep) {
     // Pickup, or move closer to it if not in range.
     switch (creep.pickup(this.resource)) {
         case ERR_NOT_IN_RANGE:
-            creep.moveTo(this.resource, {reusePath: Math.floor(Math.random() * 2) + 1});
+            creep.moveTo(this.resource, {reusePath: Math.floor(Math.random() * 2) + 4});
             break;
         case OK:
             // Task always is completed one way or another upon successful transfer.

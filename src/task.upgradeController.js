@@ -32,7 +32,7 @@ Upgrade.prototype.run = function(creep) {
 
     // Upgrade the controller, or move closer to it if not in range.
     if (creep.transfer(this.controller, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.controller, {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(this.controller, {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 };
 

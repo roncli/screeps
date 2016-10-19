@@ -32,7 +32,7 @@ Heal.prototype.run = function(creep) {
     }
     
     if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.ally, {reusePath: Math.floor(Math.random() * 2) + 1});
+        creep.moveTo(this.ally, {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 };
 

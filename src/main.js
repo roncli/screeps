@@ -1,4 +1,5 @@
 var profiler = require("screeps-profiler"),
+    screepsplus = require("screepsplus"),
     Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
@@ -104,6 +105,10 @@ var profiler = require("screeps-profiler"),
                         console.log("  " + room.name);
                     }
 
+                    _.forEach(Cache.energySourcesInRoom(room), (s) => {
+                        console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity)
+                    });
+
                     if (Cache.roomTypes[room.name]) {
                         Cache.roomTypes[room.name].run(room);
                     }
@@ -138,6 +143,8 @@ var profiler = require("screeps-profiler"),
                     }
                 });
                 console.log("  CPU: " + Game.cpu.getUsed().toFixed(2) + "/" + Game.cpu.limit + " Bucket: " + Game.cpu.bucket + " Tick: " + Game.time);
+
+                screepsplus.collect_stats();
             });
         }
     };

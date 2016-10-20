@@ -1,0 +1,28 @@
+{
+    "name": "screepsConsole",
+    "version": "0.0.1",
+    "description": "A console application to display the Screeps game console within a terminal window.",
+    "homepage": "https://github.com/roncli/screeps",
+    "bugs": {
+        "url": "https://github.com/roncli/screeps/issues",
+        "email": "roncli@roncli.com"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Ronald M. Clifford",
+        "email": "roncli@roncli.com",
+        "url": "http://www.roncli.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/roncli/screeps.git"
+    },
+    "dependencies": {
+        "ws": "1.0.1"
+    },
+    "devDependencies": {},
+    "engines": {
+        "node": ">=6.0.0"
+    },
+    "private": true
+}

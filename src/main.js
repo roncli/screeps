@@ -105,8 +105,16 @@ var profiler = require("screeps-profiler"),
                     }
 
                     _.forEach(Cache.energySourcesInRoom(room), (s) => {
-                        console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity)
+                        console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity + " TTR " + s.ticksToRegeneration);
                     });
+
+                    _.forEach(Cache.mineralsInRoom(room), (m) => {
+                        console.log("    Mineral " + m.mineralType + " " + s.id + ": " + s.mineralAmount + " TTR " + s.ticksToRegeneration);
+                    });
+
+                    if (room.storage) {
+                        console.log("    Storage: " + room.storage.store[RESOURCE_ENERGY]);
+                    }
 
                     if (Cache.roomTypes[room.name]) {
                         Cache.roomTypes[room.name].run(room);

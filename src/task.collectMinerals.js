@@ -96,7 +96,7 @@ CollectMinerals.getStorerTasks = function(room) {
     var minerals = _.filter(Cache.containersInRoom(room), (c) => _.filter(_.keys(c.store), (m) => m !== RESOURCE_ENERGY && c.store[m] > 0).length > 0);
 
     if (room.storage && room.terminal && _.sum(room.storage.store) > 0 && (!room.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] < _.sum(room.storage.store))) {
-        minerals.push(room.storage)
+        minerals.push(room.storage);
     }
 
     return _.map(_.sortBy(minerals, (c) => -_.sum(c.store)), (c) => new CollectMinerals(c.id));

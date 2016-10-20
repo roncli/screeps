@@ -7,7 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var count, sources;
+            var count, sources, max;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -20,8 +20,9 @@ var Cache = require("cache"),
                 return;
             }
 
-            // If we have less than 3 workers, spawn a worker.
+            // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
+            max = room.storage && room.storage.store[RESOURCE_ENERGY] < 500000 ? 2 : 3;
             if (count < 3) {
                 Worker.spawn(room, sources[0].id);
             }

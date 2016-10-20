@@ -93,11 +93,15 @@ FillMinerals.fromObj = function(creep) {
 FillMinerals.getFillStorageTasks = function(room) {
     "use strict";
 
+    if (room.terminal && _.sum(room.terminal.store) < room.terminal.storeCapacity) {
+        return [new FillMinerals(room.terminal.id)];
+    }
+
     if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
         return [new FillMinerals(room.storage.id)];
-    } else {
-        return [];
     }
+
+    return [];
 };
 
 require("screeps-profiler").registerObject(FillMinerals, "TaskFillMinerals");

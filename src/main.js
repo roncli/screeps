@@ -112,11 +112,11 @@ var profiler = require("screeps-profiler"),
                         console.log("    Mineral " + m.mineralType + " " + m.id + ": " + m.mineralAmount + " TTR " + m.ticksToRegeneration);
                     });
 
-                    if (room.storage & _.sum(room.storage.store) > 0) {
+                    if (room.storage && _.sum(room.storage.store) > 0) {
                         console.log("    Storage: " + _.map(room.storage.store, (s, i) => {return s + " " + i;}).join(", "));
                     }
 
-                    if (room.terminal & _.sum(room.terminal.store) > 0) {
+                    if (room.terminal && _.sum(room.terminal.store) > 0) {
                         console.log("    Terminal: " + _.map(room.terminal.store, (s, i) => {return s + " " + i;}).join(", "));
                     }
 

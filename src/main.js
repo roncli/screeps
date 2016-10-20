@@ -109,7 +109,7 @@ var profiler = require("screeps-profiler"),
                     });
 
                     _.forEach(Cache.mineralsInRoom(room), (m) => {
-                        console.log("    Mineral " + m.mineralType + " " + s.id + ": " + s.mineralAmount + " TTR " + s.ticksToRegeneration);
+                        console.log("    Mineral " + m.mineralType + " " + m.id + ": " + m.mineralAmount + " TTR " + m.ticksToRegeneration);
                     });
 
                     if (room.storage) {

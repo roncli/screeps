@@ -1,6 +1,3 @@
 [submodule "ScreepsAutocomplete"]
 	path = ScreepsAutocomplete
 	url = https://github.com/Garethp/ScreepsAutocomplete
-[submodule "node-agent"]
-	path = node-agent
-	url = https://github.com/ScreepsPlus/node-agent

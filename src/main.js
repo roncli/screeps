@@ -1,5 +1,4 @@
 var profiler = require("screeps-profiler"),
-    screepsplus = require("screepsplus"),
     Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
@@ -143,8 +142,6 @@ var profiler = require("screeps-profiler"),
                     }
                 });
                 console.log("  CPU: " + Game.cpu.getUsed().toFixed(2) + "/" + Game.cpu.limit + " Bucket: " + Game.cpu.bucket + " Tick: " + Game.time);
-
-                screepsplus.collect_stats();
             });
         }
     };

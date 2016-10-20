@@ -58,7 +58,13 @@ var Cache = require("cache"),
 
             // Do something different for minerals.
             if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), Cache.getObjectById(id))[0] instanceof Mineral) {
+                // If we're not at 4450 and energy is not at capacity, bail.
+                if (energy < 4450 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+                    return;
+                }
+
                 body = [];
+
 
                 // Create the body based on the energy.
                 for (count = 0; count < Math.floor(energy / 550); count++) {

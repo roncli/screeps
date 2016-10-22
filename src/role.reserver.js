@@ -21,10 +21,12 @@ var Cache = require("cache"),
                     var count = _.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && c.memory.reserve === toRoom).length;
 
                     num += count;
-                    max += 1;
+                    if (!Game.rooms[toRoom] || (Game.rooms[toRoom].controller && (!Game.rooms[toRoom].controller.reservation || Game.rooms[toRoom].controller.reservation.ticksToEnd < 4000))) {
+                        max += 1;
 
-                    if (count === 0) {
-                        Reserver.spawn(room, toRoom);
+                        if (count === 0) {
+                            Reserver.spawn(room, toRoom);
+                        }
                     }
                 });
             }

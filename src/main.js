@@ -96,7 +96,11 @@ var profiler = require("screeps-profiler"),
                                 console.log("  " + room.name + " Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
                             }
                         } else if (room.controller.level === 0) {
-                            console.log("  " + room.name + " Controller unowned");
+                            if (room.controller.reservation) {
+                                console.log("  " + room.name + " Controller reserved " + room.controller.reservation.username + " TTE " + room.controller.reservation.ticksToEnd);
+                            } else {
+                                console.log("  " + room.name + " Controller unowned");
+                            }
                         } else {
                             console.log("  " + room.name + " Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
                         }

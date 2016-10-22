@@ -71,6 +71,9 @@ var Cache = require("cache"),
             // If successful, log it.
             if (typeof name !== "number") {
                 console.log("    Spawning new reserver " + name);
+                _.forEach(Cache.creepsInRoom({role: "worker"}, room), (creep) => {
+                    creep.memory.completeTask = true;
+                });
                 return true;
             }
 

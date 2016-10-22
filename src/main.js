@@ -147,6 +147,13 @@ var profiler = require("screeps-profiler"),
                         if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name) {
                             delete creep.memory.currentTask;
                         }
+
+                        // Purge current task if it is set to.
+                        if (creep.memory.completeTask) {
+                            delete creep.memory.completeTask;
+                            delete creep.memory.currentTask;
+                        }
+
                         creep.memory.lastRoom = creep.room.name;
                     } else {
                         // RIP & Pepperonis :(

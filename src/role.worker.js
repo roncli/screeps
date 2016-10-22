@@ -206,6 +206,22 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for terminals.
+            if (tasks.fillEnergy.fillTerminalTask) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (tasks.fillEnergy.fillTerminalTask.canAssign(creep)) {
+                        creep.say("Terminal");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for construction sites.
             _.forEach(tasks.build.tasks, (task) => {
                 var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "build", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)

@@ -153,7 +153,7 @@ Base.prototype.manage = function(room) {
 Base.prototype.run = function(room) {
     "use strict";
 
-    var tasks, links;
+    var tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask;
 
     // Manage room.
     if (Game.time % 100 === 0) {
@@ -165,6 +165,24 @@ Base.prototype.run = function(room) {
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         if (links.length > 1 && !links[1].cooldown && links[1].energy > 0) {
             links[1].transferEnergy(links[0]);
+        }
+    }
+
+    // Check to see if we can do a deal in the terminal.
+    if (room.terminal) {
+        terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
+        if (terminalMinerals.length > 0) {
+            topResource = _.sortBy(terminalMinerals, (s) => -s.amount)[0];
+            bestOrder = _.filter(Cache.marketOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy").sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName) - Game.map.getRoomLinearDistance(room.name, b.roomName)))[0];
+            if (bestOrder) {
+                transCost = Game.market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), room.name, bestOrder.roomName);
+                terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
+                if (terminalEnergy > transCost) {
+                    Game.market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), room.name);
+                } else {
+                    terminalTask = new TaskFillEnergy(room.terminal.id);
+                }
+            }
         }
     }
 
@@ -198,7 +216,8 @@ Base.prototype.run = function(room) {
             fillTowerTasks: TaskFillEnergy.getFillTowerTasks(room),
             fillStorageTasks: TaskFillEnergy.getFillStorageTasks(room),
             fillContainerTasks: TaskFillEnergy.getFillContainerTasks(room),
-            fillLinkTask: TaskFillEnergy.getFillLinkTask(room)
+            fillLinkTask: TaskFillEnergy.getFillLinkTask(room),
+            fillTerminalTask: terminalTask
         },
         fillMinerals: {
             fillStorageTasks: TaskFillMinerals.getFillStorageTasks(room)

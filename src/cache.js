@@ -13,6 +13,7 @@ var creeps = {},
     extractorsInRoom = {},
     flagsInRoom = {},
     hostilesInRoom = {},
+    marketOrders = null,
     objects = {};
 
 var Cache = {
@@ -39,6 +40,7 @@ var Cache = {
         extractorsInRoom = {};
         flagsInRoom = {};
         hostilesInRoom = {};
+        marketOrders = null;
         objects = {};
         Cache.creepTasks = {};
         Cache.roomTypes = {};
@@ -151,6 +153,13 @@ var Cache = {
         "use strict";
 
         return hostilesInRoom[room.name] ? hostilesInRoom[room.name] : (hostilesInRoom[room.name] = room.find(FIND_HOSTILE_CREEPS));
+    },
+
+    // Get all market orders.
+    marketOrders: () => {
+        "use strict";
+
+        return marketOrders ? marketOrders : (marketOrders = Game.market.getAllOrders());
     },
 
     // Get object by ID.

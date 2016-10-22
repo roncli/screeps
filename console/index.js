@@ -39,10 +39,14 @@ var run = () => {
                             });
 
                             res.on("end", function() {
-                                var response = JSON.parse(meResponse);
+                                try {
+                                    var response = JSON.parse(meResponse);
 
-                                id = response._id;
-                                ws.send("auth " + token);
+                                    id = response._id;
+                                    ws.send("auth " + token);
+                                } catch (err) {
+                                    run();
+                                }
                             });
                         });
 

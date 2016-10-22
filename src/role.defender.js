@@ -115,9 +115,12 @@ var Cache = require("cache"),
             name = spawnToUse.createCreep(body, undefined, {role: "defender", home: room.name, defending: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 
-            // If successful, log it, and set spawning to true so it's not used this turn.
+            // If successful, log it.
             if (typeof name !== "number") {
                 console.log("    Spawning new defender " + name);
+                _.forEach(Cache.creepsInRoom({role: "worker"}, room), (creep) => {
+                    delete creep.memory.currentTask;
+                });
                 return true;
             }
 

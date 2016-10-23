@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskHarvest = require("task.harvest"),
+    TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
 
     Worker = {
@@ -23,7 +24,7 @@ var Cache = require("cache"),
             // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
             max = 3;
-            
+
             if (count < max) {
                 Worker.spawn(room, sources[0].id);
             }
@@ -286,6 +287,26 @@ var Cache = require("cache"),
                 assigned = [];
             });
             
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for dropped resources in current room.
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                    if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                        return;
+                    }
+                    if (task.canAssign(creep)) {
+                        creep.say("Pickup");
+                        assigned.push(creep.name);
+                        return false;
+                    }
+                });
+            });
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
             if (creepsWithNoTask.length === 0) {
                 return;
             }

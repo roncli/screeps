@@ -197,7 +197,7 @@ Base.prototype.run = function(room) {
     RoleWorker.checkSpawn(room);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
-    RoleMeleeAttack.assignTasks(room, tasks);
+    RoleMeleeAttack.checkSpawn(room);
     RoleRangedAttack.checkSpawn(room);
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);

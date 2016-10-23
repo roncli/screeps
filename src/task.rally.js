@@ -77,45 +77,6 @@ Rally.fromObj = function(creep) {
     return new Rally(creep.memory.currentTask.id);
 };
 
-Rally.getHealerTasks = function(room) {
-    "use strict";
-
-    var flags = Cache.flagsInRoom(room),
-        targets, rallyPoint;
-    
-    // If there are no flags, there is nothing for anyone to rally to.
-    if (flags.length === 0) {
-        return [];
-    }
-
-    // Find a rally target.
-    targets = Cache.creepsInRoom("rangedAttack", room);
-    if (targets.length === 0) {
-        targets = Cache.creepsInRoom("meleeAttack", room);
-    }
-
-    // Return the rally point.
-    if (targets.length === 0) {
-        return [new Rally(flags[0].name)];
-    } else {
-        return [new Rally(Utilities.objectsClosestToObj(targets, flags[0])[0].id)];
-    }
-};
-
-Rally.getAttackerTasks = function(room) {
-    "use strict";
-
-    var flags = Cache.flagsInRoom(room);
-
-    // If there are no flags, there is nothing for anyone to rally to.
-    if (flags.length === 0) {
-        return [];
-    }
-
-    // Return the rally point.
-    return [new Rally(flags[0].name)];
-};
-
 Rally.getHarvesterTasks = function(creeps) {
     "use strict";
 
@@ -130,6 +91,22 @@ Rally.getDeliveryTasks = function(creeps) {
 
 Rally.getDefenderTask = function(creep) {
     "use strict";
+
+    if (creep.memory.role === "healer") {
+        // Find a rally target.
+        var targets = Cache.creepsInRoom("rangedAttack", room);
+        if (targets.length === 0) {
+            targets = Cache.creepsInRoom("meleeAttack", room);
+        }
+        if (targets.length === 0) {
+            targets = Cache.creepsInRoom("defender", room);
+        }
+
+        // Return the rally point.
+        if (targets.length === 0) {
+            return [new Rally(flags[0].name)];
+        }
+    }
 
     return new Rally(creep.memory.defending, creep);
 };

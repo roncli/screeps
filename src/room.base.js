@@ -6,6 +6,7 @@ var RoomObj = require("roomObj"),
     RoleDefender = require("role.defender"),
     RoleDelivery = require("role.delivery"),
     RoleHealer = require("role.healer"),
+    RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
     RoleRangedAttack = require("role.rangedAttack"),
     RoleReserver = require("role.reserver"),
@@ -194,10 +195,11 @@ Base.prototype.run = function(room) {
 
     // Spawn new creeps.
     RoleWorker.checkSpawn(room);
-    RoleRangedAttack.checkSpawn(room);
-    RoleHealer.checkSpawn(room);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
+    RoleMeleeAttack.assignTasks(room, tasks);
+    RoleRangedAttack.checkSpawn(room);
+    RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
     RoleCollector.checkSpawn(room);
     RoleDelivery.checkSpawn(room);
@@ -230,10 +232,6 @@ Base.prototype.run = function(room) {
         },
         heal: {
             tasks: TaskHeal.getTasks(room)
-        },
-        rally: {
-            attackerTasks: TaskRally.getAttackerTasks(room),
-            healerTasks: TaskRally.getHealerTasks(room)
         },
         rangedAttack: {
             tasks: TaskRangedAttack.getTasks(room)
@@ -288,10 +286,11 @@ Base.prototype.run = function(room) {
 
     // Assign tasks to creeps.                    
     RoleWorker.assignTasks(room, tasks);
-    RoleRangedAttack.assignTasks(room, tasks);
-    RoleHealer.assignTasks(room, tasks);
     RoleMiner.assignTasks(room, tasks);
     RoleStorer.assignTasks(room, tasks);
+    RoleMeleeAttack.assignTasks(room, tasks);
+    RoleRangedAttack.assignTasks(room, tasks);
+    RoleHealer.assignTasks(room, tasks);
     RoleDefender.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleDelivery.assignTasks(room, tasks);

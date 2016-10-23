@@ -22,7 +22,7 @@ var Cache = require("cache"),
             }
 
             // If we have less than max workers, spawn a worker.
-            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === room.name).length;
+            count = Cache.creepsInRoom("worker", room).length;
             max = 3;
 
             if (count < max) {
@@ -306,7 +306,7 @@ var Cache = require("cache"),
                     });
                 });
             }
-            
+
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
             assigned = [];
 

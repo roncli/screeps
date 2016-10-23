@@ -25,31 +25,6 @@ var profiler = require("screeps-profiler"),
                 // Reset the cache.
                 Cache.reset();
 
-                // Upgrade creep memory
-                if (!Memory.runOnce) {
-                    _.forEach(Game.creeps, (creep) => {
-                        switch (creep.role) {
-                            case "collector":
-                            case "worker":
-                                creep.memory.homeSource = creep.memory.home;
-                                creep.memory.home = Cache.getObjectById(creep.memory.homeSource).room.name;
-                                break;
-                            case "delivery":
-                                creep.memory.homeSource = creep.memory.home;
-                                creep.memory.home = creep.memroy.deliver;
-                                delete creep.memory.deliver;
-                                break;
-                            case "miner":
-                                creep.memory.home = Cache.getObjectById(creep.memory.container).room.name;
-                                break;
-                            case "storer":
-                                creep.memory.home = creep.room.name;
-                                break;
-                        }
-                    });
-                    Memory.runOnce = true;
-                }
-
                 // Export global objects to Game.cmd for use from console.
                 Game.cmd = {
                     Cache: Cache,

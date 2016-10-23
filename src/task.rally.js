@@ -104,7 +104,7 @@ Rally.getDefenderTask = function(creep) {
 
         // Return the rally point.
         if (targets.length === 0) {
-            return [new Rally(flags[0].name)];
+            return new Rally(creep.memory.defending, creep);
         }
     }
 

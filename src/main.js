@@ -1,3 +1,5 @@
+require("screeps-perf")();
+
 var profiler = require("screeps-profiler"),
     Cache = require("cache"),
     Commands = require("commands"),

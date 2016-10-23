@@ -196,9 +196,9 @@ Base.prototype.run = function(room) {
     RoleWorker.checkSpawn(room);
     RoleRangedAttack.checkSpawn(room);
     RoleHealer.checkSpawn(room);
-    RoleDefender.checkSpawn(room);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
+    RoleDefender.checkSpawn(room);
     RoleCollector.checkSpawn(room);
     RoleDelivery.checkSpawn(room);
     RoleReserver.checkSpawn(room);
@@ -290,9 +290,9 @@ Base.prototype.run = function(room) {
     RoleWorker.assignTasks(room, tasks);
     RoleRangedAttack.assignTasks(room, tasks);
     RoleHealer.assignTasks(room, tasks);
-    RoleDefender.assignTasks(room, tasks);
     RoleMiner.assignTasks(room, tasks);
     RoleStorer.assignTasks(room, tasks);
+    RoleDefender.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleDelivery.assignTasks(room, tasks);
     RoleReserver.assignTasks(room, tasks);

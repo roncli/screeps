@@ -1,4 +1,6 @@
-require("screeps-perf")();
+require("screeps-perf")({
+    optimizePathFinding: false
+});
 
 var profiler = require("screeps-profiler"),
     Cache = require("cache"),

@@ -22,11 +22,11 @@ var Cache = require("cache"),
             }
 
             // If we have less than max workers, spawn a worker.
-            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === sources[0].id).length;
+            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.home === room.name).length;
             max = 3;
 
             if (count < max) {
-                Worker.spawn(room, sources[0].id);
+                Worker.spawn(room);
             }
 
             // Output worker count in the report.
@@ -79,7 +79,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "worker", home: Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0])[0].id});
+            name = spawnToUse.createCreep(body, undefined, {role: "worker", home: room.name, homeSource: Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0])[0].id});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.
@@ -97,7 +97,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.home === Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0])[0].id)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -291,19 +291,22 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for dropped resources in current room.
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Pickup");
-                        assigned.push(creep.name);
-                        return false;
-                    }
+            // Check for dropped resources in current room if there are no hostiles.
+            if (Cache.hostilesInRoom(room).length === 0) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                        if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                            return;
+                        }
+                        if (task.canAssign(creep)) {
+                            creep.say("Pickup");
+                            assigned.push(creep.name);
+                            return false;
+                        }
+                    });
                 });
-            });
+            }
+            
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
             assigned = [];
 

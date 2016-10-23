@@ -1,30 +1,41 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskHeal = require("task.heal"),
+    TaskRally = require("task.rally"),
+    TaskRangedAttack = require("task.rangedAttack"),
 
     Ranged = {
         checkSpawn: (room) => {
             "use strict";
 
-            var count;
+            var num = 0, max = 0;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
                 return;
             }
 
-            // If we have less than max ranged attackers, spawn a ranged attacker.
-            count = Cache.creepsInRoom("rangedAttack", room).length;
-            if (count < Memory.maxCreeps.rangedAttack) {
-                Ranged.spawn(room);
+            // Loop through the room ranged attackers to see if we need to spawn a creep.
+            if (Memory.maxCreeps.rangedAttack) {
+                _.forEach(Memory.maxCreeps.rangedAttack[room.name], (value, toRoom) => {
+                    var count = _.filter(Cache.creepsInRoom("rangedAttack", room), (c) => c.memory.defending === toRoom).length;
+
+                    num += count;
+                    max += value.maxCreeps;
+
+                    if (count < value.maxCreeps) {
+                        Ranged.spawn(room, toRoom);
+                    }
+                });
             }
 
             // Output ranged attacker count in the report.
-            if (Memory.maxCreeps.rangedAttack > 0) {
-                console.log("    Ranged Attackers: " + count + "/" + Memory.maxCreeps.rangedAttack);
+            if (max > 0) {
+                console.log("    Ranged Attackers: " + num + "/" + max);
             }        
         },
         
-        spawn: (room) => {
+        spawn: (room, toRoom) => {
             "use strict";
 
             var body = [],
@@ -88,7 +99,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "rangedAttack"});
+            name = spawnToUse.createCreep(body, undefined, {role: "rangedAttack", home: room.name, defending: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.
@@ -106,20 +117,50 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            // Find hostiles to attack.
-            _.forEach(tasks.rangedAttack.tasks, (task) => {
-                _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Die!", true);
-                    }
-                });
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // If the creeps are not in the room, rally them.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+                var task = TaskRally.getDefenderTask(creep);
+                if (task.canAssign(creep)) {
+                    assigned.push(creep.name);
+                };
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            
+            // Find hostiles to attack.
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task = TaskRangedAttack.getDefenderTask(creep);
+                if (task && task.canAssign(creep)) {
+                    creep.say("Die!", true);
+                    assigned.push(creep.name);
+                }
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Rally the troops!
-            _.forEach(tasks.rally.attackerTasks, (task) => {
-                _.forEach(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (creep) => {
-                    task.canAssign(creep);
-                });
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.defending), (creep) => {
+                var task = TaskRally.getDefenderTask(creep);
+                if (task.canAssign(creep)) {
+                    assigned.push(creep.name);
+                };
             });
         }
     };

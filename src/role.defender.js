@@ -18,7 +18,7 @@ var Cache = require("cache"),
             // Loop through the room defenders to see if we need to spawn a creep.
             if (Memory.maxCreeps.defender) {
                 _.forEach(Memory.maxCreeps.defender[room.name], (value, toRoom) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "defender" && c.memory.home === room.name && c.memory.defending === toRoom).length;
+                    var count = _.filter(Cache.creepsInRoom("defender", room), (c) => c.memory.defending === toRoom).length;
 
                     num += count;
                     max += value.maxCreeps;
@@ -130,7 +130,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "defender" && c.memory.home === room.name && !c.memory.currentTask)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

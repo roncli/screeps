@@ -12,7 +12,7 @@ Harvest.prototype.constructor = Harvest;
 Harvest.prototype.canAssign = function(creep) {
     "use strict";
 
-    var source = Cache.getObjectById(creep.memory.home);
+    var source = Cache.getObjectById(creep.memory.homeSource);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0) || creep.getActiveBodyparts(WORK) === 0) {
         return false;
@@ -25,7 +25,7 @@ Harvest.prototype.canAssign = function(creep) {
 Harvest.prototype.run = function(creep) {
     "use strict";
 
-    var source = Cache.getObjectById(creep.memory.home),
+    var source = Cache.getObjectById(creep.memory.homeSource),
         pos;
     
     // No sources found or the source is drained, complete task.
@@ -40,7 +40,7 @@ Harvest.prototype.run = function(creep) {
             creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2) + 4});
         }
     } else {
-        pos = Memory.maxCreeps.delivery[creep.memory.deliver][creep.memory.home].fromPos;
+        pos = Memory.maxCreeps.delivery[creep.memory.home][creep.memory.homeSource].fromPos;
         creep.moveTo(new RoomPosition(pos.x, pos.y, pos.roomName), {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 };
@@ -48,7 +48,7 @@ Harvest.prototype.run = function(creep) {
 Harvest.prototype.canComplete = function(creep) {
     "use strict";
 
-    var source = Cache.getObjectById(creep.memory.home);
+    var source = Cache.getObjectById(creep.memory.homeSource);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || (!source && creep.memory.role !== "delivery") || (source && source.energy === 0)) {
         Task.prototype.complete.call(this, creep);

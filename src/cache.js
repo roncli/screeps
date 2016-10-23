@@ -51,7 +51,11 @@ var Cache = {
     creeps: (type) => {
         "use strict";
 
-        return creeps[type] ? creeps[type] : (creeps[type] = _.filter(Game.creeps, (c) => type === "all" || c.memory.role === type));
+        if (type === "all") {
+            return Game.creeps;
+        }
+
+        return creeps[type] ? creeps[type] : (creeps[type] = _.filter(Game.creeps, (c) => c.memory.role === type));
     },
     
     // Returns all creeps of a certain in the current room.
@@ -61,7 +65,7 @@ var Cache = {
         if (!creepsInRoom[room.name]) {
             creepsInRoom[room.name] = {};
         }
-        return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(Cache.creeps(type), (c) => c.room.name === room.name));
+        return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(Cache.creeps(type), (c) => c.memory.home === room.name));
     },
 
     // Returns all spawns in the current room.    

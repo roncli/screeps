@@ -67,7 +67,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "storer"});
+            name = spawnToUse.createCreep(body, undefined, {role: "storer", home: room.name});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.

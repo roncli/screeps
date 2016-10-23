@@ -25,6 +25,31 @@ var profiler = require("screeps-profiler"),
                 // Reset the cache.
                 Cache.reset();
 
+                // Upgrade creep memory
+                if (!Memory.runOnce) {
+                    _.forEach(Game.creeps, (creep) => {
+                        switch (creep.role) {
+                            case "collector":
+                            case "worker":
+                                creep.memory.homeSource = creep.memory.home;
+                                creep.memory.home = Cache.getObjectById(creep.memory.homeSource).room.name;
+                                break;
+                            case "delivery":
+                                creep.memory.homeSource = creep.memory.home;
+                                creep.memory.home = creep.memroy.deliver;
+                                delete creep.memory.deliver;
+                                break;
+                            case "miner":
+                                creep.memory.home = Cache.getObjectById(creep.memory.container).room.name;
+                                break;
+                            case "storer":
+                                creep.memory.home = creep.room.name;
+                                break;
+                        }
+                    });
+                    Memory.runOnce = true;
+                }
+
                 // Export global objects to Game.cmd for use from console.
                 Game.cmd = {
                     Cache: Cache,
@@ -134,7 +159,21 @@ var profiler = require("screeps-profiler"),
                 _.forEach(Game.creeps, (creep) => {
                     // Countdown to death!
                     if (creep.ticksToLive <= 150 || (creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1) || creep.ticksToLive % 100 === 1) {
-                        creep.say("TTL " + (creep.ticksToLive - 1).toString());
+                        switch (creep.ticksToLive - 1) {
+                            case 3:
+                                creep.say("R.I.P. and", true);
+                                break;
+                            case 2:
+                                creep.say("Pepperonis", true);
+                                break;
+                            case 1:
+                                creep.say(":(", true);
+                                console.log("  RIP & Pepperonis, " + creep.name + " :(");
+                                break;
+                            default:
+                                creep.say("TTL " + (creep.ticksToLive - 1).toString());
+                                break;
+                        }
                     }
 
                     if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
@@ -161,6 +200,7 @@ var profiler = require("screeps-profiler"),
                         delete creep.memory.currentTask;
                         if (creep.ticksToLive && creep.ticksToLive < 150) {
                             console.log("  RIP & Pepperonis, " + creep.name + " :(");
+                            creep.say("R.I.P. :(", true);
                             creep.suicide();
                         }
                     }

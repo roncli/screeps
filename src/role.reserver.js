@@ -18,7 +18,7 @@ var Cache = require("cache"),
             // Loop through the room reservers to see if we need to spawn a creep.
             if (Memory.maxCreeps.reserver) {
                 _.forEach(Memory.maxCreeps.reserver[room.name], (value, toRoom) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && c.memory.reserve === toRoom).length;
+                    var count = _.filter(Cache.creepsInRoom("reserver", room), (c) => c.memory.reserve === toRoom).length;
 
                     num += count;
                     if (!Game.rooms[toRoom] || (Game.rooms[toRoom].controller && (!Game.rooms[toRoom].controller.reservation || Game.rooms[toRoom].controller.reservation.ticksToEnd < 4000))) {
@@ -85,7 +85,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "reserver" && c.memory.home === room.name && !c.memory.currentTask)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("reserver", room)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -128,7 +128,6 @@ var Cache = require("cache"),
                 var task = TaskReserve.getTask(creep);
                 if (task.canAssign(creep)) {
                     creep.say("Reserving");
-                    assigned.push(creep.name);
                 };
             });
         }

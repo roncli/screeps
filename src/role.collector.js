@@ -53,7 +53,7 @@ var Cache = require("cache"),
                 max += Math.ceil(Memory.sources[source.id].empty * adjustment);
 
                 // If we have less than max collectors, spawn a collector.
-                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.home === source.id).length;
+                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.homeSource === source.id).length;
                 if (count < Math.ceil(Memory.sources[source.id].empty * adjustment)) {
                     Collector.spawn(room, source.id);
                 }
@@ -111,7 +111,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "collector", home: id});
+            name = spawnToUse.createCreep(body, undefined, {role: "collector", home: room.name, homeSource: id});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.

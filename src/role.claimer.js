@@ -18,7 +18,7 @@ var Cache = require("cache"),
             // Loop through the room claimers to see if we need to spawn a creep.
             if (Memory.maxCreeps.claimer) {
                 _.forEach(Memory.maxCreeps.claimer[room.name], (value, toRoom) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "claimer" && c.memory.home === room.name && c.memory.claim === toRoom).length;
+                    var count = _.filter(Cache.creepsInRoom("claimer", room.name), (c) => c.memory.claim === toRoom).length;
 
                     num += count;
                     max += 1;
@@ -83,7 +83,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "claimer" && c.memory.home === room.name && !c.memory.currentTask)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("claimer", room)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

@@ -20,7 +20,7 @@ var Cache = require("cache"),
             // Loop through the room deliveries to see if we need to spawn a creep.
             if (Memory.maxCreeps.delivery) {
                 _.forEach(Memory.maxCreeps.delivery[room.name], (value, toId) => {
-                    var count = _.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name && c.memory.home === toId).length;
+                    var count = _.filter(Cache.creepsInRoom("delivery", room), (c) => c.memory.homeSource === toId).length;
 
                     num += count;
                     max += value.maxCreeps;
@@ -83,7 +83,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "delivery", deliver: room.name, home: id});
+            name = spawnToUse.createCreep(body, undefined, {role: "delivery", home: room.name, homeSource: id});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.
@@ -101,76 +101,131 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("delivery", room)),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for repairs under 2500 if we're not in the home room.
-            _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
                 _.forEach(TaskRepair.getDeliveryTasks(creep.room), (task) => {
                     if (Utilities.creepsWithTask(Cache.creepsInRoom("all", creep.room), {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
+                            assigned.push(creep.name);
                             return false;
                         }
                     }
                 });
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for construction sites if we're not in the home room.
-            _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (c) => c.room.name !== c.memory.deliver), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
                 if (Cache.constructionSitesInRoom(creep.room).length > 0) {
                     var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
                     if (task.canAssign(creep)) {
                         creep.say("Build");
+                        assigned.push(creep.name);
                     }
                 }
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled links.
             if (tasks.fillEnergy.fillLinkTask) {
-                _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (c) => c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+                _.forEach(_.filter(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.home === room.name)), (c) => c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
                     if (tasks.fillEnergy.fillLinkTask.canAssign(creep)) {
                         creep.say("Link");
+                        assigned.push(creep.name);
                     }
                 });
+            }
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
             }
 
             // Check for unfilled containers.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks, tasks.fillEnergy.fillContainerTasks]), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), task.object), (creep) => {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Container");
+                            assigned.push(creep.name);
                             energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             if (energyMissing <= 0) {
                                 return false;
                             }
                         }
                     });
+
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 }
             });
 
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for dropped resources in current room.
-            _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery")), (creep) => {
+            _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
                     if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
                         return;
                     }
                     if (task.canAssign(creep)) {
                         creep.say("Pickup");
+                        assigned.push(creep.name);
                         return false;
                     }
                 });
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Attempt to assign harvest task to remaining creeps.
-            _.forEach(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name)), (creep) => {
+            _.forEach(creepsWithNoTask, (creep) => {
                 var task = new TaskHarvest();
                 if (task.canAssign(creep)) {
                     creep.say("Harvesting");
+                    assigned.push(creep.name);
                 }
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Rally remaining creeps.
-            _.forEach(TaskRally.getDeliveryTasks(Utilities.creepsWithNoTask(_.filter(Game.creeps, (c) => c.memory.role === "delivery" && c.memory.deliver === room.name))), (task) => {
+            _.forEach(TaskRally.getDeliveryTasks(creepsWithNoTask), (task) => {
                 task.canAssign(task.creep);
             });
         }

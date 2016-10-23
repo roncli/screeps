@@ -28,6 +28,8 @@ Rally.prototype.canAssign = function(creep) {
 
 Rally.prototype.run = function(creep) {
     "use strict";
+    
+    var pos;
 
     // If the rally point doesn't exist, complete the task.
     if (!this.rallyPoint) {
@@ -39,7 +41,10 @@ Rally.prototype.run = function(creep) {
     if (this.rallyPoint instanceof RoomPosition) {
         creep.moveTo(this.rallyPoint, {reusePath: Math.floor(Math.random() * 2) + 4});
     } else {
-        creep.moveTo(this.rallyPoint.pos.x + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.y + Math.floor(Math.random() * 7 - 3), {reusePath: Math.floor(Math.random() * 2) + 4});
+        pos = new RoomPosition(this.rallyPoint.pos.x + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.y + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.roomName);
+        pos.x = Math.max(Math.min(pos.x, 48), 1);
+        pos.y = Math.max(Math.min(pos.y, 48), 1);
+        creep.moveTo(pos, {reusePath: Math.floor(Math.random() * 2) + 4});
     }
 
     // Always complete the task.
@@ -114,13 +119,13 @@ Rally.getAttackerTasks = function(room) {
 Rally.getHarvesterTasks = function(creeps) {
     "use strict";
 
-    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.home, c));
+    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(c.memory.homeSource, c));
 };
 
 Rally.getDeliveryTasks = function(creeps) {
     "use strict";
 
-    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(Cache.getObjectById(c.memory.home) ? c.memory.home : Memory.maxCreeps.delivery[c.memory.deliver][c.memory.home].fromPos.roomName, c));
+    return _.map(_.filter(creeps, (c) => c.ticksToLive >= 150), (c) => new Rally(Cache.getObjectById(c.memory.homeSource) ? c.memory.home : Memory.maxCreeps.delivery[c.memory.home][c.memory.homeSource].fromPos.roomName, c));
 };
 
 Rally.getDefenderTask = function(creep) {

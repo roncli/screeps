@@ -81,12 +81,8 @@ Mine.prototype.run = function(room) {
 
                     // Convert builders to workers.
                     _.forEach(Cache.creepsInRoom("remoteBuilder", room), (creep) => {
-                        creep.memory = {
-                            type: "remoteWorker",
-                            home: creep.memory.home,
-                            supportRoom: creep.memory.supportRoom,
-                            container: source.id
-                        };
+                        creep.memory.role = "remoteWorker";
+                        creep.memory.container = source.id;
                     });
                     return false;
                 });

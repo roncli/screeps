@@ -15,10 +15,21 @@ CollectEnergy.prototype.constructor = CollectEnergy;
 CollectEnergy.prototype.canAssign = function(creep) {
     "use strict";
 
+    var energy;
+    
     if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     
+    energy = this.object.energy;
+    if (energy === undefined) {
+        energy = this.object.store[RESOURCE_ENERGY] || 0;
+    }
+
+    if (energy === 0) {
+        return false;
+    }
+
     Task.prototype.assign.call(this, creep);
     return true;
 }

@@ -8,7 +8,6 @@ var RoomObj = require("roomObj"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
     RoleRangedAttack = require("role.rangedAttack"),
-    RoleReserver = require("role.reserver"),
     RoleStorer = require("role.storer"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
@@ -170,7 +169,7 @@ Base.prototype.run = function(room) {
         // Report any spawns.
         _.forEach(Cache.spawnsInRoom(room), (spawn) => {
             if (spawn.spawning) {
-                console.log("    Spawning " + Game.creeps[spawn.spawning.name].memory.role + " " + spawn.spawning.name + " Remaining: " + spawn.spawning.remainingTime);
+                console.log("    Spawning " + Game.creeps[spawn.spawning.name].memory.role + " " + spawn.spawning.name + ", Ticks Remaining: " + spawn.spawning.remainingTime);
             }
         });
 
@@ -214,7 +213,6 @@ Base.prototype.run = function(room) {
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
     RoleCollector.checkSpawn(room);
-    RoleReserver.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
 
     // Get the tasks needed for this room.
@@ -304,7 +302,6 @@ Base.prototype.run = function(room) {
     RoleHealer.assignTasks(room, tasks);
     RoleDefender.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
-    RoleReserver.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
 
     // Assign tasks to towers.

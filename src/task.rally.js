@@ -109,12 +109,6 @@ Rally.getDefenderTask = function(creep) {
     return new Rally(creep.memory.defending, creep);
 };
 
-Rally.getReserverTask = function(creep) {
-    "use strict";
-
-    return new Rally(creep.memory.reserve, creep);
-};
-
 Rally.getClaimerTask = function(creep) {
     "use strict";
 

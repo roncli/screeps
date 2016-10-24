@@ -88,6 +88,23 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled links.
+            if (tasks.fillEnergy.fillLinkTask) {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.supportRoom === room.name && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+                    if (tasks.fillEnergy.fillLinkTask.canAssign(creep)) {
+                        creep.say("Link");
+                        assigned.push(creep.name);
+                    }
+                });
+            }
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled containers.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Game.creeps, {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Game.creeps, {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + _.sum(c.carry);}, 0);

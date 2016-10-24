@@ -20,7 +20,7 @@ var Cache = require("cache"),
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
                 var count = 0,
-                    source;
+                    source, length, linkToUse;
 
                 // If this container is for a mineral, bail if there are no minerals left.  If it's not a mineral, start counter at -1 since it has a worker on it already.
                 if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
@@ -33,7 +33,23 @@ var Cache = require("cache"),
                     foundFirstSource = true;
                 }
 
-                count += Math.max(Math.ceil(Memory.lengthToContainer[container.id][supportRoom.name] / 22), 0);
+                // Calculate the length the storers need to travel.
+                length = Memory.lengthToContainer[container.id][supportRoom.name];
+                if (Cache.linksInRoom(supportRoom).length > 1) {
+                    if (!Memory.lengthToLink) {
+                        Memory.lengthToLink = {};
+                    }
+                    if (!Memory.lengthToLink[container.id]) {
+                        Memory.lengthToLink[container.id] = {};
+                    }
+                    if (!Memory.lengthToLink[container.id][supportRoom.name]) {
+                        Memory.lengthToLink[container.id][supportRoom.name] = Utilities.objectsClosestToObj(Cache.linksInRoom(supportRoom), container)[0].pos.getRangeTo(container);
+                    }
+                    length = Memory.lengthToLink[container.id][supportRoom.name];
+                }
+
+                // Calculate number of storers needed.
+                count += Math.max(Math.ceil(length / 22), 0);
                 max += count;
 
                 // If we don't have enough remote storers for this container, spawn one.

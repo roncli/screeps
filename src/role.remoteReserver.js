@@ -30,7 +30,7 @@ var Cache = require("cache"),
                 Memory.lengthToController[room.controller.id][supportRoom.name] = PathFinder.search(room.controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path.length;
             }
 
-            count = _.filter(Cache.creepsInRoom("remoteReserver", room), (c) => c.memory.reserve === toRoom && (c.spawning || c.ticksToLive > Memory.lengthToController[room.controller.id][supportRoom.name])).length;
+            count = _.filter(Cache.creepsInRoom("remoteReserver", room), (c) => c.spawning || c.ticksToLive > Memory.lengthToController[room.controller.id][supportRoom.name]).length;
 
             if (room.controller.reservation.ticksToEnd < 4000) {
                 max += 1;

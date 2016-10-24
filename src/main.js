@@ -212,10 +212,11 @@ var profiler = require("screeps-profiler"),
                         if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
                             Cache.creepTasks[creep.name].toObj(creep);
                         }
-                    } else {
+                    }
+                    if (!creep.memory.currentTask || !Cache.creepTasks[creep.name]) {
                         // RIP & Pepperonis :(
                         delete creep.memory.currentTask;
-                        if (creep.ticksToLive && creep.ticksToLive < 150) {
+                        if (!creep.spawning && creep.ticksToLive < 150) {
                             console.log("  RIP & Pepperonis, " + creep.name + " :(");
                             creep.say("R.I.P. :(", true);
                             creep.suicide();

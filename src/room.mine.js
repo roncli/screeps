@@ -173,7 +173,7 @@ Mine.prototype.run = function(room) {
 Mine.prototype.toObj = function(room) {
     "use strict";
 
-    room.memory.roomType = {
+    Memory.rooms[room.name].roomType = {
         type: this.type,
         supportRoom: this.supportRoom,
         stage: this.stage

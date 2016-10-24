@@ -14,7 +14,7 @@ Melee.prototype.constructor = Melee;
 Melee.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.getActiveBodyparts(MELEE_ATTACK) === 0) {
+    if (creep.getActiveBodyparts(ATTACK) === 0) {
         return false;
     }
     

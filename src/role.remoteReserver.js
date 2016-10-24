@@ -42,7 +42,7 @@ var Cache = require("cache"),
 
             // Output remote reserver count in the report.
             if (count > 0 || max > 0) {
-                console.log("    Remote Reservers: " + count + "/" + max);
+                console.log("    Remote Reservers: " + Cache.creepsInRoom("remoteReserver", room).length + "/" + max);
             }        
         },
         

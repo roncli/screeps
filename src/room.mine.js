@@ -52,6 +52,15 @@ Mine.prototype.run = function(room) {
 
         // Output room report.
         if (!room.unobservable) {
+            tasks = {
+                build: {
+                    tasks: TaskBuild.getTasks(room)
+                }
+            };
+            if (tasks.build.tasks.length > 0) {
+                console.log("    Structures to build: " + tasks.build.tasks.length);
+            }
+
             if (TaskBuild.getTasks(room).length > 0) {
                 console.log("    Structures to build: " + tasks.build.tasks.length);
             }
@@ -123,10 +132,16 @@ Mine.prototype.run = function(room) {
 
         // Output room report.
         if (!room.unobservable) {
-            tasks.build.tasks = TaskBuild.getTasks(room);
-            tasks.heal.tasks = TaskHeal.getTasks(room);
-            tasks.repair.criticalTasks = TaskRepair.getCriticalTasks(room);
-            tasks.repair.tasks = TaskRepair.getTasks(room);
+            tasks.build = {
+                tasks: TaskBuild.getTasks(room)
+            };
+            tasks.heal = {
+                tasks: TaskHeal.getTasks(room)
+            };
+            tasks.repair = {
+                criticalTasks: TaskRepair.getCriticalTasks(room),
+                tasks: TaskRepair.getTasks(room)
+            };
 
             if (tasks.build.tasks.length > 0) {
                 console.log("    Structures to build: " + tasks.build.tasks.length);

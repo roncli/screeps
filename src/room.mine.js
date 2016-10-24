@@ -50,6 +50,14 @@ Mine.prototype.run = function(room) {
         // Spawn new creeps.
         RoleRemoteBuilder.checkSpawn(room);
 
+        // Output room report.
+        if (!room.unobservable) {
+            tasks.build.tasks = TaskBuild.getTasks(room);
+            if (tasks.build.tasks.length > 0) {
+                console.log("    Structures to build: " + tasks.build.tasks.length);
+            }
+        }
+
         // Assign tasks to creeps.                    
         RoleRemoteBuilder.assignTasks(room);
 

@@ -136,7 +136,6 @@ var Cache = require("cache"),
                     assigned = [];
                 }
             });
-
         }
     };
 

@@ -82,7 +82,7 @@ Mine.prototype.run = function(room) {
                     // Convert builders to workers.
                     _.forEach(Cache.creepsInRoom("remoteBuilder", room), (creep) => {
                         creep.memory.role = "remoteWorker";
-                        creep.memory.container = source.id;
+                        creep.memory.container = Utilities.objectsClosestToObj(Cache.containersInRoom(room), source)[0].id;
                     });
                     return false;
                 });

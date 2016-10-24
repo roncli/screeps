@@ -130,7 +130,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("defender", room)), (c) => !c.spawning && c.ticksToLive > 150),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

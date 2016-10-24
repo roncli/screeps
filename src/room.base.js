@@ -174,7 +174,7 @@ Base.prototype.run = function(room) {
         terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
         if (terminalMinerals.length > 0) {
             topResource = _.sortBy(terminalMinerals, (s) => -s.amount)[0];
-            bestOrder = _.filter(Cache.marketOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName) - Game.map.getRoomLinearDistance(room.name, b.roomName)))[0];
+            bestOrder = _.filter(Cache.marketOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
             if (bestOrder) {
                 transCost = Game.market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), room.name, bestOrder.roomName);
                 terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;

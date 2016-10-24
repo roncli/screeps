@@ -310,7 +310,7 @@ Base.prototype.run = function(room) {
 Base.prototype.toObj = function(room) {
     "use strict";
 
-    Memory.room[room.name].roomType = {
+    Memory.rooms[room.name].roomType = {
         type: this.type
     }
 };

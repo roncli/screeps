@@ -166,8 +166,15 @@ Base.prototype.run = function(room) {
         this.manage(room);
     }
 
-    // Transfer energy from far link to near link.
     if (Cache.spawnsInRoom(room).length > 0) {
+        // Report any spawns.
+        _.forEach(Cache.spawnsInRoom(room), (spawn) => {
+            if (spawn.spawning) {
+                console.log("    Spawning " + Game.creeps[spawn.spawning.name].memory.role + " " + spawn.spawning.name + " Remaining: " + spawn.spawning.remainingTime);
+            }
+        });
+
+        // Transfer energy from far link to near link.
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         if (links.length > 1 && !links[1].cooldown && links[1].energy > 0) {
             links[1].transferEnergy(links[0]);

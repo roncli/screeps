@@ -12,7 +12,7 @@ Reserve.prototype.constructor = Reserve;
 Reserve.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.getActiveBodyparts(CLAIM) === 0) {
+    if (creep.spawning || creep.getActiveBodyparts(CLAIM) === 0) {
         return false;
     }
 

@@ -30,7 +30,7 @@ var Cache = require("cache"),
                 max += 1;
 
                 // If we don't have a remote worker for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("remoteWorker", room), (c) => (!c.ticksToLive || c.ticksToLive >= 150 + Memory.lengthToContainer[container.id][supportRoom.name]) && c.memory.container === container.id).length === 0) {
+                if (_.filter(Cache.creepsInRoom("remoteWorker", room), (c) => (c.spawning || c.ticksToLive >= 150 + Memory.lengthToContainer[container.id][supportRoom.name]) && c.memory.container === container.id).length === 0) {
                     Worker.spawn(room, supportRoom, container.id);
                 }
 

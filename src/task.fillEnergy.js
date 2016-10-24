@@ -15,7 +15,7 @@ FillEnergy.prototype.constructor = FillEnergy;
 FillEnergy.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY]) {
+    if (creep.spawning || !creep.carry[RESOURCE_ENERGY]) {
         return false;
     }
     

@@ -168,6 +168,11 @@ var profiler = require("screeps-profiler"),
                 
                 // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
                 _.forEach(Game.creeps, (creep) => {
+                    // Don't do anything if the creep is spawning.
+                    if (creep.spawning) {
+                        return;
+                    }
+
                     // Countdown to death!
                     if (creep.ticksToLive <= 150 || (creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1) || creep.ticksToLive % 100 === 1) {
                         switch (creep.ticksToLive - 1) {

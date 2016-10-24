@@ -27,7 +27,7 @@ var Cache = require("cache"),
                 max += 1;
 
                 // If we don't have a miner for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("miner", room), (c) => (!c.ticksToLive || c.ticksToLive >= 150) && c.memory.container === container.id).length === 0) {
+                if (_.filter(Cache.creepsInRoom("miner", room), (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === container.id).length === 0) {
                     Miner.spawn(room, container.id);
                 }
             });

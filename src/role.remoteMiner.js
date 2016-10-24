@@ -42,7 +42,7 @@ var Cache = require("cache"),
                 max += 1;
 
                 // If we don't have a remote miner for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("remoteMiner", room), (c) => (!c.ticksToLive || c.ticksToLive >= 150 + Memory.lengthToContainer[container.id][supportRoom.name] * 3) && c.memory.container === container.id).length === 0) {
+                if (_.filter(Cache.creepsInRoom("remoteMiner", room), (c) => (c.spawning || c.ticksToLive >= 150 + Memory.lengthToContainer[container.id][supportRoom.name] * 3) && c.memory.container === container.id).length === 0) {
                     Miner.spawn(room, supportRoom, container.id);
                 }
             });

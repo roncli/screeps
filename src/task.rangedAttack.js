@@ -14,7 +14,7 @@ Ranged.prototype.constructor = Ranged;
 Ranged.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.getActiveBodyparts(RANGED_ATTACK) === 0) {
+    if (creep.spawning || creep.getActiveBodyparts(RANGED_ATTACK) === 0) {
         return false;
     }
     

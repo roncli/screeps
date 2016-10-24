@@ -14,7 +14,7 @@ Pickup.prototype.constructor = Pickup;
 Pickup.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (!this.resource || _.sum(creep.carry) === creep.carryCapacity) {
+    if (creep.spawning || !this.resource || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     

@@ -15,7 +15,7 @@ CollectEnergy.prototype.constructor = CollectEnergy;
 CollectEnergy.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
+    if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     

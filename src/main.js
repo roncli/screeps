@@ -14,11 +14,17 @@ var profiler = require("screeps-profiler"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
     RoleRangedAttack = require("role.rangedAttack"),
+    RoleRemoteBuilder = require("role.remoteBuilder"),
+    RoleRemoteMiner = require("role.remoteMiner"),
+    RoleRemoteReserver = require("role.remoteReserver"),
+    RoleRemoteStorer = require("role.remoteStorer"),
+    RoleRemoteWorker = require("role.remoteWorker"),
     RoleReserver = require("role.reserver"),
     RoleStorer = require("role.storer"),
     RoleTower = require("role.tower"),
     RoleWorker = require("role.worker"),
     RoomBase = require("room.base"),
+    RoomMine = require("room.mine"),
     taskDeserialization = require("taskDeserialization"),
     roomDeserialization = require("roomDeserialization"),
     
@@ -27,6 +33,8 @@ var profiler = require("screeps-profiler"),
             "use strict";
 
             profiler.wrap(() => {
+                var unobservableRooms = [];
+
                 // Reset the cache.
                 Cache.reset();
 
@@ -43,13 +51,19 @@ var profiler = require("screeps-profiler"),
                         MeleeAttack: RoleMeleeAttack,
                         Miner: RoleMiner,
                         RangedAttack: RoleRangedAttack,
+                        RemoteBuilder: RoleRemoteBuilder,
+                        RemoteMiner: RoleRemoteMiner,
+                        RemoteReserver: RoleRemoteReserver,
+                        RemoteStorer: RoleRemoteStorer,
+                        RemoteWorker: RoleRemoteWorker,
                         Reserver: RoleReserver,
                         Storer: RoleStorer,
                         Tower: RoleTower,
                         Worker: RoleWorker
                     },
                     Room: {
-                        Base: RoomBase
+                        Base: RoomBase,
+                        Mine: RoomMine
                     },
                     Utilities: Utilities
                 };
@@ -85,50 +99,63 @@ var profiler = require("screeps-profiler"),
                     }
                 });
 
-                // Lop through each room in memory to deserialize their type.
+                // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
                 _.forEach(Memory.rooms, (roomMemory, name) => {
                     if (roomMemory && roomMemory.roomType) {
                         roomDeserialization(roomMemory, name);
                     }
+                    if (!Game.rooms[name]) {
+                        unobservableRooms.push({
+                            name: name,
+                            unobservable: true
+                        });
+                    }
                 });
 
                 // Loop through each room to determine the required tasks for the room.
-                _.forEach(Game.rooms, (room) => {
-                    // Log room status.
-                    if (room.controller) {
-                        if (room.controller.my) {
-                            if (room.controller.level === 8) {
-                                console.log("  " + room.name + " Controller level " + room.controller.level);
+                _.forEach(_.sortBy([].concat.apply([], [Game.rooms, unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine"].indexOf(Memory.rooms[r.name].roomType.type) : -1), (room) => {
+                    var type = + Memory.rooms[room.name] && Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type ? Memory.rooms[room.name].roomType.type : "unknown";
+
+                    if (room.unobservable) {
+                        // Log room status.
+                        console.log("  " + type + " " + room.name + " Unobservable");
+                    } else {
+                        // Log room status.
+                        if (room.controller) {
+                            if (room.controller.my) {
+                                if (room.controller.level === 8) {
+                                    console.log("  " + type + " " + room.name + " Controller level " + room.controller.level);
+                                } else {
+                                    console.log("  " + type + " " + room.name + " Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                                }
+                            } else if (room.controller.level === 0) {
+                                if (room.controller.reservation) {
+                                    console.log("  " + type + " " + room.name + " Controller reserved " + room.controller.reservation.username + " TTE " + room.controller.reservation.ticksToEnd);
+                                } else {
+                                    console.log("  " + type + " " + room.name + " Controller unowned");
+                                }
                             } else {
-                                console.log("  " + room.name + " Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
-                            }
-                        } else if (room.controller.level === 0) {
-                            if (room.controller.reservation) {
-                                console.log("  " + room.name + " Controller reserved " + room.controller.reservation.username + " TTE " + room.controller.reservation.ticksToEnd);
-                            } else {
-                                console.log("  " + room.name + " Controller unowned");
+                                console.log("  " + type + " " + room.name + " Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
                             }
                         } else {
-                            console.log("  " + room.name + " Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
+                            console.log("  " + type + " " + room.name);
                         }
-                    } else {
-                        console.log("  " + room.name);
-                    }
 
-                    _.forEach(Cache.energySourcesInRoom(room), (s) => {
-                        console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity + " TTR " + s.ticksToRegeneration);
-                    });
+                        _.forEach(Cache.energySourcesInRoom(room), (s) => {
+                            console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity + " TTR " + s.ticksToRegeneration);
+                        });
 
-                    _.forEach(Cache.mineralsInRoom(room), (m) => {
-                        console.log("    Mineral " + m.mineralType + " " + m.id + ": " + m.mineralAmount + " TTR " + m.ticksToRegeneration);
-                    });
+                        _.forEach(Cache.mineralsInRoom(room), (m) => {
+                            console.log("    Mineral " + m.mineralType + " " + m.id + ": " + m.mineralAmount + " TTR " + m.ticksToRegeneration);
+                        });
 
-                    if (room.storage && _.sum(room.storage.store) > 0) {
-                        console.log("    Storage: " + _.map(room.storage.store, (s, i) => {return s + " " + i;}).join(", "));
-                    }
+                        if (room.storage && _.sum(room.storage.store) > 0) {
+                            console.log("    Storage: " + _.map(room.storage.store, (s, i) => {return s + " " + i;}).join(", "));
+                        }
 
-                    if (room.terminal && _.sum(room.terminal.store) > 0) {
-                        console.log("    Terminal: " + _.map(room.terminal.store, (s, i) => {return s + " " + i;}).join(", "));
+                        if (room.terminal && _.sum(room.terminal.store) > 0) {
+                            console.log("    Terminal: " + _.map(room.terminal.store, (s, i) => {return s + " " + i;}).join(", "));
+                        }
                     }
 
                     if (Cache.roomTypes[room.name]) {

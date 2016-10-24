@@ -32,7 +32,7 @@ var Cache = require("cache"),
             }
 
             // Output reserver count in the report.
-            if (max > 0) {
+            if (num > 0 || max > 0) {
                 console.log("    Reservers: " + num + "/" + max);
             }        
         },

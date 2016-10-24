@@ -156,6 +156,12 @@ Base.prototype.run = function(room) {
 
     var tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amountToSend;
 
+    // Something is supremely wrong.  Notify and bail.
+    if (room.unobservable) {
+        Game.notify("Base Room " + room.name + " is unobservable, something is wrong!");
+        return;
+    }
+
     // Manage room.
     if (Game.time % 100 === 0) {
         this.manage(room);

@@ -6,53 +6,60 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair"),
 
-    Delivery = {
+    Worker = {
         checkSpawn: (room) => {
             "use strict";
 
-            var num = 0, max = 0;
-            
-            // If there are no spawns in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0) {
+            var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
+                max = 0;
+
+            // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
+            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || Cache.containersInRoom(room).length === 0) {
                 return;
             }
 
-            // Loop through the room deliveries to see if we need to spawn a creep.
-            if (Memory.maxCreeps.delivery) {
-                _.forEach(Memory.maxCreeps.delivery[room.name], (value, toId) => {
-                    var count = _.filter(Cache.creepsInRoom("delivery", room), (c) => c.memory.homeSource === toId).length;
+            // Loop through containers to see if we have anything we need to spawn.
+            _.forEach(Cache.containersInRoom(room), (container) => {
+                var source;
 
-                    num += count;
-                    max += value.maxCreeps;
+                // If this container is for a mineral, skip it.
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                    return;
+                }
 
-                    if (count < value.maxCreeps) {
-                        Delivery.spawn(room, toId);
-                    }
-                });
-            }
+                max += 1;
 
-            // Output delivery count in the report.
+                // If we don't have a remote worker for this container, spawn one.
+                if (_.filter(Cache.creepsInRoom("remoteWorker", room), (c) => (!c.ticksToLive || c.ticksToLive >= 150 + Memory.lengthToContainer[container.id][supportRoom.name]) && c.memory.container === container.id).length === 0) {
+                    Worker.spawn(room, supportRoom, container.id);
+                }
+
+                // Only 1 worker per room.
+                return false;
+            });
+
+            // Output remote worker count in the report.
             if (max > 0) {
-                console.log("    Deliveries: " + num + "/" + max);
+                console.log("    Remote Workers: " + Cache.creepsInRoom("remoteWorker", room).length + "/" + max);
             }        
         },
         
-        spawn: (room, id) => {
+        spawn: (room, supportRoom, id) => {
             "use strict";
 
             var body = [],
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Get the total energy in the room, limited to 3300.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 3300);
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(supportRoom), 3300);
 
             // If we're not at 3300 and energy is not at capacity, bail.
-            if (energy < 3300 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            if (energy < 3300 && energy !== Utilities.getEnergyCapacityInRoom(supportRoom)) {
                 return;
             }
 
@@ -82,14 +89,14 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "delivery", home: room.name, homeSource: id});
+            spawnToUse = _.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            name = spawnToUse.createCreep(body, undefined, {role: "remoteWorker", home: room.name, supportRoom: supportRoom.name, container: id});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.
             if (typeof name !== "number") {
-                console.log("    Spawning new delivery " + name);
-                _.forEach(Cache.creepsInRoom("worker", room), (creep) => {
+                console.log("    Spawning new remote worker " + name);
+                _.forEach(Cache.creepsInRoom("worker", supportRoom), (creep) => {
                     creep.memory.completeTask = true;
                 });
                 return true;
@@ -101,15 +108,15 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("delivery", room)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteWorker", room)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;
             }
 
-            // Check for repairs under 2500 if we're not in the home room.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
+            // Check for repairs under 2500 if we're not in the support room.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.supportRoom), (creep) => {
                 _.forEach(TaskRepair.getDeliveryTasks(creep.room), (task) => {
                     if (Utilities.creepsWithTask(Game.creeps, {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
@@ -128,8 +135,8 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for construction sites if we're not in the home room.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
+            // Check for construction sites.
+            _.forEach(creepsWithNoTask, (creep) => {
                 if (Cache.constructionSitesInRoom(creep.room).length > 0) {
                     var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
                     if (task.canAssign(creep)) {
@@ -148,7 +155,7 @@ var Cache = require("cache"),
 
             // Check for unfilled links.
             if (tasks.fillEnergy.fillLinkTask) {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.home === room.name && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.supportRoom === room.name && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
                     if (tasks.fillEnergy.fillLinkTask.canAssign(creep)) {
                         creep.say("Link");
                         assigned.push(creep.name);
@@ -209,13 +216,23 @@ var Cache = require("cache"),
             }
 
             // Attempt to assign harvest task to remaining creeps.
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskHarvest();
-                if (task.canAssign(creep)) {
-                    creep.say("Harvesting");
-                    assigned.push(creep.name);
-                }
-            });
+            if (!room.unobservable) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    var task = new TaskHarvest(),
+                        sources = Utilities.objectsClosestToObj(_.filter(Cache.energySourcesInRoom(room), (s) => s.energy > 0), creep);
+                    
+                    if (sources.length === 0) {
+                        return false;
+                    }
+
+                    creep.memory.homeSource = sources[0].id;
+
+                    if (task.canAssign(creep)) {
+                        creep.say("Harvesting");
+                        assigned.push(creep.name);
+                    }
+                });
+            }
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
             assigned = [];
@@ -225,11 +242,12 @@ var Cache = require("cache"),
             }
 
             // Rally remaining creeps.
-            _.forEach(TaskRally.getDeliveryTasks(creepsWithNoTask), (task) => {
-                task.canAssign(task.creep);
+            _.forEach(creesWithNoTask, (creep) => {
+                var task = new TaskRally(creep.memory.home);
+                task.canAssign(creep);
             });
         }
     };
 
-require("screeps-profiler").registerObject(Delivery, "RoleDelivery");
-module.exports = Delivery;
+require("screeps-profiler").registerObject(Worker, "RoleRemoteWOrker");
+module.exports = Worker;

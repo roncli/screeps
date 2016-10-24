@@ -56,7 +56,7 @@ var Cache = require("cache"),
         spawn: (room, supportRoom, id) => {
             "use strict";
 
-            var body = [MOVE, WORK, WORK, WORK, WORK, WORK],
+            var body = [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -67,8 +67,8 @@ var Cache = require("cache"),
             // Get the energy available, limiting to 4450.
             energy = Math.min(Utilities.getAvailableEnergyInRoom(supportRoom), 4450);
 
-            // Fail under 550 energy.
-            if (energy < 550) {
+            // Fail under 650 energy.
+            if (energy < 650) {
                 return false;
             }
 

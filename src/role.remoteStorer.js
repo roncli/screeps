@@ -36,8 +36,8 @@ var Cache = require("cache"),
                 count += Math.max(Math.ceil(Memory.lengthToContainer[container.id][supportRoom.name] / 22), 0);
                 max += count;
 
-                // If we don't have a remote storer for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("remoteStorer", room), (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === container.id).length === 0) {
+                // If we don't have enough remote storers for this container, spawn one.
+                if (_.filter(Cache.creepsInRoom("remoteStorer", room), (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === container.id).length < count) {
                     Storer.spawn(room, supportRoom, container.id);
                 }
             });

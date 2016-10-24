@@ -113,7 +113,7 @@ var profiler = require("screeps-profiler"),
                 });
 
                 // Loop through each room to determine the required tasks for the room.
-                _.forEach(_.sortBy([].concat.apply([], [Game.rooms, unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine"].indexOf(Memory.rooms[r.name].roomType.type) : -1), (room) => {
+                _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine"].indexOf(Memory.rooms[r.name].roomType.type) : -1), (room) => {
                     var type = + Memory.rooms[room.name] && Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type ? Memory.rooms[room.name].roomType.type : "unknown";
 
                     if (room.unobservable) {

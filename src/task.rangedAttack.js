@@ -17,6 +17,11 @@ Ranged.prototype.canAssign = function(creep) {
     if (creep.spawning || creep.getActiveBodyparts(RANGED_ATTACK) === 0) {
         return false;
     }
+
+    // Temporary code to not attack Suppen's workers passing through.
+    if (creep.room.name === "E39N13" && this.enemy.owner && this.enemy.owner.username === "Suppen" && this.enemy.pos.getRangeTo(25, 25) <= 15) {
+        return false;
+    }
     
     Task.prototype.assign.call(this, creep);
     return true;

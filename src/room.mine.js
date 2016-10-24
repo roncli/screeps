@@ -162,10 +162,10 @@ Mine.prototype.toObj = function(room) {
     }
 };
 
-Mine.fromObj = function(room) {
+Mine.fromObj = function(roomMemory) {
     "use strict";
 
-    return new Mine(Memory.rooms[room.name].roomType.supportRoom, Memory.rooms[room.name].roomType.stage);
+    return new Mine(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
 };
 
 require("screeps-profiler").registerObject(Mine, "RoomMine");

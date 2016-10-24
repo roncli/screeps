@@ -38,6 +38,31 @@ var Cache = require("cache"),
             return _.map(objList, (o) => o.object);
         },
 
+        objectsClosestToObjByPath: (objects, obj) => {
+            "use strict";
+
+            if (objects.length === 0) {
+                return [];
+            }
+
+            if (!obj) {
+                return objects;
+            }
+            
+            var objList = _.map(objects, (o) => {
+                return {
+                    object: o,
+                    distance: PathFinder.search(obj.pos, {pos: o, range: 1}, {swampCost: 1}).path.length
+                };
+            });
+            
+            objList.sort((a, b) => {
+                return a.distance - b.distance;
+            });
+            
+            return _.map(objList, (o) => o.object);
+        },
+
         getEmptyPosAroundPos: (pos) => {
             "use strict";
 

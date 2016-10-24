@@ -60,10 +60,6 @@ Mine.prototype.run = function(room) {
             if (tasks.build.tasks.length > 0) {
                 console.log("    Structures to build: " + tasks.build.tasks.length);
             }
-
-            if (TaskBuild.getTasks(room).length > 0) {
-                console.log("    Structures to build: " + tasks.build.tasks.length);
-            }
         }
 
         // Assign tasks to creeps.                    

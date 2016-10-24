@@ -115,7 +115,7 @@ var profiler = require("screeps-profiler"),
                     }
                 });
 
-                // Loop through each room to determine the required tasks for the room.
+                // Loop through each room to determine the required tasks for the room, and then serialize the room.
                 _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
                     var type = Memory.rooms[room.name] && Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type ? Memory.rooms[room.name].roomType.type : "unknown";
 
@@ -163,6 +163,7 @@ var profiler = require("screeps-profiler"),
 
                     if (Cache.roomTypes[room.name]) {
                         Cache.roomTypes[room.name].run(room);
+                        Cache.roomTypes[room.name].toObj(room);
                     }
                 });
                 

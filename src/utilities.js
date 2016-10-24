@@ -52,7 +52,7 @@ var Cache = require("cache"),
             var objList = _.map(objects, (o) => {
                 return {
                     object: o,
-                    distance: PathFinder.search(obj.pos, {pos: o, range: 1}, {swampCost: 1}).path.length
+                    distance: PathFinder.search(obj.pos, {pos: o.pos, range: 1}, {swampCost: 1}).path.length
                 };
             });
             

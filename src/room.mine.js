@@ -52,8 +52,7 @@ Mine.prototype.run = function(room) {
 
         // Output room report.
         if (!room.unobservable) {
-            tasks.build.tasks = TaskBuild.getTasks(room);
-            if (tasks.build.tasks.length > 0) {
+            if (TaskBuild.getTasks(room).length > 0) {
                 console.log("    Structures to build: " + tasks.build.tasks.length);
             }
         }

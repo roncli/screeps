@@ -212,8 +212,7 @@ var profiler = require("screeps-profiler"),
                         if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
                             Cache.creepTasks[creep.name].toObj(creep);
                         }
-                    }
-                    if (!creep.memory.currentTask || !Cache.creepTasks[creep.name]) {
+                    } else {
                         // RIP & Pepperonis :(
                         delete creep.memory.currentTask;
                         if (!creep.spawning && creep.ticksToLive < 150) {

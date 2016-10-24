@@ -30,7 +30,7 @@ var Cache = require("cache"),
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + count + "/" + max);        
+            console.log("    Workers: " + Cache.creepsInRoom("worker", room).length + "/" + max);        
         },
         
         spawn: (room) => {

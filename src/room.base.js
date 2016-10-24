@@ -4,7 +4,6 @@ var RoomObj = require("roomObj"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
-    RoleDelivery = require("role.delivery"),
     RoleHealer = require("role.healer"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
@@ -208,7 +207,6 @@ Base.prototype.run = function(room) {
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
     RoleCollector.checkSpawn(room);
-    RoleDelivery.checkSpawn(room);
     RoleReserver.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
 
@@ -299,7 +297,6 @@ Base.prototype.run = function(room) {
     RoleHealer.assignTasks(room, tasks);
     RoleDefender.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
-    RoleDelivery.assignTasks(room, tasks);
     RoleReserver.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
 

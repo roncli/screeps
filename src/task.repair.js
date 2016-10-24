@@ -78,11 +78,5 @@ Repair.getTasks = function(room) {
     return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => (room.controller.level === 8 || s.hits < 1000000) && s.hits / s.hitsMax < 0.9), (s) => new Repair(s.id)), (s) => s.structure.hits);
 };
 
-Repair.getDeliveryTasks = function(room) {
-    "use strict";
-
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits !== s.hitsMax && s.hits < 2500), (s) => new Repair(s.id)), (s) => s.structure.hits);
-};
-
 require("screeps-profiler").registerObject(Repair, "TaskRepair");
 module.exports = Repair;

@@ -69,6 +69,28 @@ Mine.prototype.run = function(room) {
             // Check to see if we have built containers.  If so, move to stage 2.
             if (Cache.containersInRoom(room).length === Cache.energySourcesInRoom(room).length) {
                 this.stage = 2;
+
+                // Loop through containers to get first container by source.
+                _.forEach(Cache.containersInRoom(room), (container) => {
+                    var source;
+
+                    // If this container is for a mineral, skip it.
+                    if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                        return;
+                    }
+
+                    // Convert builders to workers.
+                    _.forEach(Cache.creepsInRoom("remoteBuilder", room), (creep) => {
+                        creep.memory = {
+                            type: "remoteWorker",
+                            home: creep.memory.home,
+                            supportRoom: creep.memory.supportRoom,
+                            container: source.id
+                        };
+                    });
+                    return false;
+                });
+
             }
 
             // Check to see if we have construction sites for the containers.  If not, create them.

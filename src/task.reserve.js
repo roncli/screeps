@@ -38,6 +38,55 @@ Reserve.prototype.canAssign = function(creep) {
 Reserve.prototype.run = function(creep) {
     "use strict";
 
+    // R.I.P. Pete Burns
+    switch (Game.time % 16) {
+        case 0:
+            creep.say("You", true);
+            break;
+        case 1:
+            creep.say("spin", true);
+            break;
+        case 2:
+            creep.say("me", true);
+            break;
+        case 3:
+            creep.say("right", true);
+            break;
+        case 4:
+            creep.say("round", true);
+            break;
+        case 5:
+            creep.say("baby", true);
+            break;
+        case 6:
+            creep.say("right", true);
+            break;
+        case 7:
+            creep.say("round", true);
+            break;
+        case 8:
+            creep.say("like a", true);
+            break;
+        case 9:
+            creep.say("record", true);
+            break;
+        case 10:
+            creep.say("baby", true);
+            break;
+        case 11:
+            creep.say("right", true);
+            break;
+        case 12:
+            creep.say("round", true);
+            break;
+        case 13:
+            creep.say("round", true);
+            break;
+        case 14:
+            creep.say("round", true);
+            break;
+    }
+
     switch (creep.memory.role) {
         case "reserver":
             if (!creep.room.controller) {

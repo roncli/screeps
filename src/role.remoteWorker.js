@@ -242,7 +242,7 @@ var Cache = require("cache"),
             }
 
             // Rally remaining creeps.
-            _.forEach(creesWithNoTask, (creep) => {
+            _.forEach(creepsWithNoTask, (creep) => {
                 var task = new TaskRally(creep.memory.home);
                 task.canAssign(creep);
             });

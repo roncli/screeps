@@ -315,7 +315,7 @@ var Cache = require("cache"),
             }
 
             // Check for controllers to upgrade.
-            _.forEach(tasks.upgradeController.tasks(room), (task) => {
+            _.forEach(tasks.upgradeController.tasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Controller");

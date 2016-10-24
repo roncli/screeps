@@ -90,7 +90,7 @@ var Cache = require("cache"),
 
             // Check for unfilled links.
             if (tasks.fillEnergy.fillLinkTask) {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.supportRoom === room.name && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.supportRoom && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
                     if (tasks.fillEnergy.fillLinkTask.canAssign(creep)) {
                         creep.say("Link");
                         assigned.push(creep.name);

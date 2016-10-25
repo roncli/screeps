@@ -38,7 +38,7 @@ var Cache = require("cache"),
                 }
             }
 
-            // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.
+            // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.path.
             if (creep.memory._pathing) {
                 wasStationary = creep.pos.x === creep.memory._pathing.start.x && creep.pos.y === creep.memory._pathing.start.y && creep.room.name === creep.memory._pathing.start.room;
                 
@@ -56,7 +56,7 @@ var Cache = require("cache"),
                             creep.memory._pathing.blocked.push(firstPos);
                         }
                     }
-                    delete creep.memory._pathing;
+                    delete creep.memory._pathing.path;
                 } else if (!wasStationary) {
                     // We were successful moving last turn, update accordingly.
                     if (creep.memory._pathing.path.length === 1) {
@@ -76,7 +76,7 @@ var Cache = require("cache"),
             }
             
             // If we don't have a _pathing, generate it.
-            if (!creep.memory._pathing) {
+            if (!creep.memory._pathing || !creep.memory._pathing.path) {
                 path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
                     plainCost: 2,
                     swampCost: 10,
@@ -89,7 +89,7 @@ var Cache = require("cache"),
 
                         matrix = Cache.getCostMatrix(Game.rooms[roomName]);
 
-                        if (roomName === creep.room.name) {
+                        if (creep.memory._pathing && roomName === creep.room.name) {
                             _.forEach(creep.memory._pathing.blocked, (blocked) => {
                                 if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
                                     matrix.set(firstPos.x, firstPos.y, 255);
@@ -107,21 +107,25 @@ var Cache = require("cache"),
                 }
 
                 // Serialize the path.
-                creep.memory._pathing = {
-                    start: {
-                        x: creep.pos.x,
-                        y: creep.pos.y,
-                        room: creep.room.name
-                    },
-                    dest: {
-                        x: pos.x,
-                        y: pos.y,
-                        room: pos.roomName
-                    },
-                    path: Pathing.serializePath(creep.pos, path.path),
-                    stationary: 0,
-                    blocked: []
-                };
+                if (creep.memory._pathing) {
+                    creep.memory._pathing.path = Pathing.serializePath(creep.pos, path.path)
+                } else {
+                    creep.memory._pathing = {
+                        start: {
+                            x: creep.pos.x,
+                            y: creep.pos.y,
+                            room: creep.room.name
+                        },
+                        dest: {
+                            x: pos.x,
+                            y: pos.y,
+                            room: pos.roomName
+                        },
+                        path: Pathing.serializePath(creep.pos, path.path),
+                        stationary: 0,
+                        blocked: []
+                    };
+                }
             }
 
             // Attempt to move.

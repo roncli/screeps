@@ -49,7 +49,8 @@ var Cache = require("cache"),
                         firstPos = {
                             x: creep.pos.x + direction[+creep.memory._pathing.path[0]].dx,
                             y: creep.pos.y + direction[+creep.memory._pathing.path[0]].dy,
-                            room: creep.room.name
+                            room: creep.room.name,
+                            blockedUntil: Game.time + 12
                         };
 
                         if (firstPos.x !== creep.pos.x || firstPos.y !== creep.pos.y) {
@@ -70,8 +71,7 @@ var Cache = require("cache"),
                         creep.memory._pathing.start = {
                             x: creep.pos.x,
                             y: creep.pos.y,
-                            room: creep.room.name,
-                            blockedUntil: Game.time + 12
+                            room: creep.room.name
                         };
                         creep.memory._pathing.path = creep.memory._pathing.path.substring(1);
                     }

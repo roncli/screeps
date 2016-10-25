@@ -1,6 +1,5 @@
 var Task = require("task"),
     Cache = require("cache"),
-    Pathing = require("pathing"),
     Utilities = require("utilities"),
     FillEnergy = function(id) {
         Task.call(this);
@@ -35,10 +34,9 @@ FillEnergy.prototype.run = function(creep) {
 
     // Move to the object and fill it.
     Pathing.moveTo(creep, this.object, 1);
-    creep.transfer(this.object, RESOURCE_ENERGY);
-
-    // If we didn't move, complete task.
-    Task.prototype.complete.call(this, creep);
+    if (creep.transfer(this.object, RESOURCE_ENERGY) === OK) {
+        Task.prototype.complete.call(this, creep);
+    }
 };
 
 FillEnergy.prototype.canComplete = function(creep) {

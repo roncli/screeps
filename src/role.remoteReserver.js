@@ -32,7 +32,7 @@ var Cache = require("cache"),
 
             count = _.filter(Cache.creepsInRoom("remoteReserver", room), (c) => c.spawning || c.ticksToLive > Memory.lengthToController[room.controller.id][supportRoom.name]).length;
 
-            if (room.controller.reservation.ticksToEnd < 4000) {
+            if (!room.controller.reservation || room.controller.reservation.ticksToEnd < 4000) {
                 max += 1;
             }
 

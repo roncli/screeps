@@ -48,8 +48,13 @@ var Cache = require("cache"),
                     if (creep.memory._pathing.path && creep.memory._pathing.path.length > 0) {
                         firstPos = {
                             x: creep.pos.x + direction[+creep.memory._pathing.path[0]].dx,
-                            y: creep.pos.y + direction[+creep.memory._pathing.path[0]].dy
+                            y: creep.pos.y + direction[+creep.memory._pathing.path[0]].dy,
+                            room: creep.room.name
                         };
+
+                        if (firstPos.x !== creep.pos.x || firstPos.y !== creep.pos.y) {
+                            creep.memory._pathing.blocked.push(firstPos);
+                        }
                     }
                     delete creep.memory._pathing;
                 } else if (!wasStationary) {
@@ -62,7 +67,8 @@ var Cache = require("cache"),
                         creep.memory._pathing.start = {
                             x: creep.pos.x,
                             y: creep.pos.y,
-                            room: creep.room.name
+                            room: creep.room.name,
+                            blockedUntil: Game.time + 12
                         };
                         creep.memory._pathing.path = creep.memory._pathing.path.substring(1);
                     }
@@ -83,8 +89,12 @@ var Cache = require("cache"),
 
                         matrix = Cache.getCostMatrix(Game.rooms[roomName]);
 
-                        if (firstPos && roomName === creep.room.name) {
-                            matrix.set(firstPos.x, firstPos.y, 255);
+                        if (roomName === creep.room.name) {
+                            _.forEach(creep.memory._pathing.blocked, (blocked) => {
+                                if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
+                                    matrix.set(firstPos.x, firstPos.y, 255);
+                                }
+                            });
                         }
 
                         return matrix;
@@ -109,7 +119,8 @@ var Cache = require("cache"),
                         room: pos.roomName
                     },
                     path: Pathing.serializePath(creep.pos, path.path),
-                    stationary: 0
+                    stationary: 0,
+                    blocked: []
                 };
             }
 

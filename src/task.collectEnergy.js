@@ -45,7 +45,7 @@ CollectEnergy.prototype.run = function(creep) {
 
     // Move to the object and collect from it.
     Pathing.moveTo(creep, this.object, 1);
-    creep.withdraw(this.object, RESOURCE_ENERGY) === OK) {
+    if (creep.withdraw(this.object, RESOURCE_ENERGY) === OK) {
         Task.prototype.complete.call(this, creep);
     }
 };

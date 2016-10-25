@@ -37,7 +37,7 @@ Mine.prototype.run = function(room) {
     var supportRoom, spawnToUse, tasks;
 
     // If there are no energy sources, bail.
-    if (Cache.energySourcesInRoom(room).length === 0) {
+    if (!room.unobservable && Cache.energySourcesInRoom(room).length === 0) {
         return;
     }
 

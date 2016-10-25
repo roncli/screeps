@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Claim = function(id) {
         Task.call(this);
 
@@ -27,10 +28,10 @@ Claim.prototype.run = function(creep) {
         Task.prototype.complete.call(this, creep);
         return;
     }
-    
-    if (creep.claimController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(creep.room.controller, {reusePath: Math.floor(Math.random() * 2) + 4});
-    }
+
+    // Move towards the controller and claim it.    
+    Pathing.moveTo(creep, creep.room.controller, 1);
+    creep.claimController(creep.room.controller);
 };
 
 Claim.prototype.canComplete = function(creep) {

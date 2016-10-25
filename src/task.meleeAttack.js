@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Melee = function(id) {
         Task.call(this);
 
@@ -32,8 +33,18 @@ Melee.prototype.run = function(creep) {
         return;
     }
     
+    // Move and attack.
+    Pathing.moveTo(creep, this.enemy, 1);
     if (creep.attack(this.enemy) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.enemy, {reusePath: Math.floor(Math.random() * 2) + 4});
+        // Heal self if possible available.
+        if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.maxHits) {
+            creep.heal(creep);
+        }
+    }
+
+    // Try ranged attack if possible.
+    if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
+        creep.rangedAttack(this.enemy);
     }
 };
 

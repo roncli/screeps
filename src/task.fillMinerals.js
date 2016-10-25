@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     FillMinerals = function(id) {
         Task.call(this);
 
@@ -42,11 +43,9 @@ FillMinerals.prototype.run = function(creep) {
         return;
     }
 
-    // Fill the object, or move closer to it if not in range.
-    if (creep.transfer(this.object, minerals[0]) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 4});
-        return;
-    }
+    // Move to the object and fill it.
+    Pathing.moveTo(creep, this.object, 1);
+    creep.transfer(this.object, minerals[0]);
 
     // If we are out of minerals, complete task.
     if (_.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {

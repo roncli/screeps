@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Utilities = require("utilities"),
     Rally = function(id, creep) {
         Task.call(this);
@@ -42,14 +43,7 @@ Rally.prototype.run = function(creep) {
     }
 
     // Rally to the rally point.
-    if (this.rallyPoint instanceof RoomPosition) {
-        creep.moveTo(this.rallyPoint, {reusePath: Math.floor(Math.random() * 2) + 4});
-    } else {
-        pos = new RoomPosition(this.rallyPoint.pos.x + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.y + Math.floor(Math.random() * 7 - 3), this.rallyPoint.pos.roomName);
-        pos.x = Math.max(Math.min(pos.x, 48), 1);
-        pos.y = Math.max(Math.min(pos.y, 48), 1);
-        creep.moveTo(pos, {reusePath: Math.floor(Math.random() * 2) + 4});
-    }
+    Pathing.moveTo(creep, this.rallyPoint, 0);
 
     // Always complete the task.
     Task.prototype.complete.call(this, creep);

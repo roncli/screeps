@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Reserve = function(id) {
         Task.call(this);
 
@@ -48,9 +49,8 @@ Reserve.prototype.run = function(creep) {
                 return;
             }
             
-            if (creep.reserveController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller, {reusePath: Math.floor(Math.random() * 2) + 4});
-            }
+            Pathing.moveTo(creep, creep.room.controller, 1);
+            creep.reserveController(creep.room.controller);
 
             break;
         case "remoteReserver":
@@ -59,9 +59,8 @@ Reserve.prototype.run = function(creep) {
                 return;
             }
             
-            if (creep.reserveController(Game.rooms[creep.memory.home].controller) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(Game.rooms[creep.memory.home].controller, {reusePath: Math.floor(Math.random() * 2) + 4});
-            }
+            Pathing.moveTo(creep, Game.rooms[creep.memory.home].controller, 1);
+            creep.reserveController(Game.rooms[creep.memory.home].controller);
 
             break;
     }

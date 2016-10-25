@@ -1,4 +1,5 @@
 var Task = require("task"),
+    Pathing = require("pathing"),
     Upgrade = function(room) {
         Task.call(this);
 
@@ -30,10 +31,9 @@ Upgrade.prototype.run = function(creep) {
         return;
     }
 
-    // Upgrade the controller, or move closer to it if not in range.
-    if (creep.transfer(this.controller, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.controller, {reusePath: Math.floor(Math.random() * 2) + 4});
-    }
+    // Move to the controller and upgrade it.
+    Pathing.moveTo(creep, this.controller, 3);
+    creep.transfer(this.controller, RESOURCE_ENERGY);
 };
 
 Upgrade.prototype.canComplete = function(creep) {

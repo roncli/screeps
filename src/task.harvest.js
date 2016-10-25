@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Harvest = function() {
         Task.call(this);
         
@@ -34,10 +35,9 @@ Harvest.prototype.run = function(creep) {
         return;
     }
     
-    // Harvest the source, or move closer to it if not in range.
-    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(source, {reusePath: Math.floor(Math.random() * 2) + 4});
-    }
+    // Move to the source and harvest it.
+    Pathing.moveTo(creep, source, 1);
+    creep.harvest(source);
 };
 
 Harvest.prototype.canComplete = function(creep) {

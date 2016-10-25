@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Ranged = function(id) {
         Task.call(this);
 
@@ -36,10 +37,32 @@ Ranged.prototype.run = function(creep) {
         Task.prototype.complete.call(this, creep);
         return;
     }
-    
-    if (creep.rangedAttack(this.enemy) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.enemy, {reusePath: Math.floor(Math.random() * 2) + 4});
-    }
+
+    // If this has attack body parts, use different logic.
+    if (creep.getActiveBodyparts(ATTACK) > 0) {
+        // Move and attack.
+        Pathing.moveTo(creep, this.enemy, 1);
+        if (creep.attack(this.enemy) === ERR_NOT_IN_RANGE) {
+            // Heal self if possible available.
+            if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.maxHits) {
+                creep.heal(creep);
+            }
+        }
+
+        // Try ranged attack if possible.
+        if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
+            creep.rangedAttack(this.enemy);
+        }
+    } else {
+        Pathing.moveTo(creep, this.enemy, 3);
+        
+        if (creep.rangedAttack(this.enemy) === ERR_NOT_IN_RANGE) {
+            // Heal self if possible available.
+            if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.maxHits) {
+                creep.heal(creep);
+            }
+        }
+    } 
 };
 
 Ranged.prototype.canComplete = function(creep) {

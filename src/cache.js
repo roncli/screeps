@@ -14,6 +14,7 @@ var creeps = {},
     flagsInRoom = {},
     hostilesInRoom = {},
     marketOrders = null,
+    costMatricies = {},
     objects = {};
 
 var Cache = {
@@ -41,6 +42,7 @@ var Cache = {
         flagsInRoom = {};
         hostilesInRoom = {};
         marketOrders = null;
+        costMatricies = {};
         objects = {};
         Cache.creepTasks = {};
         Cache.roomTypes = {};
@@ -164,6 +166,25 @@ var Cache = {
         "use strict";
 
         return marketOrders ? marketOrders : (marketOrders = Game.market.getAllOrders());
+    },
+
+    // Get the cost matrix for a room.
+    getCostMatrix: (room) => {
+        "use strict";
+
+        if (!costMatricies[room.name]) {
+            costMatrices[room.name] = new PathFinder.CostMatrix();
+
+            _.forEach(room.find(FIND_STRUCTURES), (structure) => {
+                if (structure.structureType === STRUCTURE_ROAD) {
+                    costMatrices[room.name].set(structure.pos.x, structure.pos.y, 1);
+                } else if (structure.structureType !== STRUCTURE_CONTAINER && (structure.structureType !== STRUCTURE_RAMPART || !structure.my)) {
+                    costMatrices[room.name].set(structure.pos.x, structure.pos.y, 255);
+                }
+            });
+        }
+        
+        return costMatrices[room.name];
     },
 
     // Get object by ID.

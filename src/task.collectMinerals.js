@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     CollectMinerals = function(id) {
         Task.call(this);
 
@@ -42,11 +43,9 @@ CollectMinerals.prototype.run = function(creep) {
         return;
     }
 
-    // Collect from the object, or move closer to it if not in range.
-    if (creep.withdraw(this.object, minerals[0]) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 4});
-        return;
-    }
+    // Move to the object and collect from it.
+    Pathing.moveTo(creep, this.object, 1);
+    creep.withdraw(this.object, minerals[0]);
 
     // If we're full or there are no more minerals, complete task.
     if (_.sum(creep.carry) === creep.carryCapacity || _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) {

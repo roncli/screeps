@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Utilities = require("utilities"),
     FillEnergy = function(id) {
         Task.call(this);
@@ -32,11 +33,9 @@ FillEnergy.prototype.run = function(creep) {
         return;
     }
 
-    // Fill the object, or move closer to it if not in range.
-    if (creep.transfer(this.object, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.object, {reusePath: Math.floor(Math.random() * 2) + 4});
-        return;
-    }
+    // Move to the object and fill it.
+    Pathing.moveTo(creep, this.object, 1);
+    creep.transfer(this.object, RESOURCE_ENERGY);
 
     // If we didn't move, complete task.
     Task.prototype.complete.call(this, creep);

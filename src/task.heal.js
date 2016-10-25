@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Heal = function(id) {
         Task.call(this);
         
@@ -31,8 +32,10 @@ Heal.prototype.run = function(creep) {
         return;
     }
     
+    // Move and heal, or ranged heal if not in range.
+    Pathing.moveTo(creep, this.ally, 1);
     if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.ally, {reusePath: Math.floor(Math.random() * 2) + 4});
+        creep.rangedHeal(this.ally)
     }
 };
 

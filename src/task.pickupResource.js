@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Pickup = function(id) {
         Task.call(this);
 
@@ -30,16 +31,12 @@ Pickup.prototype.run = function(creep) {
         Task.prototype.complete.call(this, creep);
         return;
     }
-    
-    // Pickup, or move closer to it if not in range.
-    switch (creep.pickup(this.resource)) {
-        case ERR_NOT_IN_RANGE:
-            creep.moveTo(this.resource, {reusePath: Math.floor(Math.random() * 2) + 4});
-            break;
-        case OK:
-            // Task always is completed one way or another upon successful transfer.
-            Task.prototype.complete.call(this, creep);
-            break;
+
+    // Move and pickup if possible.    
+    Pathing.moveTo(creep, this.resource, 1);
+    if (creep.pickup(this.resource) === OK) {
+        // Task always is completed one way or another upon successful transfer.
+        Task.prototype.complete.call(this, creep);
     }
 };
 

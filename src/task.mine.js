@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Utilities = require("utilities"),
     Mine = function() {
         Task.call(this);
@@ -36,7 +37,7 @@ Mine.prototype.run = function(creep) {
     
     // Move to the container if we are not there.
     if (container.pos.getRangeTo(creep) !== 0) {
-        creep.moveTo(container, {reusePath: Math.floor(Math.random() * 2) + 4});
+        Pathing.moveTo(creep, container, 0);
     }
 
     // If we are at the container, get the source closest to the creep and attempt to harvest it.

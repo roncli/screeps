@@ -1,5 +1,6 @@
 var Task = require("task"),
     Cache = require("cache"),
+    Pathing = require("pathing"),
     Repair = function(id) {
         Task.call(this);
 
@@ -31,10 +32,9 @@ Repair.prototype.run = function(creep) {
         return;
     }
     
-    // Repair the structure, or move closer to it if not in range.
-    if (creep.repair(this.structure) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(this.structure, {reusePath: Math.floor(Math.random() * 2) + 4});
-    }
+    // Move to the structure and repair it.
+    Pathing.moveTo(creep, this.structure, 3);
+    creep.repair(this.structure);
 };
 
 Repair.prototype.canComplete = function(creep) {

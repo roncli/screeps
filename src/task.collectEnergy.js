@@ -1,6 +1,5 @@
 var Task = require("task"),
     Cache = require("cache"),
-    Pathing = require("pathing"),
     Utilities = require("utilities"),
     CollectEnergy = function(id) {
         Task.call(this);
@@ -46,10 +45,9 @@ CollectEnergy.prototype.run = function(creep) {
 
     // Move to the object and collect from it.
     Pathing.moveTo(creep, this.object, 1);
-    creep.withdraw(this.object, RESOURCE_ENERGY);
-
-    // If we didn't move, complete task.
-    Task.prototype.complete.call(this, creep);
+    creep.withdraw(this.object, RESOURCE_ENERGY) === OK) {
+        Task.prototype.complete.call(this, creep);
+    }
 };
 
 CollectEnergy.prototype.canComplete = function(creep) {

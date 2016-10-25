@@ -53,6 +53,9 @@ var Cache = require("cache"),
                         };
 
                         if (firstPos.x !== creep.pos.x || firstPos.y !== creep.pos.y) {
+                            if (!creep.memory._pathing.blocked) {
+                                creep.memory._pathing.blocked = [];
+                            }
                             creep.memory._pathing.blocked.push(firstPos);
                         }
                     }

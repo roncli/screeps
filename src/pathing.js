@@ -95,7 +95,7 @@ var Cache = require("cache"),
                         if (creep.memory._pathing && roomName === creep.room.name) {
                             _.forEach(creep.memory._pathing.blocked, (blocked) => {
                                 if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
-                                    matrix.set(firstPos.x, firstPos.y, 255);
+                                    matrix.set(blocked.x, blocked.y, 255);
                                 }
                             });
                         }

@@ -189,6 +189,46 @@ var profiler = require("screeps-profiler"),
                         }
                     }
 
+                    // Happy new million!
+                    switch (Game.time % 1000000) {
+                        case 999990:
+                            creep.say("TEN!", true);
+                            break;
+                        case 999991:
+                            creep.say("NINE!", true);
+                            break;
+                        case 999992:
+                            creep.say("EIGHT!", true);
+                            break;
+                        case 999993:
+                            creep.say("SEVEN!", true);
+                            break;
+                        case 999994:
+                            creep.say("SIX!", true);
+                            break;
+                        case 999995:
+                            creep.say("FIVE!", true);
+                            break;
+                        case 999996:
+                            creep.say("FOUR!", true);
+                            break;
+                        case 999997:
+                            creep.say("THREE!", true);
+                            break;
+                        case 999998:
+                            creep.say("TWO!", true);
+                            break;
+                        case 999999:
+                            creep.say("ONE!", true);
+                            break;
+                        case 0:
+                            creep.say("HAPPY NEW", true);
+                            break;
+                        case 1:
+                            creep.say("MILLION!", true);
+                            break;
+                    }
+
                     if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
                         Cache.creepTasks[creep.name].run(creep);
 

@@ -56,11 +56,11 @@ Ranged.prototype.run = function(creep) {
     } else {
         Pathing.moveTo(creep, this.enemy, 3);
         
-        if (creep.rangedAttack(this.enemy) === ERR_NOT_IN_RANGE) {
-            // Heal self if possible available.
-            if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.maxHits) {
-                creep.heal(creep);
-            }
+        creep.rangedAttack(this.enemy);
+
+        // Heal self if possible available.
+        if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.maxHits) {
+            creep.heal(creep);
         }
     } 
 };

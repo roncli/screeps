@@ -83,6 +83,7 @@ var Cache = require("cache"),
                 path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
                     plainCost: 2,
                     swampCost: 10,
+                    maxOps: 100000,
                     roomCallback: (roomName) => {
                         var matrix;
 

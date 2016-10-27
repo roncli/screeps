@@ -100,7 +100,7 @@ var Cache = require("cache"),
             // Check for enemy construction sites and rally to them.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
                 if (Cache.enemyConstructionSitesInRoom(room).length > 0) {
-                    var task = new TaskRally(Cache.enemyConstructionSitesInRoom(room)[0]);
+                    var task = new TaskRally(Cache.enemyConstructionSitesInRoom(room)[0].id);
                     task.canAssign(creep);
                     creep.say("Stomping");
                     assigned.push(creep.name);

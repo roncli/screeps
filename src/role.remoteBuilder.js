@@ -97,6 +97,23 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for enemy construction sites and rally to them.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+                if (Cache.enemyConstructionSitesInRoom(room).length > 0) {
+                    var task = new TaskRally(Cache.enemyConstructionSitesInRoom(room)[0]);
+                    task.canAssign(creep);
+                    creep.say("Stomping");
+                    assigned.push(creep.name);
+                }
+            });
+
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteBuilder", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for construction sites if we're in the remote room.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
                 if (Cache.constructionSitesInRoom(room).length > 0) {

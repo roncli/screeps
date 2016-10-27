@@ -7,6 +7,7 @@ var creeps = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
     constructionSitesInRoom = {},
+    enemyConstructionSitesInRoom = {},
     energySourcesInRoom = {},
     mineralsInRoom = {},
     resourcesInRoom = {},
@@ -117,6 +118,13 @@ var Cache = {
         "use strict";
 
         return constructionSitesInRoom[room.name] ? constructionSitesInRoom[room.name] : (constructionSitesInRoom[room.name] = room.find(FIND_MY_CONSTRUCTION_SITES));
+    },
+
+    // Return all enemy construction sites in the current room.
+    enemyConstructionSitesInRoom: (room) => {
+        "use strict";
+
+        return enemyConstructionSitesInRoom[room.name] ? enemyConstructionSitesInRoom[room.name] : (enemyConstructionSitesInRoom[room.name] = room.find(FIND_HOSTILE_CONSTRUCTION_SITES));
     },
 
     // Returns all energy sources in the current room.

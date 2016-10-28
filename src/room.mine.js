@@ -5,6 +5,7 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Utilities = require("utilities"),
+    RoleDismantler = require("role.dismantler"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteReserver = require("role.remoteReserver"),
@@ -13,6 +14,7 @@ var RoomObj = require("roomObj"),
     TaskBuild = require("task.build"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskCollectMinerals = require("task.collectMinerals"),
+    TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHeal = require("task.heal"),
@@ -34,7 +36,8 @@ Mine.prototype.constructor = Mine;
 Mine.prototype.run = function(room) {
     "use strict";
 
-    var supportRoom, spawnToUse, tasks;
+    var completed = [],
+        supportRoom, spawnToUse, tasks;
 
     // If there are no energy sources, bail.
     if (!room.unobservable && Cache.energySourcesInRoom(room).length === 0) {
@@ -130,6 +133,9 @@ Mine.prototype.run = function(room) {
             RoleRemoteWorker.checkSpawn(room);
             RoleRemoteStorer.checkSpawn(room);
             RoleRemoteReserver.checkSpawn(room);
+            if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
+                RoleDismantler.checkSpawn(room, supportRoom);
+            }
         }
 
         // Get the tasks needed for this room.
@@ -156,6 +162,23 @@ Mine.prototype.run = function(room) {
                 criticalTasks: TaskRepair.getCriticalTasks(room),
                 tasks: TaskRepair.getTasks(room)
             };
+            tasks.dismantle = {
+                tasks: []
+            };
+
+            if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
+                _.forEach(Memory.dismantle[room.name], (pos) => {
+                    var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
+                    if (structures.length === 0) {
+                        completed.push(pos);
+                    } else {
+                        tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
+                    }
+                });
+                _.forEach(completed, (complete) => {
+                    _.remove(Memory.dismantle, (d) => d.x === complete.x && d.y === complete.y);
+                });
+            }
 
             if (tasks.build.tasks.length > 0) {
                 console.log("    Structures to build: " + tasks.build.tasks.length);
@@ -185,6 +208,9 @@ Mine.prototype.run = function(room) {
         RoleRemoteWorker.assignTasks(room, tasks);
         RoleRemoteStorer.assignTasks(room, tasks);
         RoleRemoteReserver.assignTasks(room, tasks);
+        if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
+            RoleDismantler.checkSpawn(room, tasks);
+        }
     }
 };
 

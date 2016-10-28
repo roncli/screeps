@@ -120,6 +120,20 @@ var Cache = require("cache"),
             } else {
                 delete Memory.maxCreeps.claimer[fromRoom][toRoom];
             }
+        },
+
+        dismantle: (x, y, room) => {
+            "use strict";
+
+            if (!Memory.dismantle) {
+                Memory.dismantle = {};
+            }
+
+            if (!Memory.dismantle[room]) {
+                Memory.dismantle[room] = [];
+            }
+
+            Memory.dismantle[room].push({x: x, y: y});
         }
     };
 

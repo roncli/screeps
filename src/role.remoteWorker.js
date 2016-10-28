@@ -5,6 +5,7 @@ var Cache = require("cache"),
     TaskHarvest = require("task.harvest"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
+    TaskRepair = require("task.repair"),
 
     Worker = {
         checkSpawn: (room) => {
@@ -115,9 +116,9 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check critical repairs if we're in the home room.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
-                _.forEach(tasks.repair.criticalTasks, (task) => {
+            // Check critical repairs.
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
                     if (Utilities.creepsWithTask(Game.creeps, {type: "repair", id: task.id}).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");

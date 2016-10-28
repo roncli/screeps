@@ -104,7 +104,7 @@ var Cache = require("cache"),
             // If we have claimed the controller, stop trying to reserve the room and suicide any remaining creeps.
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    if (creep.room.controller.my && creep.room.name === creep.memory.home) {
+                    if (creep.room.name === creep.memory.home && creep.room.controller.my) {
                         assigned.push(creep.name);
                         Commands.setRoomType(creep.room, {type: "base"});
                         creep.suicide();

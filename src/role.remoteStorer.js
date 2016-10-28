@@ -43,7 +43,7 @@ var Cache = require("cache"),
                         Memory.lengthToLink[container.id] = {};
                     }
                     if (!Memory.lengthToLink[container.id][supportRoom.name]) {
-                        Memory.lengthToLink[container.id][supportRoom.name] = PathFinder.search(Utilities.objectsClosestToObjByPath(Cache.linksInRoom(supportRoom), Cache.spawnsInRoom(supportRoom)[0].pos)[1].pos, {pos: container.pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length; 
+                        Memory.lengthToLink[container.id][supportRoom.name] = PathFinder.search(Utilities.objectsClosestToObjByPath(Cache.linksInRoom(supportRoom), Cache.spawnsInRoom(supportRoom)[0])[1].pos, {pos: container.pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length; 
                     }
                     length = Memory.lengthToLink[container.id][supportRoom.name];
                 }

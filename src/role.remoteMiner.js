@@ -29,7 +29,7 @@ var Cache = require("cache"),
                     Memory.lengthToContainer[container.id] = {};
                 }
                 if (!Memory.lengthToContainer[container.id][supportRoom.name]) {
-                    Memory.lengthToContainer[container.id][supportRoom.name] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path.length;
+                    Memory.lengthToContainer[container.id][supportRoom.name] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
                 }
 
                 // If this container is for a mineral, check to make sure it has resources.

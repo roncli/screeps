@@ -3,6 +3,7 @@ var Cache = require("cache"),
     TaskClaim = require("task.claim"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskCollectMinerals = require("task.collectMinerals"),
+    TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHarvest = require("task.harvest"),
@@ -31,6 +32,9 @@ var Cache = require("cache"),
                 break;
             case "collectMinerals":
                 Cache.creepTasks[creep.name] = TaskCollectMinerals.fromObj(creep);
+                break;
+            case "dismantle":
+                Cache.creepTasks[creep.name] = TaskDismantle.fromObj(creep);
                 break;
             case "fillEnergy":
                 Cache.creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);

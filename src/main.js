@@ -165,8 +165,8 @@ var profiler = require("screeps-profiler"),
                 
                 // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
                 _.forEach(Game.creeps, (creep) => {
-                    // Don't do anything if the creep is spawning.
-                    if (creep.spawning) {
+                    // Don't do anything if the creep is spawning or stopped.
+                    if (creep.spawning || creep.memory.stop) {
                         return;
                     }
 

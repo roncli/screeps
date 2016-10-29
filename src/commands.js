@@ -134,6 +134,18 @@ var Cache = require("cache"),
             }
 
             Memory.dismantle[room].push({x: x, y: y});
+        },
+
+        stopCreep: (name) => {
+            if (Game.creeps[name]) {
+                Game.creeps[name].memory.stop = true;
+            }
+        },
+
+        startCreep: (name) => {
+            if (Game.creeps[name]) {
+                delete Game.creeps[name].memory.stop;
+            }
         }
     };
 

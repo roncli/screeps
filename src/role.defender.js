@@ -64,11 +64,11 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            for (count = 0; count < Math.floor(energy / 500); count++) {
-                body.push(HEAL);
+            if (energy % 500 >= 250) {
+                body.push(MOVE);
             }
 
-            if (energy % 500 >= 300) {
+            for (count = 0; count < Math.floor(energy / 500); count++) {
                 body.push(HEAL);
             }
 
@@ -76,7 +76,7 @@ var Cache = require("cache"),
                 body.push(RANGED_ATTACK);
             }
 
-            if (energy % 500 >= 450) {
+            if (energy % 500 >= 200) {
                 body.push(RANGED_ATTACK);
             } 
 

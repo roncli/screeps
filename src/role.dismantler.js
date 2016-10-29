@@ -197,6 +197,13 @@ var Cache = require("cache"),
                 });
             });
 
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for dropped resources in current room.
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {

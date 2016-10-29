@@ -21,6 +21,11 @@ CollectEnergy.prototype.canAssign = function(creep) {
     if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
+
+    if (!this.object) {
+        Game.notify("WARNING: Can't assign collectEnergy to object", this.id);
+        return false;
+    }
     
     energy = this.object.energy;
     if (energy === undefined) {

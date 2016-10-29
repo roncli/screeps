@@ -46,67 +46,37 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room, limited to 2900.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 2900);
+            // Get the total energy in the room, limited to 6000.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 6000);
 
-            // If we're not at 2900 and energy is not at capacity, bail.
-            if (energy < 2900 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            // If we're not at 6000 and energy is not at capacity, bail.
+            if (energy < 6200 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
                 return;
             }
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 650); count++) {
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-            }
-
-            if (energy % 650 >= 350 && energy % 650 < 450) {
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-            }
-
-            for (count = 0; count < Math.floor(energy / 650); count++) {
-                body.push(MOVE);
-                body.push(MOVE);
-                body.push(MOVE);
-                body.push(MOVE);
-            }
-
-            if (energy % 650 >= 50) {
-                body.push(MOVE);
-            }
-
-            if ((energy % 650 >= 100 && energy % 650 < 200) || (energy % 650 >= 250 && energy % 650 < 450) || (energy % 650 >= 500)) {
-                body.push(MOVE);
-            }
-
-            if ((energy % 650 >= 150 && energy % 650 < 200) || (energy % 650 >= 300 && energy % 650 < 450) || (energy % 650 >= 550)) {
-                body.push(MOVE);
-            }
-
-            if ((energy % 650 >= 400 && energy % 650 < 450) || (energy % 650 >= 600)) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < Math.floor(energy / 650); count++) {
+            for (count = 0; count < Math.floor(energy / 500); count++) {
                 body.push(RANGED_ATTACK);
             }
 
-            if (energy % 650 >= 200) {
+            if (energy % 500 >= 150) {
                 body.push(RANGED_ATTACK);
+            } 
+
+            for (count = 0; count < Math.floor(energy / 500); count++) {
+                body.push(MOVE);
+                body.push(MOVE);
             }
 
-            for (count = 0; count < Math.floor(energy / 650); count++) {
+            if (energy % 500 >= 200) {
+                body.push(MOVE);
+            }
+
+            for (count = 0; count < Math.floor(energy / 500); count++) {
                 body.push(HEAL);
             }
 
-            if (energy % 650 >= 450) {
+            if (energy % 500 >= 450) {
                 body.push(HEAL);
             }
 

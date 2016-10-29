@@ -41,7 +41,7 @@ Build.prototype.run = function(creep) {
 Build.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY] || !this.constructionSite) {
+    if (!creep.carry[RESOURCE_ENERGY] || !this.constructionSite || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

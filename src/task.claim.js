@@ -37,7 +37,7 @@ Claim.prototype.run = function(creep) {
 Claim.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!creep.room.controller || creep.room.controller.my) {
+    if (!creep.room.controller || creep.room.controller.my || !creep.getActiveBodyparts(CLAIM) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

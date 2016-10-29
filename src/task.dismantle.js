@@ -40,7 +40,7 @@ Dismantle.prototype.run = function(creep) {
 Dismantle.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (_.sum(creep.carry) === creep.carry.capacity || !this.structure) {
+    if (_.sum(creep.carry) === creep.carry.capacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

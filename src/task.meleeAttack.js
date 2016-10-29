@@ -51,6 +51,12 @@ Melee.prototype.run = function(creep) {
 Melee.prototype.canComplete = function(creep) {
     "use strict";
 
+    if (creep.getActiveBodyparts(ATTACK) === 0) {
+        creep.say("Help!");
+        Task.prototype.complete.call(this, creep);
+        return true;
+    }
+
     if (!this.enemy) {
         creep.say("Get Rekt!", true);
         Task.prototype.complete.call(this, creep);

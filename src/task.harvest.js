@@ -45,7 +45,7 @@ Harvest.prototype.canComplete = function(creep) {
 
     var source = Cache.getObjectById(creep.memory.homeSource);
 
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0) {
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

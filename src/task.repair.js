@@ -40,7 +40,7 @@ Repair.prototype.run = function(creep) {
 Repair.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY] || !this.structure || this.structure.hits === this.structure.hitsMax) {
+    if (!creep.carry[RESOURCE_ENERGY] || !this.structure || this.structure.hits === this.structure.hitsMax || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

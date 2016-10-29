@@ -68,6 +68,11 @@ Reserve.prototype.run = function(creep) {
 
 Reserve.prototype.canComplete = function(creep) {
     "use strict";
+    if (creep.getActiveBodyparts(CLAIM) === 0) {
+        Task.prototype.complete.call(this, creep);
+        return true;
+    }
+
     switch (creep.memory.role) {
         case "reserver":
             if (!creep.room.controller || creep.room.controller.my) {

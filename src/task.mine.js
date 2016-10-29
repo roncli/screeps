@@ -49,9 +49,7 @@ Mine.prototype.run = function(creep) {
 Mine.prototype.canComplete = function(creep) {
     "use strict";
 
-    var container = Cache.getObjectById(creep.memory.container);
-
-    if (!container) {
+    if (!Cache.getObjectById(creep.memory.container) || creep.getActiveBodyparts(WORK) === 0) {
         return true;
     }
     return false;

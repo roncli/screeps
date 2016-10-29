@@ -42,7 +42,7 @@ Heal.prototype.run = function(creep) {
 Heal.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!this.ally || this.ally.hits === this.ally.hitsMax) {
+    if (!this.ally || this.ally.hits === this.ally.hitsMax || creep.getActiveBodyparts(HEAL) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

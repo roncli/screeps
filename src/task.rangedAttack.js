@@ -68,6 +68,12 @@ Ranged.prototype.run = function(creep) {
 Ranged.prototype.canComplete = function(creep) {
     "use strict";
 
+    if (creep.getActiveBodyparts(RANGED_ATTACK) === 0) {
+        creep.say("Help!");
+        Task.prototype.complete.call(this, creep);
+        return true;
+    }
+
     if (!this.enemy) {
         creep.say("Get Rekt!", true);
         Task.prototype.complete.call(this, creep);

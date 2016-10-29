@@ -39,7 +39,7 @@ Upgrade.prototype.run = function(creep) {
 Upgrade.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!creep.carry[RESOURCE_ENERGY]) {
+    if (!creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

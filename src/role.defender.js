@@ -56,29 +56,29 @@ var Cache = require("cache"),
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 500); count++) {
-                body.push(RANGED_ATTACK);
-            }
-
-            if (energy % 500 >= 150) {
-                body.push(RANGED_ATTACK);
-            } 
-
-            for (count = 0; count < Math.floor(energy / 500); count++) {
                 body.push(MOVE);
                 body.push(MOVE);
             }
 
-            if (energy % 500 >= 200) {
+            if (energy % 500 >= 50) {
                 body.push(MOVE);
             }
 
             for (count = 0; count < Math.floor(energy / 500); count++) {
                 body.push(HEAL);
+            }
+
+            if (energy % 500 >= 300) {
+                body.push(HEAL);
+            }
+
+            for (count = 0; count < Math.floor(energy / 500); count++) {
+                body.push(RANGED_ATTACK);
             }
 
             if (energy % 500 >= 450) {
-                body.push(HEAL);
-            }
+                body.push(RANGED_ATTACK);
+            } 
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];

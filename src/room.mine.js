@@ -172,7 +172,7 @@ Mine.prototype.run = function(room) {
                     if (structures.length === 0) {
                         completed.push(pos);
                     } else {
-                        tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
+                        tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
                     }
                 });
                 _.forEach(completed, (complete) => {

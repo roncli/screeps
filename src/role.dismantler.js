@@ -218,25 +218,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Attempt to get energy from containers.
-            if (!room.unobservable) {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    var task = new TaskCollectEnergy(creep.memory.container);
-
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
-            }
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Attempt to assign harvest task to remaining creeps.
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {

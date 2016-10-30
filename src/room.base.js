@@ -184,15 +184,20 @@ Base.prototype.run = function(room) {
 
     // Check to see if we can do a deal in the terminal.
     if (room.terminal) {
+        if (!Memory.minimumSell) {
+            Memory.minimumSell = {};
+        }
+
         terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
         if (terminalMinerals.length > 0) {
             topResource = _.sortBy(terminalMinerals, (s) => -s.amount)[0];
-            bestOrder = _.filter(Cache.marketOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
+            bestOrder = _.filter(Cache.marketOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0 && (!Memory.minimumSell[o.resourceType] || o.price >= Memory.minimumSell[o.resourceType])).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
             if (bestOrder) {
                 transCost = Game.market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), room.name, bestOrder.roomName);
                 terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
                 if (terminalEnergy > transCost) {
                     Game.market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), room.name);
+                    delete Memory.minimumSell[bestOrder.resourceType];
                 } else {
                     terminalTask = new TaskFillEnergy(room.terminal.id);
                     if (terminalEnergy > 0) {
@@ -232,6 +237,7 @@ Base.prototype.run = function(room) {
                 transCost = Game.market.calcTransactionCost(flip.sell.amount, room.name, flip.sell.roomName);
                 if (terminalEnergy > transCost) {
                     Game.market.deal(flip.sell.id, flip.sell.amount, room.name);
+                    Memory.minimumSell[flip.resource] = flip.sell.price;
                     dealMade = true;
                     return false;
                 }
@@ -241,6 +247,7 @@ Base.prototype.run = function(room) {
                     amount = Math.floor(flip.sell.amount * terminalEnergy / transCost);
                     if (amount > 0) {
                         Game.market.deal(flip.sell.id, amount, room.name);
+                        Memory.minimumSell[flip.resource] = flip.sell.price;
                         dealMade = true;
                         return false;
                     }

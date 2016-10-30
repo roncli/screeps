@@ -39,7 +39,7 @@ var Cache = require("cache"),
             }
 
             // If we're in a room to restart the search on, clear the path.
-            if (creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
+            if (creep.memory._pathing.restartOn && creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
                 delete creep.memory._pathing.path;
                 delete creep.memory._pathing.restartOn;
             }

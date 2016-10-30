@@ -69,7 +69,7 @@ var Cache = require("cache"),
                     }
                     delete creep.memory._pathing.path;
                     delete creep.memory._pathing.restartOn;
-                } else if (!wasStationary) {
+                } else if (creep.memory._pathing.path && !wasStationary) {
                     // We were successful moving last turn, update accordingly.
                     if (creep.memory._pathing.path.length === 1) {
                         // We've reached the end of the path.

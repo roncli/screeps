@@ -96,9 +96,6 @@ var Cache = require("cache"),
                         var matrix;
 
                         if (!Game.rooms[roomName]) {
-                            if (!creep.memory._pathing.restartOn) {
-                                creep.memory._pathing.restartOn = [];
-                            }
                             restartOn.push(roomName);
                             return;
                         }

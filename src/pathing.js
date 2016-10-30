@@ -38,6 +38,12 @@ var Cache = require("cache"),
                 }
             }
 
+            // If we're in a room to restart the search on, clear the path.
+            if (creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
+                delete creep.memory._pathing.path;
+                delete creep.memory._pathing.restartOn;
+            }
+
             // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.path.
             if (creep.memory._pathing) {
                 wasStationary = creep.pos.x === creep.memory._pathing.start.x && creep.pos.y === creep.memory._pathing.start.y && creep.room.name === creep.memory._pathing.start.room;
@@ -61,6 +67,7 @@ var Cache = require("cache"),
                         }
                     }
                     delete creep.memory._pathing.path;
+                    delete creep.memory._pathing.restartOn;
                 } else if (!wasStationary) {
                     // We were successful moving last turn, update accordingly.
                     if (creep.memory._pathing.path.length === 1) {
@@ -88,6 +95,10 @@ var Cache = require("cache"),
                         var matrix;
 
                         if (!Game.rooms[roomName]) {
+                            if (!creep.memory._pathing.restartOn) {
+                                creep.memory._pathing.restartOn = [];
+                            }
+                            creep.memory._pathing.restartOn.push(roomName);
                             return;
                         }
 

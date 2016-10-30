@@ -37,12 +37,12 @@ var Cache = require("cache"),
                 if (creep.memory._pathing.dest.x !== pos.x || creep.memory._pathing.dest.y !== pos.y || creep.memory._pathing.dest.room !== pos.roomName) {
                     delete creep.memory._pathing;
                 }
+            }
 
-                // If we're in a room to restart the search on, clear the path.
-                if (creep.memory._pathing.restartOn && creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
-                    delete creep.memory._pathing.path;
-                    delete creep.memory._pathing.restartOn;
-                }
+            // If we're in a room to restart the search on, clear the path.
+            if (creep.memory._pathing && creep.memory._pathing.restartOn && creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
+                delete creep.memory._pathing.path;
+                delete creep.memory._pathing.restartOn;
             }
 
             // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.path.

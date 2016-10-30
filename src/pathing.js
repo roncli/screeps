@@ -14,11 +14,12 @@ var Cache = require("cache"),
         moveTo: (creep, pos, range) => {
             "use strict";
 
+            var restartOn = [],
+                wasStationary, firstPos, path;
+
             if (pos instanceof RoomObject) {
                 pos = pos.pos;
             }
-
-            var wasStationary, firstPos, path;
 
             // Default range to 0.
             if (!range) {
@@ -98,7 +99,7 @@ var Cache = require("cache"),
                             if (!creep.memory._pathing.restartOn) {
                                 creep.memory._pathing.restartOn = [];
                             }
-                            creep.memory._pathing.restartOn.push(roomName);
+                            restartOn.push(roomName);
                             return;
                         }
 
@@ -124,6 +125,7 @@ var Cache = require("cache"),
                 // Serialize the path.
                 if (creep.memory._pathing) {
                     creep.memory._pathing.path = Pathing.serializePath(creep.pos, path.path)
+                    creep.memory._pathing.restartOn = restartOn;
                 } else {
                     creep.memory._pathing = {
                         start: {
@@ -138,7 +140,8 @@ var Cache = require("cache"),
                         },
                         path: Pathing.serializePath(creep.pos, path.path),
                         stationary: 0,
-                        blocked: []
+                        blocked: [],
+                        restartOn: restartOn
                     };
                 }
             }

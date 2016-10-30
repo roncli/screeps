@@ -66,11 +66,7 @@ var profiler = require("screeps-profiler"),
                 
                 // Initialize max creeps.
                 if (!Memory.maxCreeps) {
-                    Memory.maxCreeps = {
-                        healer: 0,
-                        meleeAttack: 0,
-                        rangedAttack: 0
-                    };
+                    Memory.maxCreeps = {};
                 }
 
                 // Log date, GCL, and credits.
@@ -82,6 +78,21 @@ var profiler = require("screeps-profiler"),
                 _.forEach(Memory.creeps, (creep, name) => {
                     if (!Game.creeps[name]) {
                         delete Memory.creeps[name];
+                    }
+                });
+                _.forEach(Memory.lengthToContainer, (value, id) => {
+                    if (!Cache.getObjectById(id)) {
+                        delete Memory.lengthToContainer[id];
+                    }
+                });
+                _.forEach(Memory.lengthToController, (value, id) => {
+                    if (!Cache.getObjectById(id)) {
+                        delete Memory.lengthToController[id];
+                    }
+                });
+                _.forEach(Memory.lengthToLink, (value, id) => {
+                    if (!Cache.getObjectById(id)) {
+                        delete Memory.lengthToLink[id];
                     }
                 });
 

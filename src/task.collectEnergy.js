@@ -43,6 +43,8 @@ CollectEnergy.prototype.canAssign = function(creep) {
 CollectEnergy.prototype.run = function(creep) {
     "use strict";
 
+    var resources;
+
     // Object not found, complete task.
     if (!this.object) {
         Task.prototype.complete.call(this, creep);
@@ -51,6 +53,15 @@ CollectEnergy.prototype.run = function(creep) {
 
     // Move to the object and collect from it.
     Pathing.moveTo(creep, this.object, 1);
+
+    // If we are 1 square from the goal, check to see if there's a resource on it and pick it up.
+    if (creep.pos.getRangeTo(this.object) === 1) {
+        if ((resources = creep.pos.lookFor(LOOK_RESOURCES)).length > 0) {
+            creep.pickup(resources[0]);
+            return;
+        }
+    }
+
     if (creep.withdraw(this.object, RESOURCE_ENERGY) === OK) {
         Task.prototype.complete.call(this, creep);
     }

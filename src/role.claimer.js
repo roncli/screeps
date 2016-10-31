@@ -18,7 +18,7 @@ var Cache = require("cache"),
             // Loop through the room claimers to see if we need to spawn a creep.
             if (Memory.maxCreeps.claimer) {
                 _.forEach(Memory.maxCreeps.claimer[room.name], (value, toRoom) => {
-                    var count = _.filter(Cache.creepsInRoom("claimer", room.name), (c) => c.memory.claim === toRoom).length;
+                    var count = _.filter(Cache.creepsInRoom("claimer", room), (c) => c.memory.claim === toRoom).length;
 
                     num += count;
                     max += 1;

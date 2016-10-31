@@ -71,7 +71,7 @@ var profiler = require("screeps-profiler"),
 
                 // Log date, GCL, and credits.
                 console.log(new Date());
-                console.log("Global level " + Game.gcl.level + " " + Game.gcl.progress + "/" + Game.gcl.progressTotal.toFixed(0) + " " + (100 * Game.gcl.progress / Game.gcl.progressTotal).toFixed(3) + "%");
+                console.log("GCL " + Game.gcl.level + " " + Game.gcl.progress + "/" + Game.gcl.progressTotal.toFixed(0) + " " + (100 * Game.gcl.progress / Game.gcl.progressTotal).toFixed(3) + "% " + (Game.gcl.progressTotal - Game.gcl.progress).toFixed(0) + " to go");
                 console.log("Credits: " + Game.market.credits.toFixed(2));
 
                 // Clear old memory.
@@ -134,9 +134,9 @@ var profiler = require("screeps-profiler"),
                         if (room.controller) {
                             if (room.controller.my) {
                                 if (room.controller.level === 8) {
-                                    console.log("  " + type + " " + room.name + " Controller level " + room.controller.level);
+                                    console.log("  " + type + " " + room.name + " RCL " + room.controller.level);
                                 } else {
-                                    console.log("  " + type + " " + room.name + " Controller level " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "%");
+                                    console.log("  " + type + " " + room.name + " RCL " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "% " + (room.controller.progressTotal - room.controller.progress) + " to go");
                                 }
                             } else if (room.controller.level === 0) {
                                 if (room.controller.reservation) {
@@ -145,7 +145,7 @@ var profiler = require("screeps-profiler"),
                                     console.log("  " + type + " " + room.name + " Controller unowned");
                                 }
                             } else {
-                                console.log("  " + type + " " + room.name + " Controller level " + room.controller.level + " owned by " + room.controller.owner.username);
+                                console.log("  " + type + " " + room.name + " RCL " + room.controller.level + " owned by " + room.controller.owner.username);
                             }
                         } else {
                             console.log("  " + type + " " + room.name);

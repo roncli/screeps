@@ -15,7 +15,7 @@ Pickup.prototype.constructor = Pickup;
 Pickup.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || !this.resource || _.sum(creep.carry) === creep.carryCapacity) {
+    if (creep.spawning || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource)) {
         return false;
     }
     
@@ -43,7 +43,7 @@ Pickup.prototype.run = function(creep) {
 Pickup.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!this.resource) {
+    if (!this.resource || this.resource.amount < creep.pos.getRangeTo(this.resource)) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

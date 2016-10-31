@@ -120,6 +120,29 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled containers.
+            _.forEach(tasks.fillMinerals.fillStorageTasks, (task) => {
+                var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce(Utilities.creepsWithTask(Game.creeps, {type: "fillMinerals", id: task.id}), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Storage");
+                            assigned.push(creep.name);
+                            energyMissing -= _.sum(creep.carry);
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for critical controllers to upgrade.
             _.forEach(tasks.upgradeController.criticalTasks, (task) => {
                 if (Utilities.creepsWithTask(Cache.creepsInRoom("worker", room), {type: "upgradeController", room: task.room}).length === 0) {

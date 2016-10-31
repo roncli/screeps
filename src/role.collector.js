@@ -330,6 +330,45 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for dropped resources in current room if there are no hostiles.
+            if (Cache.hostilesInRoom(room).length === 0) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                        if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                            return;
+                        }
+                        if (task.canAssign(creep)) {
+                            creep.say("Pickup");
+                            assigned.push(creep.name);
+                            return false;
+                        }
+                    });
+                });
+            }
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Attempt to get energy from containers.
+            _.forEach(tasks.collectEnergy.tasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Attempt to assign harvest task to remaining creeps.
             _.forEach(creepsWithNoTask, (creep) => {
                 var task = new TaskHarvest();

@@ -25,6 +25,8 @@ Upgrade.prototype.canAssign = function(creep) {
 Upgrade.prototype.run = function(creep) {
     "use strict";
 
+    creep.say(["I've", "got to", "celebrate", "you baby", "I've got", "to praise", "GCL like", "I should!", ""][Game.time % 9], true);
+
     // Controller not found, complete task.
     if (!this.controller) {
         Task.prototype.complete.call(this, creep);

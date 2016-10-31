@@ -32,7 +32,7 @@ Upgrade.prototype.run = function(creep) {
     }
 
     // Move to the controller and upgrade it.
-    Pathing.moveTo(creep, this.controller, 3);
+    Pathing.moveTo(creep, this.controller, 1);
     creep.transfer(this.controller, RESOURCE_ENERGY);
 };
 

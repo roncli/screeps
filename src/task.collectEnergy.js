@@ -56,7 +56,7 @@ CollectEnergy.prototype.run = function(creep) {
 
     // If we are 1 square from the goal, check to see if there's a resource on it and pick it up.
     if (creep.pos.getRangeTo(this.object) === 1) {
-        if ((resources = creep.pos.lookFor(LOOK_RESOURCES)).length > 0) {
+        if ((resources = this.object.pos.lookFor(LOOK_RESOURCES)).length > 0) {
             creep.pickup(resources[0]);
             return;
         }

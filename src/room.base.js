@@ -163,7 +163,7 @@ Base.prototype.run = function(room) {
     }
 
     // Manage room.
-    if (Game.time % 100 === 0) {
+    if (Game.time % 100 === 0 && room.spawn) {
         this.manage(room);
     }
 

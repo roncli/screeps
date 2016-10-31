@@ -176,7 +176,7 @@ Mine.prototype.run = function(room) {
                     }
                 });
                 _.forEach(completed, (complete) => {
-                    _.remove(Memory.dismantle, (d) => d.x === complete.x && d.y === complete.y);
+                    _.remove(Memory.dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
                 });
             }
 

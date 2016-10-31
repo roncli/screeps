@@ -43,6 +43,12 @@ Mine.prototype.run = function(creep) {
     // If we are at the container, get the source closest to the creep and attempt to harvest it.
     if (container.pos.getRangeTo(creep) === 0) {
         creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(container.room), Cache.mineralsInRoom(container.room)]), creep)[0]);
+
+        // Suicide creep if there's another one right here with a higher TTL.
+        if (_.filter(Cache.creepsInRoom(creep.room), (c) => c.memory.role === "miner" && c.room.name === creep.room.name && c.memory.home === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive)) {
+            creep.say(":(", true);
+            creep.suicide();
+        }
     }
 };
 

@@ -121,13 +121,36 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled containers.
+            // Check for unfilled storage.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(_.sum(task.object.store)) - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Game.creeps, {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Game.creeps, {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Game.creeps, {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Game.creeps, {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Storage");
+                            assigned.push(creep.name);
+                            energyMissing -= _.sum(creep.carry);
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled containers.
+            _.forEach(tasks.fillEnergy.fillContainerTasks, (task) => {
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Game.creeps, {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Game.creeps, {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Container");
                             assigned.push(creep.name);
                             energyMissing -= _.sum(creep.carry);
                             if (energyMissing <= 0) {
@@ -165,7 +188,11 @@ var Cache = require("cache"),
 
             // Rally remaining creeps.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskRally(creep.memory.home);
+                if (_.sum(creep.carry) > 0) {
+                    var task = new TaskRally(creep.memory.supportRoom);
+                } else {
+                    var task = new TaskRally(creep.memory.home);
+                }
                 task.canAssign(creep);
             });
         }

@@ -89,15 +89,11 @@ var Cache = require("cache"),
             // If we don't have a _pathing, generate it.
             if (!creep.memory._pathing || !creep.memory._pathing.path) {
                 // Determine multiplier to use for terrain cost.
-                if (creep.hits - creep.getActiveBodyparts(MOVE) * 300 + _.sum(creep.carry) * 4 <= 0) {
-                    multiplier = 1;
-                } else {
-                    multiplier = 2;
-                }
+                multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
 
                 path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
-                    plainCost: 1 * multiplier,
-                    swampCost: 5 * multiplier,
+                    plainCost: Math.ceil(1 * multiplier),
+                    swampCost: Math.ceil(5 * multiplier),
                     maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
                     roomCallback: (roomName) => {
                         var matrix;

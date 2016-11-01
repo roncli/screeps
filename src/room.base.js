@@ -254,9 +254,9 @@ Base.prototype.run = function(room) {
                 }
             });
 
-            if (!dealMade) {
+            if (!dealMade && terminalEnergy > 100) {
                 // Attempt to sell excess energy.
-                bestOrder = _.sortBy(_.filter(Cache.marketOrders(), (o) => o.resourceType === RESOURCE_ENERGY && o.type === "buy" && o.amount > 0), (o) => -((o.price * o.amount + Game.market.calcTransactionCost(o.amount, room.name, o.roomName)) / o.amount));
+                bestOrder = _.sortBy(_.filter(Cache.marketOrders(), (o) => o.resourceType === RESOURCE_ENERGY && o.type === "buy" && o.amount > 0), (o) => -((o.price * o.amount + Game.market.calcTransactionCost(o.amount, room.name, o.roomName)) / o.amount))[0];
                 if (bestOrder) {
                     transCost = Game.market.calcTransactionCost(bestOrder.amount, room.name, bestOrder.roomName);
                     if (terminalEnergy > transCost + room.terminal.store[RESOURCE_ENERGY]) {

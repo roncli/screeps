@@ -114,24 +114,26 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for construction sites if we're in the remote room.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
-                if (Cache.constructionSitesInRoom(room).length > 0) {
-                    var task = new TaskBuild(Cache.constructionSitesInRoom(room)[0].id);
-                    if (task.canAssign(creep)) {
-                        creep.say("Build");
-                        assigned.push(creep.name);
+            // Check for construction sites.
+            if (!room.unobservable) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (Cache.constructionSitesInRoom(room).length > 0) {
+                        var task = new TaskBuild(Cache.constructionSitesInRoom(room)[0].id);
+                        if (task.canAssign(creep)) {
+                            creep.say("Build");
+                            assigned.push(creep.name);
+                        }
                     }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
                 }
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
             }
-
+            
             // Attempt to assign harvest task to remaining creeps.
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {

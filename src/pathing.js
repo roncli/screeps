@@ -15,7 +15,7 @@ var Cache = require("cache"),
             "use strict";
 
             var restartOn = [],
-                wasStationary, firstPos, path;
+                wasStationary, firstPos, multiplier, path;
 
             if (pos instanceof RoomObject) {
                 pos = pos.pos;
@@ -88,9 +88,16 @@ var Cache = require("cache"),
             
             // If we don't have a _pathing, generate it.
             if (!creep.memory._pathing || !creep.memory._pathing.path) {
+                // Determine multiplier to use for terrain cost.
+                if (creep.hits - creep.getActiveBodyparts(MOVE) * 300 + _.sum(creep.carry) * 4 <= 0) {
+                    multiplier = 1;
+                } else {
+                    multiplier = 2;
+                }
+
                 path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
-                    plainCost: 2,
-                    swampCost: 10,
+                    plainCost: 1 * multiplier,
+                    swampCost: 5 * multiplier,
                     maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
                     roomCallback: (roomName) => {
                         var matrix;

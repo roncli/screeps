@@ -72,15 +72,20 @@ var run = () => {
             JSON.parse(message.data)[1].messages.log.forEach((l) => {
                 console.log(l);
             });
-        } catch (err) {}
+        } catch (err) {
+            console.log("\033c");
+            console.log(message.data);
+            console.log(err);
+        }
     };
 
     ws.onerror = function(err) {
         console.log(err);
+        ws.close();
     };
 
     ws.onclose = function() {
-        run();
+        //run();
     };
 };
 

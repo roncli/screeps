@@ -181,7 +181,7 @@ Mine.prototype.run = function(room) {
             } else {
                 _.forEach(Cache.creepsInRoom("dismantler", room), (creep) => {
                     creep.memory.role = "remoteWorker";
-                    creep.memory.container = Cache.containersInRoom(room)[0];
+                    creep.memory.container = Cache.containersInRoom(room)[0].id;
                 });
             }
 

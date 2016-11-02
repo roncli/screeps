@@ -73,8 +73,17 @@ var profiler = require("screeps-profiler"),
 
                 // Log date, GCL, and credits.
                 console.log(new Date());
+                Cache.log.push({date: new Date()});
                 console.log("GCL " + Game.gcl.level + " " + Game.gcl.progress.toFixed(0) + "/" + Game.gcl.progressTotal.toFixed(0) + " " + (100 * Game.gcl.progress / Game.gcl.progressTotal).toFixed(3) + "% " + (Game.gcl.progressTotal - Game.gcl.progress).toFixed(0) + " to go");
+                Cache.log.push({
+                    gcl: {
+                        level: Game.gcl.level,
+                        progress: Game.gcl.progress,
+                        progressTotal: Game.gcl.progressTotal
+                    }
+                });
                 console.log("Credits: " + Game.market.credits.toFixed(2));
+                Cache.log.push({credits: Game.market.credits});
 
                 // Clear old memory.
                 _.forEach(Memory.creeps, (creep, name) => {
@@ -131,42 +140,131 @@ var profiler = require("screeps-profiler"),
                     if (room.unobservable) {
                         // Log room status.
                         console.log("  " + type + " " + room.name + " Unobservable");
+                        Cache.log.push({
+                            room: {
+                                name: room.name,
+                                type: type,
+                                unobservable: true
+                            }
+                        });
                     } else {
                         // Log room status.
                         if (room.controller) {
                             if (room.controller.my) {
                                 if (room.controller.level === 8) {
                                     console.log("  " + type + " " + room.name + " RCL " + room.controller.level);
+
+                                    Cache.log.push({
+                                        room: {
+                                            name: room.name,
+                                            type: type,
+                                            owned: true,
+                                            ownedBy: room.controller.owner.username,
+                                            rcl: room.controller.level
+                                        }
+                                    });
                                 } else {
                                     console.log("  " + type + " " + room.name + " RCL " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "% " + (room.controller.progressTotal - room.controller.progress) + " to go");
+                                    Cache.log.push({
+                                        room: {
+                                            name: room.name,
+                                            type: type,
+                                            owned: true,
+                                            ownedBy: room.controller.owner.username,
+                                            rcl: room.controller.level,
+                                            progress: room.controller.progress,
+                                            progressTotal: room.controller.progressTotal
+                                        }
+                                    });
                                 }
                             } else if (room.controller.level === 0) {
                                 if (room.controller.reservation) {
                                     console.log("  " + type + " " + room.name + " Controller reserved " + room.controller.reservation.username + " TTE " + room.controller.reservation.ticksToEnd);
+                                    Cache.log.push({
+                                        room: {
+                                            name: room.name,
+                                            type: type,
+                                            owned: false,
+                                            reservation: room.controller.reservation.username,
+                                            tte: room.controller.reservation.ticksToEnd
+                                        }
+                                    });
                                 } else {
                                     console.log("  " + type + " " + room.name + " Controller unowned");
+                                    Cache.log.push({
+                                        room: {
+                                            name: room.name,
+                                            type: type,
+                                            owned: false
+                                        }
+                                    });
                                 }
                             } else {
                                 console.log("  " + type + " " + room.name + " RCL " + room.controller.level + " owned by " + room.controller.owner.username);
+                                Cache.log.push({
+                                    room: {
+                                        name: room.name,
+                                        type: type,
+                                        rcl: room.controller.level,
+                                        owned: true,
+                                        ownedBy: room.controller.owner.username
+                                    }
+                                });
                             }
                         } else {
                             console.log("  " + type + " " + room.name);
+                            Cache.log.push({
+                                room: {
+                                    name: room.name,
+                                    type: type
+                                }
+                            });
                         }
 
                         _.forEach(Cache.energySourcesInRoom(room), (s) => {
                             console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity + " TTR " + s.ticksToRegeneration);
+                            Cache.log.push({
+                                source: {
+                                    room: room.name,
+                                    id: s.id,
+                                    energy: s.energy,
+                                    energyCapacity: s.energyCapacity,
+                                    ttr: s.ticksToRegeneration
+                                }
+                            });
                         });
 
                         _.forEach(Cache.mineralsInRoom(room), (m) => {
                             console.log("    Mineral " + m.mineralType + " " + m.id + ": " + m.mineralAmount + " TTR " + m.ticksToRegeneration);
+                            Cache.log.push({
+                                mineral: {
+                                    room: room.name,
+                                    id: m.id,
+                                    mineralType: m.mineralType,
+                                    mineralAmount: m.mineralAmount,
+                                    ttr: m.ticksToRegeneration
+                                }
+                            });
                         });
 
                         if (room.storage && _.sum(room.storage.store) > 0) {
                             console.log("    Storage: " + _.map(room.storage.store, (s, i) => {return s + " " + i;}).join(", "));
+                            Cache.log.push({
+                                storage: {
+                                    room: room.name,
+                                    store: room.storage.store
+                                }
+                            });
                         }
 
                         if (room.terminal && _.sum(room.terminal.store) > 0) {
                             console.log("    Terminal: " + _.map(room.terminal.store, (s, i) => {return s + " " + i;}).join(", "));
+                            Cache.log.push({
+                                terminal: {
+                                    room: room.name,
+                                    store: room.terminal.store
+                                }
+                            });
                         }
                     }
 

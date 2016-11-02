@@ -16,7 +16,8 @@ var creeps = {},
     hostilesInRoom = {},
     marketOrders = null,
     costMatricies = {},
-    objects = {};
+    objects = {},
+    log = [];
 
 var Cache = {
     creepTasks: {},
@@ -45,6 +46,7 @@ var Cache = {
         marketOrders = null;
         costMatricies = {};
         objects = {};
+        log = [];
         Cache.creepTasks = {};
         Cache.roomTypes = {};
         Cache.spawning = {};

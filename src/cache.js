@@ -16,13 +16,13 @@ var creeps = {},
     hostilesInRoom = {},
     marketOrders = null,
     costMatricies = {},
-    objects = {},
-    log = [];
+    objects = {};
 
 var Cache = {
     creepTasks: {},
     roomTypes: {},
     spawning: {},
+    log: [],
 
     // Reset the cache.
     reset: () => {
@@ -46,10 +46,10 @@ var Cache = {
         marketOrders = null;
         costMatricies = {};
         objects = {};
-        log = [];
         Cache.creepTasks = {};
         Cache.roomTypes = {};
         Cache.spawning = {};
+        Cache.log = [];
     },
 
     // Returns all creeps of a certain type.

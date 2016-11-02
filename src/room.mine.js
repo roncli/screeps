@@ -178,6 +178,11 @@ Mine.prototype.run = function(room) {
                 _.forEach(completed, (complete) => {
                     _.remove(Memory.dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
                 });
+            } else {
+                _.forEach(Cache.creepsInRoom("dismantler", room), (creep) => {
+                    creep.memory.role = "remoteWorker";
+                    creep.memory.container = Cache.containersInRoom(room)[0];
+                });
             }
 
             if (tasks.build.tasks.length > 0) {

@@ -95,7 +95,7 @@ var Cache = require("cache"),
                 body.push(ATTACK);
             }
 
-            if (energy % 350 >= 190) {
+            if (energy % 350 >= 270) {
                 body.push(ATTACK);
             }
 

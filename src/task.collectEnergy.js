@@ -23,7 +23,7 @@ CollectEnergy.prototype.canAssign = function(creep) {
     }
 
     if (!this.object) {
-        Game.notify("WARNING: Can't assign collectEnergy to object", this.id);
+        Game.notify("WARNING: Can't assign collectEnergy to object " + this.id);
         return false;
     }
     

@@ -17,14 +17,6 @@ WebSocketClient.prototype.open = function(url){
         this.onmessage(data,flags,number);
     });
     this.instance.on('close',(e)=>{
-        switch (e){
-        case 1000:  // CLOSE_NORMAL
-            console.log("WebSocket: closed");
-            break;
-        default:    // Abnormal closure
-            this.reconnect(e);
-            break;
-        }
         this.onclose(e);
     });
     this.instance.on('error',(e)=>{
@@ -52,6 +44,9 @@ WebSocketClient.prototype.reconnect = function(e){
         console.log("WebSocketClient: reconnecting...");
         that.open(that.url);
     },this.autoReconnectInterval);
+}
+WebSocketClient.prototype.close = function() {
+    this.instance.close();
 }
 
 module.exports = WebSocketClient;

@@ -13,16 +13,21 @@ var https = require("https"),
                 process.stdout.write(child_process.execSync("clear && printf '\\e[3J'"));
                 break;
         }
-    },
+    }, wsc
 
     run = () => {
         "use strict";
 
-        var wsc = new WebSocketClient(),
-            authPost = "email=" + config.user + "&password=" + config.password,
-
+        var authPost = "email=" + config.user + "&password=" + config.password,
             id;
 
+        if (wsc) {
+            wsc.close();
+            return;
+        }
+
+        wsc = new WebSocketClient();
+        
         wsc.onopen = (err) => {
             var req;
             
@@ -106,12 +111,11 @@ var https = require("https"),
         };
 
         wsc.onerror = (err) => {
-            console.log("Errored", err);
             wsc.reconnect();
         };
 
         wsc.onclose = (err) => {
-            console.log("Closed", err);
+            wsc = null;
             wsc.reconnect();
         };
 

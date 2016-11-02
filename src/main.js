@@ -259,6 +259,13 @@ var profiler = require("screeps-profiler"),
                         if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
                             Cache.creepTasks[creep.name].toObj(creep);
                         }
+
+                        // If the creep has a work part, try to repair any road that may be under it.
+                        if (creep.getActiveBodyparts(WORK) > 0 && creep.carry[RESOURCE_ENERGY] > 0) {
+                            _.forEach(_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax), (structure) => {
+                                creep.repair(structure);
+                            });
+                        }
                     } else {
                         // RIP & Pepperonis :(
                         delete creep.memory.currentTask;

@@ -116,7 +116,7 @@ var https = require("https"),
 
         wsc.onclose = (err) => {
             wsc = null;
-            wsc.reconnect();
+            run();
         };
 
         wsc.open("wss://screeps.com/socket/websocket");

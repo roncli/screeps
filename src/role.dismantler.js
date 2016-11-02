@@ -104,6 +104,27 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for structures needing dismantling.
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(tasks.dismantle.tasks, (task) => {
+                    if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
+                        return;
+                    }
+                    if (task.canAssign(creep)) {
+                        creep.say("Dismantle");
+                        assigned.push(creep.name);
+                        return false;
+                    }
+                });
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check critical repairs.
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
@@ -178,27 +199,6 @@ var Cache = require("cache"),
                     assigned = [];
                 }
             });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for structures needing dismantling.
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(tasks.dismantle.tasks, (task) => {
-                    if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Dismantle");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

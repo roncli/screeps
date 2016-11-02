@@ -110,14 +110,8 @@ var Cache = require("cache"),
                 room = Game.rooms[pos.roomName],
                 structures;
             
-            // Cannot be a wall, or be next to a wall horizontally or vertically.
-            if (
-                (new RoomPosition(pos.x, pos.y, pos.roomName)).lookFor(LOOK_TERRAIN)[0] === "wall" ||
-                (new RoomPosition(pos.x - 1, pos.y, pos.roomName)).lookFor(LOOK_TERRAIN)[0] === "wall" ||
-                (new RoomPosition(pos.x + 1, pos.y, pos.roomName)).lookFor(LOOK_TERRAIN)[0] === "wall" ||
-                (new RoomPosition(pos.x, pos.y - 1, pos.roomName)).lookFor(LOOK_TERRAIN)[0] === "wall" ||
-                (new RoomPosition(pos.x, pos.y + 1, pos.roomName)).lookFor(LOOK_TERRAIN)[0] === "wall"
-            ) {
+            // Cannot be a wall.
+            if (new RoomPosition(pos.x, pos.y, pos.roomName).lookFor(LOOK_TERRAIN)[0] === "wall") {
                 return false;
             }
 

@@ -43,6 +43,8 @@ FillEnergy.prototype.run = function(creep) {
 FillEnergy.prototype.canComplete = function(creep) {
     "use strict";
 
+    var minEnergy;
+
     if (!this.object) {
         Task.prototype.complete.call(this, creep);
         return true;
@@ -53,10 +55,29 @@ FillEnergy.prototype.canComplete = function(creep) {
         energy = _.sum(this.object.store);
     }
 
-    if (!creep.carry[RESOURCE_ENERGY] || energy === (this.object.energyCapacity || this.object.storeCapacity)) {
-        Task.prototype.complete.call(this, creep);
-        return true;
+    if (this.object instanceof StructureExtension) {
+        switch (this.object.room.controller.level) {
+            case 7:
+                minEnergy = 100;
+                break;
+            case 8:
+                minEnergy = 200;
+                break;
+            default:
+                minEnergy = 50;
+                break;
+        }
+        if (!creep.carry[RESOURCE_ENERGY] || creep.carry[RESOURCE_ENERGY] < minEnergy || energy === this.object.energyCapacity) {
+            Task.prototype.complete.call(this, creep);
+            return true;
+        }
+    } else {
+        if (!creep.carry[RESOURCE_ENERGY] || energy === (this.object.energyCapacity || this.object.storeCapacity)) {
+            Task.prototype.complete.call(this, creep);
+            return true;
+        }
     }
+
     return false;
 };
 

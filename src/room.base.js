@@ -379,7 +379,7 @@ Base.prototype.run = function(room) {
     RoleDefender.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
-    RoleUpgrader.checkSpawn(room);
+    RoleUpgrader.assignTasks(room, tasks);
 
     // Assign tasks to towers.
     RoleTower.assignTasks(room, tasks);

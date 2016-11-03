@@ -289,7 +289,9 @@ Base.prototype.run = function(room) {
     RoleDefender.checkSpawn(room);
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
-    RoleUpgrader.checkSpawn(room);
+    if (room.controller && room.controller.level < 8) {
+        RoleUpgrader.checkSpawn(room);
+    }
 
     // Get the tasks needed for this room.
     tasks = {

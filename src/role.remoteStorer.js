@@ -49,7 +49,7 @@ var Cache = require("cache"),
                 }
 
                 // Calculate number of storers needed.
-                count += Math.min(Math.max(Math.ceil(length / 20), 0), 4);
+                count += Math.max(Math.ceil(length / 20), 0);
                 max += count;
 
                 // If we don't have enough remote storers for this container, spawn one.

@@ -84,6 +84,7 @@ var Cache = require("cache"),
                 console.log("    Spawning new remote reserver " + name);
                 _.forEach(Cache.creepsInRoom("worker", supportRoom), (creep) => {
                     creep.memory.completeTask = true;
+                    return false;
                 });
                 return true;
             }

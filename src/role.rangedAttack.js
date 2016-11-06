@@ -107,6 +107,7 @@ var Cache = require("cache"),
                 console.log("    Spawning new ranged attacker " + name);
                 _.forEach(Cache.creepsInRoom("worker", room), (creep) => {
                     creep.memory.completeTask = true;
+                    return false;
                 });
                 return true;
             }

@@ -58,7 +58,9 @@ var Cache = require("cache"),
                 }
             });
 
-            console.log("    Remote Storers: " + Cache.creepsInRoom("remoteStorer", room).length + "/" + max);
+            if (max > 0) {
+                console.log("    Remote Storers: " + Cache.creepsInRoom("remoteStorer", room).length + "/" + max);
+            }
         },
         
         spawn: (room, supportRoom, id) => {

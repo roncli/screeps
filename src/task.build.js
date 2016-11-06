@@ -34,7 +34,7 @@ Build.prototype.run = function(creep) {
     }
     
     // Move to the construction site and build it.
-    Pathing.moveTo(creep, this.constructionSite, 1);
+    Pathing.moveTo(creep, this.constructionSite, Math.max(Math.min(creep.pos.getRangeTo(this.constructionSite) - 1, 3), 1));
     creep.build(this.constructionSite, RESOURCE_ENERGY);
 };
 

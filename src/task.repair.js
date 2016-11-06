@@ -33,7 +33,7 @@ Repair.prototype.run = function(creep) {
     }
     
     // Move to the structure and repair it.
-    Pathing.moveTo(creep, this.structure, 1);
+    Pathing.moveTo(creep, this.structure, Math.max(Math.min(creep.pos.getRangeTo(this.structure) - 1, 3), 1));
     creep.repair(this.structure);
 };
 

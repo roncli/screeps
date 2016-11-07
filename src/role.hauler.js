@@ -84,7 +84,7 @@ var Cache = require("cache"),
             // Check for unfilled links.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.supportRoom && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
                 var supportRoom = Game.rooms[creep.memory.supportRoom],
-                    links = Cache.linksInRoom(supportRoom);
+                    links = _.filter(Cache.linksInRoom(supportRoom), (l) => l.energy < l.energyCapacity);
                 
                 if (links.length > 0 && new TaskFillEnergy(Utilities.objectsClosestToObjByPath(links, room.storage)[0].id).canAssign(creep)) {
                     creep.say("Link");

@@ -79,31 +79,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled links.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.supportRoom && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
-                var supportRoom = Game.rooms[creep.memory.supportRoom],
-                    links = _.filter(Cache.linksInRoom(supportRoom)),
-                    linkToUse;
-
-                if (links.length < 2) {
-                    return;
-                }
-
-                linkToUse = Utilities.objectsClosestToObjByPath(links, room.storage)[0];
-                
-                if (linkToUse.energy < linkToUse.energyCapacity && new TaskFillEnergy(linkToUse.id).canAssign(creep)) {
-                    creep.say("Link");
-                    assigned.push(creep.name);
-                }
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Check for unfilled storage.
             _.forEach(creepsWithNoTask, (creep) => {
                 var supportRoom = Game.rooms[creep.memory.supportRoom];

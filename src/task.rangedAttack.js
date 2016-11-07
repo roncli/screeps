@@ -110,6 +110,11 @@ Ranged.getTasks = function(room) {
 Ranged.getDefenderTask = function(creep) {
     "use strict";
 
+    // Do not attack in E38N13 for now.
+    if (creep.room === "E38N13") {
+        return [];
+    }
+
     return _.map(_.sortBy(Cache.hostilesInRoom(creep.room), (h) => h.hits), (h) => new Ranged(h.id))[0];
 }
 

@@ -86,7 +86,7 @@ var Cache = require("cache"),
                 var supportRoom = Game.rooms[creep.memory.supportRoom],
                     links = Cache.linksInRoom(supportRoom);
                 
-                if (links.length > 0 && new TaskFillEnergy(Utilities.objectsClosestToObjByPath(links[0], room.storage)[0].id).canAssign(creep)) {
+                if (links.length > 0 && new TaskFillEnergy(Utilities.objectsClosestToObjByPath(links, room.storage)[0].id).canAssign(creep)) {
                     creep.say("Link");
                     assigned.push(creep.name);
                 }

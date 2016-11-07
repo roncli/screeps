@@ -16,8 +16,8 @@ var Cache = require("cache"),
                 return;
             }
 
-            // If we don't have enough remote haulers for this container, spawn one.
-            if (_.filter(Cache.creepsInRoom("hauler", room), (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === container.id).length < max) {
+            // If we don't have enough remote haulers for this support room, spawn one.
+            if (_.filter(Cache.creepsInRoom("hauler", room), (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.supportRoom === supportRoom.name).length < max) {
                 Hauler.spawn(room, supportRoom);
             }
 

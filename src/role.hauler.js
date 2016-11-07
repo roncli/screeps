@@ -95,7 +95,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled storage.
-            _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+            _.forEach(creepsWithNoTask, (creep) => {
                 var supportRoom = Game.rooms[creep.memory.supportRoom];
 
                 if (new TaskFillEnergy(supportRoom.storage.id).canAssign(creep)) {

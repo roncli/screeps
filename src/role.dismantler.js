@@ -40,7 +40,7 @@ var Cache = require("cache"),
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
@@ -78,9 +78,11 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
             name = spawnToUse.createCreep(body, undefined, {role: "dismantler", home: room.name, supportRoom: supportRoom.name});
-            Cache.spawning[spawnToUse.id] = true;
+            if (spawnToUse.room.name === supportRoom.name) {
+                Cache.spawning[spawnToUse.id] = true;
+            }
 
             // If successful, log it.
             if (typeof name !== "number") {

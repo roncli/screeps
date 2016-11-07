@@ -30,7 +30,7 @@ var Cache = require("cache"),
                 energy, spawnToUse, name, count;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
@@ -53,9 +53,11 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === room.name ? 0 : 1)[0];
             name = spawnToUse.createCreep(body, undefined, {role: "hauler", home: room.name, supportRoom: supportRoom.name});
-            Cache.spawning[spawnToUse.id] = true;
+            if (spawnToUse.room.name === room.name) {
+                Cache.spawning[spawnToUse.id] = true;
+            }
 
             // If successful, log it.
             if (typeof name !== "number") {

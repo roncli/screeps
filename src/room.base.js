@@ -4,6 +4,7 @@ var RoomObj = require("roomObj"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
+    RoleHauler = require("role.hauler"),
     RoleHealer = require("role.healer"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
@@ -299,6 +300,9 @@ Base.prototype.run = function(room) {
     if (room.controller && room.controller.level < 8) {
         RoleUpgrader.checkSpawn(room);
     }
+    if (Cache.haulers[room.name]) {
+        RoleHauler.checkSpawn(room);
+    }
 
     // Get the tasks needed for this room.
     tasks = {
@@ -389,6 +393,7 @@ Base.prototype.run = function(room) {
     RoleCollector.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
     RoleUpgrader.assignTasks(room, tasks);
+    RoleHauler.assignTasks(room, tasks);
 
     // Assign tasks to towers.
     RoleTower.assignTasks(room, tasks);

@@ -7,10 +7,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var length = 0, foundFirstSource = false;
-            
             var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
-                max = 0;
+                max = 0, foundFirstSource = false;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
             if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || Cache.containersInRoom(room).length === 0) {
@@ -43,7 +41,7 @@ var Cache = require("cache"),
                         Memory.lengthToLink[container.id] = {};
                     }
                     if (!Memory.lengthToLink[container.id][supportRoom.name]) {
-                        Memory.lengthToLink[container.id][supportRoom.name] = PathFinder.search(Utilities.objectsClosestToObjByPath(Cache.linksInRoom(supportRoom), Cache.spawnsInRoom(supportRoom)[0])[1].pos, {pos: container.pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length; 
+                        Memory.lengthToLink[container.id][supportRoom.name] = PathFinder.search(Utilities.objectsClosestToObjByPath(Cache.linksInRoom(supportRoom), Cache.spawnsInRoom(supportRoom)[0])[1].pos, {pos: container.pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
                     }
                     length = Memory.lengthToLink[container.id][supportRoom.name];
                 }

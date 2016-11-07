@@ -22,6 +22,7 @@ var Cache = {
     creepTasks: {},
     roomTypes: {},
     spawning: {},
+    haulers: {},
     log: [],
 
     // Reset the cache.
@@ -49,6 +50,7 @@ var Cache = {
         Cache.creepTasks = {};
         Cache.roomTypes = {};
         Cache.spawning = {};
+        Cache.haulers = {};
         Cache.log = [];
     },
 

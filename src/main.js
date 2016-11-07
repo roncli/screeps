@@ -9,6 +9,7 @@ var profiler = require("screeps-profiler"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
+    RoleHauler = require("role.hauler"),
     RoleHealer = require("role.healer"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
@@ -32,7 +33,8 @@ var profiler = require("screeps-profiler"),
             "use strict";
 
             profiler.wrap(() => {
-                var unobservableRooms = [];
+                var unobservableRooms = [],
+                    rooms;
 
                 // Reset the cache.
                 Cache.reset();
@@ -45,6 +47,7 @@ var profiler = require("screeps-profiler"),
                         Claimer: RoleClaimer,
                         Collector: RoleCollector,
                         Defender: RoleDefender,
+                        Hauler: RoleHauler,
                         Healer: RoleHealer,
                         MeleeAttack: RoleMeleeAttack,
                         Miner: RoleMiner,
@@ -132,6 +135,20 @@ var profiler = require("screeps-profiler"),
                         });
                     }
                 });
+
+                // See if there is some energy balancing we can do.
+                rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType === "base" && r.storage), (r) => r.storage.store[RESOURCE_ENERGY]);
+                if (rooms.length > 1) {
+                    _.forEach(rooms, (room, index) => {
+                        var otherRoom = rooms[rooms.length - index - 1];
+                        
+                        if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] > 500000 || otherRoom.storage.store[RESOURCE_ENERGY] < 500000) {
+                            return false;
+                        }
+
+                        Cache.haulers[otherRoom.name] = room.name;
+                    });
+                }
 
                 // Loop through each room to determine the required tasks for the room, and then serialize the room.
                 _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {

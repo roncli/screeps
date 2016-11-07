@@ -28,7 +28,7 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, spawnToUse, name;
+                energy, spawnToUse, name, count;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {

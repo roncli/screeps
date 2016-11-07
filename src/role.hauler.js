@@ -8,11 +8,10 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var supportRoom = Game.rooms[Cache.haulers[room.name]], max = 5,
-                length;
+            var supportRoom = Game.rooms[Cache.haulers[room.name]], max = 5;
 
-            // If there are no spawns in the support room, or the room is unobservable, or there is no storage in the room, ignore the room.
-            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || !room.storage || !supportRoom.storage) {
+            // If there are no spawns in the room, or the room is unobservable, or there is no storage in the room, ignore the room.
+            if (Cache.spawnsInRoom(room).length === 0 || room.unobservable || !room.storage || !supportRoom.storage) {
                 return;
             }
 

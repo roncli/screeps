@@ -31,12 +31,12 @@ var Cache = require("cache"),
                 energy, spawnToUse, name, count;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Get the total energy in the room, limited to 2400.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(supportRoom), 2400);
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 2400);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 150); count++) {
@@ -49,14 +49,14 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
             name = spawnToUse.createCreep(body, undefined, {role: "hauler", home: room.name, supportRoom: supportRoom.name});
             Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.
             if (typeof name !== "number") {
                 console.log("    Spawning new hauler " + name);
-                _.forEach(Cache.creepsInRoom("worker", supportRoom), (creep) => {
+                _.forEach(Cache.creepsInRoom("worker", room), (creep) => {
                     creep.memory.completeTask = true;
                     return false;
                 });

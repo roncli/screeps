@@ -41,10 +41,10 @@ var Cache = require("cache"),
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 150); count++) {
                 body.push(CARRY);
+                body.push(CARRY);
             }
 
             for (count = 0; count < Math.floor(energy / 150); count++) {
-                body.push(MOVE);
                 body.push(MOVE);
             }
 

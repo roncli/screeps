@@ -1,7 +1,3 @@
-/**
- * - Need a reserver per room if it has a controller
- */
-
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Utilities = require("utilities"),

@@ -78,9 +78,13 @@ var profiler = require("screeps-profiler"),
                 Utilities: Utilities
             };
             
-            // Initialize max creeps.
+            // Initialize memory objects.
             if (!Memory.maxCreeps) {
                 Memory.maxCreeps = {};
+            }
+
+            if (!Memory.containerSource) {
+                Memory.containerSource = {};
             }
 
             // Log date, GCL, and credits.

@@ -4,7 +4,7 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
 
     RemoteCollector = {
-        checkSpawn: (room) => {
+        checkSpawn: (room, supportRoom) => {
             "use strict";
 
             var max = 1;

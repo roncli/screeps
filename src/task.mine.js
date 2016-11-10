@@ -36,12 +36,12 @@ Mine.prototype.run = function(creep) {
     }
     
     // Move to the container if we are not there.
-    if (container.pos.getRangeTo(creep) !== 0) {
+    if (container.pos.x !== creep.pos.x || container.pos.y !== creep.pos.y || container.pos.roomName !== creep.pos.roomName) {
         Pathing.moveTo(creep, container, 0);
     }
 
     // If we are at the container, get the source closest to the creep and attempt to harvest it.
-    if (container.pos.getRangeTo(creep) === 0) {
+    if (container.pos.x === creep.pos.x && container.pos.y === creep.pos.y && container.pos.roomName === creep.pos.roomName) {
         if (Memory.containerSource[creep.memory.container]) {
             creep.harvest(Cache.getObjectById(Memory.containerSource[creep.memory.container]));
         } else {

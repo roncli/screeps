@@ -10,6 +10,7 @@ const direction = {
 };
 
 var Cache = require("cache"),
+    Proxy = require("proxy"),
     Pathing = {
         moveTo: (creep, pos, range) => {
             "use strict";
@@ -106,10 +107,12 @@ var Cache = require("cache"),
                         matrix = Cache.getCostMatrix(Game.rooms[roomName]);
 
                         if (creep.memory._pathing && roomName === creep.room.name) {
-                            _.forEach(creep.memory._pathing.blocked, (blocked) => {
-                                if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
-                                    matrix.set(blocked.x, blocked.y, 255);
-                                }
+                            Proxy.run("pathing.addBlocked", () => {
+                                _.forEach(creep.memory._pathing.blocked, (blocked) => {
+                                    if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
+                                        matrix.set(blocked.x, blocked.y, 255);
+                                    }
+                                });
                             });
                         }
 

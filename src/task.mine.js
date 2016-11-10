@@ -49,7 +49,7 @@ Mine.prototype.run = function(creep) {
         }
 
         // Suicide creep if there's another one right here with a higher TTL.
-        if (_.filter([].concat.apply([], [Cache.creepsInRoom("miner", creep.room), Cache.creepsInRoom("remoteMiner", creep.room)]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive).length > 0) {
+        if (_.filter([].concat.apply([], [Cache.creepsInRoom("miner", creep.room), Cache.creepsInRoom("remoteMiner", creep.room)]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {
             creep.say(":(", true);
             creep.suicide();
         }

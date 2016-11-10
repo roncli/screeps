@@ -83,9 +83,6 @@ var Cache = require("cache"),
             // If successful, log it.
             if (typeof name !== "number") {
                 console.log("    Spawning new upgrader " + name);
-                _.forEach(Cache.creepsInRoom("upgrader", room), (creep) => {
-                    creep.memory.completeTask = true;
-                });
                 return true;
             }
 

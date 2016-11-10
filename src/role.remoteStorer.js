@@ -87,9 +87,6 @@ var Cache = require("cache"),
             // If successful, log it.
             if (typeof name !== "number") {
                 console.log("    Spawning new remote storer " + name);
-                _.forEach(Cache.creepsInRoom("worker", supportRoom), (creep) => {
-                    creep.memory.completeTask = true;
-                });
                 return true;
             }
 

@@ -90,9 +90,6 @@ var Cache = require("cache"),
             // If successful, log it.
             if (typeof name !== "number") {
                 console.log("    Spawning new defender " + name);
-                _.forEach(Cache.creepsInRoom("worker", room), (creep) => {
-                    creep.memory.completeTask = true;
-                });
                 return true;
             }
 

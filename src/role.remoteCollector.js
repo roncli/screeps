@@ -18,9 +18,9 @@ var Cache = require("cache"),
                 return;
             }
 
-            // If we don't have enough remote collectors for this container, spawn one.
+            // If we don't have enough remote collectors for this room, spawn one.
             if (_.filter(Cache.creepsInRoom("remotecollector", room), (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
-                RemoteCollector.spawn(room, supportRoom, container.id);
+                RemoteCollector.spawn(room, supportRoom);
             }
 
             if (max > 0) {
@@ -28,7 +28,7 @@ var Cache = require("cache"),
             }
         },
         
-        spawn: (room, supportRoom, id) => {
+        spawn: (room, supportRoom) => {
             "use strict";
 
             var body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
@@ -46,7 +46,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "remoteCollector", home: room.name, supportRoom: supportRoom.name, container: id});
+            name = spawnToUse.createCreep(body, undefined, {role: "remoteCollector", home: room.name, supportRoom: supportRoom.name});
             if (spawnToUse.room.name === supportRoom.name) {
                 Cache.spawning[spawnToUse.id] = true;
             }

@@ -70,6 +70,23 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Attempt to get energy from containers.
+            _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled links.
             if (tasks.fillEnergy.fillLinkTask) {
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.supportRoom && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
@@ -128,23 +145,6 @@ var Cache = require("cache"),
                     assigned = [];
                 }
             });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Attempt to get energy from containers.
-            _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

@@ -28,7 +28,7 @@ var profiler = require("screeps-profiler"),
     RoomMine = require("room.mine"),
     taskDeserialization = require("taskDeserialization"),
     roomDeserialization = require("roomDeserialization"),
-    unobservableRooms = [],
+    unobservableRooms,
 
     main = {
         loop: () => {
@@ -133,6 +133,7 @@ var profiler = require("screeps-profiler"),
             });
 
             // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
+            unobservableRooms = [];
             _.forEach(Memory.rooms, (roomMemory, name) => {
                 if (name === "undefined") {
                     return;

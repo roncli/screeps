@@ -66,5 +66,11 @@ Dismantle.fromObj = function(creep) {
     return new Dismantle(creep.memory.currentTask.id);
 };
 
+Dismantle.getCleanupTasks = function(structures) {
+    "use strict";
+
+    return _.map(structures, (s) => new Dismantle(s.id));
+};
+
 require("screeps-profiler").registerObject(Dismantle, "TaskDismantle");
 module.exports = Dismantle;

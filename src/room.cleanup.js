@@ -59,9 +59,9 @@ Cleanup.prototype.run = function(room) {
         // Collect energy and minerals from structures that aren't under ramparts.
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
 
-        if (noEnergyStructures.length === 0) {
+        if (noEnergyStructures.length > 0) {
             // Dismantle structures with no energy or minerals that aren't under ramparts.
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleaunupTasks(noEnergyStructures);
+            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(noEnergyStructures);
         } else {
             // Dismantle ramparts.
             tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);

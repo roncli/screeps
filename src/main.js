@@ -320,8 +320,6 @@ profiler.registerObject(main, "main");
 
 if (Memory.profiling) {
     profiler.enable();
-
-    PathFinder.search = profiler.registerFN(PathFinder.search, "Pathfinder.search");
 }
 
 module.exports = main;

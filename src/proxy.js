@@ -2,15 +2,15 @@
  * A way to proxy calls so the profiler picks them up.
  */
 
-var Proxy = {
-    run: (name, fx) => {
-        "use strict";
+var Profiler = require("screeps-profiler"),
+    Proxy = {
+        run: (name, fx) => {
+            "use strict";
 
-        Proxy.name = fx;
-        Proxy.name();
-        delete Proxy.name;
-    }
-};
+            Profiler.registerFN(fx, "Proxy." + name);
+            fx();
+        }
+    };
 
-require("screeps-profiler").registerObject(Proxy, "Proxy");
+Profiler.registerObject(Proxy, "Proxy");
 module.exports = Proxy;

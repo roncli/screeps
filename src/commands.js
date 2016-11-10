@@ -146,6 +146,18 @@ var Cache = require("cache"),
             if (Game.creeps[name]) {
                 delete Game.creeps[name].memory.stop;
             }
+        },
+
+        addAlly: (name) => {
+            if (!Memory.allies) {
+                Memory.allies = [];
+            }
+
+            Memory.allies.push(name);
+        },
+
+        removeAlly: (name) => {
+            _.pull(Memory.allies, name);
         }
     };
 

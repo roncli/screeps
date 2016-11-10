@@ -210,18 +210,6 @@ var Cache = require("cache"),
 
         setContainerSource: (containerId, sourceId) => {
             Memory.containerSource[containerId] = sourceId;
-        },
-
-        addAlly: (name) => {
-            if (!Memory.allies) {
-                Memory.allies = [];
-            }
-
-            Memory.allies.push(name);
-        },
-
-        removeAlly: (name) => {
-            _.pull(Memory.allies, name);
         } 
     };
 

@@ -49,7 +49,7 @@ Cleanup.prototype.run = function(room) {
 
     if (!room.unobservable) {
         // Find all ramparts.
-        ramparts = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.type === STRUCTURE_RAMPART);
+        ramparts = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.structureType === STRUCTURE_RAMPART);
 
         // Find all structures that aren't under ramparts, divided by whether they have energy or not.
         structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.type !== STRUCTURE_RAMPART && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));

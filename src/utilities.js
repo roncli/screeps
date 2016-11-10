@@ -206,11 +206,7 @@ var Cache = require("cache"),
 
                 distanceFromSpawn++;
             }
-        },
-
-        setContainerSource: (containerId, sourceId) => {
-            Memory.containerSource[containerId] = sourceId;
-        } 
+        }
     };
 
 require("screeps-profiler").registerObject(Utilities, "Utilities");

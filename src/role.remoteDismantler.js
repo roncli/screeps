@@ -7,7 +7,7 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair"),
 
-    Dismantler = {
+    RemoteDismantler = {
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
@@ -17,19 +17,19 @@ var Cache = require("cache"),
                 supportRoom = room;
             }
 
-            // If there are no spawns in the support room, or the room is unobservable, ignore the room.
-            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable) {
+            // If there are no spawns in the support room, ignore the room.
+            if (Cache.spawnsInRoom(supportRoom).length === 0) {
                 return;
             }
 
-            // If we don't have a dismantler for this room, spawn one.
-            if (_.filter(Cache.creepsInRoom("dismantler", room), (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
-                Dismantler.spawn(room, supportRoom);
+            // If we don't have a remote dismantler for this room, spawn one.
+            if (_.filter(Cache.creepsInRoom("remoteDismantler", room), (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
+                RemoteDismantler.spawn(room, supportRoom);
             }
 
-            // Output dismantler count in the report.
+            // Output remote dismantler count in the report.
             if (max > 0) {
-                console.log("    Dismantlers: " + Cache.creepsInRoom("dismantler", room).length + "/" + max);
+                console.log("    Remote Dismantlers: " + Cache.creepsInRoom("remoteDismantler", room).length + "/" + max);
             }        
         },
         
@@ -79,14 +79,14 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "dismantler", home: room.name, supportRoom: supportRoom.name});
+            name = spawnToUse.createCreep(body, undefined, {role: "remoteDismantler", home: room.name, supportRoom: supportRoom.name});
             if (spawnToUse.room.name === supportRoom.name) {
                 Cache.spawning[spawnToUse.id] = true;
             }
 
             // If successful, log it.
             if (typeof name !== "number") {
-                console.log("    Spawning new dismantler " + name);
+                console.log("    Spawning new remote dismantler " + name);
                 return true;
             }
 
@@ -96,7 +96,24 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("dismantler", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteDismantler", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for enemy construction sites and rally to them.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+                if (Cache.enemyConstructionSitesInRoom(room).length > 0) {
+                    var task = new TaskRally(Cache.enemyConstructionSitesInRoom(room)[0].id);
+                    task.canAssign(creep);
+                    creep.say("Stomping");
+                    assigned.push(creep.name);
+                }
+            });
+
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteBuilder", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -105,7 +122,7 @@ var Cache = require("cache"),
 
             // Check for structures needing dismantling.
             _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(tasks.dismantle.tasks, (task) => {
+                _.forEach(tasks.remoteDismantle.cleanupTasks, (task) => {
                     if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
                         return;
                     }
@@ -113,26 +130,6 @@ var Cache = require("cache"),
                         creep.say("Dismantle");
                         assigned.push(creep.name);
                         return false;
-                    }
-                });
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check critical repairs.
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
-                    if (Utilities.creepsWithTask(Game.creeps, {type: "repair", id: task.id}).length === 0) {
-                        if (task.canAssign(creep)) {
-                            creep.say("CritRepair");
-                            assigned.push(creep.name);
-                            return false;
-                        }
                     }
                 });
             });
@@ -232,5 +229,5 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Dismantler, "RoleDismantler");
-module.exports = Dismantler;
+require("screeps-profiler").registerObject(RemoteDismantler, "RoleRemoteDismantler");
+module.exports = RemoteDismantler;

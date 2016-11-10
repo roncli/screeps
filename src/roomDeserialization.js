@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     RoomBase = require("room.base"),
+    RoomCleanup = require("room.cleanup"),
     RoomMine = require("room.mine"),
     
     deserialization = (roomMemory, name) => {
@@ -8,6 +9,9 @@ var Cache = require("cache"),
         switch (roomMemory.roomType.type) {
             case "base":
                 Cache.roomTypes[name] = RoomBase.fromObj(roomMemory);
+                break;
+            case "cleanup":
+                Cache.roomTypes[name] = RoomCleanup.fromObj(roomMemory);
                 break;
             case "mine":
                 Cache.roomTypes[name] = RoomMine.fromObj(roomMemory);

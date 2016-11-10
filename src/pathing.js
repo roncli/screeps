@@ -10,7 +10,6 @@ const direction = {
 };
 
 var Cache = require("cache"),
-    Proxy = require("proxy"),
     Pathing = {
         moveTo: (creep, pos, range) => {
             "use strict";
@@ -92,32 +91,30 @@ var Cache = require("cache"),
                 // Determine multiplier to use for terrain cost.
                 multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
 
-                Proxy.run("PathFinder.search", () => {
-                    path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
-                        plainCost: Math.ceil(1 * multiplier),
-                        swampCost: Math.ceil(5 * multiplier),
-                        maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
-                        roomCallback: (roomName) => {
-                            var matrix;
+                path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
+                    plainCost: Math.ceil(1 * multiplier),
+                    swampCost: Math.ceil(5 * multiplier),
+                    maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
+                    roomCallback: (roomName) => {
+                        var matrix;
 
-                            if (!Game.rooms[roomName]) {
-                                restartOn.push(roomName);
-                                return;
-                            }
-
-                            matrix = Cache.getCostMatrix(Game.rooms[roomName]);
-
-                            if (creep.memory._pathing && roomName === creep.room.name) {
-                                _.forEach(creep.memory._pathing.blocked, (blocked) => {
-                                    if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
-                                        matrix.set(blocked.x, blocked.y, 255);
-                                    }
-                                });
-                            }
-
-                            return matrix;
+                        if (!Game.rooms[roomName]) {
+                            restartOn.push(roomName);
+                            return;
                         }
-                    });
+
+                        matrix = Cache.getCostMatrix(Game.rooms[roomName]);
+
+                        if (creep.memory._pathing && roomName === creep.room.name) {
+                            _.forEach(creep.memory._pathing.blocked, (blocked) => {
+                                if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
+                                    matrix.set(blocked.x, blocked.y, 255);
+                                }
+                            });
+                        }
+
+                        return matrix;
+                    }
                 });
 
                 if (!path.path || path.path.length === 0) {

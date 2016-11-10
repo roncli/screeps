@@ -317,6 +317,10 @@ var profiler = require("screeps-profiler"),
     };
 
 profiler.registerObject(main, "main");
-profiler.enable();
+if (Memory.profiling) {
+    profiler.enable();
+
+    PathFinder.search = profiler.registerFN(Pathfinder.search, "Pathfinder.search");
+}
 
 module.exports = main;

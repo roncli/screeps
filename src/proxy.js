@@ -7,8 +7,7 @@ var Profiler = require("screeps-profiler"),
         run: (name, fx) => {
             "use strict";
 
-            fx = Profiler.registerFN(fx, "Proxy." + name);
-            fx();
+            Profiler.registerFN(fx, "Proxy." + name)();
         }
     };
 

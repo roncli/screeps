@@ -177,11 +177,17 @@ Base.prototype.run = function(room) {
             }
         });
 
-        // Transfer energy from far link to near link.
+        // Transfer energy from far links to near link.
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
-        if (links.length > 1 && !links[1].cooldown && links[1].energy > 0) {
-            links[1].transferEnergy(links[0]);
-        }
+        _.forEach(links, (link, index) => {
+            if (index === 0) {
+                return;
+            }
+
+            if (!link.cooldown && link.energy > 0) {
+                link.transferEnergy(links[0]);
+            }
+        });
     }
 
     // Check to see if we can do a deal in the terminal.
@@ -322,7 +328,7 @@ Base.prototype.run = function(room) {
             fillTowerTasks: TaskFillEnergy.getFillTowerTasks(room),
             fillStorageTasks: TaskFillEnergy.getFillStorageTasks(room),
             fillContainerTasks: TaskFillEnergy.getFillContainerTasks(room),
-            fillLinkTask: TaskFillEnergy.getFillLinkTask(room),
+            fillLinkTask: [],
             fillTerminalTask: terminalTask
         },
         fillMinerals: {

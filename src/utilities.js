@@ -38,7 +38,7 @@ var Cache = require("cache"),
             return _.map(objList, (o) => o.object);
         },
 
-        objectsClosestToObjByPath: (objects, obj) => {
+        objectsClosestToObjByPath: (objects, obj, range) => {
             "use strict";
 
             if (objects.length === 0) {
@@ -48,11 +48,15 @@ var Cache = require("cache"),
             if (!obj) {
                 return objects;
             }
+
+            if (!range) {
+                range = 1;
+            }
             
             var objList = _.map(objects, (o) => {
                 return {
                     object: o,
-                    distance: PathFinder.search(obj.pos, {pos: o.pos, range: 1}, {swampCost: 1, maxOps: obj.pos.roomName === o.pos.roomName ? 2000 : 100000}).path.length
+                    distance: PathFinder.search(obj.pos, {pos: o.pos, range: range}, {swampCost: 1, maxOps: obj.pos.roomName === o.pos.roomName ? 2000 : 100000}).path.length
                 };
             });
             

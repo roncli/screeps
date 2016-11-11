@@ -37,7 +37,7 @@ Cleanup.prototype.run = function(room) {
         fillEnergy: {
             fillStorageTasks: TaskFillEnergy.getFillStorageTasks(supportRoom),
             fillContainerTasks: TaskFillEnergy.getFillContainerTasks(supportRoom),
-            fillLinkTask: TaskFillEnergy.getFillLinkTask(supportRoom)
+            fillLinkTask: TaskFillEnergy.getFillLinkTask(room, supportRoom)
         },
         fillMinerals: {
             fillStorageTasks: TaskFillMinerals.getFillStorageTasks(supportRoom)

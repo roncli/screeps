@@ -328,7 +328,7 @@ Base.prototype.run = function(room) {
             fillTowerTasks: TaskFillEnergy.getFillTowerTasks(room),
             fillStorageTasks: TaskFillEnergy.getFillStorageTasks(room),
             fillContainerTasks: TaskFillEnergy.getFillContainerTasks(room),
-            fillLinkTask: [],
+            fillLinkTask: null,
             fillTerminalTask: terminalTask
         },
         fillMinerals: {

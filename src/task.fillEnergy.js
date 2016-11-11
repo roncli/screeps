@@ -170,7 +170,7 @@ FillEnergy.getFillLinkTask = function(fromRoom, toRoom) {
         }
     }
 
-    return [];
+    return null;
 };
 
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");

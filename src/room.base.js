@@ -372,7 +372,7 @@ Base.prototype.run = function(room) {
     if (tasks.rangedAttack.tasks.length > 0) {
         console.log("    Hostiles: " + tasks.rangedAttack.tasks.length);
         _.forEach(_.take(tasks.rangedAttack.tasks, 5), (task) => {
-            console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "%");
+            console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "% " + (task.enemy.owner ? task.enemy.owner.username : ""));
         });
     }
     if (tasks.heal.tasks.length > 0) {

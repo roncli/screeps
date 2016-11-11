@@ -193,7 +193,7 @@ Mine.prototype.run = function(room) {
             if (Cache.hostilesInRoom(room).length > 0) {
                 console.log("    Hostiles: " + Cache.hostilesInRoom(room).length);
                 _.forEach(_.take(Cache.hostilesInRoom(room), 5), (enemy) => {
-                    console.log("      " + enemy.pos.x + "," + enemy.pos.y + " " + enemy.hits + "/" + enemy.hitsMax + " " + (100 * enemy.hits / enemy.hitsMax).toFixed(3) + "%");
+                    console.log("      " + enemy.pos.x + "," + enemy.pos.y + " " + enemy.hits + "/" + enemy.hitsMax + " " + (100 * enemy.hits / enemy.hitsMax).toFixed(3) + "% " + (enemy.owner ? enemy.owner.username : ""));
                 });
             }
             if (tasks.heal.tasks.length > 0) {

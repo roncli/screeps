@@ -2,7 +2,6 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
     TaskCollectEnergy = require("task.collectEnergy"),
-    TaskHarvest = require("task.harvest"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair"),
@@ -130,6 +129,26 @@ var Cache = require("cache"),
                         creep.say("Dismantle");
                         assigned.push(creep.name);
                         return false;
+                    }
+                });
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check critical repairs.
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
+                    if (Utilities.creepsWithTask(Game.creeps, {type: "repair", id: task.id}).length === 0) {
+                        if (task.canAssign(creep)) {
+                            creep.say("CritRepair");
+                            assigned.push(creep.name);
+                            return false;
+                        }
                     }
                 });
             });

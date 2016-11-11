@@ -6,7 +6,7 @@ var Cache = require("cache"),
             "use strict";
 
             if (options === undefined) {
-                delete Memory.rooms[name];
+                delete Memory.rooms[name].roomType;
             } else {
                 if (!Memory.rooms[name]) {
                     Memory.rooms[name] = {};

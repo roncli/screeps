@@ -89,6 +89,49 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled extensions.
+            _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
+                _.forEach(_.sortBy(tasks.fillEnergy.fillExtensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
+                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                    if (energyMissing > 0) {
+                        if (task.canAssign(creep)) {
+                            creep.say("Extension");
+                            assigned.push(creep.name);
+                            return false;
+                        }
+                    }
+                });
+            });
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled spawns.
+            _.forEach(tasks.fillEnergy.fillSpawnTasks, (task) => {
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(Utilities.creepsWithTask(Cache.creepsInRoom("all", room), {type: "fillEnergy", id: task.id}), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Spawn");
+                            assigned.push(creep.name);
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled containers.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce([].concat.apply([], [Utilities.creepsWithTask(Game.creeps, {type: "fillEnergy", id: task.id}), Utilities.creepsWithTask(Game.creeps, {type: "fillMinerals", id: task.id})]), function(sum, c) {return sum + _.sum(c.carry);}, 0);

@@ -159,6 +159,10 @@ FillEnergy.getFillLinkTask = function(fromRoom, toRoom) {
 
     var links;
 
+    if (fromRoom.unobservable) {
+        return null;
+    }
+
     if (Cache.spawnsInRoom(toRoom).length > 0) {
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(toRoom), Cache.spawnsInRoom(toRoom)[0]);
         links.shift();

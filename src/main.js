@@ -150,17 +150,19 @@ var profiler = require("screeps-profiler"),
             });
 
             // See if there is some energy balancing we can do.
-            rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage), (r) => r.storage.store[RESOURCE_ENERGY]);
-            if (rooms.length > 1) {
-                _.forEach(rooms, (room, index) => {
-                    var otherRoom = rooms[rooms.length - index - 1];
-                    
-                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] > 500000 || otherRoom.storage.store[RESOURCE_ENERGY] < 500000) {
-                        return false;
-                    }
+            if (Game.cpu.bucket >= 9000) {
+                rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage), (r) => r.storage.store[RESOURCE_ENERGY]);
+                if (rooms.length > 1) {
+                    _.forEach(rooms, (room, index) => {
+                        var otherRoom = rooms[rooms.length - index - 1];
+                        
+                        if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] > 500000 || otherRoom.storage.store[RESOURCE_ENERGY] < 500000) {
+                            return false;
+                        }
 
-                    Cache.haulers[otherRoom.name] = room.name;
-                });
+                        Cache.haulers[otherRoom.name] = room.name;
+                    });
+                }
             }
 
             // Loop through each room to determine the required tasks for the room, and then serialize the room.

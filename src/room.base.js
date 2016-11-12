@@ -191,7 +191,7 @@ Base.prototype.run = function(room) {
     }
 
     // Check to see if we can do a deal in the terminal.
-    if (room.terminal) {
+    if (room.terminal && Game.cpu.bucket >= 9000) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
         }

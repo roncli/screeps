@@ -100,7 +100,20 @@ var Cache = require("cache"),
 
                         if (!Game.rooms[roomName]) {
                             restartOn.push(roomName);
-                            return;
+                            if (["E36N10", "E37N10", "E38N10", "E39N10"].indexOf(roomName) !== -1) {
+                                if (Memory.tempMatrix) {
+                                    return PathFinder.CostMatrix.deserialize(Memory.tempMatrix);
+                                } else {
+                                    matrix = new PathFinder.CostMatrix();
+                                    for (var i = 0; i < 50; i++) {
+                                        matrix.set(i, 11, 255);
+                                    }
+                                    Memory.tempMatrix = matrix.serialize();
+                                    return matrix;
+                                }
+                            } else {
+                                return;
+                            }
                         }
 
                         matrix = Cache.getCostMatrix(Game.rooms[roomName]);

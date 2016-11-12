@@ -184,7 +184,7 @@ Base.prototype.run = function(room) {
                 return;
             }
 
-            if (!link.cooldown && link.energy > 0 && link.energy * 0.97 < links[0].energyCapacity - links[0].energy) {
+            if (!link.cooldown && link.energy > 0 && links[0].energy <= 300) {
                 link.transferEnergy(links[0]);
             }
         });

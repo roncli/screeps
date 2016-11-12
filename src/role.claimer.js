@@ -136,7 +136,7 @@ var Cache = require("cache"),
                                     case "remoteWorker":
                                         creep.memory.role = "worker";
                                         creep.memory.home = room.name;
-                                        creep.memory.homeSource = Utilities.objectsClosestToObj(_.filter(Cache.energySourcesInRoom(room), (s) => s.energy > 0), creep)[0].id;
+                                        creep.memory.homeSource = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), creep)[0].id;
                                         break;
                                     case "remoteReserver":
                                         creep.suicide();

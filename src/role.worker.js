@@ -41,11 +41,6 @@ var Cache = require("cache"),
                 max = 2;
             }
 
-            // If there is more than 500 energy on the ground in the room, spawn a worker anyway.
-            if (count < max || _.sum(_.map(_.filter(Cache.resourcesInRoom(room), (r) => r.resourceType === RESOURCE_ENERGY), (r) => r.amount)) > 500) {
-                Worker.spawn(room);
-            }
-
             // Output worker count in the report.
             console.log("    Workers: " + Cache.creepsInRoom("worker", room).length + "/" + max);        
         },

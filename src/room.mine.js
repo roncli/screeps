@@ -53,7 +53,7 @@ Mine.prototype.run = function(room) {
         Commands.claimRoom(supportRoom.name, room.name, false);
         switch (oldRoomType) {
             case "mine":
-                _.forEach(Cache.creepsInRoom(room), (creep) => {
+                _.forEach(Cache.creepsInRoom("all", room), (creep) => {
                     switch (creep.memory.role) {
                         case "remoteBuilder":
                         case "remoteWorker":

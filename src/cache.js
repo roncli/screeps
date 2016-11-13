@@ -199,6 +199,10 @@ var Cache = {
                     costMatricies[room.name].set(structure.pos.x, structure.pos.y, 255);
                 }
             });
+
+            _.forEach(room.find(FIND_CONSTRUCTION_SITES), (structure) => {
+                costMatricies[room.name].set(structure.pos.x, structure.pos.y, 5);
+            });
         }
         
         return costMatricies[room.name];

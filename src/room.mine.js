@@ -74,6 +74,7 @@ Mine.prototype.run = function(room) {
                     }
                 });
         }
+        return;
     }
 
     if (this.stage === 1) {

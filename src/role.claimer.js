@@ -64,11 +64,9 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === room.name ? 0 : 1)[0];
+            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
             name = spawnToUse.createCreep(body, undefined, {role: "claimer", home: room.name, claim: toRoom});
-            if (spawnToUse.room.name === room.name) {
-                Cache.spawning[spawnToUse.id] = true;
-            }
+            Cache.spawning[spawnToUse.id] = true;
 
             // If successful, log it.
             if (typeof name !== "number") {

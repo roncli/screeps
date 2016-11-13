@@ -1,12 +1,6 @@
 var Cache = require("cache"),
 
     Utilities = {
-        creepsWithTask: (creeps, task) => {
-            "use strict";
-
-            return _.filter(creeps, (c) => c.memory.currentTask && _.isMatch(c.memory.currentTask, task));
-        },
-
         creepsWithNoTask: (creeps) => {
             "use strict";
 

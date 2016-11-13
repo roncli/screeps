@@ -10,11 +10,6 @@ var Cache = require("cache"),
 
             var num = 0, max = 0;
             
-            // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-                return false;
-            }
-
             // Loop through the room claimers to see if we need to spawn a creep.
             if (Memory.maxCreeps.claimer) {
                 _.forEach(Memory.maxCreeps.claimer[room.name], (value, toRoom) => {
@@ -42,7 +37,7 @@ var Cache = require("cache"),
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 

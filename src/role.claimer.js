@@ -10,9 +10,9 @@ var Cache = require("cache"),
 
             var num = 0, max = 0;
             
-            // If there are no spawns in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0) {
-                return;
+            // Fail if all the spawns are busy.
+            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+                return false;
             }
 
             // Loop through the room claimers to see if we need to spawn a creep.

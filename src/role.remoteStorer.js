@@ -125,7 +125,7 @@ var Cache = require("cache"),
 
             // Check for unfilled storage.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => ["fillEnergy", "fillMinerals"].indexOf(c.type) && c.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
@@ -148,7 +148,7 @@ var Cache = require("cache"),
 
             // Check for unfilled containers.
             _.forEach(tasks.fillEnergy.fillContainerTasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => ["fillEnergy", "fillMinerals"].indexOf(c.type) && c.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {

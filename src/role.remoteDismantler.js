@@ -143,7 +143,7 @@ var Cache = require("cache"),
             // Check critical repairs.
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
-                    if (_.filter(Game.creeps, (c) => c.type === "repair" && c.id === task.id).length === 0) {
+                    if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
                             assigned.push(creep.name);
@@ -197,7 +197,7 @@ var Cache = require("cache"),
 
             // Check for unfilled containers.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks, tasks.fillEnergy.fillContainerTasks]), (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => ["fillEnergy", "fillMinerals"].indexOf(c.type) && c.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {

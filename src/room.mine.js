@@ -1,5 +1,6 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
+    Commands = require("commands"),
     Utilities = require("utilities"),
     RoleDismantler = require("role.dismantler"),
     RoleRemoteBuilder = require("role.remoteBuilder"),

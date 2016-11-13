@@ -67,6 +67,7 @@ Mine.prototype.run = function(room) {
                         case "remoteStorer":
                             creep.memory.role = "storer";
                             creep.memory.home = creep.memory.supportRoom;
+                            break;
                         case "dismantler":
                             creep.memory.home = room.name;
                             creep.memory.supportRoom = room.name;

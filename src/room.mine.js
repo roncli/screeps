@@ -45,6 +45,36 @@ Mine.prototype.run = function(room) {
         return;
     }
 
+    // If the controller is ours, convert this to a base.
+    if (room.controller.my) {
+        oldRoomType = Memory.rooms[room.name].type;
+        Commands.setRoomType(room.name, {type: "base"});
+        Commands.claimRoom(supportRoom.name, room.name, false);
+        switch (oldRoomType) {
+            case "mine":
+                _.forEach(Cache.creepsInRoom(room.name), (creep) => {
+                    switch (creep.memory.role) {
+                        case "remoteBuilder":
+                        case "remoteWorker":
+                            creep.memory.role = "worker";
+                            creep.memory.home = room.name;
+                            creep.memory.homeSource = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), creep)[0].id;
+                            break;
+                        case "remoteReserver":
+                            creep.suicide();
+                            break;
+                        case "remoteStorer":
+                            creep.memory.role = "storer";
+                            creep.memory.home = creep.memory.supportRoom;
+                        case "dismantler":
+                            creep.memory.home = room.name;
+                            creep.memory.supportRoom = room.name;
+                            break;
+                    }
+                });
+        }
+    }
+
     if (this.stage === 1) {
         // Spawn new creeps.
         RoleRemoteBuilder.checkSpawn(room);

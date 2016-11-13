@@ -117,33 +117,7 @@ var Cache = require("cache"),
             _.forEach(creepsWithNoTask, (creep) => {
                 var oldRoomType; 
                 if (creep.room.name === creep.memory.claim && creep.room.controller.my) {
-                    oldRoomType = Memory.rooms[creep.room.name].type;
-                    Commands.setRoomType(creep.room.name, {type: "base"});
-                    Commands.claimRoom(creep.memory.home, room.name, false);
                     creep.suicide();
-                    switch (oldRoomType) {
-                        case "mine":
-                            _.forEach(Cache.creepsInRoom(room.name), (creep) => {
-                                switch (creep.memory.role) {
-                                    case "remoteBuilder":
-                                    case "remoteWorker":
-                                        creep.memory.role = "worker";
-                                        creep.memory.home = room.name;
-                                        creep.memory.homeSource = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), creep)[0].id;
-                                        break;
-                                    case "remoteReserver":
-                                        creep.suicide();
-                                        break;
-                                    case "remoteStorer":
-                                        creep.memory.role = "storer";
-                                        creep.memory.home = creep.memory.supportRoom;
-                                    case "dismantler":
-                                        creep.memory.home = room.name;
-                                        creep.memory.supportRoom = room.name;
-                                        break;
-                                }
-                            });
-                    }
                 }
             });
         }

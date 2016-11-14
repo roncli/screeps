@@ -219,6 +219,9 @@ var profiler = require("screeps-profiler"),
                         supportRoom: room.memory ? room.memory.supportRoom : undefined,
                         unobservable: true
                     }
+
+                    Cache.log.rooms[room.name].store = {};
+                    Cache.log.rooms[room.name].source = [];
                 } else {
                     Cache.log.rooms[room.name] = {
                         type: type,

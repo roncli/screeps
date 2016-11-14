@@ -39,6 +39,9 @@ var profiler = require("screeps-profiler"),
                 main.log();
                 main.rooms();
                 main.creeps();
+
+                Cache.log.cpuUsed = Game.cpu.getUsed();
+                console.log(JSON.stringify(Cache.log));
             });
         },
 
@@ -119,7 +122,6 @@ var profiler = require("screeps-profiler"),
             Cache.log.gcl = Game.gcl.level;
             Cache.log.progress = Game.gcl.progress;
             Cache.log.progressTotal = Game.gcl.progressTotal;
-            Cache.log.cpuUsed = Game.cpu.getUsed();
             Cache.log.limit = Game.cpu.limit;
             Cache.log.tickLimit = Game.cpu.tickLimit;
             Cache.log.bucket = Game.cpu.bucket;
@@ -410,8 +412,6 @@ var profiler = require("screeps-profiler"),
                     }
                 }
             });
-
-            console.log(JSON.stringify(Cache.log));
         }
     };
 

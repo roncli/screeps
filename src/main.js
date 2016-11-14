@@ -212,13 +212,13 @@ var profiler = require("screeps-profiler"),
                 if (room.unobservable) {
                     Cache.log.rooms[room.name] = {
                         type: type,
-                        supportRoom: room.memory.supportRoom,
+                        supportRoom: room.memory ? room.memory.supportRoom : undefined,
                         unobservable: true
                     }
                 } else {
                     Cache.log.rooms[room.name] = {
                         type: type,
-                        supportRoom: room.memory.supportRoom,
+                        supportRoom: room.memory? room.memory.supportRoom : undefined,
                         unobservable: false,
                         controller: !!room.controller
                     }
@@ -233,7 +233,7 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[room.name].ttd = room.controller.ticksToDowngrade
                     }
 
-                    if (room.controller.reservation) {
+                    if (room.controller && room.controller.reservation) {
                         Cache.log.rooms[room.name].reservedUsername = room.controller.reservation.username;
                         Cache.log.rooms[room.name].tte = room.controller.reservation.ticksToEnd;
                     }

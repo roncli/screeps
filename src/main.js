@@ -281,7 +281,7 @@ var profiler = require("screeps-profiler"),
                             sourceId: s.id,
                             resource: RESOURCE_ENERGY,
                             amount: s.energy,
-                            capacity: s.capacity,
+                            capacity: s.energyCapacity,
                             ttr: s.ticksToRegeneration
                         });
                     });

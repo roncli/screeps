@@ -81,6 +81,7 @@ Mine.prototype.run = function(room) {
     if (this.stage === 1) {
         // Spawn new creeps.
         RoleRemoteBuilder.checkSpawn(room);
+        RoleRemoteReserver.checkSpawn(room);
 
         // Get tasks.
         if (!room.unobservable) {
@@ -93,6 +94,7 @@ Mine.prototype.run = function(room) {
 
         // Assign tasks to creeps.                    
         RoleRemoteBuilder.assignTasks(room);
+        RoleRemoteReserver.assignTasks(room);
 
         if (!room.unobservable) {
             // Check to see if we have built containers.  If so, move to stage 2.

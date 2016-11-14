@@ -57,6 +57,7 @@ var Cache = {
             hostiles: [],
             creeps: [],
             spawns: [],
+            structures: [],
             rooms: {}
         }
     },

@@ -294,7 +294,7 @@ var profiler = require("screeps-profiler"),
                     });
 
                     _.forEach(Cache.hostilesInRoom(room), (h) => {
-                        Cache.hostiles.push({
+                        Cache.log.hostiles.push({
                             creepId: h.id,
                             ownerUsername: h.owner.username,
                             room: room.name,

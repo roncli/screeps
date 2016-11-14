@@ -153,7 +153,9 @@ var profiler = require("screeps-profiler"),
                     room: s.room.name,
                     spawningName: s.spawning ? s.spawning.name : undefined,
                     spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
-                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
+                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined,
+                    spawningRole: s.spawning ? Game.creeps[s.spawning.name].memory.role : undefined,
+                    spawningHome: s.spawning ? Game.creeps[s.spawning.name].memory.home : undefined,
                 });
             });
         },

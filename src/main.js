@@ -178,12 +178,12 @@ var profiler = require("screeps-profiler"),
             // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
             unobservableRooms = [];
             _.forEach(Memory.rooms, (roomMemory, name) => {
-                if (name === "undefined") {
+                if (!roomMemory.roomType) {
                     return;
                 }
-                if (roomMemory && roomMemory.roomType) {
-                    roomDeserialization(roomMemory, name);
-                }
+
+                roomDeserialization(roomMemory, name);
+
                 if (!Game.rooms[name]) {
                     unobservableRooms.push({
                         name: name,

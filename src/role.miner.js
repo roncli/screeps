@@ -34,7 +34,11 @@ var Cache = require("cache"),
 
             // Output miner count in the report.
             if (max > 0) {
-                console.log("    Miners: " + Cache.creepsInRoom("miner", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "miner",
+                    count: Cache.creepsInRoom("miner", room).length,
+                    max: max
+                });
             }        
         },
         
@@ -106,13 +110,7 @@ var Cache = require("cache"),
             name = spawnToUse.createCreep(body, undefined, {role: "miner", home: room.name, container: id});
             Cache.spawning[spawnToUse.id] = true;
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new miner " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

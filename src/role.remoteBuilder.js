@@ -23,7 +23,11 @@ var Cache = require("cache"),
             }
 
             // Output remote builder count in the report.
-            console.log("    Remote Builders: " + num + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "remoteBuilder",
+                    count: num,
+                    max: max
+                });
         },
         
         spawn: (room, supportRoom) => {
@@ -77,13 +81,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new remote builder " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room) => {

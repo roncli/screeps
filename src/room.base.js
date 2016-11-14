@@ -170,13 +170,6 @@ Base.prototype.run = function(room) {
     }
 
     if (Cache.spawnsInRoom(room).length > 0) {
-        // Report any spawns.
-        _.forEach(Cache.spawnsInRoom(room), (spawn) => {
-            if (spawn.spawning) {
-                console.log("    Spawning " + Game.creeps[spawn.spawning.name].memory.role + " " + spawn.spawning.name + ", Ticks Remaining: " + spawn.spawning.remainingTime);
-            }
-        });
-
         // Transfer energy from far links to near link.
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         _.forEach(links, (link, index) => {
@@ -245,7 +238,7 @@ Base.prototype.run = function(room) {
 
             _.forEach(_.sortBy(flips, (f) => f.sell.price - f.buy.price), (flip, index) => {
                 if (index === 0) {
-                    console.log("    Biggest flip: " + flip.resource + " x" + Math.min(flip.buy.amount, flip.sell.amount) + " " + flip.sell.price.toFixed(2) + " to " + flip.buy.price.toFixed(2));
+                    Cache.log.events.push("Biggest flip: " + flip.resource + " x" + Math.min(flip.buy.amount, flip.sell.amount) + " " + flip.sell.price.toFixed(2) + " to " + flip.buy.price.toFixed(2));
                 }
 
                 // Determine how much energy we need for the deal.
@@ -276,15 +269,15 @@ Base.prototype.run = function(room) {
                     transCost = Game.market.calcTransactionCost(bestOrder.amount, room.name, bestOrder.roomName);
                     if (terminalEnergy > transCost + room.terminal.store[RESOURCE_ENERGY]) {
                         // Game.market.deal(bestOrder.id, bestOrder.amount, room.name);
-                        console.log("Would be selling", bestOrder.amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", transCost)
+                        Cache.log.events.push("Would be selling", bestOrder.amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", transCost)
                     } else {
                         // terminalTask = new TaskFillEnergy(room.terminal.id);
-                        console.log("Would be filling terminal with energy.")
+                        Cache.log.events.push("Would be filling terminal with energy.")
                         if (terminalEnergy > 0) {
                             amount = Math.floor(bestOrder.amount * (terminalEnergy / (bestOrder.amount + transCost)));
                             if (amount > 0) {
                                 // Game.market.deal(bestOrder.id, amount, room.name);
-                                console.log("Would be selling", amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", Game.market.calcTransactionCost(amount, room.name, bestOrder.roomName))
+                                Cache.log.events.push("Would be selling", amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", Game.market.calcTransactionCost(amount, room.name, bestOrder.roomName))
                             }
                         }
                     }
@@ -349,44 +342,6 @@ Base.prototype.run = function(room) {
             criticalTasks: TaskUpgradeController.getCriticalTasks(room)
         }
     };
-
-    // Output room report.
-    if (tasks.fillEnergy.fillExtensionTasks.length > 0) {
-        console.log("    Extensions to fill: " + tasks.fillEnergy.fillExtensionTasks.length);
-    }
-    if (tasks.fillEnergy.fillSpawnTasks.length > 0) {
-        console.log("    Spawns to fill: " + tasks.fillEnergy.fillSpawnTasks.length);
-    }
-    if (tasks.fillEnergy.fillTowerTasks.length > 0) {
-        console.log("    Towers to fill: " + tasks.fillEnergy.fillTowerTasks.length);
-    }
-    if (tasks.build.tasks.length > 0) {
-        console.log("    Structures to build: " + tasks.build.tasks.length);
-    }
-    if (tasks.repair.criticalTasks.length > 0) {
-        console.log("    Critical repairs needed: " + tasks.repair.criticalTasks.length);
-        _.forEach(_.take(tasks.repair.criticalTasks, 5), (task) => {
-            console.log("      " + task.structure.structureType + " " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
-        });
-    }
-    if (tasks.repair.tasks.length > 0) {
-        console.log("    Repairs needed: " + tasks.repair.tasks.length);
-        _.forEach(_.take(tasks.repair.tasks, 5), (task) => {
-            console.log("      " + task.structure.structureType + " " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
-        });
-    }
-    if (tasks.rangedAttack.tasks.length > 0) {
-        console.log("    Hostiles: " + tasks.rangedAttack.tasks.length);
-        _.forEach(_.take(tasks.rangedAttack.tasks, 5), (task) => {
-            console.log("      " + task.enemy.pos.x + "," + task.enemy.pos.y + " " + task.enemy.hits + "/" + task.enemy.hitsMax + " " + (100 * task.enemy.hits / task.enemy.hitsMax).toFixed(3) + "% " + (task.enemy.owner ? task.enemy.owner.username : ""));
-        });
-    }
-    if (tasks.heal.tasks.length > 0) {
-        console.log("    Creeps to heal: " + tasks.heal.tasks.length);
-        _.forEach(_.take(tasks.heal.tasks, 5), (task) => {
-            console.log("      " + task.ally.pos.x + "," + task.ally.pos.y + " " + task.ally.hits + "/" + task.ally.hitsMax + " " + (100 * task.ally.hits / task.ally.hitsMax).toFixed(3) + "%");
-        });
-    }
 
     // Assign tasks to creeps.                    
     RoleWorker.assignTasks(room, tasks);

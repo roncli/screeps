@@ -49,7 +49,11 @@ var Cache = require("cache"),
 
             // Output miner count in the report.
             if (max > 0) {
-                console.log("    Remote Miners: " + Cache.creepsInRoom("remoteMiner", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "remoteMiner",
+                    count: Cache.creepsInRoom("remoteMiner", room).length,
+                    max: max
+                });
             }        
         },
         
@@ -123,13 +127,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new remote miner " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

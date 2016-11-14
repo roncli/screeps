@@ -41,7 +41,11 @@ var Cache = require("cache"),
             }
 
             // Output worker count in the report.
-            console.log("    Workers: " + Cache.creepsInRoom("worker", room).length + "/" + max);        
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "worker",
+                    count: Cache.creepsInRoom("worker", room).length,
+                    max: max
+                });
         },
         
         spawn: (room) => {
@@ -95,13 +99,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new worker " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

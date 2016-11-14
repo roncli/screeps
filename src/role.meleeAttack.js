@@ -31,7 +31,11 @@ var Cache = require("cache"),
 
             // Output melee attacker count in the report.
             if (max > 0) {
-                console.log("    Melee Attackers: " + num + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "meleeAttack",
+                    count: num,
+                    max: max
+                });
             }        
         },
         
@@ -106,13 +110,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new melee attacker " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

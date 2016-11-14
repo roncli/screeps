@@ -100,19 +100,6 @@ Cleanup.prototype.run = function(room) {
         RoleRemoteCollector.checkSpawn(room, supportRoom);
     }
 
-    // Output room report.
-    if (!room.unobservable) {
-        if (ramparts.length !== 0) {
-            console.log("    Ramparts: " + ramparts.length);
-        }
-        if (structures.length !== 0) {
-            console.log("    Structures: " + structures.length);
-        }
-        if (energyStructures.length !== 0) {
-            console.log("    Structures with energy: " + energyStructures.length);
-        }
-    }
-
     // Assign tasks to creeps.                    
     RoleRemoteDismantler.assignTasks(room, tasks);
     RoleRemoteCollector.assignTasks(room, tasks);

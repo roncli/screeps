@@ -31,7 +31,11 @@ var Cache = require("cache"),
 
             // Output ranged attacker count in the report.
             if (max > 0) {
-                console.log("    Ranged Attackers: " + num + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "rangedAttack",
+                    count: num,
+                    max: max
+                });
             }        
         },
         
@@ -104,13 +108,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new ranged attacker " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

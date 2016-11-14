@@ -40,7 +40,11 @@ var Cache = require("cache"),
 
             // Output remote worker count in the report.
             if (max > 0) {
-                console.log("    Remote Workers: " + Cache.creepsInRoom("remoteWorker", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "remoteWorker",
+                    count: Cache.creepsInRoom("remoteWorker", room).length,
+                    max: max
+                });
             }        
         },
         
@@ -95,13 +99,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new remote worker " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

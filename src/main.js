@@ -36,10 +36,9 @@ var profiler = require("screeps-profiler"),
 
             profiler.wrap(() => {
                 main.init();
+                main.log();
                 main.rooms();
                 main.creeps();
-
-                console.log("  CPU: " + Game.cpu.getUsed().toFixed(2) + "/" + Game.cpu.limit + " Bucket: " + Game.cpu.bucket + " Tick: " + Game.time);
             });
         },
 
@@ -89,11 +88,6 @@ var profiler = require("screeps-profiler"),
                 Memory.containerSource = {};
             }
 
-            // Log date, GCL, and credits.
-            console.log(new Date());
-            console.log("GCL " + Game.gcl.level + " " + Game.gcl.progress.toFixed(0) + "/" + Game.gcl.progressTotal.toFixed(0) + " " + (100 * Game.gcl.progress / Game.gcl.progressTotal).toFixed(3) + "% " + (Game.gcl.progressTotal - Game.gcl.progress).toFixed(0) + " to go");
-            console.log("Credits: " + Game.market.credits.toFixed(2));
-
             // Clear old memory.
             _.forEach(Memory.creeps, (creep, name) => {
                 if (!Game.creeps[name]) {
@@ -114,6 +108,51 @@ var profiler = require("screeps-profiler"),
                 if (!Cache.getObjectById(id)) {
                     delete Memory.lengthToLink[id];
                 }
+            });
+        },
+
+        log: () => {
+            "use strict";
+
+            Cache.log.tick = Game.time;
+            Cache.log.date = new Date();
+            Cache.log.gcl = Game.gcl.level;
+            Cache.log.progress = Game.gcl.progress;
+            Cache.log.progressTotal = Game.gcl.progressTotal;
+            Cache.log.cpuUsed = Game.cpu.getUsed();
+            Cache.log.limit = Game.cpu.limit;
+            Cache.log.tickLimit = Game.cpu.tickLimit;
+            Cache.log.bucket = Game.cpu.bucket;
+            Cache.log.credits = Game.market.credits;
+
+            _.forEach(Game.creeps, (c) => {
+                Cache.log.creeps.push({
+                    creepId: c.id,
+                    name: c.name,
+                    creepType: c.memory.role,
+                    home: c.memory.home,
+                    army: c.memory.army,
+                    room: c.pos.roomName,
+                    x: c.pos.x,
+                    y: c.pos.y,
+                    spawning: c.spawning,
+                    ttl: c.ticksToLive,
+                    carryCapacity: c.carryCapacity,
+                    carryJSON: JSON.stringify(c.carry),
+                    hits: c.hits,
+                    hitsMax: c.hitsMax
+                });
+            });
+
+            _.forEach(Game.spawns, (s) => {
+                Cache.log.spawns.push({
+                    spawnId: s.id,
+                    name: s.name,
+                    room: s.room.name,
+                    spawningName: s.spawning ? s.spawning.name : undefined,
+                    spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
+                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
+                });
             });
         },
 
@@ -169,47 +208,104 @@ var profiler = require("screeps-profiler"),
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
                 var type = Memory.rooms[room.name] && Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type ? Memory.rooms[room.name].roomType.type : "unknown";
 
+                // Log room data.
                 if (room.unobservable) {
-                    // Log room status.
-                    console.log("  " + type + " " + room.name + " Unobservable");
+                    Cache.log.rooms[room.name] = {
+                        type: type,
+                        supportRoom: room.memory.supportRoom,
+                        unobservable: true
+                    }
                 } else {
-                    // Log room status.
-                    if (room.controller) {
-                        if (room.controller.my) {
-                            if (room.controller.level === 8) {
-                                console.log("  " + type + " " + room.name + " RCL " + room.controller.level);
-                            } else {
-                                console.log("  " + type + " " + room.name + " RCL " + room.controller.level + " " + room.controller.progress + "/" + room.controller.progressTotal + " " + (100 * room.controller.progress / room.controller.progressTotal).toFixed(3) + "% " + (room.controller.progressTotal - room.controller.progress) + " to go");
-                            }
-                        } else if (room.controller.level === 0) {
-                            if (room.controller.reservation) {
-                                console.log("  " + type + " " + room.name + " Controller reserved " + room.controller.reservation.username + " TTE " + room.controller.reservation.ticksToEnd);
-                            } else {
-                                console.log("  " + type + " " + room.name + " Controller unowned");
-                            }
-                        } else {
-                            console.log("  " + type + " " + room.name + " RCL " + room.controller.level + " owned by " + room.controller.owner.username);
+                    Cache.log.rooms[room.name] = {
+                        type: type,
+                        supportRoom: room.memory.supportRoom,
+                        unobservable: false,
+                        controller: !!room.controller
+                    }
+
+                    if (Cache.log.rooms[room.name].controller) {
+                        Cache.log.rooms[room.name].rcl = room.controller.level;
+                        if (room.controller.owner) {
+                            Cache.log.rooms[room.name].ownerUsername = room.controller.owner.username;
                         }
-                    } else {
-                        console.log("  " + type + " " + room.name);
+                        Cache.log.rooms[room.name].progress = room.controller.progress;
+                        Cache.log.rooms[room.name].progressTotal = room.controller.progressTotal;
+                        Cache.log.rooms[room.name].ttd = room.controller.ticksToDowngrade
+                    }
+
+                    if (room.controller.reservation) {
+                        Cache.log.rooms[room.name].reservedUsername = room.controller.reservation.username;
+                        Cache.log.rooms[room.name].tte = room.controller.reservation.ticksToEnd;
+                    }
+
+                    _.forEach(_.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) === -1), (s) => s.hits), (s) => {
+                        Cache.log.structures.push({
+                            structureId: s.id,
+                            room: room.name,
+                            x: s.pos.x,
+                            y: s.pos.y,
+                            structureType: s.structureType,
+                            hits: s.hits,
+                            hitsMax: s.hitsMax
+                        });
+                    });
+
+                    if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
+                        Cache.log.rooms[room.name].energyAvailable = room.energyAvailable;
+                        Cache.log.rooms[room.name].energyCapacityAvailable = room.energyCapacityAvailable;
+                    }
+
+                    Cache.log.rooms[room.name].constructionProgress = _.sum(_.map(Cache.constructionSitesInRoom(room), (c) => c.progress));
+                    Cache.log.rooms[room.name].constructionProgressTotal = _.sum(_.map(Cache.constructionSitesInRoom(room), (c) => c.progressTotal));
+
+                    Cache.log.rooms[room.name].towerEnergy = _.sum(_.map(Cache.towersInRoom(room), (t) => t.energy));
+                    Cache.log.rooms[room.name].towerEnergyCapacity = _.sum(_.map(Cache.towersInRoom(room), (t) => t.energyCapacity));
+
+                    Cache.log.rooms[room.name].store = {};
+                    Cache.log.rooms[room.name].source = [];
+
+                    if (room.storage) {
+                        Cache.log.rooms[room.name].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});
+                    }
+
+                    if (room.terminal) {
+                        Cache.log.rooms[room.name].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
                     }
 
                     _.forEach(Cache.energySourcesInRoom(room), (s) => {
-                        console.log("    Source " + s.id + ": " + s.energy + "/" + s.energyCapacity + " TTR " + s.ticksToRegeneration);
+                        Cache.log.rooms[room.name].source.push({
+                            sourceId: s.id,
+                            resource: RESOURCE_ENERGY,
+                            amount: s.energy,
+                            capacity: s.capacity,
+                            ttr: s.ticksToRegeneration
+                        });
                     });
 
                     _.forEach(Cache.mineralsInRoom(room), (m) => {
-                        console.log("    Mineral " + m.mineralType + " " + m.id + ": " + m.mineralAmount.toFixed(0) + " TTR " + m.ticksToRegeneration);
+                        Cache.log.rooms[room.name].source.push({
+                            sourceId: m.id,
+                            resource: m.mineralType,
+                            amount: m.mineralAmount,
+                            ttr: m.ticksToRegeneration
+                        });
                     });
 
-                    if (room.storage && _.sum(room.storage.store) > 0) {
-                        console.log("    Storage: " + _.map(room.storage.store, (s, i) => {return s + " " + i;}).join(", "));
-                    }
-
-                    if (room.terminal && _.sum(room.terminal.store) > 0) {
-                        console.log("    Terminal: " + _.map(room.terminal.store, (s, i) => {return s + " " + i;}).join(", "));
-                    }
+                    _.forEach(Cache.hostilesInRoom(room), (h) => {
+                        Cache.hostiles.push({
+                            creepId: h.id,
+                            ownerUsername: h.owner.username,
+                            room: room.name,
+                            x: h.pos.x,
+                            y: h.pos.y,
+                            ttl: h.ticksToLive,
+                            hits: h.hits,
+                            hitsMax: h.hitsMax
+                        });
+                    });
                 }
+
+                Cache.log.rooms[room.name].creeps = [];
 
                 if (Cache.roomTypes[room.name]) {
                     Cache.roomTypes[room.name].run(room);
@@ -239,7 +335,6 @@ var profiler = require("screeps-profiler"),
                             break;
                         case 1:
                             creep.say(":(", true);
-                            console.log("  RIP & Pepperonis, " + creep.name + " :(");
                             break;
                         default:
                             creep.say("TTL " + (creep.ticksToLive - 1).toString());
@@ -311,12 +406,12 @@ var profiler = require("screeps-profiler"),
                     // RIP & Pepperonis :(
                     delete creep.memory.currentTask;
                     if (!creep.spawning && creep.ticksToLive < 150) {
-                        console.log("  RIP & Pepperonis, " + creep.name + " :(");
-                        creep.say("R.I.P. :(", true);
                         creep.suicide();
                     }
                 }
             });
+
+            console.log(JSON.stringify(Cache.log));
         }
     };
 

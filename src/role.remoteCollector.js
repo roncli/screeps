@@ -24,7 +24,11 @@ var Cache = require("cache"),
             }
 
             if (max > 0) {
-                console.log("    Remote Collectors: " + Cache.creepsInRoom("remoteCollector", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "remoteCollector",
+                    count: Cache.creepsInRoom("remoteCollector", room).length,
+                    max: max
+                });
             }
         },
         
@@ -51,13 +55,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new remote collector " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

@@ -42,7 +42,11 @@ var Cache = require("cache"),
 
             // Output remote reserver count in the report.
             if (count > 0 || max > 0) {
-                console.log("    Remote Reservers: " + Cache.creepsInRoom("remoteReserver", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "remoteReserver",
+                    count: Cache.creepsInRoom("remoteReserver", room).length,
+                    max: max
+                });
             }        
         },
         
@@ -81,13 +85,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new remote reserver " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

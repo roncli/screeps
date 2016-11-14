@@ -60,7 +60,11 @@ var Cache = require("cache"),
             });
 
             if (max > 0) {
-                console.log("    Remote Storers: " + Cache.creepsInRoom("remoteStorer", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "remoteStorer",
+                    count: Cache.creepsInRoom("remoteStorer", room).length,
+                    max: max
+                });
             }
         },
         
@@ -87,13 +91,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new remote storer " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

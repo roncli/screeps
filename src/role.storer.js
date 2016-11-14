@@ -45,7 +45,11 @@ var Cache = require("cache"),
 
             // Output storer count in the report.
             if (Math.ceil(2 * length / 30) > 0) {
-                console.log("    Storers: " + Cache.creepsInRoom("storer", room).length + "/" + Math.ceil(2 * length / 30));
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "storer",
+                    count: Cache.creepsInRoom("storer", room).length,
+                    max: Math.ceil(2 * length / 30)
+                });
             }        
         },
         
@@ -70,13 +74,7 @@ var Cache = require("cache"),
             name = spawnToUse.createCreep(body, undefined, {role: "storer", home: room.name});
             Cache.spawning[spawnToUse.id] = true;
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new storer " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

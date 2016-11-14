@@ -26,7 +26,11 @@ var Cache = require("cache"),
             }
 
             // Output upgrader count in the report.
-            console.log("    Upgraders: " + Cache.creepsInRoom("upgrader", room).length + "/" + max);        
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "upgrader",
+                    count: Cache.creepsInRoom("upgrader", room).length,
+                    max: max
+                });
         },
         
         spawn: (room) => {
@@ -80,13 +84,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new upgrader " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

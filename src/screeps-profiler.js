@@ -1,3 +1,5 @@
+var Cache = require("cache");
+
 let usedOnStart = 0;
 let enabled = false;
 let depth = 0;
@@ -124,8 +126,7 @@ function profileObjectFunctions(object, label) {
 function profileFunction(fn, functionName) {
   const fnName = functionName || fn.name;
   if (!fnName) {
-    console.log('Couldn\'t find a function name for - ', fn);
-    console.log('Will not profile this function.');
+    Cache.log.events.push('Couldn\'t find a function name, will not profile this function.');
     return fn;
   }
 
@@ -134,7 +135,7 @@ function profileFunction(fn, functionName) {
 
 const Profiler = {
   printProfile() {
-    console.log(Profiler.output());
+    Cache.log.events.push(Profiler.output());
   },
 
   emailProfile() {

@@ -62,7 +62,11 @@ var Cache = require("cache"),
 
             // Output collector count in the report.
             if (max > 0) {
-                console.log("    Collectors: " + Cache.creepsInRoom("collector", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "collector",
+                    count: Cache.creepsInRoom("collector", room).length,
+                    max: max
+                });
             }        
         },
         
@@ -117,13 +121,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new collector " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

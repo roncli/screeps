@@ -28,7 +28,11 @@ var Cache = require("cache"),
 
             // Output dismantler count in the report.
             if (max > 0) {
-                console.log("    Dismantlers: " + Cache.creepsInRoom("dismantler", room).length + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "dismantler",
+                    count: Cache.creepsInRoom("dismantler", room).length,
+                    max: max
+                });
             }        
         },
         
@@ -83,13 +87,7 @@ var Cache = require("cache"),
                 Cache.spawning[spawnToUse.id] = true;
             }
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new dismantler " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

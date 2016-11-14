@@ -26,7 +26,11 @@ var Cache = require("cache"),
 
             // Output claimer count in the report.
             if (max > 0) {
-                console.log("    Claimers: " + num + "/" + max);
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "claimer",
+                    count: num,
+                    max: max
+                });
             }        
         },
         
@@ -63,13 +67,7 @@ var Cache = require("cache"),
             name = spawnToUse.createCreep(body, undefined, {role: "claimer", home: room.name, claim: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 
-            // If successful, log it.
-            if (typeof name !== "number") {
-                console.log("    Spawning new claimer " + name);
-                return true;
-            }
-
-            return false;
+            return typeof name !== "number";
         },
 
         assignTasks: (room, tasks) => {

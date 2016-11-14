@@ -23,6 +23,7 @@ var Cache = {
     roomTypes: {},
     spawning: {},
     haulers: {},
+    log: {},
 
     // Reset the cache.
     reset: () => {
@@ -50,6 +51,14 @@ var Cache = {
         Cache.roomTypes = {};
         Cache.spawning = {};
         Cache.haulers = {};
+
+        Cache.log = {
+            events: [],
+            hostiles: [],
+            creeps: [],
+            spawns: [],
+            rooms: {}
+        }
     },
 
     // Returns all creeps of a certain type.

@@ -82,16 +82,13 @@ Mine.prototype.run = function(room) {
         // Spawn new creeps.
         RoleRemoteBuilder.checkSpawn(room);
 
-        // Output room report.
+        // Get tasks.
         if (!room.unobservable) {
             tasks = {
                 build: {
                     tasks: TaskBuild.getTasks(room)
                 }
             };
-            if (tasks.build.tasks.length > 0) {
-                console.log("    Structures to build: " + tasks.build.tasks.length);
-            }
         }
 
         // Assign tasks to creeps.                    
@@ -179,7 +176,7 @@ Mine.prototype.run = function(room) {
             }
         };
 
-        // Output room report.
+        // Get tasks.
         if (!room.unobservable) {
             tasks.build = {
                 tasks: TaskBuild.getTasks(room)
@@ -211,28 +208,6 @@ Mine.prototype.run = function(room) {
                 _.forEach(Cache.creepsInRoom("dismantler", room), (creep) => {
                     creep.memory.role = "remoteWorker";
                     creep.memory.container = Cache.containersInRoom(room)[0].id;
-                });
-            }
-
-            if (tasks.build.tasks.length > 0) {
-                console.log("    Structures to build: " + tasks.build.tasks.length);
-            }
-            if (tasks.repair.criticalTasks.length > 0) {
-                console.log("    Critical repairs needed: " + tasks.repair.criticalTasks.length);
-                _.forEach(_.take(tasks.repair.criticalTasks, 5), (task) => {
-                    console.log("      " + task.structure.structureType + " " + task.structure.pos.x + "," + task.structure.pos.y + " " + task.structure.hits + "/" + task.structure.hitsMax + " " + (100 * task.structure.hits / task.structure.hitsMax).toFixed(3) + "%");
-                });
-            }
-            if (Cache.hostilesInRoom(room).length > 0) {
-                console.log("    Hostiles: " + Cache.hostilesInRoom(room).length);
-                _.forEach(_.take(Cache.hostilesInRoom(room), 5), (enemy) => {
-                    console.log("      " + enemy.pos.x + "," + enemy.pos.y + " " + enemy.hits + "/" + enemy.hitsMax + " " + (100 * enemy.hits / enemy.hitsMax).toFixed(3) + "% " + (enemy.owner ? enemy.owner.username : ""));
-                });
-            }
-            if (tasks.heal.tasks.length > 0) {
-                console.log("    Creeps to heal: " + tasks.heal.tasks.length);
-                _.forEach(_.take(tasks.heal.tasks, 5), (task) => {
-                    console.log("      " + task.ally.pos.x + "," + task.ally.pos.y + " " + task.ally.hits + "/" + task.ally.hitsMax + " " + (100 * task.ally.hits / task.ally.hitsMax).toFixed(3) + "%");
                 });
             }
         }

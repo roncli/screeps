@@ -19,11 +19,6 @@ Ranged.prototype.canAssign = function(creep) {
         return false;
     }
 
-    // Temporary code to not attack Suppen's workers passing through.
-    if (creep.room.name === "E39N13" && this.enemy.owner && this.enemy.owner.username === "Suppen" && this.enemy.pos.getRangeTo(25, 25) > 15) {
-        return false;
-    }
-    
     Task.prototype.assign.call(this, creep);
     return true;
 }
@@ -109,11 +104,6 @@ Ranged.getTasks = function(room) {
 
 Ranged.getDefenderTask = function(creep) {
     "use strict";
-
-    // Do not attack in E38N13 for now.
-    if (creep.room === "E38N13") {
-        return [];
-    }
 
     return _.map(_.sortBy(Cache.hostilesInRoom(creep.room), (h) => h.hits), (h) => new Ranged(h.id))[0];
 }

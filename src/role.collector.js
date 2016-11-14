@@ -134,29 +134,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled storage.
-            _.forEach(tasks.fillEnergy.fillStorageTasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store[RESOURCE_ENERGY]) - _.reduce(_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Storage");
-                            assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Check for critical controllers to upgrade.
             _.forEach(tasks.upgradeController.criticalTasks, (task) => {
                 if (_.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "upgradeController" && c.memory.currentTask.room === task.room).length === 0) {

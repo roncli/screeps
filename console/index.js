@@ -27,6 +27,11 @@ var https = require("https"),
         for (let room in data.rooms) {
             let r = data.rooms[room];
 
+            if (!r) {
+                output += "Room - " + room + " undefined" + "\n";
+                break;
+            }
+
             output += "Room - " + r.type + " " + room;
             if (r.unobservable) {
                 output += " - unobservable";

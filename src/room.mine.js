@@ -47,7 +47,7 @@ Mine.prototype.run = function(room) {
     }
 
     // If the controller is ours, convert this to a base.
-    if (room.controller.my) {
+    if (room.controller && room.controller.my) {
         oldRoomType = Memory.rooms[room.name].roomType.type;
         Commands.setRoomType(room.name, {type: "base"});
         Commands.claimRoom(supportRoom.name, room.name, false);

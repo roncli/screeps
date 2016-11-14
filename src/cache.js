@@ -58,7 +58,8 @@ var Cache = {
             creeps: [],
             spawns: [],
             structures: [],
-            rooms: {}
+            rooms: {},
+            clearConsole: "<script>angular.element(document.getElementsByClassName('fa fa-trash ng-scope')[0].parentNode).scope().Console.clear()</script>"
         }
     },
 

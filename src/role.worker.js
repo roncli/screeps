@@ -112,6 +112,29 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for dropped resources in current room if there are no hostiles.
+            if (Cache.hostilesInRoom(room).length === 0) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                        if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                            return;
+                        }
+                        if (task.canAssign(creep)) {
+                            creep.say("Pickup");
+                            assigned.push(creep.name);
+                            return false;
+                        }
+                    });
+                });
+            }
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled containers.
             _.forEach(tasks.fillMinerals.fillStorageTasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
@@ -318,29 +341,6 @@ var Cache = require("cache"),
                 assigned = [];
             });
             
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for dropped resources in current room if there are no hostiles.
-            if (Cache.hostilesInRoom(room).length === 0) {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                        if (_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                            return;
-                        }
-                        if (task.canAssign(creep)) {
-                            creep.say("Pickup");
-                            assigned.push(creep.name);
-                            return false;
-                        }
-                    });
-                });
-            }
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
             if (creepsWithNoTask.length === 0) {
                 return;
             }

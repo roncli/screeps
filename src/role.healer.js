@@ -50,58 +50,19 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room, limited to 2400.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 2400);
+            // Get the total energy in the room, limited to 7500.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 7500);
 
-            // If we're not at 2400 and energy is not at capacity, bail.
-            if (energy < 2400 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            // If we're not at 7500 and energy is not at capacity, bail.
+            if (energy < 7500 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
                 return;
             }
 
-            // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 450); count++) {
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-            }
-
-            if (energy % 450 >= 200 && energy % 450 < 300) {
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-            }
-
-            for (count = 0; count < Math.floor(energy / 450); count++) {
-                body.push(MOVE);
-                body.push(MOVE);
+            for (count = 0; count < Math.floor(energy / 300); count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 450 >= 50) {
-                body.push(MOVE);
-            }
-
-            if ((energy % 450 >= 100 && energy % 450 < 300) || (energy % 450 >= 350)) {
-                body.push(MOVE);
-            }
-
-            if ((energy % 450 >= 150 && energy % 450 < 300) || (energy % 450 >= 400)) {
-                body.push(MOVE);
-            }
-
-            if (energy % 450 >= 250 && energy % 450 < 300) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < Math.floor(energy / 450); count++) {
-                body.push(HEAL);
-            }
-
-            if (energy % 450 >= 300) {
+            for (count = 0; count < Math.floor(energy / 300); count++) {
                 body.push(HEAL);
             }
 

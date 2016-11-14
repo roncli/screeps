@@ -50,54 +50,20 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room, limited to 1850.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 1850);
+            // Get the total energy in the room, limited to 5000.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 5000);
 
-            // If we're not at 1850 and energy is not at capacity, bail.
-            if (energy < 1850 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            // If we're not at 5000 and energy is not at capacity, bail.
+            if (energy < 5000 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
                 return;
             }
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 350); count++) {
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-            }
-
-            if (energy % 350 >= 150 && energy % 350 < 250) {
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-                body.push(TOUGH);
-            }
-
-            for (count = 0; count < Math.floor(energy / 350); count++) {
-                body.push(MOVE);
-                body.push(MOVE);
+            for (count = 0; count < Math.floor(energy / 200); count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 350 >= 50) {
-                body.push(MOVE);
-            }
-
-            if (energy % 350 >= 100) {
-                body.push(MOVE);
-            }
-
-            if ((energy % 350 >= 200 && energy % 350 < 250) || (energy % 350 >= 300)) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < Math.floor(energy / 350); count++) {
-                body.push(RANGED_ATTACK);
-            }
-
-            if (energy % 350 >= 250) {
+            for (count = 0; count < Math.floor(energy / 200); count++) {
                 body.push(RANGED_ATTACK);
             }
 

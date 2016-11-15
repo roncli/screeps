@@ -71,24 +71,20 @@ Cleanup.prototype.run = function(room) {
             // Notify that the room is cleaned up.
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
             
-            // Eliminate the room from memory.
-            Commands.setRoomType(room.name);
-        }
-
-        if (energyStructures.length === 0) {
             // No longer need remote collectors.
             _.forEach(Cache.creepsInRoom("remoteCollector", room), (creep) => {
                 creep.memory.role = "storer";
                 creep.memory.home = supportRoom.name;
             });
-        }
 
-        if (tasks.remoteDismantle.cleanupTasks.length === 0) {
             // No longer need dismantlers.
             _.forEach(Cache.creepsInRoom("remoteDismantler", room), (creep) => {
                 creep.memory.role = "upgrader";
                 creep.memory.home = supportRoom.name;
             });
+
+            // Eliminate the room from memory.
+            Commands.setRoomType(room.name);
         }
     }
 

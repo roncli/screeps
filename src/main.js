@@ -41,8 +41,9 @@ var profiler = require("screeps-profiler"),
                 main.creeps();
 
                 Cache.log.cpuUsed = Game.cpu.getUsed();
-                console.log(JSON.stringify(Cache.log));
             });
+
+            console.log(JSON.stringify(Cache.log));
         },
 
         init: () => {

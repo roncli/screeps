@@ -176,6 +176,22 @@ var Cache = require("cache"),
                     assigned = [];
                 }
             });
+
+            // As a last resort, get energy from containers.
+            _.forEach(tasks.collectEnergy.tasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
         }
     };
 

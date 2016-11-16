@@ -317,20 +317,22 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for controllers to upgrade.
-            _.forEach(tasks.upgradeController.tasks, (task) => {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Controller");
-                        assigned.push(creep.name);
-                    }
+            // Check for controllers to upgrade under RCL 8.
+            if (room.controller && room.controller.level < 8) {
+                _.forEach(tasks.upgradeController.tasks, (task) => {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Controller");
+                            assigned.push(creep.name);
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
                 });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-            
-            if (creepsWithNoTask.length === 0) {
-                return;
+                
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             }
 
             // Attempt to get energy from containers.

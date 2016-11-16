@@ -5,7 +5,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var length = 0;
+            var length = 0,
+                max;
             
             // If there are no spawns, containers, or storages in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0 || !room.storage) {
@@ -39,16 +40,17 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            if (Math.ceil(2 * length / 30) > _.filter(Cache.creepsInRoom("storer", room), (c) => c.spawning || c.ticksToLive >= 150).length) {
+            max = Math.ceil(2 * length / 30) + 1;
+            if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 Storer.spawn(room);
             }
 
             // Output storer count in the report.
-            if (Math.ceil(2 * length / 30) > 0) {
+            if (max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "storer",
                     count: Cache.creepsInRoom("storer", room).length,
-                    max: Math.ceil(2 * length / 30)
+                    max: max
                 });
             }        
         },

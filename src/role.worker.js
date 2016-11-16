@@ -17,35 +17,19 @@ var Cache = require("cache"),
             }
 
             // If we have less than max workers, spawn a worker.
-            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.spawning || c.ticksToLive >= 300).length;
-            if (room.storage) {
-                if (_.sum(room.storage.store) > 990000) {
-                    max = 7;
-                } else if (_.sum(room.storage.store) > 950000) {
-                    max = 6;
-                } else if (_.sum(room.storage.store) > 900000) {
-                    max = 5;
-                } else if (_.sum(room.storage.store) > 750000) {
-                    max = 4;
-                } else if (_.sum(room.storage.store) > 500000) {
-                    max = 3;
-                } else {
-                    max = 2;
-                }
-            } else {
-                max = 2;
-            }
+            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.spawning || c.ticksToLive >= room.storage ? 150 : 300).length;
+            max = room.storage ? 1 : 2;
 
             if (count < max) {
                 Worker.spawn(room);
             }
 
             // Output worker count in the report.
-                Cache.log.rooms[room.name].creeps.push({
-                    role: "worker",
-                    count: Cache.creepsInRoom("worker", room).length,
-                    max: max
-                });
+            Cache.log.rooms[room.name].creeps.push({
+                role: "worker",
+                count: Cache.creepsInRoom("worker", room).length,
+                max: max
+            });
         },
         
         spawn: (room) => {
@@ -59,11 +43,11 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room, limited to 2000.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 2000);
+            // Get the total energy in the room, limited to 3300.
+            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 3300);
 
-            // If we're not at 2000 and energy is not at capacity, bail.
-            if (energy < 2000 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            // If we're not at 3300 and energy is not at capacity, bail.
+            if (energy < 3300 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
                 return;
             }
 
@@ -177,44 +161,48 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled extensions.
-            _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
-                _.forEach(_.sortBy(tasks.fillEnergy.fillExtensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
-                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                    if (energyMissing > 0) {
-                        if (task.canAssign(creep)) {
-                            creep.say("Extension");
-                            assigned.push(creep.name);
-                            return false;
-                        }
-                    }
-                });
-            });
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for unfilled spawns.
-            _.forEach(tasks.fillEnergy.fillSpawnTasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Spawn");
-                            assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                            if (energyMissing <= 0) {
+            // Check for unfilled extensions if we don't have storage or storer creeps.
+            if (!room.storage || Cache.creepsInRoom("storer", room).length === 0) {
+                _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
+                    _.forEach(_.sortBy(tasks.fillEnergy.fillExtensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
+                        var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                        if (energyMissing > 0) {
+                            if (task.canAssign(creep)) {
+                                creep.say("Extension");
+                                assigned.push(creep.name);
                                 return false;
                             }
                         }
                     });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
                 }
-            });
+            }
+            
+            // Check for unfilled spawns if we don't have storage or storer creeps.
+            if (!room.storage || Cache.creepsInRoom("storer", room).length === 0) {
+                _.forEach(tasks.fillEnergy.fillSpawnTasks, (task) => {
+                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                    if (energyMissing > 0) {
+                        _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                            if (task.canAssign(creep)) {
+                                creep.say("Spawn");
+                                assigned.push(creep.name);
+                                energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                                if (energyMissing <= 0) {
+                                    return false;
+                                }
+                            }
+                        });
+                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                        assigned = [];
+                    }
+                });
+            }
 
             if (creepsWithNoTask.length === 0) {
                 return;

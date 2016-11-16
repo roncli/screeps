@@ -67,6 +67,10 @@ var https = require("https"),
                 output += "  Towers - " + r.towerEnergy.toFixed(0) + "/" + r.towerEnergyCapacity.toFixed(0) + " - " + (100 * r.towerEnergy / r.towerEnergyCapacity).toFixed(0) + "% - " + (r.towerEnergyCapacity - r.towerEnergy).toFixed(0) + " to go" + "\n";
             }
 
+            if (r.labEnergyCapacity) {
+                output += "  Labs - " + r.labEnergy.toFixed(0) + "/" + r.labEnergyCapacity.toFixed(0) + " - " + (100 * r.labEnergy / r.labEnergyCapacity).toFixed(0) + "% - " + (r.labEnergyCapacity - r.labEnergy).toFixed(0) + " to go" + "\n";
+            }
+
             r.source.forEach((s) => {
                 output += "    " + s.resource + " - " + s.amount;
                 if (s.capacity) {

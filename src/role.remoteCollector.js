@@ -70,12 +70,17 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
+                var assignedTask = false;
+
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
+                        assignedTask = true;
                     }
                 });
+
+                return !assignedTask;
             });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);

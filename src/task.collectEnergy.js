@@ -133,7 +133,7 @@ CollectEnergy.getStorerTasks = function(room) {
 CollectEnergy.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(structures, (s) => new CollectEnergy(s.id));
+    return _.map(_.sortBy(structures, (s) => s.energy || _.sum(s.store)), (s) => new CollectEnergy(s.id));
 };
 
 require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");

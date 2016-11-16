@@ -3,6 +3,7 @@ var creeps = {},
     spawnsInRoom = {},
     extensionsInRoom = {},
     towersInRoom = {},
+    labsInRoom = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
@@ -34,6 +35,7 @@ var Cache = {
         spawnsInRoom = {};
         extensionsInRoom = {};
         towersInRoom = {};
+        labsInRoom = {};
         containersInRoom = {};
         linksInRoom = {};
         repairableStructuresInRoom = {};
@@ -103,6 +105,13 @@ var Cache = {
         "use strict";
 
         return towersInRoom[room.name] ? towersInRoom[room.name] : (towersInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s.structureType === STRUCTURE_TOWER));
+    },
+
+    // Returns all labs in the current room.
+    labsInRoom: (room) => {
+        "use strict";
+
+        return labsInRoom[room.name] ? labsInRoom[room.name] : (labsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s.structureType === STRUCTURE_LAB));
     },
 
     // Returns all containers in the current room.

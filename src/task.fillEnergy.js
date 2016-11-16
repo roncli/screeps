@@ -138,6 +138,12 @@ FillEnergy.getFillTowerTasks = function(room) {
     return _.map(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8), (t) => new FillEnergy(t.id));
 };
 
+FillEnergy.getFillLabTasks = function(room) {
+    "use strict";
+
+    return _.map(_.filter(Cache.labsInRoom(room), (t) => t.energy < t.energyCapacity), (t) => new FillEnergy(t.id));
+};
+
 FillEnergy.getFillContainerTasks = function(room) {
     "use strict";
 

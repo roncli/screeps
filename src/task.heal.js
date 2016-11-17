@@ -32,10 +32,16 @@ Heal.prototype.run = function(creep) {
         return;
     }
     
-    // Move and heal, or ranged heal if not in range.
-    Pathing.moveTo(creep, this.ally, 1);
-    if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
-        creep.rangedHeal(this.ally)
+    if (creep.id === this.ally.id) {
+        // Move to middle if we are the ally healing.
+        Pathing.moveTo(creep, new RoomPosition(25, 25, creep.room.name), 0);
+        creep.heal(this.ally);
+    } else {
+        // Move and heal, or ranged heal if not in range.
+        Pathing.moveTo(creep, this.ally, 1);
+        if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
+            creep.rangedHeal(this.ally)
+        }
     }
 };
 

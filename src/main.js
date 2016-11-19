@@ -34,6 +34,10 @@ var profiler = require("screeps-profiler"),
         loop: () => {
             "use strict";
 
+            if (Game.cpu.bucket < Game.cpu.tickLimit) {
+                return;
+            }
+
             profiler.wrap(() => {
                 main.init();
                 main.log();

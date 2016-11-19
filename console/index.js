@@ -9,7 +9,7 @@ var https = require("https"),
 
         switch (process.platform) {
             case "win32":
-                console.log("\x1Bc");
+                process.stdout.write("\x1B[2J");
                 break;
             default:
                 process.stdout.write(child_process.execSync("clear && printf '\\e[3J'"));
@@ -215,18 +215,18 @@ var https = require("https"),
                         console.log(report(data));
                     } catch (err) {
                         console.log(l);
-                        console.log();
-                        console.log();
-                        console.log();
+                        console.log("");
+                        console.log("");
+                        console.log("");
                         console.log(err);
                     }
                 });
             } catch (err) {
                 clear();
                 console.log(message);
-                console.log();
-                console.log();
-                console.log();
+                console.log("");
+                console.log("");
+                console.log("");
                 console.log(err);
             }
         };

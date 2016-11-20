@@ -254,6 +254,29 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for 1-progress construction sites.
+            _.forEach(_.filter(tasks.build.tasks, (t) => t.constructionSite.progressTotal === 1), (task) => {
+                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(Game.creeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                if (progressMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Build");
+                            assigned.push(creep.name);
+                            progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            if (progressMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for critical repairs.
             _.forEach(tasks.repair.criticalTasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {

@@ -37,25 +37,11 @@ var Cache = require("cache"),
                     return;
                 }
 
-                if (!Memory.sources || !Memory.sources[source.id] || Memory.sources[source.id].empty === undefined) {
-                    // Initialize.
-                    if (!Memory.sources) {
-                        Memory.sources = {};
-                    }
-                    
-                    if (!Memory.sources[source.id]) {
-                        Memory.sources[source.id] = {};
-                    }
-
-                    // Count the empty squares around the source.
-                    Memory.sources[source.id].empty = Utilities.getEmptyPosAroundPos(source.pos);
-                }
-
-                max += Math.ceil(Memory.sources[source.id].empty * adjustment);
+                max += 3 * adjustment;
 
                 // If we have less than max collectors, spawn a collector.
                 count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.homeSource === source.id).length;
-                if (count < Math.ceil(Memory.sources[source.id].empty * adjustment)) {
+                if (count < 3 * adjustment) {
                     Collector.spawn(room, source.id);
                 }
             });

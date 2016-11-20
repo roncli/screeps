@@ -117,6 +117,34 @@ var profiler = require("screeps-profiler"),
                     delete Memory.lengthToLink[id];
                 }
             });
+            _.forEach(Memory.lengthToStorage, (value, id) => {
+                if (!Cache.getObjectById(id)) {
+                    delete Memory.lengthToStorage[id];
+                }
+            });
+            _.forEach(Memory.containerSource, (value, id) => {
+                if (!Cache.getObjectById(id)) {
+                    delete Memory.containerSource[id];
+                }
+            });
+            _.forEach(Memory.dismantle, (value, room) => {
+                if (value.length === 0) {
+                    delete Memory.dismantle[room];
+                }
+            });
+            _.forEach(Memory.rooms, (value, room) => {
+                if (!value || !value.roomType) {
+                    delete Memory.rooms[room];
+                }
+            });
+            _.forEach(Memory.maxCreeps, (max, type) => {
+                _.forEach(Memory.maxCreeps[type], (value, room) => {
+                     if (Object.keys(value).length === 0) {
+                         delete max[room];
+                     }
+                });
+            });
+            delete Memory.flags;
         },
 
         log: () => {

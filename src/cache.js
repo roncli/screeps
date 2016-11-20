@@ -97,35 +97,35 @@ var Cache = {
     extensionsInRoom: (room) => {
         "use strict";
 
-        return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : (extensionsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s.structureType === STRUCTURE_EXTENSION));
+        return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : (extensionsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s instanceof StructureExtension));
     },
 
     // Returns all towers in the current room.
     towersInRoom: (room) => {
         "use strict";
 
-        return towersInRoom[room.name] ? towersInRoom[room.name] : (towersInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s.structureType === STRUCTURE_TOWER));
+        return towersInRoom[room.name] ? towersInRoom[room.name] : (towersInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s instanceof StructureTower));
     },
 
     // Returns all labs in the current room.
     labsInRoom: (room) => {
         "use strict";
 
-        return labsInRoom[room.name] ? labsInRoom[room.name] : (labsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s.structureType === STRUCTURE_LAB));
+        return labsInRoom[room.name] ? labsInRoom[room.name] : (labsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s instanceof StructureLab));
     },
 
     // Returns all containers in the current room.
     containersInRoom: (room) => {
         "use strict";
 
-        return containersInRoom[room.name] ? containersInRoom[room.name] : (containersInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_CONTAINER}));
+        return containersInRoom[room.name] ? containersInRoom[room.name] : (containersInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s instanceof StructureContainer}));
     },
 
     // Returns all links in the current room.
     linksInRoom: (room) => {
         "use strict";
 
-        return linksInRoom[room.name] ? linksInRoom[room.name] : (linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK}));
+        return linksInRoom[room.name] ? linksInRoom[room.name] : (linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s instanceof StructureLink}));
     },
 
     // Returns all repairable structures in the current room.
@@ -174,7 +174,7 @@ var Cache = {
     extractorsInRoom: (room) => {
         "use strict";
 
-        return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : (extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.structureType === STRUCTURE_EXTRACTOR)}));
+        return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : (extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s instanceof StructureExtractor)}));
     },
 
     // Returns all flags in the current room.
@@ -213,7 +213,7 @@ var Cache = {
             }
 
             _.forEach(room.find(FIND_STRUCTURES), (structure) => {
-                if (structure.structureType === STRUCTURE_ROAD) {
+                if (structure instanceof StructureRoad) {
                     costMatricies[room.name].set(structure.pos.x, structure.pos.y, 1);
                 } else if (structure.structureType !== STRUCTURE_CONTAINER && (structure.structureType !== STRUCTURE_RAMPART || !structure.my)) {
                     costMatricies[room.name].set(structure.pos.x, structure.pos.y, 255);

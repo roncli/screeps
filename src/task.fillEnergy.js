@@ -135,7 +135,7 @@ FillEnergy.getFillSpawnTasks = function(room) {
 FillEnergy.getFillTowerTasks = function(room) {
     "use strict";
 
-    return _.map(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8), (t) => new FillEnergy(t.id));
+    return _.map(_.sortBy(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8), (t) => t.energy), (t) => new FillEnergy(t.id));
 };
 
 FillEnergy.getFillLabTasks = function(room) {

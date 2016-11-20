@@ -148,6 +148,12 @@ var Cache = require("cache"),
             }
         },
 
+        startAllCreeps: () => {
+            _.forEach(Game.creeps, (creep) => {
+                delete creep.memory.stop;
+            });
+        },
+
         setContainerSource: (containerId, sourceId) => {
             Memory.containerSource[containerId] = sourceId;
         },

@@ -290,6 +290,20 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
+                    _.forEach(_.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) === -1), (s) => s.hits), (s) => {
+                        Cache.log.structures.push({
+                            structureId: s.id,
+                            room: room.name,
+                            x: s.pos.x,
+                            y: s.pos.y,
+                            structureType: s.structureType,
+                            hits: s.hits,
+                            hitsMax: s.hitsMax
+                        });
+                    });
+
+                    Cache.log.rooms[room.name].lowestWall = _.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== -1), (s) => s.hits)[0];
+
                     if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
                         Cache.log.rooms[room.name].energyAvailable = room.energyAvailable;
                         Cache.log.rooms[room.name].energyCapacityAvailable = room.energyCapacityAvailable;

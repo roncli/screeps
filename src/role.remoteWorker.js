@@ -123,7 +123,27 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteWorker", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [];
+                assigned = [],
+                sites;
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for 1-progress construction sites.
+            _.forEach(creepsWithNoTask, (creep) => {
+                sites = _.filter(Cache.constructionSitesInRoom(creep.room), (c) => c.progressTotal === 1);
+                if (sites.length > 0) {
+                    var task = new TaskBuild(sites[0].id);
+                    if (task.canAssign(creep)) {
+                        creep.say("Build");
+                        assigned.push(creep.name);
+                    }
+                }
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

@@ -221,7 +221,7 @@ Base.prototype.run = function(room) {
             });
         }
         
-        if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 300000 && terminalEnergy >= 1000) {
+        if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 500000 && terminalEnergy >= 1000) {
             _.forEach(_.uniq(_.map(Cache.marketOrders(), (o) => o.resourceType)), (resource) => {
                 var sellOrder, buyOrder;
 

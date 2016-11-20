@@ -189,8 +189,14 @@ Base.prototype.run = function(room) {
             Memory.minimumSell = {};
         }
 
+        terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
         terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
-        if (terminalMinerals.length > 0) {
+
+        if (terminalEnergy < 1000) {
+            terminalTask = new TaskFillEnergy(room.terminal.id);
+        }
+
+        if (terminalMinerals.length > 0 && terminalEnergy >= 1000) {
             _.forEach(_.sortBy(terminalMinerals, (s) => -s.amount), (topResource) => {
                 bestOrder = _.filter(Cache.marketOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0 && (!Memory.minimumSell[o.resourceType] || o.price >= Memory.minimumSell[o.resourceType])).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
                 if (bestOrder) {
@@ -202,7 +208,6 @@ Base.prototype.run = function(room) {
                         delete Memory.minimumSell[bestOrder.resourceType];
                         return false;
                     } else {
-                        terminalTask = new TaskFillEnergy(room.terminal.id);
                         if (terminalEnergy > 0) {
                             amount = Math.floor(Math.min(topResource.amount, bestOrder.amount) * terminalEnergy / transCost);
                             if (amount > 0) {
@@ -216,7 +221,7 @@ Base.prototype.run = function(room) {
             });
         }
         
-        if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
+        if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 300000 && terminalEnergy >= 1000) {
             _.forEach(_.uniq(_.map(Cache.marketOrders(), (o) => o.resourceType)), (resource) => {
                 var sellOrder, buyOrder;
 
@@ -234,8 +239,6 @@ Base.prototype.run = function(room) {
                 }
             });
 
-            terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
-
             _.forEach(_.sortBy(flips, (f) => f.sell.price - f.buy.price), (flip, index) => {
                 if (index === 0) {
                     Cache.log.events.push("Biggest flip: " + flip.resource + " x" + Math.min(flip.buy.amount, flip.sell.amount) + " " + flip.sell.price.toFixed(2) + " to " + flip.buy.price.toFixed(2));
@@ -250,7 +253,6 @@ Base.prototype.run = function(room) {
                     return false;
                 }
 
-                terminalTask = new TaskFillEnergy(room.terminal.id);
                 if (terminalEnergy > 0) {
                     amount = Math.floor(flip.sell.amount * terminalEnergy / transCost);
                     if (amount > 0) {
@@ -262,7 +264,7 @@ Base.prototype.run = function(room) {
                 }
             });
 
-            if (!dealMade && terminalEnergy > 100) {
+            if (!dealMade) {
                 // Attempt to sell excess energy.
                 bestOrder = _.sortBy(_.filter(Cache.marketOrders(), (o) => o.resourceType === RESOURCE_ENERGY && o.type === "buy" && o.amount > 0), (o) => -((o.price * o.amount + Game.market.calcTransactionCost(o.amount, room.name, o.roomName)) / o.amount))[0];
                 if (bestOrder) {

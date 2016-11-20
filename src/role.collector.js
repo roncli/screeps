@@ -28,7 +28,7 @@ var Cache = require("cache"),
             }
 
             // Determine the max creep adjustment to use.
-            adjustment = Math.max((2500 - Utilities.getEnergyCapacityInRoom(room)) / 2500, 0.1);
+            adjustment = Math.max((2500 - room.energyCapacityAvailable) / 2500, 0.1);
 
             //  Loop through sources to see if we have anything we need to spawn.
             _.forEach(sources, (source, index) => {
@@ -68,10 +68,10 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 3300.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 3300);
+            energy = Math.min(room.energyAvailable, 3300);
 
             // If we're not at 3300 and energy is not at capacity, bail.
-            if (energy < 3300 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            if (energy < 3300 && energy !== room.energyCapacityAvailable) {
                 return;
             }
 

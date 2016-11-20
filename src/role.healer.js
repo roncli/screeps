@@ -51,10 +51,10 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 7500.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), 7500);
+            energy = Math.min(room.energyAvailable, 7500);
 
             // If we're not at 7500 and energy is not at capacity, bail.
-            if (energy < 7500 && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            if (energy < 7500 && energy !== room.energyCapacityAvailable) {
                 return;
             }
 

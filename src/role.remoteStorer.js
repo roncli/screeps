@@ -80,7 +80,7 @@ var Cache = require("cache"),
             }
 
             // Fail under 750 energy.
-            if (Utilities.getAvailableEnergyInRoom(supportRoom) < 750) {
+            if (supportRoom.energyAvailable < 750) {
                 return false;
             }
 

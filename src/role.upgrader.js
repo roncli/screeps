@@ -45,10 +45,10 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 3300, or 3000 at RCL 8.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(room), room.controller.level === 8 ? 3000 : 3300);
+            energy = Math.min(room.energyAvailable, room.controller.level === 8 ? 3000 : 3300);
 
             // If we're not at 3300, or 3000 at RCL 8, and energy is not at capacity, bail.
-            if (energy < (room.controller.level === 8 ? 3000 : 3300) && energy !== Utilities.getEnergyCapacityInRoom(room)) {
+            if (energy < (room.controller.level === 8 ? 3000 : 3300) && energy !== room.energyCapacityAvailable) {
                 return;
             }
 

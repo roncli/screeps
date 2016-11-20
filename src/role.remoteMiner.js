@@ -69,7 +69,7 @@ var Cache = require("cache"),
             }
 
             // Get the energy available, limiting to 4450.
-            energy = Math.min(Utilities.getAvailableEnergyInRoom(supportRoom), 4450);
+            energy = Math.min(supportRoom.energyAvailable, 4450);
 
             // Fail under 650 energy.
             if (energy < 650) {
@@ -79,7 +79,7 @@ var Cache = require("cache"),
             // Do something different for minerals.
             if (Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), Cache.getObjectById(id))[0] instanceof Mineral) {
                 // If we're not at 4450 and energy is not at capacity, bail.
-                if (energy < 4450 && energy !== Utilities.getEnergyCapacityInRoom(supportRoom)) {
+                if (energy < 4450 && energy !== supportRoom.energyCapacityAvailable) {
                     return;
                 }
 

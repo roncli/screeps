@@ -26,7 +26,7 @@ var Cache = require("cache"),
             // Determine conditions for next stage or success.
             switch (Memory.army[army].directive) {
                 case "building":
-                    if (_.filter(Cache.creepsInArmy("all", army), (c) => c.room.name !== Memory.army[army].buildRoom).length === 0 && _.filter(Cache.creepsInArmy("all", army), (c) => c.room.name === Memory.army[army].buildRoom).length === Memory.army[army].dismantler.maxCreeps + Memory.army[army].healer.maxCreeps+ Memory.army[army].melee.maxCreeps+ Memory.army[army].ranged.maxCreeps) {
+                    if (_.filter(Cache.creepsInArmy("all", army), (c) => c.room.name !== Memory.army[army].buildRoom).length === 0 && _.filter(Cache.creepsInArmy("all", army), (c) => c.room.name === Memory.army[army].buildRoom).length >= Memory.army[army].dismantler.maxCreeps + Memory.army[army].healer.maxCreeps + Memory.army[army].melee.maxCreeps + Memory.army[army].ranged.maxCreeps) {
                         Memory.army[army].directive = "staging";
                     }
                     break;

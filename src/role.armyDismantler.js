@@ -7,7 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (army) => {
             "use strict";
 
-            var count = _.filter(Cache.creepsInArmy("armyDismantler", army), (c) => c.memory.defending === toRoom).length, max = Memory.army[army].dismantler.maxCreeps;
+            var count = Cache.creepsInArmy("armyDismantler", army).length, max = Memory.army[army].dismantler.maxCreeps;
 
             if (count < max) {
                 Dismantler.spawn(army);

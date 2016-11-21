@@ -6,7 +6,7 @@ var Cache = require("cache"),
         checkSpawn: (army) => {
             "use strict";
 
-            var count = _.filter(Cache.creepsInArmy("armyRanged", army), (c) => c.memory.defending === toRoom).length, max = Memory.army[army].ranged.maxCreeps;
+            var count = Cache.creepsInArmy("armyRanged", army).length, max = Memory.army[army].ranged.maxCreeps;
 
             if (count < max) {
                 Ranged.spawn(army);

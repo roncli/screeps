@@ -6,7 +6,7 @@ var Cache = require("cache"),
         checkSpawn: (army) => {
             "use strict";
 
-            var count = _.filter(Cache.creepsInArmy("armyMelee", army), (c) => c.memory.defending === toRoom).length, max = Memory.army[army].melee.maxCreeps;
+            var count = Cache.creepsInArmy("armyMelee", army).length, max = Memory.army[army].melee.maxCreeps;
 
             if (count < max) {
                 Melee.spawn(army);

@@ -7,7 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (army) => {
             "use strict";
 
-            var count = _.filter(Cache.creepsInArmy("armyHealer", army), (c) => c.memory.defending === toRoom).length, max = Memory.army[army].healer.maxCreeps;
+            var count = Cache.creepsInArmy("armyHealer", army).length, max = Memory.army[army].healer.maxCreeps;
 
             if (count < max) {
                 Healer.spawn(army);

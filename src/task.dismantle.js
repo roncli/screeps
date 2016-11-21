@@ -15,7 +15,7 @@ Dismantle.prototype.constructor = Dismantle;
 Dismantle.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity) || creep.getActiveBodyparts(WORK) === 0 || creep.spawning || creep.ticksToLive < 150) {
+    if (creep.spawning || (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity) || creep.getActiveBodyparts(WORK) === 0 || creep.spawning) {
         return false;
     }
     
@@ -40,7 +40,7 @@ Dismantle.prototype.run = function(creep) {
 Dismantle.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (_.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0 || creep.ticksToLive < 150) {
+    if (_.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

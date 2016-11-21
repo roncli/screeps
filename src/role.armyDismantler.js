@@ -133,7 +133,7 @@ var Cache = require("cache"),
                     }
 
                     if (Game.rooms[Memory.army[army].attackRoom]) {
-                        structures = _.sortBy(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));
+                        structures = _.sortBy(_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));
 
                         // Dismantle towers, spawns, and any remaining structures.
                         if (structures.length > 0) {

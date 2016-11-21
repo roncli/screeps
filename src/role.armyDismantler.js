@@ -79,7 +79,7 @@ var Cache = require("cache"),
                 case "dismantle":
                     // Return to army's staging location if missing 1000 hits.
                     task = new TaskRally(Memory.army[army].stageRoom);
-                    _.forEach(_.filter(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000), (creep) => {
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === Memory.army[army].attackRoom && c.hitsMax - c.hits >= 1000), (creep) => {
                         creep.say("Ouch!");
                         task.canAssign(creep);
                         assigned.push(creep.name);
@@ -91,6 +91,9 @@ var Cache = require("cache"),
                     if (creepsWithNoTask.length === 0) {
                         return;
                     }
+
+                    // Remove any creeps that need healing.
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
 
                     // Dismantle a dismantle location if it can be seen.
                     if (Game.rooms[Memory.army[army].attackRoom] && Memory.army[army].dismantle.length > 0) {
@@ -119,7 +122,7 @@ var Cache = require("cache"),
                 case "attack":
                     // Return to army's staging location if missing 1000 hits.
                     task = new TaskRally(Memory.army[army].stageRoom);
-                    _.forEach(_.filter(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000), (creep) => {
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === Memory.army[army].attackRoom && c.hitsMax - c.hits >= 1000), (creep) => {
                         creep.say("Ouch!");
                         task.canAssign(creep);
                         assigned.push(creep.name);
@@ -131,6 +134,9 @@ var Cache = require("cache"),
                     if (creepsWithNoTask.length === 0) {
                         return;
                     }
+
+                    // Remove any creeps that need healing.
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
 
                     if (Game.rooms[Memory.army[army].attackRoom]) {
                         structures = _.sortBy(_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));

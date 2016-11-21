@@ -96,9 +96,10 @@ var Cache = require("cache"),
                     if (Game.rooms[Memory.army[army].attackRoom] && Memory.army[army].dismantle.length > 0) {
                         task = new TaskDismantle(Memory.army[army].dismantle[0]);
                         _.forEach(creepsWithNoTask, (creep) => {
-                            creep.say("Dismantle");
-                            task.canAssign(creep);
-                            assigned.push(creep.name);
+                            if (task.canAssign(creep)) {
+                                creep.say("Dismantle");
+                                assigned.push(creep.name);
+                            }
                         });
 
                         _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -138,9 +139,10 @@ var Cache = require("cache"),
                         if (structures.length > 0) {
                             task = new TaskDismantle(structures[0].id);
                             _.forEach(creepsWithNoTask, (creep) => {
-                                creep.say("Dismantle");
-                                task.canAssign(creep);
-                                assigned.push(creep.name);
+                                if (task.canAssign(creep)) {
+                                    creep.say("Dismantle");
+                                    assigned.push(creep.name);
+                                }
                             });
 
                             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -155,10 +157,9 @@ var Cache = require("cache"),
                     // Rally to any hostile construction sites.
                     _.forEach(tasks.rally.tasks, (task) => {
                         _.forEach(creepsWithNoTask, (creep) => {
-                            if (task.canAssign(creep)) {
-                                assigned.push(creep.name);
-                                return false;
-                            }
+                            task.canAssign(creep);
+                            assigned.push(creep.name);
+                            return false;
                         });
 
                         _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);

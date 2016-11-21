@@ -202,6 +202,7 @@ var profiler = require("screeps-profiler"),
                     spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined,
                     spawningRole: s.spawning ? Game.creeps[s.spawning.name].memory.role : undefined,
                     spawningHome: s.spawning ? Game.creeps[s.spawning.name].memory.home : undefined,
+                    spawningArmy: s.spawning ? Game.creeps[s.spawning.name].memory.army : undefined
                 });
             });
         },

@@ -15,7 +15,7 @@ Dismantle.prototype.constructor = Dismantle;
 Dismantle.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || _.sum(creep.carry) === creep.carryCapacity || creep.getActiveBodyparts(WORK) === 0 || creep.spawning || creep.ticksToLive < 150) {
+    if (creep.spawning || (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity) || creep.getActiveBodyparts(WORK) === 0 || creep.spawning || creep.ticksToLive < 150) {
         return false;
     }
     

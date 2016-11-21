@@ -168,6 +168,15 @@ var Cache = require("cache"),
 
         removeAlly: (name) => {
             _.pull(Memory.allies, name);
+        },
+
+        createArmy: (army, options) => {
+            if (options === undefined) {
+                delete Memory.army[army];
+            } else {
+                Memory.army[army] = options;
+                Memory.army[army].directive = "building";
+            }
         }
     };
 

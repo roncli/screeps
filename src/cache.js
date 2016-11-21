@@ -1,5 +1,6 @@
 var creeps = {},
     creepsInRoom = {},
+    creepsInArmy = {},
     spawnsInRoom = {},
     extensionsInRoom = {},
     towersInRoom = {},
@@ -32,6 +33,7 @@ var Cache = {
 
         creeps = {};
         creepsInRoom = {};
+        creepsInArmy = {};
         spawnsInRoom = {};
         extensionsInRoom = {};
         towersInRoom = {};
@@ -61,6 +63,7 @@ var Cache = {
             spawns: [],
             structures: [],
             rooms: {},
+            army: {},
             clearConsole: "<script>angular.element(document.getElementsByClassName('fa fa-trash ng-scope')[0].parentNode).scope().Console.clear()</script>"
         }
     },
@@ -84,6 +87,16 @@ var Cache = {
             creepsInRoom[room.name] = {};
         }
         return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(Cache.creeps(type), (c) => c.memory.home === room.name));
+    },
+
+    // Returns all creeps of a certain in an army.
+    creepsInArmy: (type, army) => {
+        "use strict";
+
+        if (!creepsInArmy[army]) {
+            creepsInArmy[army] = {};
+        }
+        return creepsInArmy[army][type] ? creepsInArmy[army][type] : (creepsInArmy[army][type] = _.filter(Cache.creeps(type), (c) => c.memory.army === army));
     },
 
     // Returns all spawns in the current room.    

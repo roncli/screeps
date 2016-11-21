@@ -3,9 +3,14 @@ require("screeps-perf")({
 });
 
 var profiler = require("screeps-profiler"),
+    Army = require("army"),
     Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
+    RoleArmyDismantler = require("role.armyDismantler"),
+    RoleArmyHealer = require("role.armyHealer"),
+    RoleArmyMelee = require("role.armyMelee"),
+    RoleArmyRanged = require("role.armyRanged"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
@@ -42,6 +47,7 @@ var profiler = require("screeps-profiler"),
                 main.init();
                 main.log();
                 main.rooms();
+                main.army();
                 main.creeps();
 
                 Cache.log.cpuUsed = Game.cpu.getUsed();
@@ -58,9 +64,14 @@ var profiler = require("screeps-profiler"),
 
             // Export global objects to Game.cmd for use from console.
             Game.cmd = {
+                Army: Army,
                 Cache: Cache,
                 Commands: Commands,
                 Role: {
+                    ArmyDismantler: RoleArmyDismantler,
+                    ArmyHealer: RoleArmyHealer,
+                    ArmyMelee: RoleArmyMelee,
+                    ArmyRanged: RoleArmyRanged,
                     Claimer: RoleClaimer,
                     Collector: RoleCollector,
                     Defender: RoleDefender,
@@ -91,9 +102,11 @@ var profiler = require("screeps-profiler"),
             if (!Memory.maxCreeps) {
                 Memory.maxCreeps = {};
             }
-
             if (!Memory.containerSource) {
                 Memory.containerSource = {};
+            }
+            if (!Memory.army) {
+                Memory.army = {};
             }
 
             // Clear old memory.
@@ -250,17 +263,20 @@ var profiler = require("screeps-profiler"),
                     Cache.log.rooms[room.name] = {
                         type: type,
                         supportRoom: room.memory ? room.memory.supportRoom : undefined,
-                        unobservable: true
+                        unobservable: true,
+                        store: {},
+                        source: [],
+                        creeps: []
                     }
-
-                    Cache.log.rooms[room.name].store = {};
-                    Cache.log.rooms[room.name].source = [];
                 } else {
                     Cache.log.rooms[room.name] = {
                         type: type,
                         supportRoom: room.memory? room.memory.supportRoom : undefined,
                         unobservable: false,
-                        controller: !!room.controller
+                        controller: !!room.controller,
+                        store: {},
+                        source: [],
+                        creeps: []
                     }
 
                     if (Cache.log.rooms[room.name].controller) {
@@ -306,9 +322,6 @@ var profiler = require("screeps-profiler"),
                     Cache.log.rooms[room.name].labEnergy = _.sum(_.map(Cache.labsInRoom(room), (l) => l.energy));
                     Cache.log.rooms[room.name].labEnergyCapacity = _.sum(_.map(Cache.labsInRoom(room), (l) => l.energyCapacity));
 
-                    Cache.log.rooms[room.name].store = {};
-                    Cache.log.rooms[room.name].source = [];
-
                     if (room.storage) {
                         Cache.log.rooms[room.name].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});
                     }
@@ -350,14 +363,35 @@ var profiler = require("screeps-profiler"),
                     });
                 }
 
-                Cache.log.rooms[room.name].creeps = [];
-
                 if (Cache.roomTypes[room.name]) {
                     Cache.roomTypes[room.name].run(room);
                     if (Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type === Cache.roomTypes[room.name].type) {
                         Cache.roomTypes[room.name].toObj(room);
                     }
                 }
+            });
+        },
+
+        army: () => {
+            // Loop through each army and run it.
+            _.forEach(Memory.army, (value, army) => {
+                // Log army data.
+                Cache.log.army[army] = {
+                    directive: value.directive,
+                    buildRoom: value.buildRoom,
+                    stageRoom: value.stageRoom,
+                    attackRoom: value.attackRoom,
+                    dismantle: value.dismantle.length,
+                    creeps: []
+                }
+
+                if (Game.rooms[value.attackRoom]) {
+                    Cache.log.army[army].structures = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES).length;
+                    Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
+                }
+
+                // Run army.
+                Army.run(army);
             });
         },
 

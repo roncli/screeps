@@ -91,6 +91,30 @@ var Cache = require("cache"),
                         return;
                     }
 
+                    // Remove any creeps that need healing.
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+
+                    // Attack hostile units.
+                    _.forEach(tasks.melee.tasks, (task) => {
+                        _.forEach(creepsWithNoTask, (creep) => {
+                            if (task.canAssign(creep)) {
+                                creep.say("Die!", true);
+                                assigned.push(creep.name);
+                            }
+                        });
+
+                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                        assigned = [];
+
+                        if (creepsWithNoTask.length === 0) {
+                            return false;
+                        }
+                    });
+                    
+                    if (creepsWithNoTask.length === 0) {
+                        return;
+                    }
+
                     // Rally to near dismantle location.
                     if (Game.rooms[Memory.army[army].attackRoom] && Memory.army[army].dismantle.length > 0) {
                         task = new TaskRally(Memory.army[army].dismantle[0]);
@@ -116,6 +140,24 @@ var Cache = require("cache"),
 
                     break;
                 case "attack":
+                    // Return to army's staging location if missing 1000 hits.
+                    task = new TaskRally(Memory.army[army].stageRoom);
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === Memory.army[army].attackRoom && c.hitsMax - c.hits >= 1000), (creep) => {
+                        creep.say("Ouch!");
+                        task.canAssign(creep);
+                        assigned.push(creep.name);
+                    });
+
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+
+                    if (creepsWithNoTask.length === 0) {
+                        return;
+                    }
+
+                    // Remove any creeps that need healing.
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+
                     // Attack hostile units.
                     _.forEach(tasks.melee.tasks, (task) => {
                         _.forEach(creepsWithNoTask, (creep) => {

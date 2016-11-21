@@ -92,6 +92,9 @@ var Cache = require("cache"),
                         return;
                     }
 
+                    // Remove any creeps that need healing.
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+
                     // Dismantle a dismantle location if it can be seen.
                     if (Game.rooms[Memory.army[army].attackRoom] && Memory.army[army].dismantle.length > 0) {
                         task = new TaskDismantle(Memory.army[army].dismantle[0]);
@@ -132,8 +135,11 @@ var Cache = require("cache"),
                         return;
                     }
 
+                    // Remove any creeps that need healing.
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+
                     if (Game.rooms[Memory.army[army].attackRoom]) {
-                        structures = _.sortBy(_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));
+                        structures = _.sortBy(_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));
 
                         // Dismantle towers, spawns, and any remaining structures.
                         if (structures.length > 0) {

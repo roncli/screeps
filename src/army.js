@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
     RoleArmyMelee = require("role.armyMelee"),
@@ -46,7 +47,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (Game.rooms[Memory.army[army].attackRoom]) {
-                        if (_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController)).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
+                        if (_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
                             Memory.army[army].success = true;
                         }
                     }
@@ -77,7 +78,7 @@ var Cache = require("cache"),
                         if (Memory.army[army].dismantle.length > 0) {
                             tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => c.pos.getRangeTo(Cache.getObjectById(Memory.army[army].dismantle[0])) <= 2), (c) => new TaskRangedAttack(c.id));
                         }
-                        
+                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => Utilities.objectsClosestToObj(Cache.creepsInArmy(army), c)[0] <= 3), (c) => new TaskMeleeAttack(c.id));
                         break;
                     case "attack":
                         tasks.melee.tasks = _.map(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => new TaskMeleeAttack(c.id));

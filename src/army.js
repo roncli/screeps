@@ -46,7 +46,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (Game.rooms[Memory.army[army].attackRoom]) {
-                        if (Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
+                        if (_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController)).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
                             Memory.army[army].success = true;
                         }
                     }

@@ -71,7 +71,14 @@ var https = require("https"),
                 output += "  Labs - " + r.labEnergy.toFixed(0) + "/" + r.labEnergyCapacity.toFixed(0) + " - " + (100 * r.labEnergy / r.labEnergyCapacity).toFixed(0) + "% - " + (r.labEnergyCapacity - r.labEnergy).toFixed(0) + " to go" + "\n";
             }
 
+            if (r.lowestWall) {
+                output += "  Lowest Wall - " + r.lowestWall.hits.toFixed(0) + "\n";
+            }
+
             r.source.forEach((s) => {
+                if (r.type !== "base" && s.resource !== "energy") {
+                    return;
+                }
                 output += "    " + s.resource + " - " + s.amount;
                 if (s.capacity) {
                     output += "/" + s.capacity;
@@ -89,6 +96,28 @@ var https = require("https"),
             });
         }
 
+        for (let army in data.army) {
+            let a = data.army[army];
+
+            output += "Army - " + a.directive + " - Build at " + a.buildRoom + " - Stage at " + a.stageRoom + " - Attacking " + a.attackRoom + "\n";
+            
+            if (a.dismantle > 0) {
+                output += "  Initial structures to dismantle: " + a.dismantle + "\n";
+            }
+
+            if (a.structures > 0) {
+                output += "  Structures to dismantle: " + a.structures + "\n";
+            }
+
+            if (a.constructionSites > 0) {
+                output += "  Construction sites to stomp: " + a.constructionSites + "\n";
+            }
+
+            a.creeps.forEach((a) => {
+                output += "    " + c.role + " " + c.count + "/" + c.max + "\n";
+            });
+        }
+
         output += "Creeps - " + data.creeps.length + "\n";
         data.creeps.forEach((c) => {
             if (c.hits < c.hitsMax) {
@@ -98,7 +127,13 @@ var https = require("https"),
 
         data.spawns.forEach((s) => {
             if (s.spawningName) {
-                output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for " + s.spawningHome + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                if (s.spawningHome) {
+                    output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for room " + s.spawningHome + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                } else if (s.spawningArmy) {
+                    output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for army " + s.spawningArmy + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                } else {
+                    output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                }
             }
         });
 

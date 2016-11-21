@@ -43,7 +43,7 @@ Rally.prototype.run = function(creep) {
     }
 
     // Rally to the rally point.
-    Pathing.moveTo(creep, this.rallyPoint, creep.room.name === this.rallyPoint.roomName || (this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName) ? (this.range || 0) : 20);
+    Pathing.moveTo(creep, this.rallyPoint, !(this.rallyPoint instanceof RoomPosition) ? (this.range || 0) : 20);
 
     // Always complete the task.
     Task.prototype.complete.call(this, creep);

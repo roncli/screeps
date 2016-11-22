@@ -133,9 +133,9 @@ function profileFunction(fn, functionName) {
 }
 
 const Profiler = {
-  printProfile() {
+  printProfile(numresults) {
     var Cache = require("cache");
-    Cache.log.events.push(Profiler.output());
+    Cache.log.events.push(Profiler.output(numresults));
   },
 
   emailProfile() {
@@ -143,7 +143,7 @@ const Profiler = {
   },
 
   output(numresults) {
-    const displayresults = !!numresults ? numresults : 200;
+    const displayresults = !!numresults ? numresults : 20;
     if (!Memory.profiler || !Memory.profiler.enabledTick) {
       return 'Profiler not active.';
     }
@@ -279,6 +279,7 @@ module.exports = {
   },
 
   output: Profiler.output,
+  print: Profiler.printProfile,
 
   registerObject: profileObjectFunctions,
   registerFN: profileFunction,

@@ -19,9 +19,26 @@ var Cache = require("cache"),
             }
             
             var objList = _.map(objects, (o) => {
+                var range;
+                
+                if (Memory.ranges && Memory.ranges[obj.id] && Memory.ranges[obj.id][o.id]) {
+                    range = Memory.ranges[obj.id][o.id];
+                } else {
+                    range = obj.pos.getRangeTo(o);
+                    if (!(o instanceof Creep) && !(obj instanceof Creep)) {
+                        if (!Memory.ranges) {
+                            Memory.ranges = {};
+                        }
+                        if (!Memory.ranges[obj.id]) {
+                            Memory.ranges[obj.id] = {};
+                        }
+                        Memory.ranges[obj.id][o.id] = range;
+                    }
+                }
+
                 return {
                     object: o,
-                    distance: obj.pos.getRangeTo(o)
+                    distance: range
                 };
             });
             
@@ -50,17 +67,19 @@ var Cache = require("cache"),
             var objList = _.map(objects, (o) => {
                 var distance;
                 
-                if (!(o instanceof Creep) && !(obj instanceof Creep) && Memory.distances && Memory.distances[obj.id] && Memory.distances[obj.id][o.id]) {
+                if (Memory.distances && Memory.distances[obj.id] && Memory.distances[obj.id][o.id]) {
                     distance = Memory.distances[obj.id][o.id];
                 } else {
                     distance = PathFinder.search(obj.pos, {pos: o.pos, range: range}, {swampCost: 1, maxOps: obj.pos.roomName === o.pos.roomName ? 2000 : 100000}).path.length;
-                    if (!Memory.distances) {
-                        Memory.distances = {};
+                    if (!(o instanceof Creep) && !(obj instanceof Creep)) {
+                        if (!Memory.distances) {
+                            Memory.distances = {};
+                        }
+                        if (!Memory.distances[obj.id]) {
+                            Memory.distances[obj.id] = {};
+                        }
+                        Memory.distances[obj.id][o.id] = distance;
                     }
-                    if (!Memory.distances[obj.id]) {
-                        Memory.distances[obj.id] = {};
-                    }
-                    Memory.distances[obj.id][o.id] = distance;
                 }
 
                 return {

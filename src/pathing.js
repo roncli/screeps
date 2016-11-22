@@ -133,7 +133,8 @@ var Cache = require("cache"),
                             roomCallback: (roomName) => {
                                 var matrix;
 
-                                if (Memory.avoidRooms.indexOf(roomName) !== -1) {
+                                // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room.
+                                if (Memory.avoidRooms.indexOf(roomName) !== -1 || (creep.pos.roomName === pos.roomName && roomName !== pos.roomName)) {
                                     return false;
                                 }
 

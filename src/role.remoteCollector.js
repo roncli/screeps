@@ -35,17 +35,30 @@ var Cache = require("cache"),
         spawn: (room, supportRoom) => {
             "use strict";
 
-            var body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-                spawnToUse, name;
+            var body = [],
+                energy, spawnToUse, name, count;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
-            // Fail under 750 energy.
-            if (supportRoom.energyAvailable < 750) {
-                return false;
+            // Get the total energy in the room, limited to 2400.
+            energy = Math.min(room.energyAvailable, 2400);
+
+            // If we're not at 2400 and energy is not at capacity, bail.
+            if (energy < 2400 && energy !== room.energyCapacityAvailable) {
+                return;
+            }
+
+            // Create the body based on the energy.
+            for (count = 0; count < Math.floor(energy / 150); count++) {
+                body.push(CARRY);
+                body.push(CARRY);
+            }
+
+            for (count = 0; count < Math.floor(energy / 150); count++) {
+                body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.

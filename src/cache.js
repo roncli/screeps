@@ -1,5 +1,4 @@
-var creeps = {},
-    creepsInRoom = {},
+var creepsInRoom = {},
     creepsInArmy = {},
     spawnsInRoom = {},
     extensionsInRoom = {},
@@ -26,7 +25,6 @@ var Cache = {
     reset: () => {
         "use strict";
 
-        creeps = {};
         creepsInRoom = {};
         creepsInArmy = {};
         spawnsInRoom = {};
@@ -59,17 +57,6 @@ var Cache = {
         }
     },
 
-    // Returns all creeps of a certain type.
-    creeps: (type) => {
-        "use strict";
-
-        if (type === "all") {
-            return Game.creeps;
-        }
-
-        return creeps[type] ? creeps[type] : (creeps[type] = _.filter(Game.creeps, (c) => c.memory.role === type));
-    },
-    
     // Returns all creeps of a certain in the current room.
     creepsInRoom: (type, room) => {
         "use strict";
@@ -77,7 +64,12 @@ var Cache = {
         if (!creepsInRoom[room.name]) {
             creepsInRoom[room.name] = {};
         }
-        return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(Cache.creeps(type), (c) => c.memory.home === room.name));
+
+        if (!creepsInRoom[room.name].all) {
+            creepsInRoom[room.name].all = _.filter(Game.creeps, (c) => c.memory.home === room.name);
+        }
+
+        return creepsInRoom[room.name][type] ? creepsInRoom[room.name][type] : (creepsInRoom[room.name][type] = _.filter(creepsInRoom[room.name].all, (c) => type === "all" || c.memory.role === type));
     },
 
     // Returns all creeps of a certain in an army.
@@ -87,7 +79,12 @@ var Cache = {
         if (!creepsInArmy[army]) {
             creepsInArmy[army] = {};
         }
-        return creepsInArmy[army][type] ? creepsInArmy[army][type] : (creepsInArmy[army][type] = _.filter(Cache.creeps(type), (c) => c.memory.army === army));
+
+        if (!creepsInArmy[army].all) {
+            creepsInArmy[army].all = _.filter(Game.creeps, (c) => c.memory.army === army);
+        }
+
+        return creepsInArmy[army][type] ? creepsInArmy[army][type] : (creepsInArmy[army][type] = _.filter(creepsInArmy[army].all, (c) => type === "all" || c.memory.role === type));
     },
 
     // Returns all spawns in the current room.    

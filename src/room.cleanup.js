@@ -52,7 +52,7 @@ Cleanup.prototype.run = function(room) {
         ramparts = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s instanceof StructureRampart);
 
         // Find all structures that aren't under ramparts, divided by whether they have energy or not.
-        structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.type !== STRUCTURE_RAMPART && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
+        structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureRampart) && !(s instanceof StructureController) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
         noEnergyStructures = _.filter(structures, (s) => (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0));
         energyStructures = _.filter(structures, (s) => (s.energy && s.energy > 0) || (s.store && _.sum(s.store) > 0));
 

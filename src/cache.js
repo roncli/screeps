@@ -10,7 +10,6 @@ var creepsInRoom = {},
     extractorsInRoom = {},
     flagsInRoom = {},
     hostilesInRoom = {},
-    marketOrders = null,
     costMatricies = {},
     objects = {};
 
@@ -37,7 +36,6 @@ var Cache = {
         extractorsInRoom = {};
         flagsInRoom = {};
         hostilesInRoom = {};
-        marketOrders = null;
         costMatricies = {};
         objects = {};
         Cache.creepTasks = {};
@@ -155,13 +153,6 @@ var Cache = {
         "use strict";
 
         return hostilesInRoom[room.name] ? hostilesInRoom[room.name] : (hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1));
-    },
-
-    // Get all market orders.
-    marketOrders: () => {
-        "use strict";
-
-        return marketOrders ? marketOrders : (marketOrders = Game.market.getAllOrders());
     },
 
     // Get the cost matrix for a room.

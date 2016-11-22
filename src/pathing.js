@@ -116,6 +116,7 @@ var Cache = require("cache"),
                                 restartOn: Memory.paths[key].restartOn
                             };
                         }
+                        Memory.paths[key].lastUsed = Game.time;
                     } else {
                         // Determine multiplier to use for terrain cost.
                         multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);

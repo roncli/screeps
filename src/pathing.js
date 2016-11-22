@@ -179,7 +179,7 @@ var Cache = require("cache"),
                         }
 
                         // Cache serialized path
-                        if (creep.memory._pathing.path.blocked.length === 0) {
+                        if (creep.memory._pathing.blocked.length === 0) {
                             Memory.paths[key] = {
                                 path: creep.memory._pathing.path,
                                 restartOn: restartOn,

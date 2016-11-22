@@ -163,7 +163,7 @@ var Cache = require("cache"),
             var elapsed = Game.cpu.getUsed() - begin;
 
             if (elapsed > 0.3) {
-                Cache.log.events.push("Move CPU: " + elapsed.toFixed(2) + " " + creep.name + " " + creep.room.name + " " + creep.memory.role + " " + creep.memory.currentTask.type);
+                Cache.log.events.push("Move CPU: " + elapsed.toFixed(2) + " " + creep.room.name + "." + creep.pos.x + "." + creep.pos.y + " to " + pos.roomName + "." + pos.x + "." + pos.y + " " + creep.name + " " + creep.memory.role + " " + creep.memory.currentTask.type);
             }
 
             return ret;

@@ -22,7 +22,7 @@ var Cache = require("cache"),
             }
 
             // If we don't have a remote dismantler for this room, spawn one.
-            if (_.filter(Cache.creepsInRoom("remoteDismantler", room), (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
+            if (_.filter(Cache.creepsInRoom("remoteDismantler", room), (c) => c.spawning || c.ticksToLive >= 150).length < max) {
                 RemoteDismantler.spawn(room, supportRoom);
             }
 

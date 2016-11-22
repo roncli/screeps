@@ -173,7 +173,6 @@ var Cache = {
 
             // Temporary code to keep creeps above Y = 10 in certain rooms
             if (["E36N10", "E37N10", "E38N10", "E39N10"].indexOf(room.name) !== -1) {
-                for (var i = 0; i < 50; i++) {
                     costMatricies[room.name].set(i, 11, 255);
                 }
             }

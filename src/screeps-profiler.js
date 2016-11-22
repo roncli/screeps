@@ -31,6 +31,7 @@ function setupProfiler() {
       }
     },
     reset: resetMemory,
+    print: Profiler.printProfile,
     output: Profiler.output,
   };
 
@@ -279,7 +280,6 @@ module.exports = {
   },
 
   output: Profiler.output,
-  print: Profiler.printProfile,
 
   registerObject: profileObjectFunctions,
   registerFN: profileFunction,

@@ -356,7 +356,7 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
-                    _.forEach(Cache.mineralsInRoom(room), (m) => {
+                    _.forEach(room.find(FIND_MINERALS), (m) => {
                         Cache.log.rooms[room.name].source.push({
                             sourceId: m.id,
                             resource: m.mineralType,

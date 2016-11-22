@@ -115,7 +115,7 @@ var Cache = require("cache"),
             }
             
             // Cannot be within 1 square of a mineral.
-            _.forEach(Cache.mineralsInRoom(room), (source) => {
+            _.forEach(room.find(FIND_MINERALS), (source) => {
                 return siteClear = pos.getRangeTo(source) > 1;
             });
             if (!siteClear) {

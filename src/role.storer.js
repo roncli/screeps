@@ -20,7 +20,7 @@ var Cache = require("cache"),
 
             // Determine the number storers needed.
             _.forEach(Cache.containersInRoom(room), (container) => {
-                var closest = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), container)[0];
+                var closest = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0];
 
                 if (!Memory.lengthToStorage[container.id]) {
                     // Since minerals produce up to half as much as sources, count the length for half.

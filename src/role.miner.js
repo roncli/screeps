@@ -18,7 +18,7 @@ var Cache = require("cache"),
                 var source;
                 
                 // If this container is for a mineral, check to make sure it has resources.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
                     if (source.mineralAmount === 0) {
                         return;
                     }
@@ -62,7 +62,7 @@ var Cache = require("cache"),
             }
 
             // Do something different for minerals.
-            if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), Cache.getObjectById(id))[0] instanceof Mineral) {
+            if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
                 // If we're not at 4450 and energy is not at capacity, bail.
                 if (energy < 4450 && energy !== room.energyCapacityAvailable) {
                     return;

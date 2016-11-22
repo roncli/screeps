@@ -84,8 +84,8 @@ Base.prototype.manage = function(room) {
     }
 
     // At RCL6, build extractor.
-    if (room.controller.level >= 6 && Cache.mineralsInRoom(room).length !== Cache.extractorsInRoom(room).length) {
-        _.forEach(Cache.mineralsInRoom(room), (mineral) => {
+    if (room.controller.level >= 6 && room.find(FIND_MINERALS).length !== Cache.extractorsInRoom(room).length) {
+        _.forEach(room.find(FIND_MINERALS), (mineral) => {
             if (
                 _.filter(mineral.pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureExtractor).length === 0 &&
                 _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === mineral.pos.x && s.pos.y === mineral.pos.y && s instanceof StructureExtractor).length === 0
@@ -97,7 +97,7 @@ Base.prototype.manage = function(room) {
 
     // At RCL6, build containers by minerals.
     if (room.controller.level >= 6) {
-        _.forEach(Cache.mineralsInRoom(room), (mineral) => {
+        _.forEach(room.find(FIND_MINERALS), (mineral) => {
             var location = PathFinder.search(mineral.pos, {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {swampCost: 1}).path[0];
 
             if (

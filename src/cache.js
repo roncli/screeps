@@ -8,7 +8,6 @@ var creeps = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
-    mineralsInRoom = {},
     resourcesInRoom = {},
     extractorsInRoom = {},
     flagsInRoom = {},
@@ -38,7 +37,6 @@ var Cache = {
         containersInRoom = {};
         linksInRoom = {};
         repairableStructuresInRoom = {};
-        mineralsInRoom = {};
         resourcesInRoom = {};
         extractorsInRoom = {};
         flagsInRoom = {};
@@ -141,13 +139,6 @@ var Cache = {
         "use strict";
 
         return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || [STRUCTURE_WALL, STRUCTURE_ROAD, STRUCTURE_CONTAINER].indexOf(s.structureType) !== -1)}));
-    },
-
-    // Returns all minerals in the current room.
-    mineralsInRoom: (room) => {
-        "use strict";
-
-        return mineralsInRoom[room.name] ? mineralsInRoom[room.name] : (mineralsInRoom[room.name] = room.find(FIND_MINERALS));
     },
 
     // Returns all resources in the current room.

@@ -24,7 +24,7 @@ var Cache = require("cache"),
                 var source;
 
                 // If this container is for a mineral, skip it.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
                     return;
                 }
 

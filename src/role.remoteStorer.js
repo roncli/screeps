@@ -22,7 +22,7 @@ var Cache = require("cache"),
                     source, length, linkToUse;
 
                 // If this container is for a mineral, bail if there are no minerals left.  If it's not a mineral, start counter at -1 since it has a worker on it already.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
                     if (source.mineralAmount === 0) {
                         return;
                     }

@@ -132,7 +132,7 @@ var Cache = require("cache"),
 
             // Check for 1-progress construction sites.
             _.forEach(creepsWithNoTask, (creep) => {
-                sites = _.filter(Cache.constructionSitesInRoom(creep.room), (c) => c.progressTotal === 1);
+                sites = _.filter(creep.room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progressTotal === 1);
                 if (sites.length > 0) {
                     var task = new TaskBuild(sites[0].id);
                     if (task.canAssign(creep)) {
@@ -171,8 +171,8 @@ var Cache = require("cache"),
 
             // Check for construction sites.
             _.forEach(creepsWithNoTask, (creep) => {
-                if (Cache.constructionSitesInRoom(creep.room).length > 0) {
-                    var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
+                if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
+                    var task = new TaskBuild(creep.room.find(FIND_MY_CONSTRUCTION_SITES)[0].id);
                     if (task.canAssign(creep)) {
                         creep.say("Build");
                         assigned.push(creep.name);

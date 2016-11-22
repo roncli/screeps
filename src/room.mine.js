@@ -121,7 +121,7 @@ Mine.prototype.run = function(room) {
             }
 
             // Check to see if we have construction sites for the containers.  If not, create them.
-            if (Cache.constructionSitesInRoom(room).length === 0) {
+            if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) {
                 spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
 
                 _.forEach(Cache.energySourcesInRoom(room), (source) => {
@@ -129,7 +129,7 @@ Mine.prototype.run = function(room) {
 
                     if (
                         _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureContainer).length === 0 &&
-                        _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === location.x && s.pos.y === location.y && s instanceof StructureContainer).length === 0
+                        _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === location.x && s.pos.y === location.y && s instanceof StructureContainer).length === 0
                     ) {
                         // Build the container.
                         room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);

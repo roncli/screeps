@@ -102,8 +102,8 @@ var Cache = require("cache"),
 
             // Check for enemy construction sites and rally to them.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
-                if (Cache.enemyConstructionSitesInRoom(room).length > 0) {
-                    var task = new TaskRally(Cache.enemyConstructionSitesInRoom(room)[0].id);
+                if (room.find(FIND_HOSTILE_CONSTRUCTION_SITES).length > 0) {
+                    var task = new TaskRally(room.find(FIND_HOSTILE_CONSTRUCTION_SITES)[0].id);
                     task.canAssign(creep);
                     creep.say("Stomping");
                     assigned.push(creep.name);
@@ -160,8 +160,8 @@ var Cache = require("cache"),
 
             // Check for construction sites.
             _.forEach(creepsWithNoTask, (creep) => {
-                if (Cache.constructionSitesInRoom(creep.room).length > 0) {
-                    var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
+                if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
+                    var task = new TaskBuild(creep.room.find(FIND_MY_CONSTRUCTION_SITES)[0].id);
                     if (task.canAssign(creep)) {
                         creep.say("Build");
                         assigned.push(creep.name);

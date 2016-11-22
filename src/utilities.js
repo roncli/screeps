@@ -156,7 +156,7 @@ var Cache = require("cache"),
                         }
 
                         // If there is already a construction site here, skip.
-                        if (_.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === x && s.pos.y === y).length > 0) {
+                        if (_.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === x && s.pos.y === y).length > 0) {
                             continue;
                         }
 

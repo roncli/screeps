@@ -8,8 +8,6 @@ var creeps = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
-    constructionSitesInRoom = {},
-    enemyConstructionSitesInRoom = {},
     energySourcesInRoom = {},
     mineralsInRoom = {},
     resourcesInRoom = {},
@@ -41,7 +39,6 @@ var Cache = {
         containersInRoom = {};
         linksInRoom = {};
         repairableStructuresInRoom = {};
-        constructionSitesInRoom = {};
         energySourcesInRoom = {};
         mineralsInRoom = {};
         resourcesInRoom = {};
@@ -146,20 +143,6 @@ var Cache = {
         "use strict";
 
         return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || [STRUCTURE_WALL, STRUCTURE_ROAD, STRUCTURE_CONTAINER].indexOf(s.structureType) !== -1)}));
-    },
-
-    // Return all construction sites in the current room.
-    constructionSitesInRoom: (room) => {
-        "use strict";
-
-        return constructionSitesInRoom[room.name] ? constructionSitesInRoom[room.name] : (constructionSitesInRoom[room.name] = room.find(FIND_MY_CONSTRUCTION_SITES));
-    },
-
-    // Return all enemy construction sites in the current room.
-    enemyConstructionSitesInRoom: (room) => {
-        "use strict";
-
-        return enemyConstructionSitesInRoom[room.name] ? enemyConstructionSitesInRoom[room.name] : (enemyConstructionSitesInRoom[room.name] = room.find(FIND_HOSTILE_CONSTRUCTION_SITES));
     },
 
     // Returns all energy sources in the current room.

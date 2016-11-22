@@ -329,8 +329,8 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[room.name].energyCapacityAvailable = room.energyCapacityAvailable;
                     }
 
-                    Cache.log.rooms[room.name].constructionProgress = _.sum(_.map(Cache.constructionSitesInRoom(room), (c) => c.progress));
-                    Cache.log.rooms[room.name].constructionProgressTotal = _.sum(_.map(Cache.constructionSitesInRoom(room), (c) => c.progressTotal));
+                    Cache.log.rooms[room.name].constructionProgress = _.sum(_.map(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progress));
+                    Cache.log.rooms[room.name].constructionProgressTotal = _.sum(_.map(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progressTotal));
 
                     Cache.log.rooms[room.name].towerEnergy = _.sum(_.map(Cache.towersInRoom(room), (t) => t.energy));
                     Cache.log.rooms[room.name].towerEnergyCapacity = _.sum(_.map(Cache.towersInRoom(room), (t) => t.energyCapacity));

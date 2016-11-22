@@ -83,7 +83,7 @@ var Cache = require("cache"),
                     case "attack":
                         tasks.melee.tasks = _.map(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => new TaskMeleeAttack(c.id));
                         tasks.ranged.tasks = _.map(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => new TaskRangedAttack(c.id));
-                        tasks.rally.tasks = _.map(Cache.enemyConstructionSitesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => new TaskRally(c.id));
+                        tasks.rally.tasks = _.map(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES), (c) => new TaskRally(c.id));
                         break;
                 }
             }

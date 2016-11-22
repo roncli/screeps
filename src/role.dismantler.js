@@ -143,8 +143,8 @@ var Cache = require("cache"),
 
             // Check for construction sites.
             _.forEach(creepsWithNoTask, (creep) => {
-                if (Cache.constructionSitesInRoom(creep.room).length > 0) {
-                    var task = new TaskBuild(Cache.constructionSitesInRoom(creep.room)[0].id);
+                if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
+                    var task = new TaskBuild(creep.room.find(FIND_MY_CONSTRUCTION_SITES)[0].id);
                     if (task.canAssign(creep)) {
                         creep.say("Build");
                         assigned.push(creep.name);

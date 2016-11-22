@@ -43,13 +43,13 @@ Base.prototype.manage = function(room) {
     }
 
     // Build more extensions if they are available.
-    if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][room.controller.level - 1] - (Cache.extensionsInRoom(room).length + _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_EXTENSION).length)) > 0) {
+    if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][room.controller.level - 1] - (Cache.extensionsInRoom(room).length + _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.structureType === STRUCTURE_EXTENSION).length)) > 0) {
         // Build the needed structures.
         Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, Cache.spawnsInRoom(room)[0]);
     }
 
     // At RCL3, build first tower.
-    if (room.controller.level >= 3 && Cache.towersInRoom(room).length === 0 && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_TOWER).length === 0) {
+    if (room.controller.level >= 3 && Cache.towersInRoom(room).length === 0 && _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.structureType === STRUCTURE_TOWER).length === 0) {
         Utilities.buildStructures(room, STRUCTURE_TOWER, 1, Cache.spawnsInRoom(room)[0]);
     }
 
@@ -60,7 +60,7 @@ Base.prototype.manage = function(room) {
 
             if (
                 _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureContainer).length === 0 &&
-                _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === location.x && s.pos.y === location.y && s instanceof StructureContainer).length === 0
+                _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === location.x && s.pos.y === location.y && s instanceof StructureContainer).length === 0
             ) {
                 // Destroy roads and walls at this location.
                 _.forEach(_.filter(location.lookFor(LOOK_STRUCTURES), (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
@@ -74,12 +74,12 @@ Base.prototype.manage = function(room) {
     }
 
     // At RCL4, build storage.
-    if (room.controller.level >= 4 && !room.storage && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_STORAGE).length === 0) {
+    if (room.controller.level >= 4 && !room.storage && _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.structureType === STRUCTURE_STORAGE).length === 0) {
         Utilities.buildStructures(room, STRUCTURE_STORAGE, 1, Cache.spawnsInRoom(room)[0]);
     }
 
     // At RCL6, build terminal.
-    if (room.controller.level >= 6 && room.storage && !room.terminal && _.filter(Cache.constructionSitesInRoom(room), (c) => c.structureType === STRUCTURE_TERMINAL).length === 0) {
+    if (room.controller.level >= 6 && room.storage && !room.terminal && _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.structureType === STRUCTURE_TERMINAL).length === 0) {
         Utilities.buildStructures(room, STRUCTURE_TERMINAL, 1, room.storage);
     }
 
@@ -88,7 +88,7 @@ Base.prototype.manage = function(room) {
         _.forEach(Cache.mineralsInRoom(room), (mineral) => {
             if (
                 _.filter(mineral.pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureExtractor).length === 0 &&
-                _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === mineral.pos.x && s.pos.y === mineral.pos.y && s instanceof StructureExtractor).length === 0
+                _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === mineral.pos.x && s.pos.y === mineral.pos.y && s instanceof StructureExtractor).length === 0
             ) {
                 room.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
             }
@@ -102,7 +102,7 @@ Base.prototype.manage = function(room) {
 
             if (
                 _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureContainer).length === 0 &&
-                _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === location.x && s.pos.y === location.y && s instanceof StructureContainer).length === 0
+                _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === location.x && s.pos.y === location.y && s instanceof StructureContainer).length === 0
             ) {
                 // Destroy roads and walls at this location.
                 _.forEach(_.filter(location.lookFor(LOOK_STRUCTURES), (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
@@ -121,7 +121,7 @@ Base.prototype.manage = function(room) {
             _.forEach([new RoomPosition(structure.pos.x - 1, structure.pos.y, room.name), new RoomPosition(structure.pos.x + 1, structure.pos.y, room.name), new RoomPosition(structure.pos.x, structure.pos.y - 1, room.name), new RoomPosition(structure.pos.x, structure.pos.y + 1, room.name)], (pos) => {
                 if (
                     _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureRoad).length === 0 &&
-                    _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s instanceof StructureRoad).length === 0
+                    _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s instanceof StructureRoad).length === 0
                 ) {
                     room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
                 }
@@ -136,13 +136,13 @@ Base.prototype.manage = function(room) {
                 var structures = pos.lookFor(LOOK_STRUCTURES);
                 if (
                     _.filter(structures, (s) => s.structureType !== STRUCTURE_RAMPART).length > 0 ||
-                    _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType !== STRUCTURE_RAMPART).length > 0
+                    _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType !== STRUCTURE_RAMPART).length > 0
                 ) {
                     return;
                 }
                 if (
                     _.filter(structures, (s) => s instanceof StructureRoad).length === 0 &&
-                    _.filter(Cache.constructionSitesInRoom(room), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s instanceof StructureRoad).length === 0
+                    _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s instanceof StructureRoad).length === 0
                 ) {
                     room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
                 }

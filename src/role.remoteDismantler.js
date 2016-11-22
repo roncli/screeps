@@ -10,7 +10,7 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var max = 8;
+            var max = 1;
 
             if (!supportRoom) {
                 supportRoom = room;

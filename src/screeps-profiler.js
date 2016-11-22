@@ -143,7 +143,7 @@ const Profiler = {
   },
 
   output(numresults) {
-    const displayresults = !!numresults ? numresults : 20;
+    const displayresults = !!numresults ? numresults : 200;
     if (!Memory.profiler || !Memory.profiler.enabledTick) {
       return 'Profiler not active.';
     }

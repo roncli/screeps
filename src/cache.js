@@ -101,21 +101,21 @@ var Cache = {
     extensionsInRoom: (room) => {
         "use strict";
 
-        return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : (extensionsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s instanceof StructureExtension));
+        return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : (extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.room.name === room.name && s instanceof StructureExtension));
     },
 
     // Returns all towers in the current room.
     towersInRoom: (room) => {
         "use strict";
 
-        return towersInRoom[room.name] ? towersInRoom[room.name] : (towersInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s instanceof StructureTower));
+        return towersInRoom[room.name] ? towersInRoom[room.name] : (towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.room.name === room.name && s instanceof StructureTower));
     },
 
     // Returns all labs in the current room.
     labsInRoom: (room) => {
         "use strict";
 
-        return labsInRoom[room.name] ? labsInRoom[room.name] : (labsInRoom[room.name] = _.filter(Game.structures, (s) => s.room.name === room.name && s instanceof StructureLab));
+        return labsInRoom[room.name] ? labsInRoom[room.name] : (labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.room.name === room.name && s instanceof StructureLab));
     },
 
     // Returns all containers in the current room.

@@ -171,12 +171,6 @@ var Cache = {
         if (!costMatricies[room.name]) {
             costMatricies[room.name] = new PathFinder.CostMatrix();
 
-            // Temporary code to keep creeps above Y = 10 in certain rooms
-            if (["E36N10", "E37N10", "E38N10", "E39N10"].indexOf(room.name) !== -1) {
-                    costMatricies[room.name].set(i, 11, 255);
-                }
-            }
-
             _.forEach(room.find(FIND_STRUCTURES), (structure) => {
                 if (structure instanceof StructureRoad) {
                     costMatricies[room.name].set(structure.pos.x, structure.pos.y, 1);

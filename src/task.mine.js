@@ -45,7 +45,7 @@ Mine.prototype.run = function(creep) {
         if (Memory.containerSource[creep.memory.container]) {
             creep.harvest(Cache.getObjectById(Memory.containerSource[creep.memory.container]));
         } else {
-            creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(container.room), Cache.mineralsInRoom(container.room)]), creep)[0]);
+            creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), Cache.mineralsInRoom(container.room)]), creep)[0]);
         }
 
         // Suicide creep if there's another one right here with a higher TTL.

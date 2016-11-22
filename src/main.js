@@ -346,7 +346,7 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[room.name].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
                     }
 
-                    _.forEach(Cache.energySourcesInRoom(room), (s) => {
+                    _.forEach(room.find(FIND_SOURCES), (s) => {
                         Cache.log.rooms[room.name].source.push({
                             sourceId: s.id,
                             resource: RESOURCE_ENERGY,

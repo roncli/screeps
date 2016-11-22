@@ -176,7 +176,7 @@ FillEnergy.getFillLinkTask = function(fromRoom, toRoom) {
         if (links.length === 1) {
             return new FillEnergy(links[0].id);
         } else if (links.length > 1) {
-            return new FillEnergy(Utilities.objectsClosestToObjByPath(links, Cache.energySourcesInRoom(fromRoom)[0])[0].id);
+            return new FillEnergy(Utilities.objectsClosestToObjByPath(links, fromRoom.find(FIND_SOURCES)[0])[0].id);
         }
     }
 

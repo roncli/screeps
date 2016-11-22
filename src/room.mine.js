@@ -37,7 +37,7 @@ Mine.prototype.run = function(room) {
         supportRoom, oldRoomType, spawnToUse, tasks;
 
     // If there are no energy sources, bail.
-    if (!room.unobservable && Cache.energySourcesInRoom(room).length === 0) {
+    if (!room.unobservable && room.find(FIND_SOURCES).length === 0) {
         return;
     }
 
@@ -59,7 +59,7 @@ Mine.prototype.run = function(room) {
                         case "remoteWorker":
                             creep.memory.role = "worker";
                             creep.memory.home = room.name;
-                            creep.memory.homeSource = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), creep)[0].id;
+                            creep.memory.homeSource = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), creep)[0].id;
                             break;
                         case "remoteReserver":
                             creep.suicide();
@@ -98,7 +98,7 @@ Mine.prototype.run = function(room) {
 
         if (!room.unobservable) {
             // Check to see if we have built containers.  If so, move to stage 2.
-            if (Cache.containersInRoom(room).length === Cache.energySourcesInRoom(room).length) {
+            if (Cache.containersInRoom(room).length === room.find(FIND_SOURCES).length) {
                 this.stage = 2;
 
                 // Loop through containers to get first container by source.
@@ -106,7 +106,7 @@ Mine.prototype.run = function(room) {
                     var source;
 
                     // If this container is for a mineral, skip it.
-                    if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                    if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
                         return;
                     }
 
@@ -124,7 +124,7 @@ Mine.prototype.run = function(room) {
             if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) {
                 spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
 
-                _.forEach(Cache.energySourcesInRoom(room), (source) => {
+                _.forEach(room.find(FIND_SOURCES), (source) => {
                     var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
 
                     if (
@@ -152,7 +152,7 @@ Mine.prototype.run = function(room) {
             }
         } else {
             // Check to see if we lost built containers.  If so, move to stage 1.
-            if (Cache.containersInRoom(room).length !== Cache.energySourcesInRoom(room).length) {
+            if (Cache.containersInRoom(room).length !== room.find(FIND_SOURCES).length) {
                 this.stage = 1;
             }
 

@@ -135,7 +135,7 @@ var Cache = require("cache"),
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     var task = new TaskHarvest(),
-                        sources = Utilities.objectsClosestToObj(_.filter(Cache.energySourcesInRoom(room), (s) => s.energy > 0), creep);
+                        sources = Utilities.objectsClosestToObj(_.filter(room.find(FIND_SOURCES), (s) => s.energy > 0), creep);
                     
                     if (sources.length === 0) {
                         return false;

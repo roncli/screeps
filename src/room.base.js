@@ -55,7 +55,7 @@ Base.prototype.manage = function(room) {
 
     // At RC3, build containers by source.
     if (room.controller.level >= 3) {
-        _.forEach(Cache.energySourcesInRoom(room), (source) => {
+        _.forEach(room.find(FIND_SOURCES), (source) => {
             var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {swampCost: 1}).path[0];
 
             if (

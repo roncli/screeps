@@ -107,7 +107,7 @@ var Cache = require("cache"),
             }
 
             // Cannot be within 1 square of a source.
-            _.forEach(Cache.energySourcesInRoom(room), (source) => {
+            _.forEach(room.find(FIND_SOURCES), (source) => {
                 return siteClear = pos.getRangeTo(source) > 1;
             });
             if (!siteClear) {

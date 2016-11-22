@@ -8,7 +8,6 @@ var creeps = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
-    energySourcesInRoom = {},
     mineralsInRoom = {},
     resourcesInRoom = {},
     extractorsInRoom = {},
@@ -39,7 +38,6 @@ var Cache = {
         containersInRoom = {};
         linksInRoom = {};
         repairableStructuresInRoom = {};
-        energySourcesInRoom = {};
         mineralsInRoom = {};
         resourcesInRoom = {};
         extractorsInRoom = {};
@@ -143,13 +141,6 @@ var Cache = {
         "use strict";
 
         return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || [STRUCTURE_WALL, STRUCTURE_ROAD, STRUCTURE_CONTAINER].indexOf(s.structureType) !== -1)}));
-    },
-
-    // Returns all energy sources in the current room.
-    energySourcesInRoom: (room) => {
-        "use strict";
-
-        return energySourcesInRoom[room.name] ? energySourcesInRoom[room.name] : (energySourcesInRoom[room.name] = room.find(FIND_SOURCES));
     },
 
     // Returns all minerals in the current room.

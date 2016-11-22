@@ -24,7 +24,7 @@ var Cache = require("cache"),
                 var source;
 
                 // If this container is for a mineral, skip it.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [Cache.energySourcesInRoom(room), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
+                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), Cache.mineralsInRoom(room)]), container)[0]) instanceof Mineral) {
                     return;
                 }
 
@@ -272,7 +272,7 @@ var Cache = require("cache"),
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     var task = new TaskHarvest(),
-                        sources = Utilities.objectsClosestToObj(_.filter(Cache.energySourcesInRoom(room), (s) => s.energy > 0), creep);
+                        sources = Utilities.objectsClosestToObj(_.filter(room.find(FIND_SOURCES), (s) => s.energy > 0), creep);
                     
                     if (sources.length === 0) {
                         return false;

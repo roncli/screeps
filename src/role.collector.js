@@ -22,7 +22,7 @@ var Cache = require("cache"),
             }
 
             // If there is only one energy source, ignore the room.
-            sources = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0]);
+            sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0]);
             if (sources.length <= 1) {
                 return;
             }

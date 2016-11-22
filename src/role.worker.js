@@ -11,7 +11,7 @@ var Cache = require("cache"),
             var count, sources, max;
             
             // If there are no energy sources, ignore the room.
-            sources = Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0]);
+            sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0]);
             if (sources.length === 0) {
                 return;
             }
@@ -78,7 +78,7 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === room.name ? 0 : 1)[0];
-            name = spawnToUse.createCreep(body, undefined, {role: "worker", home: room.name, homeSource: Utilities.objectsClosestToObj(Cache.energySourcesInRoom(room), Cache.spawnsInRoom(room)[0])[0].id});
+            name = spawnToUse.createCreep(body, undefined, {role: "worker", home: room.name, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0])[0].id});
             if (spawnToUse.room.name === room.name) {
                 Cache.spawning[spawnToUse.id] = true;
             }

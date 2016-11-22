@@ -14,6 +14,7 @@ var Task = require("task"),
         }
         if (!this.rallyPoint) {
             this.rallyPoint = new RoomPosition(25, 25, id);
+            this.range = 5;
         }
     };
     

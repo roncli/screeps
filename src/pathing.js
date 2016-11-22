@@ -18,7 +18,7 @@ var Cache = require("cache"),
 
             var ret = (() => {
                 var restartOn = [],
-                    wasStationary, firstPos, multiplier, path;
+                    wasStationary, firstPos, multiplier, path, key;
 
                 if (pos instanceof RoomObject) {
                     pos = pos.pos;
@@ -91,65 +91,102 @@ var Cache = require("cache"),
                 
                 // If we don't have a _pathing, generate it.
                 if (!creep.memory._pathing || !creep.memory._pathing.path) {
-                    // Determine multiplier to use for terrain cost.
-                    multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
+                    key = creep.pos.roomName + "." + creep.pos.x + "." + creep.pos.y + "." + pos.roomName + "." + pos.x + "." + pos.y + "." + range;
 
-                    path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
-                        plainCost: Math.ceil(1 * multiplier),
-                        swampCost: Math.ceil(5 * multiplier),
-                        maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
-                        roomCallback: (roomName) => {
-                            var matrix;
-
-                            if (Memory.avoidRooms.indexOf(roomName) !== -1) {
-                                return false;
-                            }
-
-                            if (!Game.rooms[roomName]) {
-                                restartOn.push(roomName);
-                                return;
-                            }
-
-                            matrix = Cache.getCostMatrix(Game.rooms[roomName]);
-
-                            if (creep.memory._pathing && roomName === creep.room.name) {
-                                _.forEach(creep.memory._pathing.blocked, (blocked) => {
-                                    if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
-                                        matrix.set(blocked.x, blocked.y, 255);
-                                    }
-                                });
-                            }
-
-                            return matrix;
+                    if ((!creep.memory._pathing || creep.memory._pathing.blocked.length === 0) && Memory.paths[key]) {
+                        // Use the cache.
+                        if (creep.memory._pathing) {
+                            creep.memory._pathing.path = Memory.paths[key].path;
+                            creep.memory._pathing.restartOn = Memory.paths[key].restartOn;
+                        } else {
+                            creep.memory._pathing = {
+                                start: {
+                                    x: creep.pos.x,
+                                    y: creep.pos.y,
+                                    room: creep.room.name
+                                },
+                                dest: {
+                                    x: pos.x,
+                                    y: pos.y,
+                                    room: pos.roomName
+                                },
+                                path: Memory.paths[key].path,
+                                stationary: 0,
+                                blocked: [],
+                                restartOn: Memory.paths[key].restartOn
+                            };
                         }
-                    });
-
-                    if (!path.path || path.path.length === 0) {
-                        // There is no path, just return.
-                        return;
-                    }
-
-                    // Serialize the path.
-                    if (creep.memory._pathing) {
-                        creep.memory._pathing.path = Pathing.serializePath(creep.pos, path.path)
-                        creep.memory._pathing.restartOn = restartOn;
                     } else {
-                        creep.memory._pathing = {
-                            start: {
-                                x: creep.pos.x,
-                                y: creep.pos.y,
-                                room: creep.room.name
-                            },
-                            dest: {
-                                x: pos.x,
-                                y: pos.y,
-                                room: pos.roomName
-                            },
-                            path: Pathing.serializePath(creep.pos, path.path),
-                            stationary: 0,
-                            blocked: [],
-                            restartOn: restartOn
-                        };
+                        // Determine multiplier to use for terrain cost.
+                        multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
+
+                        path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
+                            plainCost: Math.ceil(1 * multiplier),
+                            swampCost: Math.ceil(5 * multiplier),
+                            maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
+                            roomCallback: (roomName) => {
+                                var matrix;
+
+                                if (Memory.avoidRooms.indexOf(roomName) !== -1) {
+                                    return false;
+                                }
+
+                                if (!Game.rooms[roomName]) {
+                                    restartOn.push(roomName);
+                                    return;
+                                }
+
+                                matrix = Cache.getCostMatrix(Game.rooms[roomName]);
+
+                                if (creep.memory._pathing && roomName === creep.room.name) {
+                                    _.forEach(creep.memory._pathing.blocked, (blocked) => {
+                                        if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
+                                            matrix.set(blocked.x, blocked.y, 255);
+                                        }
+                                    });
+                                }
+
+                                return matrix;
+                            }
+                        });
+
+                        if (!path.path || path.path.length === 0) {
+                            // There is no path, just return.
+                            return;
+                        }
+
+                        // Serialize the path.
+                        if (creep.memory._pathing) {
+                            creep.memory._pathing.path = Pathing.serializePath(creep.pos, path.path)
+                            creep.memory._pathing.restartOn = restartOn;
+                        } else {
+                            creep.memory._pathing = {
+                                start: {
+                                    x: creep.pos.x,
+                                    y: creep.pos.y,
+                                    room: creep.room.name
+                                },
+                                dest: {
+                                    x: pos.x,
+                                    y: pos.y,
+                                    room: pos.roomName
+                                },
+                                path: Pathing.serializePath(creep.pos, path.path),
+                                stationary: 0,
+                                blocked: [],
+                                restartOn: restartOn
+                            };
+                        }
+
+                        // Cache serialized path
+                        if (creep.memory._pathing.path.blocked.length === 0) {
+                            Memory.paths[key] = {
+                                path: creep.memory._pathing.path,
+                                restartOn: restartOn,
+                                firstUsed: Game.time,
+                                lastUsed: Game.time
+                            }
+                        }
                     }
                 }
 

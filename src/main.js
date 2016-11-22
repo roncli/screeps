@@ -115,6 +115,9 @@ var profiler = require("screeps-profiler"),
             if (!Memory.avoidRooms) {
                 Memory.avoidRooms = [];
             }
+            if (!Memory.paths) {
+                Memory.paths = {};
+            }
 
             // Clear old memory.
             _.forEach(Memory.creeps, (creep, name) => {
@@ -163,6 +166,11 @@ var profiler = require("screeps-profiler"),
                          delete max[room];
                      }
                 });
+            });
+            _.forEach(Memory.paths, (value, id) => {
+                if (value.lastUsed <= Game.time - 1000) {
+                    delete Memory.paths[id];
+                }
             });
             delete Memory.flags;
         },

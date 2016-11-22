@@ -43,6 +43,10 @@ var profiler = require("screeps-profiler"),
                 return;
             }
 
+            if (Memory.profiling && !Game.profiler) {
+                profiler.enable();
+            }
+
             profiler.wrap(() => {
                 main.init();
                 main.log();
@@ -497,9 +501,4 @@ var profiler = require("screeps-profiler"),
     };
 
 profiler.registerObject(main, "main");
-
-if (Memory.profiling) {
-    profiler.enable();
-}
-
 module.exports = main;

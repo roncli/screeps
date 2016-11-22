@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
 
     RemoteCollector = {

@@ -108,6 +108,9 @@ var profiler = require("screeps-profiler"),
             if (!Memory.army) {
                 Memory.army = {};
             }
+            if (!Memory.avoidRooms) {
+                Memory.avoidRooms = [];
+            }
 
             // Clear old memory.
             _.forEach(Memory.creeps, (creep, name) => {

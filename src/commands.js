@@ -177,6 +177,15 @@ var Cache = require("cache"),
                 Memory.army[army] = options;
                 Memory.army[army].directive = "building";
             }
+        },
+
+        avoidRoom: (room, avoid) => {
+            if (avoid && Memory.avoidRooms.indexOf(room) === -1) {
+                Memory.avoidRooms.push(room);
+            }
+            if (!avoid) {
+                _.remove(Memory.avoidRooms, (r) => r === room);
+            }
         }
     };
 

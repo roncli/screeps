@@ -310,7 +310,7 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[room.name].tte = room.controller.reservation.ticksToEnd;
                     }
 
-                    _.forEach(_.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) === -1), (s) => s.hits), (s) => {
+                    _.forEach(_.filter(Cache.repairableStructuresInRoom(room), (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
                         Cache.log.structures.push({
                             structureId: s.id,
                             room: room.name,
@@ -322,7 +322,7 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
-                    Cache.log.rooms[room.name].lowestWall = _.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== -1), (s) => s.hits)[0];
+                    Cache.log.rooms[room.name].lowestWall = _.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits)[0];
 
                     if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
                         Cache.log.rooms[room.name].energyAvailable = room.energyAvailable;

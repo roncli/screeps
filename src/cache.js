@@ -8,7 +8,6 @@ var creeps = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
-    resourcesInRoom = {},
     extractorsInRoom = {},
     flagsInRoom = {},
     hostilesInRoom = {},
@@ -37,7 +36,6 @@ var Cache = {
         containersInRoom = {};
         linksInRoom = {};
         repairableStructuresInRoom = {};
-        resourcesInRoom = {};
         extractorsInRoom = {};
         flagsInRoom = {};
         hostilesInRoom = {};
@@ -139,13 +137,6 @@ var Cache = {
         "use strict";
 
         return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || [STRUCTURE_WALL, STRUCTURE_ROAD, STRUCTURE_CONTAINER].indexOf(s.structureType) !== -1)}));
-    },
-
-    // Returns all resources in the current room.
-    resourcesInRoom: (room) => {
-        "use strict";
-
-        return resourcesInRoom[room.name] ? resourcesInRoom[room.name] : (resourcesInRoom[room.name] = room.find(FIND_DROPPED_RESOURCES));
     },
 
     // Returns all extractors in the current room.

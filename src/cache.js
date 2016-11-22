@@ -25,7 +25,6 @@ var Cache = {
     roomTypes: {},
     spawning: {},
     haulers: {},
-    creepMoved: {},
     log: {},
 
     // Reset the cache.
@@ -56,7 +55,6 @@ var Cache = {
         Cache.roomTypes = {};
         Cache.spawning = {};
         Cache.haulers = {};
-        Cache.creepMoved = {};
 
         Cache.log = {
             events: [],

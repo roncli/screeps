@@ -17,10 +17,6 @@ var Cache = require("cache"),
             var restartOn = [],
                 wasStationary, firstPos, multiplier, path;
 
-            if (Cache.creepMoved[creep.name]) {
-                return;
-            }
-
             if (pos instanceof RoomObject) {
                 pos = pos.pos;
             }
@@ -159,7 +155,6 @@ var Cache = require("cache"),
                 // We couldn't move, so don't penalize stationary movement.
                 creep.memory._pathing.stationary -= 1;
             }
-            Cache.creepMoved[creep.name] = true;
         },
 
         serializePath: (start, path) => {

@@ -14,147 +14,159 @@ var Cache = require("cache"),
         moveTo: (creep, pos, range) => {
             "use strict";
 
-            var restartOn = [],
-                wasStationary, firstPos, multiplier, path;
+            var begin = Game.cpu.getUsed();
 
-            if (pos instanceof RoomObject) {
-                pos = pos.pos;
-            }
+            var ret = (() => {
+                var restartOn = [],
+                    wasStationary, firstPos, multiplier, path;
 
-            // Default range to 0.
-            if (!range) {
-                range = 0;
-            }
+                if (pos instanceof RoomObject) {
+                    pos = pos.pos;
+                }
 
-            // If creep is at the position, we're done.
-            if (creep.pos.getRangeTo(pos) <= range) {
-                delete creep.memory._pathing;
-                return;
-            }
+                // Default range to 0.
+                if (!range) {
+                    range = 0;
+                }
 
-            if (creep.memory._pathing) {
-                // If the position doesn't match where we're going, nuke _pathing.
-                if (creep.memory._pathing.dest.x !== pos.x || creep.memory._pathing.dest.y !== pos.y || creep.memory._pathing.dest.room !== pos.roomName) {
+                // If creep is at the position, we're done.
+                if (creep.pos.getRangeTo(pos) <= range) {
                     delete creep.memory._pathing;
-                }
-            }
-
-            // If we're in a room to restart the search on, clear the path.
-            if (creep.memory._pathing && creep.memory._pathing.restartOn && creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
-                delete creep.memory._pathing.path;
-                delete creep.memory._pathing.restartOn;
-            }
-
-            // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.path.
-            if (creep.memory._pathing) {
-                wasStationary = creep.pos.x === creep.memory._pathing.start.x && creep.pos.y === creep.memory._pathing.start.y && creep.room.name === creep.memory._pathing.start.room;
-                
-                creep.memory._pathing.stationary = (wasStationary) ? creep.memory._pathing.stationary + 1 : 0;
-
-                if (creep.memory._pathing.stationary >= 2) {
-                    if (creep.memory._pathing.path && creep.memory._pathing.path.length > 0) {
-                        firstPos = {
-                            x: creep.pos.x + direction[+creep.memory._pathing.path[0]].dx,
-                            y: creep.pos.y + direction[+creep.memory._pathing.path[0]].dy,
-                            room: creep.room.name,
-                            blockedUntil: Game.time + 12
-                        };
-
-                        if (firstPos.x !== creep.pos.x || firstPos.y !== creep.pos.y) {
-                            if (!creep.memory._pathing.blocked) {
-                                creep.memory._pathing.blocked = [];
-                            }
-                            creep.memory._pathing.blocked.push(firstPos);
-                        }
-                    }
-                    delete creep.memory._pathing.path;
-                    delete creep.memory._pathing.restartOn;
-                } else if (creep.memory._pathing.path && !wasStationary) {
-                    // We were successful moving last turn, update accordingly.
-                    if (creep.memory._pathing.path.length === 1) {
-                        // We've reached the end of the path.
-                        delete creep.memory._pathing;
-                    } else {
-                        // Update start position and remaining path.
-                        creep.memory._pathing.start = {
-                            x: creep.pos.x,
-                            y: creep.pos.y,
-                            room: creep.room.name
-                        };
-                        creep.memory._pathing.path = creep.memory._pathing.path.substring(1);
-                    }
-                }
-            }
-            
-            // If we don't have a _pathing, generate it.
-            if (!creep.memory._pathing || !creep.memory._pathing.path) {
-                // Determine multiplier to use for terrain cost.
-                multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
-
-                path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
-                    plainCost: Math.ceil(1 * multiplier),
-                    swampCost: Math.ceil(5 * multiplier),
-                    maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
-                    roomCallback: (roomName) => {
-                        var matrix;
-
-                        if (Memory.avoidRooms.indexOf(roomName) !== -1) {
-                            return false;
-                        }
-
-                        if (!Game.rooms[roomName]) {
-                            restartOn.push(roomName);
-                            return;
-                        }
-
-                        matrix = Cache.getCostMatrix(Game.rooms[roomName]);
-
-                        if (creep.memory._pathing && roomName === creep.room.name) {
-                            _.forEach(creep.memory._pathing.blocked, (blocked) => {
-                                if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
-                                    matrix.set(blocked.x, blocked.y, 255);
-                                }
-                            });
-                        }
-
-                        return matrix;
-                    }
-                });
-
-                if (!path.path || path.path.length === 0) {
-                    // There is no path, just return.
                     return;
                 }
 
-                // Serialize the path.
                 if (creep.memory._pathing) {
-                    creep.memory._pathing.path = Pathing.serializePath(creep.pos, path.path)
-                    creep.memory._pathing.restartOn = restartOn;
-                } else {
-                    creep.memory._pathing = {
-                        start: {
-                            x: creep.pos.x,
-                            y: creep.pos.y,
-                            room: creep.room.name
-                        },
-                        dest: {
-                            x: pos.x,
-                            y: pos.y,
-                            room: pos.roomName
-                        },
-                        path: Pathing.serializePath(creep.pos, path.path),
-                        stationary: 0,
-                        blocked: [],
-                        restartOn: restartOn
-                    };
+                    // If the position doesn't match where we're going, nuke _pathing.
+                    if (creep.memory._pathing.dest.x !== pos.x || creep.memory._pathing.dest.y !== pos.y || creep.memory._pathing.dest.room !== pos.roomName) {
+                        delete creep.memory._pathing;
+                    }
                 }
+
+                // If we're in a room to restart the search on, clear the path.
+                if (creep.memory._pathing && creep.memory._pathing.restartOn && creep.memory._pathing.restartOn.indexOf(creep.room.name) !== -1) {
+                    delete creep.memory._pathing.path;
+                    delete creep.memory._pathing.restartOn;
+                }
+
+                // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.path.
+                if (creep.memory._pathing) {
+                    wasStationary = creep.pos.x === creep.memory._pathing.start.x && creep.pos.y === creep.memory._pathing.start.y && creep.room.name === creep.memory._pathing.start.room;
+                    
+                    creep.memory._pathing.stationary = (wasStationary) ? creep.memory._pathing.stationary + 1 : 0;
+
+                    if (creep.memory._pathing.stationary >= 2) {
+                        if (creep.memory._pathing.path && creep.memory._pathing.path.length > 0) {
+                            firstPos = {
+                                x: creep.pos.x + direction[+creep.memory._pathing.path[0]].dx,
+                                y: creep.pos.y + direction[+creep.memory._pathing.path[0]].dy,
+                                room: creep.room.name,
+                                blockedUntil: Game.time + 12
+                            };
+
+                            if (firstPos.x !== creep.pos.x || firstPos.y !== creep.pos.y) {
+                                if (!creep.memory._pathing.blocked) {
+                                    creep.memory._pathing.blocked = [];
+                                }
+                                creep.memory._pathing.blocked.push(firstPos);
+                            }
+                        }
+                        delete creep.memory._pathing.path;
+                        delete creep.memory._pathing.restartOn;
+                    } else if (creep.memory._pathing.path && !wasStationary) {
+                        // We were successful moving last turn, update accordingly.
+                        if (creep.memory._pathing.path.length === 1) {
+                            // We've reached the end of the path.
+                            delete creep.memory._pathing;
+                        } else {
+                            // Update start position and remaining path.
+                            creep.memory._pathing.start = {
+                                x: creep.pos.x,
+                                y: creep.pos.y,
+                                room: creep.room.name
+                            };
+                            creep.memory._pathing.path = creep.memory._pathing.path.substring(1);
+                        }
+                    }
+                }
+                
+                // If we don't have a _pathing, generate it.
+                if (!creep.memory._pathing || !creep.memory._pathing.path) {
+                    // Determine multiplier to use for terrain cost.
+                    multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
+
+                    path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
+                        plainCost: Math.ceil(1 * multiplier),
+                        swampCost: Math.ceil(5 * multiplier),
+                        maxOps: creep.pos.roomName === pos.roomName ? 2000 : 100000,
+                        roomCallback: (roomName) => {
+                            var matrix;
+
+                            if (Memory.avoidRooms.indexOf(roomName) !== -1) {
+                                return false;
+                            }
+
+                            if (!Game.rooms[roomName]) {
+                                restartOn.push(roomName);
+                                return;
+                            }
+
+                            matrix = Cache.getCostMatrix(Game.rooms[roomName]);
+
+                            if (creep.memory._pathing && roomName === creep.room.name) {
+                                _.forEach(creep.memory._pathing.blocked, (blocked) => {
+                                    if (roomName === blocked.room && Game.time < blocked.blockedUntil) {
+                                        matrix.set(blocked.x, blocked.y, 255);
+                                    }
+                                });
+                            }
+
+                            return matrix;
+                        }
+                    });
+
+                    if (!path.path || path.path.length === 0) {
+                        // There is no path, just return.
+                        return;
+                    }
+
+                    // Serialize the path.
+                    if (creep.memory._pathing) {
+                        creep.memory._pathing.path = Pathing.serializePath(creep.pos, path.path)
+                        creep.memory._pathing.restartOn = restartOn;
+                    } else {
+                        creep.memory._pathing = {
+                            start: {
+                                x: creep.pos.x,
+                                y: creep.pos.y,
+                                room: creep.room.name
+                            },
+                            dest: {
+                                x: pos.x,
+                                y: pos.y,
+                                room: pos.roomName
+                            },
+                            path: Pathing.serializePath(creep.pos, path.path),
+                            stationary: 0,
+                            blocked: [],
+                            restartOn: restartOn
+                        };
+                    }
+                }
+
+                // Attempt to move.
+                if (creep.move(+creep.memory._pathing.path[0]) !== OK) {
+                    // We couldn't move, so don't penalize stationary movement.
+                    creep.memory._pathing.stationary -= 1;
+                }
+            })();
+
+            var elapsed = Game.cpu.getUsed() - begin;
+
+            if (elapsed > 0.3) {
+                Cache.log.events.push("Move CPU: " + elapsed.toFixed(2) + " " + creep.name + " " + creep.room.name + " " + creep.memory.role + " " + creep.memory.currentTask.type);
             }
 
-            // Attempt to move.
-            if (creep.move(+creep.memory._pathing.path[0]) !== OK) {
-                // We couldn't move, so don't penalize stationary movement.
-                creep.memory._pathing.stationary -= 1;
-            }
+            return ret;
         },
 
         serializePath: (start, path) => {

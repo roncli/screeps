@@ -91,6 +91,11 @@ var Cache = require("cache"),
                 
                 // If we don't have a _pathing, generate it.
                 if (!creep.memory._pathing || !creep.memory._pathing.path) {
+                    // Clean up blocked array.
+                    if (creep.memory._pathing && creep.memory._pathing.blocked) {
+                        _.remove(creep.memory._pathing.blocked, (b) => b.blockedUntil <= Game.time);
+                    }
+
                     key = creep.pos.roomName + "." + creep.pos.x + "." + creep.pos.y + "." + pos.roomName + "." + pos.x + "." + pos.y + "." + range;
 
                     if ((!creep.memory._pathing || creep.memory._pathing.blocked.length === 0) && Memory.paths[key]) {

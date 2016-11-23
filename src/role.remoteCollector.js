@@ -105,47 +105,37 @@ var Cache = require("cache"),
 
             // Attempt to get minerals from containers.
             _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                var assignedTask = false;
-
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
-                        assignedTask = true;
                     }
                 });
 
-                return !assignedTask;
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
 
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                var assignedTask = false;
-
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
-                        assignedTask = true;
                     }
                 });
 
-                return !assignedTask;
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
 
             // Check for unfilled links.
             if (tasks.fillEnergy.fillLinkTask) {

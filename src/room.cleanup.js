@@ -6,6 +6,7 @@ var RoomObj = require("roomObj"),
     RoleRemoteDismantler = require("role.remoteDismantler"),
     RoleRemoteCollector = require("role.remoteCollector"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    TaskCollectMinerals = require("task.collectMinerals"),
     TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
@@ -33,6 +34,9 @@ Cleanup.prototype.run = function(room) {
     // Get the tasks needed for this room.
     tasks = {
         collectEnergy: {
+            cleanupTasks: []
+        },
+        collectMinerals: {
             cleanupTasks: []
         },
         fillEnergy: {
@@ -81,6 +85,7 @@ Cleanup.prototype.run = function(room) {
 
         // Collect energy and minerals from structures that aren't under ramparts.
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
+        tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
 
         if (noEnergyStructures.length > 0) {
             // Dismantle structures with no energy or minerals that aren't under ramparts.

@@ -219,9 +219,7 @@ Mine.prototype.run = function(room) {
         RoleRemoteWorker.assignTasks(room, tasks);
         RoleRemoteStorer.assignTasks(room, tasks);
         RoleRemoteReserver.assignTasks(room, tasks);
-        if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
-            RoleDismantler.assignTasks(room, tasks);
-        }
+        RoleDismantler.assignTasks(room, tasks);
     }
 };
 

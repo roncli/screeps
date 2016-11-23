@@ -4,6 +4,7 @@ var RoomObj = require("roomObj"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
+    RoleDismantler = require("role.dismantler"),
     RoleHauler = require("role.hauler"),
     RoleHealer = require("role.healer"),
     RoleMeleeAttack = require("role.meleeAttack"),
@@ -296,6 +297,9 @@ Base.prototype.run = function(room) {
     RoleRangedAttack.checkSpawn(room);
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
+    if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
+        RoleDismantler.checkSpawn(room, supportRoom);
+    }
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
     if (room.controller && room.controller.level < 8) {
@@ -354,6 +358,7 @@ Base.prototype.run = function(room) {
     RoleRangedAttack.assignTasks(room, tasks);
     RoleHealer.assignTasks(room, tasks);
     RoleDefender.assignTasks(room, tasks);
+    RoleDismantler.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
     RoleUpgrader.assignTasks(room, tasks);

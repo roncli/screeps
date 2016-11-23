@@ -141,7 +141,7 @@ var Cache = require("cache"),
             // Check critical repairs.
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
-                    if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
+                    if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.room.name !== room.name && c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
                             assigned.push(creep.name);

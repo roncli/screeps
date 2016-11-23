@@ -45,8 +45,30 @@ Cleanup.prototype.run = function(room) {
         },
         remoteDismantle: {
             cleanupTasks: []
+        },
+        dismantle: {
+            tasks: []
         }
     };
+
+    if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
+        _.forEach(Memory.dismantle[room.name], (pos) => {
+            var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
+            if (structures.length === 0) {
+                completed.push(pos);
+            } else {
+                tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
+            }
+        });
+        _.forEach(completed, (complete) => {
+            _.remove(Memory.dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
+        });
+    } else {
+        _.forEach(Cache.creepsInRoom("dismantler", room), (creep) => {
+            creep.memory.role = "worker";
+            creep.memory.home = supportRoom.name
+        });
+    }
 
     if (!room.unobservable) {
         // Find all ramparts.

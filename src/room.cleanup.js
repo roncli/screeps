@@ -22,7 +22,7 @@ Cleanup.prototype.constructor = Cleanup;
 Cleanup.prototype.run = function(room) {
     "use strict";
 
-    var ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [],
+    var ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [],
         supportRoom, tasks;
 
     // Can't see the support room, we have bigger problems, so just bail.

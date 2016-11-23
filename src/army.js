@@ -47,7 +47,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (Game.rooms[Memory.army[army].attackRoom]) {
-                        if (_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
+                        if (!Memory.army[army].reinforce && _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
                             Memory.army[army].success = true;
                         }
                     }
@@ -55,7 +55,7 @@ var Cache = require("cache"),
             }
 
             // Check spawns if we're building.
-            if (Memory.army[army].directive === "building") {
+            if (Memory.army[army].directive === "building" || Memory.army[army].reinforce) {
                 RoleArmyDismantler.checkSpawn(army);
                 RoleArmyHealer.checkSpawn(army);
                 RoleArmyMelee.checkSpawn(army);

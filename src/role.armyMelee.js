@@ -6,7 +6,7 @@ var Cache = require("cache"),
         checkSpawn: (army) => {
             "use strict";
 
-            var count = Cache.creepsInArmy("armyMelee", army).length, max = Memory.army[army].melee.maxCreeps;
+            var count = _.filter(Cache.creepsInArmy("armyMelee", army), (c) => c.spawning || c.ticksToLive > 300).length, max = Memory.army[army].melee.maxCreeps;
 
             if (count < max) {
                 Melee.spawn(army);
@@ -77,18 +77,20 @@ var Cache = require("cache"),
                     break;
                 case "dismantle":
                     // Return to army's staging location if missing 1000 hits.
-                    task = new TaskRally(Memory.army[army].stageRoom);
-                    _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
+                    if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
+                        task = new TaskRally(Memory.army[army].stageRoom);
+                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
+                            creep.say("Ouch!");
+                            task.canAssign(creep);
+                            assigned.push(creep.name);
+                        });
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
+                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                        assigned = [];
 
-                    if (creepsWithNoTask.length === 0) {
-                        return;
+                        if (creepsWithNoTask.length === 0) {
+                            return;
+                        }
                     }
 
                     // Remove any creeps that need healing.
@@ -141,18 +143,20 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     // Return to army's staging location if missing 1000 hits.
-                    task = new TaskRally(Memory.army[army].stageRoom);
-                    _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
+                    if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
+                        task = new TaskRally(Memory.army[army].stageRoom);
+                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
+                            creep.say("Ouch!");
+                            task.canAssign(creep);
+                            assigned.push(creep.name);
+                        });
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
+                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                        assigned = [];
 
-                    if (creepsWithNoTask.length === 0) {
-                        return;
+                        if (creepsWithNoTask.length === 0) {
+                            return;
+                        }
                     }
 
                     // Remove any creeps that need healing.

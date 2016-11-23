@@ -104,7 +104,7 @@ CollectMinerals.getStorerTasks = function(room) {
 CollectEnergy.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(_.sortBy(structures, (s) => s.store && _.sum(s.store) > 0 && _.sum(s.store) !== s.store[RESOURCE_ENERGY]), (s) => new CollectEnergy(s.id));
+    return _.map(_.sortBy(structures, (s) => s.store && _.sum(s.store) > 0 && _.sum(s.store) !== s.store[RESOURCE_ENERGY]), (s) => new CollectMinerals(s.id));
 };
 
 require("screeps-profiler").registerObject(CollectMinerals, "TaskCollectMinerals");

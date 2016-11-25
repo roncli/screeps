@@ -46,6 +46,11 @@ Rally.prototype.run = function(creep) {
     // Rally to the rally point.
     Pathing.moveTo(creep, this.rallyPoint, creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || (this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName) ? (this.range || 0) : 20);
 
+    // If the creep has a heal part, heal itself.
+    if (creep.hits < creep.hitsMax && creep.getActiveBodyparts(HEAL) > 0) {
+        creep.heal(creep);
+    }
+
     // Always complete the task.
     Task.prototype.complete.call(this, creep);
 };

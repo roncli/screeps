@@ -337,12 +337,14 @@ var profiler = require("screeps-profiler"),
             });
 
             // Create a hierarchy of each mineral's components.
-            _.forEach(Cache.minerals[room.name], (mineral) => {
-                Minerals.getHierarchy(mineral, (parent, child) => {
-                    child.amount = parent.amount;
-                    child.terminal = room.terminal.store[child.resource] || 0;
-                    child.labs = _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === child.resource), (l) => l.mineralAmount));
-                    return child.terminal < child.amount;
+            _.forEach(Cache.minerals, (value, room) => {
+                _.forEach(Cache.minerals[room], (mineral) => {
+                    Minerals.getHierarchy(mineral, (parent, child) => {
+                        child.amount = parent.amount;
+                        child.terminal = Game.rooms[room].terminal.store[child.resource] || 0;
+                        child.labs = _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[room]), (l) => l.mineralType === child.resource), (l) => l.mineralAmount));
+                        return child.terminal < child.amount;
+                    });
                 });
             });
 

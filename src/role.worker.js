@@ -394,7 +394,7 @@ var Cache = require("cache"),
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.tasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
+                    if (task.collectEnergy.terminalTask.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
                     }

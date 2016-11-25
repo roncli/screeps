@@ -55,7 +55,7 @@ var Cache = require("cache"),
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInArmy("armyMelee", army)), (c) => !c.spawning),
                 assigned = [],
-                task;
+                task, healers;
 
             if (creepsWithNoTask.length === 0) {
                 return;

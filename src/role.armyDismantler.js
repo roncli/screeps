@@ -88,7 +88,7 @@ var Cache = require("cache"),
                                 task;
 
                             if (closest[0].pos.getRangeTo(creep) > 2) {
-                                task = new TaskRally(closest[0]);
+                                task = new TaskRally(closest[0].id);
                                 task.canAssign(creep);
                                 assigned.push(creep.name);
                             }

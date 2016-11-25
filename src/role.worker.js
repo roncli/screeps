@@ -380,9 +380,9 @@ var Cache = require("cache"),
             }
 
             // Attempt to get energy from terminals.
-            if (task.collectEnergy.terminalTask) {
+            if (tasks.collectEnergy.terminalTask) {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
+                    if (tasks.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
                     }

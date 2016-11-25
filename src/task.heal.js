@@ -42,17 +42,18 @@ Heal.prototype.run = function(creep) {
         if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
             creep.rangedHeal(this.ally)
         }
+
+        // Always complete so we can switch targets.
+        Task.prototype.complete.call(this, creep);
+        return true;
     }
 };
 
 Heal.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!this.ally || this.ally.hits === this.ally.hitsMax || creep.getActiveBodyparts(HEAL) === 0) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
+    Task.prototype.complete.call(this, creep);
+    return true;
 };
 
 Heal.prototype.toObj = function(creep) {

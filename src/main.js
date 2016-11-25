@@ -271,7 +271,7 @@ var profiler = require("screeps-profiler"),
             // Determine the minerals we need in each room and army.
             _.forEach(Game.rooms, (room) => {
                 // Build the mineral data.
-                if (room.memory.roomType === "base" && room.terminal && Cache.labsInRoom(room).length > 0) {
+                if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length > 0) {
                     Cache.minerals[room.name] = [];
 
                     // Check for mineral harvesters.  Each one needs XUHO2 x30 per WORK body part.

@@ -6,7 +6,7 @@ Minerals = {
 
         _.forEach(parent.children, (child) => {
             if (fx(parent, child)) {
-                Minerals.getHierarchy(child);
+                Minerals.getHierarchy(child, fx);
             }
         });
     }

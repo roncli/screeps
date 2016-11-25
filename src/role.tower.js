@@ -28,15 +28,6 @@ var Cache = require("cache"),
                 });
                 return;
             }
-
-            // Check for repairs under 2500 hits.
-            filteredTasks = _.filter(tasks.repair.tasks, (t) => t.structure.hits < 2500);
-            if (filteredTasks.length > 0) {
-                _.forEach(Cache.towersInRoom(room), (tower) => {
-                    tower.repair(filteredTasks[0].structure);
-                });
-                return;
-            }
         }
     };
 

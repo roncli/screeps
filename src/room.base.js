@@ -133,7 +133,22 @@ Base.prototype.manage = function(room) {
     // At RCL3 with storage, build roads from containers to storage.
     if (room.controller.level >= 3 && room.storage) {
         _.forEach(Cache.containersInRoom(room), (container) => {
-            _.forEach(PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path, (pos) => {
+            _.forEach(PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {
+                swampCost: 1,
+                roomCallback: (roomName) => {
+                    if (roomName !== room.name) {
+                        return;
+                    }
+
+                    matrix = Cache.getCostMatrix(room);
+
+                    _.forEach(Cache.containersInRoom(room), (container) => {
+                        matrix.set(container.pos.x, container.pos.y, 255);
+                    });
+
+                    return matrix;
+                }
+            }).path, (pos) => {
                 var structures = pos.lookFor(LOOK_STRUCTURES);
                 if (
                     _.filter(structures, (s) => s.structureType !== STRUCTURE_RAMPART).length > 0 ||

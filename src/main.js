@@ -264,10 +264,10 @@ var profiler = require("screeps-profiler"),
                             return false;
                         }
 
-                        if (room.terminal.store[RESOURCE_ENERGY] >= 1000) {
-                            transCost = Game.market.calcTransactionCost(room.terminal.store[RESOURCE_ENERGY], room.name, otherRoom.name);
+                        if (otherRoom.terminal.store[RESOURCE_ENERGY] >= 1000) {
+                            transCost = Game.market.calcTransactionCost(otherRoom.terminal.store[RESOURCE_ENERGY], otherRoom.name, room.name);
 
-                            room.terminal.send(RESOURCE_ENERGY, room.terminal.store[RESOURCE_ENERGY] * (room.terminal.store[RESOURCE_ENERGY] / (room.terminal.store[RESOURCE_ENERGY] + transCost)), otherRoom.name);
+                            otherRoom.terminal.send(RESOURCE_ENERGY, otherRoom.terminal.store[RESOURCE_ENERGY] * (otherRoom.terminal.store[RESOURCE_ENERGY] / (otherRoom.terminal.store[RESOURCE_ENERGY] + transCost)), room.name);
                         }
                     });
                 }

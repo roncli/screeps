@@ -332,6 +332,10 @@ Base.prototype.run = function(room) {
         }
     };
 
+    if (room.terminal.store[RESOURCE_ENERGY] >= 2000) {
+        tasks.collectEnergy.terminalTask = new TaskCollectEnergy(room.terminal.id);
+    }
+
     if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
         _.forEach(Memory.dismantle[room.name], (pos) => {
             var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);

@@ -153,6 +153,18 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Attempt to get energy from terminals.
+            if (task.collectEnergy.terminalTask) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
+
             // Attempt to get energy from containers.
             _.forEach(_.sortBy([].concat.apply([], [tasks.collectEnergy.storerTasks, tasks.collectMinerals.storerTasks]), (t) => -(t.object.energy || _.sum(t.object.store) || 0)), (task) => {
                 if (!task.object.energy && !_.sum(task.object.store)) {

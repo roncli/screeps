@@ -379,6 +379,18 @@ var Cache = require("cache"),
                 }
             }
 
+            // Attempt to get energy from terminals.
+            if (task.collectEnergy.terminalTask) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
+
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.tasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {

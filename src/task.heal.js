@@ -42,11 +42,11 @@ Heal.prototype.run = function(creep) {
         if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
             creep.rangedHeal(this.ally)
         }
-
-        // Always complete so we can switch targets.
-        Task.prototype.complete.call(this, creep);
-        return true;
     }
+
+    // Always complete so we can switch targets.
+    Task.prototype.complete.call(this, creep);
+    return true;
 };
 
 Heal.prototype.canComplete = function(creep) {

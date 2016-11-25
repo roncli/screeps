@@ -106,7 +106,6 @@ var Cache = require("cache"),
                             if (task.canAssign(creep)) {
                                 creep.say("Heal");
                                 assigned.push(creep.name);
-                                return false;
                             }
                         });
 

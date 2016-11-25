@@ -97,9 +97,6 @@ var Cache = require("cache"),
                         }
                     }
 
-                    // Remove any creeps that need healing.
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 200);
-
                     // Heal hurt creeps.
                     _.forEach(tasks.heal.tasks, (task) => {
                         _.forEach(creepsWithNoTask, (creep) => {
@@ -158,9 +155,6 @@ var Cache = require("cache"),
                             return;
                         }
                     }
-
-                    // Remove any creeps that need healing.
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 200);
 
                     // Heal hurt creeps.
                     _.forEach(tasks.heal.tasks, (task) => {

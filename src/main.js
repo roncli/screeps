@@ -253,24 +253,22 @@ var profiler = require("screeps-profiler"),
             });
 
             // See if there is some energy balancing we can do.
-            if (Game.cpu.bucket >= 9000) {
-                rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY]);
-                if (rooms.length > 1) {
-                    _.forEach(rooms, (room, index) => {
-                        var otherRoom = rooms[rooms.length - index - 1],
-                            transCost;
-                        
-                        if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] > 100000 || otherRoom.storage.store[RESOURCE_ENERGY] < 100000) {
-                            return false;
-                        }
+            rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY]);
+            if (rooms.length > 1) {
+                _.forEach(rooms, (room, index) => {
+                    var otherRoom = rooms[rooms.length - index - 1],
+                        transCost;
+                    
+                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] > 100000 || otherRoom.storage.store[RESOURCE_ENERGY] < 100000) {
+                        return false;
+                    }
 
-                        if (otherRoom.terminal.store[RESOURCE_ENERGY] >= 1000) {
-                            transCost = Game.market.calcTransactionCost(otherRoom.terminal.store[RESOURCE_ENERGY], otherRoom.name, room.name);
+                    if (otherRoom.terminal.store[RESOURCE_ENERGY] >= 1000) {
+                        transCost = Game.market.calcTransactionCost(otherRoom.terminal.store[RESOURCE_ENERGY], otherRoom.name, room.name);
 
-                            Cache.log.events.push(otherRoom.terminal.send(RESOURCE_ENERGY, Math.floor(otherRoom.terminal.store[RESOURCE_ENERGY] * (otherRoom.terminal.store[RESOURCE_ENERGY] / (otherRoom.terminal.store[RESOURCE_ENERGY] + transCost))), room.name));
-                        }
-                    });
-                }
+                        Cache.log.events.push(otherRoom.terminal.send(RESOURCE_ENERGY, Math.floor(otherRoom.terminal.store[RESOURCE_ENERGY] * (otherRoom.terminal.store[RESOURCE_ENERGY] / (otherRoom.terminal.store[RESOURCE_ENERGY] + transCost))), room.name));
+                    }
+                });
             }
 
             // Determine the minerals we need in each room and army.

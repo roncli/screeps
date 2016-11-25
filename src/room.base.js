@@ -164,6 +164,10 @@ Base.prototype.run = function(room) {
     }
 
     // Check to see if we can do a deal in the terminal.
+    if (terminalEnergy < 1000) {
+        terminalTask = new TaskFillEnergy(room.terminal.id);
+    }
+
     if (room.terminal && Game.cpu.bucket >= 9000) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
@@ -171,10 +175,6 @@ Base.prototype.run = function(room) {
 
         terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
         terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
-
-        if (terminalEnergy < 1000) {
-            terminalTask = new TaskFillEnergy(room.terminal.id);
-        }
 
         if (terminalMinerals.length > 0 && terminalEnergy >= 1000) {
             _.forEach(_.sortBy(terminalMinerals, (s) => -s.amount), (topResource) => {

@@ -80,10 +80,10 @@ var Cache = require("cache"),
                     });
                     break;
                 case "dismantle":
-                    // Return to army's staging location if missing 200 hits.
+                    // Return to army's staging location if missing 1000 hits.
                     if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
                         task = new TaskRally(Memory.army[army].stageRoom);
-                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 200), (creep) => {
+                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
                             assigned.push(creep.name);
@@ -139,10 +139,10 @@ var Cache = require("cache"),
 
                     break;
                 case "attack":
-                    // Return to army's staging location if missing 200 hits.
+                    // Return to army's staging location if missing 1000 hits.
                     if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
                         task = new TaskRally(Memory.army[army].stageRoom);
-                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 200), (creep) => {
+                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
                             assigned.push(creep.name);

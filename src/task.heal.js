@@ -31,7 +31,12 @@ Heal.prototype.run = function(creep) {
         Task.prototype.complete.call(this, creep);
         return;
     }
-    
+
+    // Attempt to heal self if needed.  This is overridden by any future heal.
+    if (creep.hits < creep.maxHits) {
+        creep.heal(creep);
+    }
+
     if (creep.id === this.ally.id) {
         // Move to middle if we are the ally healing.
         Pathing.moveTo(creep, new RoomPosition(25, 25, creep.room.name), 0);

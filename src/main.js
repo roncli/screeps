@@ -6,6 +6,7 @@ var profiler = require("screeps-profiler"),
     Army = require("army"),
     Cache = require("cache"),
     Commands = require("commands"),
+    Minerals = require("minerals"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -67,6 +68,7 @@ var profiler = require("screeps-profiler"),
                 Army: Army,
                 Cache: Cache,
                 Commands: Commands,
+                Minerals: Minerals,
                 Role: {
                     ArmyDismantler: RoleArmyDismantler,
                     ArmyHealer: RoleArmyHealer,
@@ -265,6 +267,84 @@ var profiler = require("screeps-profiler"),
                     });
                 }
             }
+
+            // Determine the minerals we need in each room and army.
+            _.forEach(Game.rooms, (room) => {
+                // Build the mineral data.
+                if (room.memory.roomType === "base" && room.terminal && Cache.labsInRoom(room).length > 0) {
+                    Cache.minerals[room.name] = [];
+
+                    // Check for mineral harvesters.  Each one needs XUHO2 x30 per WORK body part.
+                    if (room.find(FIND_MINERALS).length > 0) {
+                        Cache.minerals[room.name].push({
+                            resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE,
+                            amount: 30 * room.find(FIND_MINERALS).length * Math.floor(Math.floor(Math.min(room.energyCapacityAvailable, 4450) / 50) / 2.2),
+                            terminal: room.terminal.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] || 0,
+                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === RESOURCE_CATALYZED_UTRIUM_ALKALIDE), (l) => l.mineralAmount))
+                        });
+                    }
+
+                    // Check for upgraders.  Each one needs XGH2O x30 per WORK body part.
+                    Cache.minerals[room.name].push({
+                        resource: RESOURCE_CATALYZED_GHODIUM_ACID,
+                        amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200),
+                        terminal: room.terminal.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0,
+                        labs: _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === RESOURCE_CATALYZED_GHODIUM_ACID), (l) => l.mineralAmount))
+                    });
+
+                    // Check for workers.  Each one needs XLH2O x30 per WORK body part.
+                    Cache.minerals[room.name].push({
+                        resource: RESOURCE_CATALYZED_LEMERGIUM_ACID,
+                        amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200),
+                        terminal: room.terminal.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0,
+                        labs: _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === RESOURCE_CATALYZED_LEMERGIUM_ACID), (l) => l.mineralAmount))
+                    });
+                }
+            });
+
+            _.forEach(Memory.army, (data, army) => {
+                if (data.boostRoom) {
+                    // Check for units.  Each one needs XGHO2 per TOUGH body part, which each will have 5 of.
+                    if (data.dismantler.maxCreeps > 0 || data.melee.maxCreeps > 0 || data.ranged.maxCreeps > 0 || data.healer.maxCreeps > 0) {
+                        Cache.minerals[data.boostRoom].push({
+                            resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
+                            amount: 30 * 5 * (data.dismantler.maxCreeps + data.melee.maxCreeps + data.ranged.maxCreeps + data.healer.maxCreeps),
+                            terminal: Game.rooms[data.boostRoom].terminal.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0,
+                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[data.boostRoom]), (l) => l.mineralType === RESOURCE_CATALYZED_ZYNTHIUM_ACID), (l) => l.mineralAmount))
+                        });
+                    }
+
+                    // Check for dismantlers.  Each one needs XZH2O x30 per WORK body part.
+                    if (data.dismantler.maxCreeps > 0) {
+                        Cache.minerals[data.boostRoom].push({
+                            resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID,
+                            amount: 30 * data.dismantler.units * data.dismantler.maxCreeps,
+                            terminal: Game.rooms[data.boostRoom].terminal.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0,
+                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[data.boostRoom]), (l) => l.mineralType === RESOURCE_CATALYZED_ZYNTHIUM_ACID), (l) => l.mineralAmount))
+                        });
+                    }
+
+                    // Check for healers.  Each one needs XLHO2 x30 per HEAL body part.
+                    if (data.healer.maxCreeps > 0) {
+                        Cache.minerals[data.boostRoom].push({
+                            resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
+                            amount: 30 * data.healer.units * data.healer.maxCreeps,
+                            terminal: Game.rooms[data.boostRoom].terminal.store[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0,
+                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[data.boostRoom]), (l) => l.mineralType === RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE), (l) => l.mineralAmount))
+                        });
+                    }
+                }
+            });
+
+            // Create a hierarchy of each mineral's components.
+            _.forEach(Cache.minerals[room.name], (mineral) => {
+                Minerals.getHierarchy(mineral, (parent, child) => {
+                    child.amount = parent.amount;
+                    child.terminal = room.terminal.store[child.resource] || 0;
+                    child.labs = _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === child.resource), (l) => l.mineralAmount));
+                    return child.terminal < child.amount;
+                });
+            });
 
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {

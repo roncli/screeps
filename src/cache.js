@@ -18,6 +18,7 @@ var Cache = {
     roomTypes: {},
     spawning: {},
     haulers: {},
+    minerals: {},
     log: {},
 
     // Reset the cache.
@@ -42,6 +43,7 @@ var Cache = {
         Cache.roomTypes = {};
         Cache.spawning = {};
         Cache.haulers = {};
+        Cache.minerals = {};
 
         Cache.log = {
             events: [],

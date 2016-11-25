@@ -267,7 +267,7 @@ var profiler = require("screeps-profiler"),
                         if (otherRoom.terminal.store[RESOURCE_ENERGY] >= 1000) {
                             transCost = Game.market.calcTransactionCost(otherRoom.terminal.store[RESOURCE_ENERGY], otherRoom.name, room.name);
 
-                            otherRoom.terminal.send(RESOURCE_ENERGY, otherRoom.terminal.store[RESOURCE_ENERGY] * (otherRoom.terminal.store[RESOURCE_ENERGY] / (otherRoom.terminal.store[RESOURCE_ENERGY] + transCost)), room.name);
+                            Cache.log.events.push(otherRoom.terminal.send(RESOURCE_ENERGY, Math.floor(otherRoom.terminal.store[RESOURCE_ENERGY] * (otherRoom.terminal.store[RESOURCE_ENERGY] / (otherRoom.terminal.store[RESOURCE_ENERGY] + transCost))), room.name));
                         }
                     });
                 }

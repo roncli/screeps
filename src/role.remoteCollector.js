@@ -59,6 +59,9 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body)), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            if (!spawnToUse) {
+                return false;
+            }
             name = spawnToUse.createCreep(body, undefined, {role: "remoteCollector", home: room.name, supportRoom: supportRoom.name});
             if (spawnToUse.room.name === supportRoom.name) {
                 Cache.spawning[spawnToUse.id] = true;

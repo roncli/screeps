@@ -41,6 +41,9 @@ var Cache = require("cache"),
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            if (!spawnToUse) {
+                return false;
+            }
             name = spawnToUse.createCreep(body, undefined, {role: "armyRanged", army: army});
             Cache.spawning[spawnToUse.id] = true;
 

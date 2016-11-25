@@ -80,10 +80,10 @@ var Cache = require("cache"),
                     });
                     break;
                 case "dismantle":
-                    // Return to army's staging location if missing 1000 hits.
+                    // Return to army's staging location if missing 200 hits.
                     if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
                         task = new TaskRally(Memory.army[army].stageRoom);
-                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
+                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 200), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
                             assigned.push(creep.name);
@@ -98,7 +98,7 @@ var Cache = require("cache"),
                     }
 
                     // Remove any creeps that need healing.
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 200);
 
                     // Dismantle a dismantle location if it can be seen.
                     if (Game.rooms[Memory.army[army].attackRoom] && Memory.army[army].dismantle.length > 0) {
@@ -125,10 +125,10 @@ var Cache = require("cache"),
                     });
                     break;
                 case "attack":
-                    // Return to army's staging location if missing 1000 hits.
+                    // Return to army's staging location if missing 200 hits.
                     if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
                         task = new TaskRally(Memory.army[army].stageRoom);
-                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
+                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === Memory.army[army].attackRoom || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 200), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
                             assigned.push(creep.name);
@@ -143,7 +143,7 @@ var Cache = require("cache"),
                     }
 
                     // Remove any creeps that need healing.
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 200);
 
                     if (Game.rooms[Memory.army[army].attackRoom]) {
                         structures = _.sortBy(_.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));

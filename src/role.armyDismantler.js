@@ -80,6 +80,28 @@ var Cache = require("cache"),
                     });
                     break;
                 case "dismantle":
+                    // If we're more than 2 units from the closest healer, run towards it.
+                    healers = Cache.creepsInArmy("healer", army);
+                    if (healers.length > 0) {
+                        _.forEach(creepsWithNoTask, (creep) => {
+                            var closest = Utilities.objectsClosestToObj(healers, creep),
+                                task;
+
+                            if (closest[0].pos.getRangeTo(creep) > 2) {
+                                task = new TaskRally(closest[0]);
+                                task.canAssign(creep);
+                                assigned.push(creep.name);
+                            }
+
+                            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                            assigned = [];
+                        });
+
+                        if (creepsWithNoTask.length === 0) {
+                            return;
+                        }
+                    }
+                    
                     // Return to army's staging location if missing 1000 hits.
                     if (Memory.army[army].stageRoom !== Memory.army[army].attackRoom) {
                         task = new TaskRally(Memory.army[army].stageRoom);

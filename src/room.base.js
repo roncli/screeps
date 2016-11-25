@@ -129,44 +129,6 @@ Base.prototype.manage = function(room) {
             });
         });
     }
-
-    // At RCL3 with storage, build roads from containers to storage.
-    if (room.controller.level >= 3 && room.storage) {
-        _.forEach(Cache.containersInRoom(room), (container) => {
-            _.forEach(PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {
-                swampCost: 1,
-                roomCallback: (roomName) => {
-                    var matrix;
-                    
-                    if (roomName !== room.name) {
-                        return;
-                    }
-
-                    matrix = Cache.getCostMatrix(room);
-
-                    _.forEach(Cache.containersInRoom(room), (container) => {
-                        matrix.set(container.pos.x, container.pos.y, 255);
-                    });
-
-                    return matrix;
-                }
-            }).path, (pos) => {
-                var structures = pos.lookFor(LOOK_STRUCTURES);
-                if (
-                    _.filter(structures, (s) => s.structureType !== STRUCTURE_RAMPART).length > 0 ||
-                    _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s.structureType !== STRUCTURE_RAMPART).length > 0
-                ) {
-                    return;
-                }
-                if (
-                    _.filter(structures, (s) => s instanceof StructureRoad).length === 0 &&
-                    _.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === pos.x && s.pos.y === pos.y && s instanceof StructureRoad).length === 0
-                ) {
-                    room.createConstructionSite(pos.x, pos.y, STRUCTURE_ROAD);
-                }
-            });
-        });
-    }
 };
 
 Base.prototype.run = function(room) {

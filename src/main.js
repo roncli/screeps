@@ -282,7 +282,7 @@ var profiler = require("screeps-profiler"),
                     var otherRoom = rooms[rooms.length - index - 1],
                         transCost;
                     
-                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] + room.terminal.store[RESOURCE_ENERGY] > 100000 || otherRoom.storage.store[RESOURCE_ENERGY] + otherRoom.terminal.store[RESOURCE_ENERGY] < 100000) {
+                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] + room.terminal.store[RESOURCE_ENERGY] > 100000 || otherRoom.storage.store[RESOURCE_ENERGY] + otherRoom.terminal.store[RESOURCE_ENERGY] < 110000) {
                         return false;
                     }
 

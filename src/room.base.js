@@ -164,6 +164,7 @@ Base.prototype.run = function(room) {
     }
 
     // Check to see if we can do a deal in the terminal.
+    terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
     if (terminalEnergy < 1000) {
         terminalTask = new TaskFillEnergy(room.terminal.id);
     }
@@ -173,7 +174,6 @@ Base.prototype.run = function(room) {
             Memory.minimumSell = {};
         }
 
-        terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
         terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
 
         if (terminalMinerals.length > 0 && terminalEnergy >= 1000) {
@@ -253,7 +253,6 @@ Base.prototype.run = function(room) {
                         // Game.market.deal(bestOrder.id, bestOrder.amount, room.name);
                         Cache.log.events.push("Would be selling", bestOrder.amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", transCost)
                     } else {
-                        // terminalTask = new TaskFillEnergy(room.terminal.id);
                         Cache.log.events.push("Would be filling terminal with energy.")
                         if (terminalEnergy > 0) {
                             amount = Math.floor(bestOrder.amount * (terminalEnergy / (bestOrder.amount + transCost)));

@@ -88,12 +88,15 @@ var Cache = require("cache"),
             
             // If we don't have a _pathing, generate it.
             if (!creep.memory._pathing || !creep.memory._pathing.path) {
+                // Determine multiplier to use for terrain cost.
+                multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
+
                 // Clean up blocked array.
                 if (creep.memory._pathing && creep.memory._pathing.blocked) {
                     _.remove(creep.memory._pathing.blocked, (b) => b.blockedUntil <= Game.time);
                 }
 
-                key = creep.pos.roomName + "." + creep.pos.x + "." + creep.pos.y + "." + pos.roomName + "." + pos.x + "." + pos.y + "." + range;
+                key = creep.pos.roomName + "." + creep.pos.x + "." + creep.pos.y + "." + pos.roomName + "." + pos.x + "." + pos.y + "." + range + "." + (multiplier <= 1 ? "0" : "1");
 
                 if ((!creep.memory._pathing || creep.memory._pathing.blocked.length === 0) && Memory.paths[key]) {
                     // Use the cache.
@@ -120,9 +123,6 @@ var Cache = require("cache"),
                     }
                     Memory.paths[key].lastUsed = Game.time;
                 } else {
-                    // Determine multiplier to use for terrain cost.
-                    multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - creep.getActiveBodyparts(MOVE)) / creep.getActiveBodyparts(MOVE);
-
                     path = PathFinder.search(creep.pos, {pos: pos, range: range}, {
                         plainCost: Math.ceil(1 * multiplier),
                         swampCost: Math.ceil(5 * multiplier),

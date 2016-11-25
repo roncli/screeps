@@ -221,6 +221,10 @@ var Cache = require("cache"),
 
                 distanceFromSpawn++;
             }
+        },
+        
+        getBodypartCost: (body) => {
+            return _.sum(_.map(body, (b) => BODYPART_COST[b]));
         }
     };
 

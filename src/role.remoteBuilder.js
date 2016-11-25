@@ -42,12 +42,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 3300.
-            energy = Math.min(supportRoom.energyAvailable, 3300);
-
-            // If we're not at 3300 and energy is not at capacity, bail.
-            if (energy < 3300 && energy !== supportRoom.energyCapacityAvailable) {
-                return;
-            }
+            energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {
@@ -75,7 +70,7 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body)), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
             name = spawnToUse.createCreep(body, undefined, {role: "remoteBuilder", home: room.name, supportRoom: supportRoom.name});
             if (spawnToUse.room.name === supportRoom.name) {
                 Cache.spawning[spawnToUse.id] = true;

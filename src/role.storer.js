@@ -66,13 +66,8 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Fail under 750 energy.
-            if (room.energyAvailable < 750) {
-                return false;
-            }
-
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             name = spawnToUse.createCreep(body, undefined, {role: "storer", home: room.name});
             Cache.spawning[spawnToUse.id] = true;
 

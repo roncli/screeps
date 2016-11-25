@@ -34,7 +34,7 @@ Mine.prototype.run = function(room) {
     "use strict";
 
     var completed = [],
-        supportRoom, oldRoomType, spawnToUse, tasks;
+        supportRoom, oldRoomType, tasks;
 
     // If there are no energy sources, bail.
     if (!room.unobservable && room.find(FIND_SOURCES).length === 0) {
@@ -122,8 +122,6 @@ Mine.prototype.run = function(room) {
 
             // Check to see if we have construction sites for the containers.  If not, create them.
             if (room.find(FIND_MY_CONSTRUCTION_SITES).length === 0) {
-                spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
-
                 _.forEach(room.find(FIND_SOURCES), (source) => {
                     var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
 

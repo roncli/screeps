@@ -46,12 +46,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 650.
-            energy = Math.min(room.energyAvailable, 650);
-
-            // If we're not at 650 and energy is not at capacity, bail.
-            if (energy < 650 && energy !== room.energyCapacityAvailable) {
-                return;
-            }
+            energy = Math.min(room.energyCapacityAvailable, 650);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 650); count++) {
@@ -63,7 +58,7 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             name = spawnToUse.createCreep(body, undefined, {role: "claimer", home: room.name, claim: toRoom});
             Cache.spawning[spawnToUse.id] = true;
 

@@ -69,20 +69,10 @@ var Cache = require("cache"),
             }
 
             // Get the energy available, limiting to 4450.
-            energy = Math.min(supportRoom.energyAvailable, 4450);
-
-            // Fail under 650 energy.
-            if (energy < 650) {
-                return false;
-            }
+            energy = Math.min(supportRoom.energyCapacityAvailable, 4450);
 
             // Do something different for minerals.
             if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
-                // If we're not at 4450 and energy is not at capacity, bail.
-                if (energy < 4450 && energy !== supportRoom.energyCapacityAvailable) {
-                    return;
-                }
-
                 body = [];
 
 
@@ -121,7 +111,7 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body)), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
             name = spawnToUse.createCreep(body, undefined, {role: "remoteMiner", home: room.name, supportRoom: supportRoom.name, container: id});
             if (spawnToUse.room.name === supportRoom.name) {
                 Cache.spawning[spawnToUse.id] = true;

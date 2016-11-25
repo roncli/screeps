@@ -136,6 +136,8 @@ Base.prototype.manage = function(room) {
             _.forEach(PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {
                 swampCost: 1,
                 roomCallback: (roomName) => {
+                    var matrix;
+                    
                     if (roomName !== room.name) {
                         return;
                     }

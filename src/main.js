@@ -192,7 +192,7 @@ var profiler = require("screeps-profiler"),
                 delete Memory.ranges;
             }
             if (Game.time % 1500 === 600) {
-                delete Memory.paths;
+                Memory.paths = {};
             }
         },
 

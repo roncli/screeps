@@ -130,6 +130,22 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for terminals.
+            if (tasks.fillEnergy.fillTerminalTask) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (tasks.fillEnergy.fillTerminalTask.canAssign(creep)) {
+                        creep.say("Terminal");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled containers.
             _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);

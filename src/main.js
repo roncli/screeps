@@ -166,11 +166,34 @@ var profiler = require("screeps-profiler"),
                 });
             });
             _.forEach(Memory.paths, (value, id) => {
-                if (value.lastUsed <= Game.time - 1000) {
+                if (value.lastUsed <= Game.time - 500) {
                     delete Memory.paths[id];
                 }
             });
             delete Memory.flags;
+
+            // Every generation, clear cache.
+            if (Game.time % 1500 === 0) {
+                delete Memory.lengthToStorage;
+            }
+            if (Game.time % 1500 === 100) {
+                delete Memory.lengthToLink;
+            }
+            if (Game.time % 1500 === 200) {
+                delete Memory.lengthToContainer;
+            }
+            if (Game.time % 1500 === 300) {
+                delete Memory.lengthToController;
+            }
+            if (Game.time % 1500 === 400) {
+                delete Memory.distances;
+            }
+            if (Game.time % 1500 === 500) {
+                delete Memory.ranges;
+            }
+            if (Game.time % 1500 === 600) {
+                delete Memory.paths;
+            }
         },
 
         log: () => {

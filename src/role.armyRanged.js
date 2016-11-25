@@ -53,7 +53,7 @@ var Cache = require("cache"),
         assignTasks: (army, directive, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInArmy("armyRanged", army)), (c) => !c.spawning),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInArmy("armyHealer", army)), (c) => !c.spawning),
                 assigned = [],
                 task, healers;
 

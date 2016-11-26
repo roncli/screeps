@@ -19,21 +19,21 @@ var https = require("https"),
 
     report = (data) => {
         try {
-            var output = "";
+            var output;
 
-            output += new Date(data.date) + " - Tick " + data.tick + "\n";
-            output += "GCL " + data.gcl + " - " + data.progress.toFixed(0) + "/" + data.progressTotal.toFixed(0) + " - " + (100 * data.progress / data.progressTotal).toFixed(3) + "% - " + (data.progressTotal - data.progress).toFixed(0) + " to go" + "\n";
-            output += "Credits - " + data.credits.toFixed(2) + "\n";
+            console.log(new Date(data.date) + " - Tick " + data.tick);
+            console.log("GCL " + data.gcl + " - " + data.progress.toFixed(0) + "/" + data.progressTotal.toFixed(0) + " - " + (100 * data.progress / data.progressTotal).toFixed(3) + "% - " + (data.progressTotal - data.progress).toFixed(0) + " to go");
+            console.log("Credits - " + data.credits.toFixed(2));
 
             for (let room in data.rooms) {
                 let r = data.rooms[room];
 
                 if (!r) {
-                    output += "Room - " + room + " undefined" + "\n";
+                    console.log("Room - " + room + " undefined");
                     break;
                 }
 
-                output += "Room - " + r.type + " " + room;
+                output = "Room - " + r.type + " " + room;
                 if (r.unobservable) {
                     output += " - unobservable";
                 } else if (r.rcl) {
@@ -49,50 +49,50 @@ var https = require("https"),
                 } else if (r.controller) {
                     output += " - Unowned";
                 }
-                output += "\n";
+                console.log(output);
 
                 for (let store in r.store) {
                     let s = r.store[store];
-                    output += "  " + store + " - " + s.map((r) => r.resource + " " + r.amount).join(" - ") + "\n";
+                    console.log("  " + store + " - " + s.map((r) => r.resource + " " + r.amount).join(" - "));
                 }
 
                 if (r.energyCapacityAvailable) {
-                    output += "  Energy - " + r.energyAvailable.toFixed(0) + "/" + r.energyCapacityAvailable.toFixed(0) + " - " + (100 * r.energyAvailable / r.energyCapacityAvailable).toFixed(0) + "% - " + (r.energyCapacityAvailable - r.energyAvailable).toFixed(0) + " to go" + "\n";
+                    console.log("  Energy - " + r.energyAvailable.toFixed(0) + "/" + r.energyCapacityAvailable.toFixed(0) + " - " + (100 * r.energyAvailable / r.energyCapacityAvailable).toFixed(0) + "% - " + (r.energyCapacityAvailable - r.energyAvailable).toFixed(0) + " to go");
                 }
                 
                 if (r.constructionProgressTotal) {
-                    output += "  Construction - " + r.constructionProgress.toFixed(0) + "/" + r.constructionProgressTotal.toFixed(0) + " - " + (100 * r.constructionProgress / r.constructionProgressTotal).toFixed(3) + "% - " + (r.constructionProgressTotal - r.constructionProgress).toFixed(0) + " to go" + "\n";
+                    console.log("  Construction - " + r.constructionProgress.toFixed(0) + "/" + r.constructionProgressTotal.toFixed(0) + " - " + (100 * r.constructionProgress / r.constructionProgressTotal).toFixed(3) + "% - " + (r.constructionProgressTotal - r.constructionProgress).toFixed(0) + " to go");
                 }
 
                 if (r.towerEnergyCapacity) {
-                    output += "  Towers - " + r.towerEnergy.toFixed(0) + "/" + r.towerEnergyCapacity.toFixed(0) + " - " + (100 * r.towerEnergy / r.towerEnergyCapacity).toFixed(0) + "% - " + (r.towerEnergyCapacity - r.towerEnergy).toFixed(0) + " to go" + "\n";
+                    console.log("  Towers - " + r.towerEnergy.toFixed(0) + "/" + r.towerEnergyCapacity.toFixed(0) + " - " + (100 * r.towerEnergy / r.towerEnergyCapacity).toFixed(0) + "% - " + (r.towerEnergyCapacity - r.towerEnergy).toFixed(0) + " to go");
                 }
 
                 if (r.labEnergyCapacity) {
-                    output += "  Labs - " + r.labEnergy.toFixed(0) + "/" + r.labEnergyCapacity.toFixed(0) + " - " + (100 * r.labEnergy / r.labEnergyCapacity).toFixed(0) + "% - " + (r.labEnergyCapacity - r.labEnergy).toFixed(0) + " to go" + "\n";
+                    console.log("  Labs - " + r.labEnergy.toFixed(0) + "/" + r.labEnergyCapacity.toFixed(0) + " - " + (100 * r.labEnergy / r.labEnergyCapacity).toFixed(0) + "% - " + (r.labEnergyCapacity - r.labEnergy).toFixed(0) + " to go");
                 }
 
                 if (r.lowestWall) {
-                    output += "  Lowest Wall - " + r.lowestWall.hits.toFixed(0) + "\n";
+                    console.log("  Lowest Wall - " + r.lowestWall.hits.toFixed(0));
                 }
 
                 r.source.forEach((s) => {
                     if (r.type !== "base" && s.resource !== "energy") {
                         return;
                     }
-                    output += "    " + s.resource + " - " + s.amount;
+                    output = "    " + s.resource + " - " + s.amount;
                     if (s.capacity) {
                         output += "/" + s.capacity;
                     }
                     if (s.ttr) {
                         output += " - TTR " + s.ttr;
                     }
-                    output += "\n";
+                    console.log(output);
                 });
 
                 r.creeps.forEach((c) => {
                     if (c.count < c.max) {
-                        output += "  " + c.role + " " + c.count + "/" + c.max + "\n";
+                        console.log("  " + c.role + " " + c.count + "/" + c.max);
                     }
                 });
             }
@@ -100,59 +100,59 @@ var https = require("https"),
             for (let army in data.army) {
                 let a = data.army[army];
 
-                output += "Army " + army + " - " + a.directive + " - Build at " + a.buildRoom + " - Stage at " + a.stageRoom + " - Attacking " + a.attackRoom + "\n";
+                console.log("Army " + army + " - " + a.directive + " - Build at " + a.buildRoom + " - Stage at " + a.stageRoom + " - Attacking " + a.attackRoom);
                 
                 if (a.dismantle > 0) {
-                    output += "  Initial structures to dismantle: " + a.dismantle + "\n";
+                    console.log("  Initial structures to dismantle: " + a.dismantle);
                 }
 
                 if (a.structures > 0) {
-                    output += "  Structures to dismantle: " + a.structures + "\n";
+                    console.log("  Structures to dismantle: " + a.structures);
                 }
 
                 if (a.constructionSites > 0) {
-                    output += "  Construction sites to stomp: " + a.constructionSites + "\n";
+                    console.log("  Construction sites to stomp: " + a.constructionSites);
                 }
 
                 a.creeps.forEach((c) => {
-                    output += "    " + c.role + " " + c.count + "/" + c.max + "\n";
+                    console.log("    " + c.role + " " + c.count + "/" + c.max);
                 });
             }
 
-            output += "Creeps - " + data.creeps.length + "\n";
+            console.log("Creeps - " + data.creeps.length);
             data.creeps.forEach((c) => {
                 if (c.hits < c.hitsMax) {
-                    output += "  " + c.name + " " + c.room + " " + c.x + "," + c.y + " " + c.hits + "/" + c.hitsMax + " " + (100 * c.hits / c.hitsMax).toFixed(0) + "%" + "\n";
+                    console.log("  " + c.name + " " + c.room + " " + c.x + "," + c.y + " " + c.hits + "/" + c.hitsMax + " " + (100 * c.hits / c.hitsMax).toFixed(0) + "%");
                 }
             });
 
             data.spawns.forEach((s) => {
                 if (s.spawningName) {
                     if (s.spawningHome) {
-                        output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for room " + s.spawningHome + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                        console.log("    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for room " + s.spawningHome + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
                     } else if (s.spawningArmy) {
-                        output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for army " + s.spawningArmy + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                        console.log("    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for army " + s.spawningArmy + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
                     } else {
-                        output += "    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime + "\n";
+                        console.log("    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
                     }
                 }
             });
 
             if (data.hostiles.length > 0) {
-                output += "Hostiles" + "\n";
+                console.log("Hostiles");
                 data.hostiles.forEach((e) => {
-                    output += "  " + e.room + " " + e.x + "," + e.y + " " + e.hits + "/" + e.hitsMax + " " + (100 * e.hits / e.hitsMax).toFixed(0) + "% - " + e.ownerUsername + " - TTL " + e.ttl + "\n";
+                    console.log("  " + e.room + " " + e.x + "," + e.y + " " + e.hits + "/" + e.hitsMax + " " + (100 * e.hits / e.hitsMax).toFixed(0) + "% - " + e.ownerUsername + " - TTL " + e.ttl);
                 });
             }
 
             if (data.events.length > 0) {
-                output += "Events" + "\n";
+                console.log("Events");
                 data.events.forEach((e) => {
-                    output += "  " + e + "\n";
+                    console.log("  " + e);
                 });
             }
 
-            output += "CPU " + data.cpuUsed.toFixed(2) + "/" + data.limit + " - Bucket " + data.bucket.toFixed(0) + " - Tick Limit " + data.tickLimit + "\n";
+            console.log("CPU " + data.cpuUsed.toFixed(2) + "/" + data.limit + " - Bucket " + data.bucket.toFixed(0) + " - Tick Limit " + data.tickLimit);
 
             return output;
         } catch (err) {
@@ -240,7 +240,7 @@ var https = require("https"),
         };
 
         wsc.onmessage = (message) => {
-            var data;
+            var data, reportData;
 
             if (message.startsWith("auth ok")) {
                 wsc.send("subscribe user:" + id + "/console");
@@ -251,8 +251,7 @@ var https = require("https"),
                 JSON.parse(message)[1].messages.log.forEach((l) => {
                     try {
                         data = JSON.parse(l);
-
-                        console.log(report(data));
+                        report(data);
                     } catch (err) {
                         console.log(l);
                         console.log("");

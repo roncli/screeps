@@ -271,7 +271,7 @@ var profiler = require("screeps-profiler"),
             // See if there is some energy balancing we can do.
             rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY]);
             if (rooms.length > 1) {
-                energyGoal = Math.min(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.storage.store[RESOURCE_ENERGY]) / rooms.length, 500000);
+                energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
                     var otherRoom = rooms[rooms.length - index - 1],
                         transCost;

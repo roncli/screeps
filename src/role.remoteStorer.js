@@ -8,8 +8,7 @@ var Cache = require("cache"),
             "use strict";
 
             var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
-                max = 0, foundFirstSource = false,
-                links;
+                max = 0, foundFirstSource = false;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
             if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || Cache.containersInRoom(room).length === 0) {
@@ -19,7 +18,7 @@ var Cache = require("cache"),
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
                 var count = 0,
-                    source, length, linkToUse;
+                    source, length;
 
                 // If this container is for a mineral, bail if there are no minerals left.  If it's not a mineral, start counter at -1 since it has a worker on it already.
                 if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
@@ -34,20 +33,6 @@ var Cache = require("cache"),
 
                 // Calculate the length the storers need to travel.
                 length = Memory.lengthToContainer[container.id][supportRoom.name];
-                if (Cache.linksInRoom(supportRoom).length > 1) {
-                    if (!Memory.lengthToLink) {
-                        Memory.lengthToLink = {};
-                    }
-                    if (!Memory.lengthToLink[container.id]) {
-                        Memory.lengthToLink[container.id] = {};
-                    }
-                    if (!Memory.lengthToLink[container.id][supportRoom.name]) {
-                        links = Cache.linksInRoom(supportRoom);
-                        _.remove(links, (l) => l.id === Utilities.objectsClosestToObjByPath(Cache.linksInRoom(supportRoom), Cache.spawnsInRoom(supportRoom)[0])[0].id);
-                        Memory.lengthToLink[container.id][supportRoom.name] = PathFinder.search(Utilities.objectsClosestToObjByPath(links, container)[0].pos, {pos: container.pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
-                    }
-                    length = Memory.lengthToLink[container.id][supportRoom.name];
-                }
 
                 // Calculate number of storers needed.
                 count += Math.max(Math.ceil(length / [20, 20, 20, 20, 32, 48, 60, 64, 64][supportRoom.controller.level]), 0);
@@ -115,23 +100,6 @@ var Cache = require("cache"),
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteStorer", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for unfilled links.
-            if (tasks.fillEnergy.fillLinkTask) {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.supportRoom && c.carry[RESOURCE_ENERGY] && c.carry[RESOURCE_ENERGY] > 0), (creep) => {
-                    if (tasks.fillEnergy.fillLinkTask.canAssign(creep)) {
-                        creep.say("Link");
-                        assigned.push(creep.name);
-                    }
-                });
-            }
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

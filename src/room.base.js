@@ -306,7 +306,6 @@ Base.prototype.run = function(room) {
             fillStorageTasks: TaskFillEnergy.getFillStorageTasks(room),
             fillContainerTasks: TaskFillEnergy.getFillContainerTasks(room),
             fillLabTasks: TaskFillEnergy.getFillLabTasks(room),
-            fillLinkTask: null,
             fillTerminalTask: terminalTask
         },
         fillMinerals: {

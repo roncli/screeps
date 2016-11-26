@@ -133,11 +133,6 @@ var profiler = require("screeps-profiler"),
                     delete Memory.lengthToController[id];
                 }
             });
-            _.forEach(Memory.lengthToLink, (value, id) => {
-                if (!Cache.getObjectById(id)) {
-                    delete Memory.lengthToLink[id];
-                }
-            });
             _.forEach(Memory.lengthToStorage, (value, id) => {
                 if (!Cache.getObjectById(id)) {
                     delete Memory.lengthToStorage[id];
@@ -177,21 +172,18 @@ var profiler = require("screeps-profiler"),
                 delete Memory.lengthToStorage;
             }
             if (Game.time % 1500 === 100) {
-                delete Memory.lengthToLink;
-            }
-            if (Game.time % 1500 === 200) {
                 delete Memory.lengthToContainer;
             }
-            if (Game.time % 1500 === 300) {
+            if (Game.time % 1500 === 200) {
                 delete Memory.lengthToController;
             }
-            if (Game.time % 1500 === 400) {
+            if (Game.time % 1500 === 300) {
                 delete Memory.distances;
             }
-            if (Game.time % 1500 === 500) {
+            if (Game.time % 1500 === 400) {
                 delete Memory.ranges;
             }
-            if (Game.time % 1500 === 600) {
+            if (Game.time % 1500 === 500) {
                 Memory.paths = {};
             }
         },

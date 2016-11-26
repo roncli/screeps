@@ -117,17 +117,7 @@ CollectEnergy.getTasks = function(room) {
 CollectEnergy.getStorerTasks = function(room) {
     "use strict";
 
-    var tasks = _.map(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => new CollectEnergy(c.id)),
-        links;
-
-    if (Cache.spawnsInRoom(room).length > 0) {
-        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
-        if (links.length > 0 && links[0].energy > 0) {
-            tasks.push(new CollectEnergy(links[0].id));
-        }
-    }
-    
-    return tasks;
+    return _.map(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => new CollectEnergy(c.id));
 };
 
 CollectEnergy.getCleanupTasks = function(structures) {

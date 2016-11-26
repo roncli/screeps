@@ -160,32 +160,5 @@ FillEnergy.getFillStorageTasks = function(room) {
     }
 };
 
-FillEnergy.getFillLinkTask = function(fromRoom, toRoom) {
-    "use strict";
-
-    var links, closest;
-
-    if (fromRoom.unobservable) {
-        return null;
-    }
-
-    if (Cache.spawnsInRoom(toRoom).length > 0) {
-        links = Utilities.objectsClosestToObj(Cache.linksInRoom(toRoom), Cache.spawnsInRoom(toRoom)[0]);
-        links.shift();
-        links = Utilities.objectsClosestToObj(links, fromRoom.find(FIND_SOURCES)[0]);
-        closest = links[0];
-        _.remove(links, (l) => l.energy === l.energyCapacity);
-        if (links.length === 1) {
-            return new FillEnergy(links[0].id);
-        } else if (links.length > 1) {
-            if (links[0].pos.getRangeTo(closest.pos) < 5) {
-                return new FillEnergy(Utilities.objectsClosestToObjByPath(links, fromRoom.find(FIND_SOURCES)[0])[0].id);
-            }
-        }
-    }
-
-    return null;
-};
-
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
 module.exports = FillEnergy;

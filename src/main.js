@@ -391,7 +391,12 @@ var profiler = require("screeps-profiler"),
                             });
 
                             if (!node.children || node.children.length === 0) {
-                                node.action = "buy";
+                                if (node.terminal >= node.amount) {
+                                    node.action = "use";
+                                    node.buyPrice = 0;
+                                } else {
+                                    node.action = "buy";
+                                }
                             } else {
                                 buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
                                 if (node.buyPrice > buyPrice) {
@@ -403,7 +408,7 @@ var profiler = require("screeps-profiler"),
                             }
                         };
 
-                        fx(minerals, fx);
+                        fx(mineral, fx);
                     });
                 });
             }

@@ -30,7 +30,7 @@ var Cache = require("cache"),
 
                 max += 1;
 
-                if (_.filter(Cache.creepsInRoom("remoteWorker", room), (c) => (c.spawning || c.ticksToLive >= 150 + (Memory.lengthToContainer && Memory.lengthToContainer[container.id] && Memory.lengthToContainer[container.id][supportRoom.name] ? Memory.lengthToContainer[container.id][supportRoom.name] : 0)) && c.memory.container === container.id).length === 0) {
+                if (_.filter(Cache.creepsInRoom("remoteWorker", room), (c) => (c.spawning || c.ticksToLive >= 150 + (Memory.lengthToContainer && Memory.lengthToContainer[container.id] && Memory.lengthToContainer[container.id][supportRoom.name] ? Memory.lengthToContainer[container.id][supportRoom.name] : 0) * 2) && c.memory.container === container.id).length === 0) {
                     Worker.spawn(room, supportRoom, container.id);
                 }
 

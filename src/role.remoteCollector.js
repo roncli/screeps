@@ -20,7 +20,7 @@ var Cache = require("cache"),
             }
 
             // If we don't have enough remote collectors for this room, spawn one.
-            if (_.filter(Cache.creepsInRoom("remoteCollector", room), (c) => c.spawning || c.ticksToLive >= 150).length < max) {
+            if (_.filter(Cache.creepsInRoom("remoteCollector", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 RemoteCollector.spawn(room, supportRoom);
             }
 

@@ -368,7 +368,7 @@ var profiler = require("screeps-profiler"),
                 });
             });
 
-            if (false && Game.cpu.bucket > 9000) {
+            if (Game.cpu.bucket > 9000) {
                 // Get market values for each mineral.
                 _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
                     sellOrder = _.sortBy(_.filter(Game.market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
@@ -390,7 +390,7 @@ var profiler = require("screeps-profiler"),
                                 innerFx(child, innerFx);
                             });
 
-                            if (node.children.length === 0) {
+                            if (!node.children || node.children.length === 0) {
                                 node.action = "buy";
                             } else {
                                 buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));

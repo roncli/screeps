@@ -35,7 +35,7 @@ Rally.prototype.canAssign = function(creep) {
 Rally.prototype.run = function(creep) {
     "use strict";
     
-    var pos;
+    var range;
 
     // If the rally point doesn't exist, complete the task.
     if (!this.rallyPoint) {
@@ -44,7 +44,14 @@ Rally.prototype.run = function(creep) {
     }
 
     // Rally to the rally point.
-    Pathing.moveTo(creep, this.rallyPoint, creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || (this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName) ? (this.range || 0) : 20);
+    range = creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || (this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName) ? (this.range || 0) : 20;
+    if (creep.pos.getRangeTo(this.rallyPoint) <= range) {
+        if (_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureRoad).length > 0) {
+            creep.move(Math.floor(Math.random() * 8));
+        }
+    } else {
+        Pathing.moveTo(creep, this.rallyPoint, range);
+    }
 
     // If the creep has a heal part, heal itself.
     if (creep.hits < creep.hitsMax && creep.getActiveBodyparts(HEAL) > 0) {

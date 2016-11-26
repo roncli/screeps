@@ -246,7 +246,8 @@ var profiler = require("screeps-profiler"),
         rooms: () => {
             "use strict";
 
-            var rooms;
+            var mineralOrders = {},
+                rooms, energyGoal, sellOrder;
 
             // Loop through each creep to deserialize their task and see if it is completed.
             _.forEach(Game.creeps, (creep) => {
@@ -278,11 +279,12 @@ var profiler = require("screeps-profiler"),
             // See if there is some energy balancing we can do.
             rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY]);
             if (rooms.length > 1) {
+                energyGoal = Math.min(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.storage.store[RESOURCE_ENERGY]) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
                     var otherRoom = rooms[rooms.length - index - 1],
                         transCost;
                     
-                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] + room.terminal.store[RESOURCE_ENERGY] > 100000 || otherRoom.storage.store[RESOURCE_ENERGY] + otherRoom.terminal.store[RESOURCE_ENERGY] < 110000) {
+                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoom.storage.store[RESOURCE_ENERGY] + otherRoom.terminal.store[RESOURCE_ENERGY] < energyGoal + 10000) {
                         return false;
                     }
 
@@ -374,7 +376,45 @@ var profiler = require("screeps-profiler"),
                 });
             });
 
-            // Get market values for each mineral and determine whether we should buy or combine minerals.
+            if (Game.cpu.bucket > 9000) {
+                // Get market values for each mineral.
+                _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
+                    sellOrder = _.sortBy(_.filter(Game.market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
+
+                    if (sellOrder) {
+                        mineralOrders[resource] = sellOrder;
+                    }
+                });
+
+                // Assign the market values and determine whether we should buy or create the minerals.
+                _.forEach(Cache.minerals, (minerals, room) => {
+                    _.forEach(minerals, (mineral) => {
+                        var fx = (node, innerFx) => {
+                            var buyPrice;
+
+                            node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
+
+                            _.forEach(node.children, (child) => {
+                                innerFx(child, innerFx);
+                            });
+
+                            if (node.children.length === 0) {
+                                node.action = "buy";
+                            } else {
+                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
+                                if (node.buyPrice > buyPrice) {
+                                    node.action = "create";
+                                    node.buyPrice = buyPrice;
+                                } else {
+                                    node.action = "buy";
+                                }
+                            }
+                        };
+
+                        fx(minerals, fx);
+                    });
+                });
+            }
 
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {

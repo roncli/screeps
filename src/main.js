@@ -238,7 +238,7 @@ var profiler = require("screeps-profiler"),
 
         minerals: () => {
             var mineralOrders = {},
-                energyGoal, sellOrder;
+                sellOrder;
 
             if (Game.cpu.bucket > 9000) {
                 // Determine the minerals we need in each room and army.
@@ -400,7 +400,7 @@ var profiler = require("screeps-profiler"),
         rooms: () => {
             "use strict";
 
-            var rooms;
+            var rooms, energyGoal;
 
             // Loop through each creep to deserialize their task and see if it is completed.
             _.forEach(Game.creeps, (creep) => {

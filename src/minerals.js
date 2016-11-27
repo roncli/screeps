@@ -1,16 +1,4 @@
-Minerals = {
-    getHierarchy: (parent, fx) => {
-        "use strict";
-
-        parent.children = _.map(Minerals[parent.resource], (m) => {return {resource: m};});
-
-        _.forEach(parent.children, (child) => {
-            if (fx(parent, child)) {
-                Minerals.getHierarchy(child, fx);
-            }
-        });
-    }
-};
+Minerals = {};
 
 Minerals[RESOURCE_HYDROXIDE] = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN];
 Minerals[RESOURCE_ZYNTHIUM_KEANITE] = [RESOURCE_ZYNTHIUM, RESOURCE_KEANIUM];

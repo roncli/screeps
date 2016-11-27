@@ -47,6 +47,7 @@ var profiler = require("screeps-profiler"),
             profiler.wrap(() => {
                 main.init();
                 main.log();
+                main.minerals();
                 main.rooms();
                 main.army();
                 main.creeps();
@@ -235,11 +236,171 @@ var profiler = require("screeps-profiler"),
             });
         },
 
+        minerals: () => {
+            var mineralOrders = {},
+                energyGoal, sellOrder;
+
+            if (Game.cpu.bucket > 9000) {
+                // Determine the minerals we need in each room and army.
+                _.forEach(Game.rooms, (room) => {
+                    // Build the mineral data.
+                    if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length >= 3) {
+                        Cache.minerals[room.name] = [];
+
+                        // Check for mineral harvesters.  Each one needs UO x30 per WORK body part.
+                        if (room.find(FIND_MINERALS).length > 0) {
+                            Cache.minerals[room.name].push({
+                                resource: RESOURCE_UTRIUM_OXIDE,
+                                amount: 30 * room.find(FIND_MINERALS).length * Math.floor(Math.floor(Math.min(room.energyCapacityAvailable, 4450) / 50) / 2.2)
+                            });
+                        }
+
+                        // Check for upgraders.  Each one needs GH x30 per WORK body part.
+                        Cache.minerals[room.name].push({
+                            resource: RESOURCE_GHODIUM_HYDRIDE,
+                            amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200)
+                        });
+
+                        // Check for workers.  Each one needs LH x30 per WORK body part.
+                        Cache.minerals[room.name].push({
+                            resource: RESOURCE_LEMERGIUM_HYDRIDE,
+                            amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200)
+                        });
+                    }
+                });
+
+                _.forEach(Memory.army, (data, army) => {
+                    if (data.boostRoom) {
+                        // Check for units.  Each one needs XGHO2 per TOUGH body part, which each will have 5 of.
+                        if (data.dismantler.maxCreeps > 0 || data.melee.maxCreeps > 0 || data.ranged.maxCreeps > 0 || data.healer.maxCreeps > 0) {
+                            Cache.minerals[data.boostRoom].push({
+                                resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
+                                amount: 30 * 5 * (data.dismantler.maxCreeps + data.melee.maxCreeps + data.ranged.maxCreeps + data.healer.maxCreeps)
+                            });
+                        }
+
+                        // Check for dismantlers.  Each one needs XZH2O x30 per WORK body part.
+                        if (data.dismantler.maxCreeps > 0) {
+                            Cache.minerals[data.boostRoom].push({
+                                resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID,
+                                amount: 30 * data.dismantler.units * data.dismantler.maxCreeps
+                            });
+                        }
+
+                        // Check for healers.  Each one needs XLHO2 x30 per HEAL body part.
+                        if (data.healer.maxCreeps > 0) {
+                            Cache.minerals[data.boostRoom].push({
+                                resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
+                                amount: 30 * data.healer.units * data.healer.maxCreeps
+                            });
+                        }
+                    }
+                });
+
+                // Create a hierarchy of each mineral's components.
+                _.forEach(Cache.minerals, (value, room) => {
+                    _.forEach(Cache.minerals[room], (mineral) => {
+                        var fx = (node, innerFx) => {
+                            node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
+
+                            _.forEach(node.children, (child) => {
+                                child.amount = node.amount;
+
+                                fx(child, fx);
+                            });
+                        }
+
+                        fx(mineral, fx);
+                    });
+                });
+
+                // Get market values for each mineral.
+                _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
+                    sellOrder = _.sortBy(_.filter(Game.market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
+
+                    if (sellOrder) {
+                        mineralOrders[resource] = sellOrder;
+                    }
+                });
+
+                // Assign the market values and determine whether we should buy or create the minerals.
+                _.forEach(Cache.minerals, (minerals, room) => {
+                    _.forEach(minerals, (mineral) => {
+                        var fx = (node, innerFx) => {
+                            var buyPrice;
+
+                            node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
+
+                            _.forEach(node.children, (child) => {
+                                innerFx(child, innerFx);
+                            });
+
+                            if (!node.children || node.children.length === 0) {
+                                node.action = "buy";
+                            } else {
+                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
+                                if (node.buyPrice > buyPrice) {
+                                    node.action = "create";
+                                    node.buyPrice = buyPrice;
+                                } else {
+                                    node.action = "buy";
+                                }
+                            }
+                        };
+
+                        fx(mineral, fx);
+                    });
+                });
+
+                // Set room lab queue.
+                _.forEach(Cache.minerals, (minerals, room) => {
+                    if (!room.memory.labQueue) {
+                        _.forEach(minerals, (mineral) => {
+                            var fx = (node, innerFx) => {
+                                // If we're already set to buy a mineral, we're done.
+                                if (room.memory.labQueue && room.memory.labQueue.type === "buy") {
+                                    return;
+                                }
+
+                                // If we have the requested mineral, we're done.
+                                if ((room.storage.store[node.resource] || 0) >= node.amount) {
+                                    return;
+                                }
+
+                                switch (node.action) {
+                                    case "buy":
+                                        // We should buy the mineral from the market.
+                                        room.memory.labQueue = {
+                                            type: "buy",
+                                            resource: node.resource,
+                                            amount: node.amount - (room.storage.store[node.resource] || 0)
+                                        }
+                                        return;
+                                    case "create":
+                                        // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
+                                        room.memory.labQueue = {
+                                            type: "create",
+                                            resource: node.resource,
+                                            amount: node.amount - (room.storage.store[node.resource] || 0),
+                                            children: _.map(node.children, (c) => c.resource)
+                                        }
+                                        _.forEach(node.children, (child) => {
+                                            innerFx(child, innerFx);
+                                        });
+                                }
+                            };
+
+                            fx(mineral, fx);
+                        });
+                    }
+                });
+            }
+        },
+
         rooms: () => {
             "use strict";
 
-            var mineralOrders = {},
-                rooms, energyGoal, sellOrder;
+            var rooms;
 
             // Loop through each creep to deserialize their task and see if it is completed.
             _.forEach(Game.creeps, (creep) => {
@@ -288,131 +449,6 @@ var profiler = require("screeps-profiler"),
                 });
             }
 
-            // Determine the minerals we need in each room and army.
-            _.forEach(Game.rooms, (room) => {
-                // Build the mineral data.
-                if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length > 0) {
-                    Cache.minerals[room.name] = [];
-
-                    // Check for mineral harvesters.  Each one needs XUHO2 x30 per WORK body part.
-                    if (room.find(FIND_MINERALS).length > 0) {
-                        Cache.minerals[room.name].push({
-                            resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE,
-                            amount: 30 * room.find(FIND_MINERALS).length * Math.floor(Math.floor(Math.min(room.energyCapacityAvailable, 4450) / 50) / 2.2),
-                            terminal: room.terminal.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] || 0,
-                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === RESOURCE_CATALYZED_UTRIUM_ALKALIDE), (l) => l.mineralAmount))
-                        });
-                    }
-
-                    // Check for upgraders.  Each one needs XGH2O x30 per WORK body part.
-                    Cache.minerals[room.name].push({
-                        resource: RESOURCE_CATALYZED_GHODIUM_ACID,
-                        amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200),
-                        terminal: room.terminal.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0,
-                        labs: _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === RESOURCE_CATALYZED_GHODIUM_ACID), (l) => l.mineralAmount))
-                    });
-
-                    // Check for workers.  Each one needs XLH2O x30 per WORK body part.
-                    Cache.minerals[room.name].push({
-                        resource: RESOURCE_CATALYZED_LEMERGIUM_ACID,
-                        amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200),
-                        terminal: room.terminal.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0,
-                        labs: _.sum(_.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === RESOURCE_CATALYZED_LEMERGIUM_ACID), (l) => l.mineralAmount))
-                    });
-                }
-            });
-
-            _.forEach(Memory.army, (data, army) => {
-                if (data.boostRoom) {
-                    // Check for units.  Each one needs XGHO2 per TOUGH body part, which each will have 5 of.
-                    if (data.dismantler.maxCreeps > 0 || data.melee.maxCreeps > 0 || data.ranged.maxCreeps > 0 || data.healer.maxCreeps > 0) {
-                        Cache.minerals[data.boostRoom].push({
-                            resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
-                            amount: 30 * 5 * (data.dismantler.maxCreeps + data.melee.maxCreeps + data.ranged.maxCreeps + data.healer.maxCreeps),
-                            terminal: Game.rooms[data.boostRoom].terminal.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0,
-                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[data.boostRoom]), (l) => l.mineralType === RESOURCE_CATALYZED_ZYNTHIUM_ACID), (l) => l.mineralAmount))
-                        });
-                    }
-
-                    // Check for dismantlers.  Each one needs XZH2O x30 per WORK body part.
-                    if (data.dismantler.maxCreeps > 0) {
-                        Cache.minerals[data.boostRoom].push({
-                            resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID,
-                            amount: 30 * data.dismantler.units * data.dismantler.maxCreeps,
-                            terminal: Game.rooms[data.boostRoom].terminal.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0,
-                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[data.boostRoom]), (l) => l.mineralType === RESOURCE_CATALYZED_ZYNTHIUM_ACID), (l) => l.mineralAmount))
-                        });
-                    }
-
-                    // Check for healers.  Each one needs XLHO2 x30 per HEAL body part.
-                    if (data.healer.maxCreeps > 0) {
-                        Cache.minerals[data.boostRoom].push({
-                            resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
-                            amount: 30 * data.healer.units * data.healer.maxCreeps,
-                            terminal: Game.rooms[data.boostRoom].terminal.store[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0,
-                            labs: _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[data.boostRoom]), (l) => l.mineralType === RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE), (l) => l.mineralAmount))
-                        });
-                    }
-                }
-            });
-
-            // Create a hierarchy of each mineral's components.
-            _.forEach(Cache.minerals, (value, room) => {
-                _.forEach(Cache.minerals[room], (mineral) => {
-                    Minerals.getHierarchy(mineral, (parent, child) => {
-                        child.amount = parent.amount;
-                        child.terminal = Game.rooms[room].terminal.store[child.resource] || 0;
-                        child.labs = _.sum(_.map(_.filter(Cache.labsInRoom(Game.rooms[room]), (l) => l.mineralType === child.resource), (l) => l.mineralAmount));
-                        return child.terminal < child.amount;
-                    });
-                });
-            });
-
-            if (Game.cpu.bucket > 9000) {
-                // Get market values for each mineral.
-                _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
-                    sellOrder = _.sortBy(_.filter(Game.market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
-
-                    if (sellOrder) {
-                        mineralOrders[resource] = sellOrder;
-                    }
-                });
-
-                // Assign the market values and determine whether we should buy or create the minerals.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    _.forEach(minerals, (mineral) => {
-                        var fx = (node, innerFx) => {
-                            var buyPrice;
-
-                            node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
-
-                            _.forEach(node.children, (child) => {
-                                innerFx(child, innerFx);
-                            });
-
-                            if (!node.children || node.children.length === 0) {
-                                if (node.terminal >= node.amount) {
-                                    node.action = "use";
-                                    node.buyPrice = 0;
-                                } else {
-                                    node.action = "buy";
-                                }
-                            } else {
-                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
-                                if (node.buyPrice > buyPrice) {
-                                    node.action = "create";
-                                    node.buyPrice = buyPrice;
-                                } else {
-                                    node.action = "buy";
-                                }
-                            }
-                        };
-
-                        fx(mineral, fx);
-                    });
-                });
-            }
-
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
                 var type = Memory.rooms[room.name] && Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type ? Memory.rooms[room.name].roomType.type : "unknown";
@@ -430,7 +466,7 @@ var profiler = require("screeps-profiler"),
                 } else {
                     Cache.log.rooms[room.name] = {
                         type: type,
-                        supportRoom: room.memory? room.memory.supportRoom : undefined,
+                        supportRoom: room.memory ? room.memory.supportRoom : undefined,
                         unobservable: false,
                         controller: !!room.controller,
                         store: {},

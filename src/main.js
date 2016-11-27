@@ -298,15 +298,34 @@ var profiler = require("screeps-profiler"),
                 });
 
                 // Create a hierarchy of each mineral's components.
-                _.forEach(Cache.minerals, (value, room) => {
-                    _.forEach(Cache.minerals[room], (mineral) => {
+                _.forEach(Cache.minerals, (minerals, room) => {
+                    _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
                             node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
 
                             _.forEach(node.children, (child) => {
                                 child.amount = node.amount;
 
-                                fx(child, fx);
+                                innerFx(child, innerFx);
+                            });
+                        }
+
+                        fx(mineral, fx);
+                    });
+                });
+
+                // Determine how many of each mineral needs to be saved in each room.
+                _.forEach(Cache.minerals, (minerals, room) => {
+                    Memory.rooms[room].reserveMinerals = {};
+                    _.forEach(minerals, (mineral) => {
+                        var fx = (node, innerFx) => {
+                            if (!Memory.rooms[room].reserveMinerals[node.resource]) {
+                                Memory.rooms[room].reserveMinerals[node.resource] = 0;
+                            }
+                            Memory.rooms[room].reserveMinerals[node.resource] += node.amount;
+
+                            _.forEach(node.children, (child) => {
+                                innerFx(child, innerFx);
                             });
                         }
 

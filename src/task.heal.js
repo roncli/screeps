@@ -33,18 +33,19 @@ Heal.prototype.run = function(creep) {
     }
 
     // Attempt to heal self if needed.  This is overridden by any future heal.
-    if (creep.hits < creep.maxHits) {
+    if (creep.hits < creep.hitsMax) {
         creep.heal(creep);
     }
 
     if (creep.id === this.ally.id) {
         // Move to middle if we are the ally healing.
         Pathing.moveTo(creep, new RoomPosition(25, 25, creep.room.name), 0);
-        creep.heal(this.ally);
     } else {
         // Move and heal, or ranged heal if not in range.
         Pathing.moveTo(creep, this.ally, 1);
-        if (creep.heal(this.ally) === ERR_NOT_IN_RANGE) {
+        if (creep.pos.getRangeTo(this.ally) <= 1) {
+            creep.heal(this.ally);
+        } else if (creep.pos.getRangeTo(this.ally) <= 3) {
             creep.rangedHeal(this.ally)
         }
     }

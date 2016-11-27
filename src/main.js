@@ -354,11 +354,11 @@ var profiler = require("screeps-profiler"),
 
                 // Set room lab queue.
                 _.forEach(Cache.minerals, (minerals, room) => {
-                    if (!room.memory.labQueue) {
+                    if (!Game.rooms[room].memory.labQueue) {
                         _.forEach(minerals, (mineral) => {
                             var fx = (node, innerFx) => {
                                 // If we're already set to buy a mineral, we're done.
-                                if (room.memory.labQueue && room.memory.labQueue.type === "buy") {
+                                if (Game.rooms[room].memory.labQueue && Game.rooms[room].memory.labQueue.type === "buy") {
                                     return;
                                 }
 
@@ -370,7 +370,7 @@ var profiler = require("screeps-profiler"),
                                 switch (node.action) {
                                     case "buy":
                                         // We should buy the mineral from the market.
-                                        room.memory.labQueue = {
+                                        Game.rooms[room].memory.labQueue = {
                                             type: "buy",
                                             resource: node.resource,
                                             amount: node.amount - (room.storage.store[node.resource] || 0)
@@ -378,7 +378,7 @@ var profiler = require("screeps-profiler"),
                                         return;
                                     case "create":
                                         // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
-                                        room.memory.labQueue = {
+                                        Game.rooms[room].memory.labQueue = {
                                             type: "create",
                                             resource: node.resource,
                                             amount: node.amount - (room.storage.store[node.resource] || 0),

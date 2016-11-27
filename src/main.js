@@ -363,7 +363,7 @@ var profiler = require("screeps-profiler"),
                                 }
 
                                 // If we have the requested mineral, we're done.
-                                if ((room.storage.store[node.resource] || 0) >= node.amount) {
+                                if ((Game.rooms[room].storage.store[node.resource] || 0) >= node.amount) {
                                     return;
                                 }
 
@@ -373,7 +373,7 @@ var profiler = require("screeps-profiler"),
                                         Game.rooms[room].memory.labQueue = {
                                             type: "buy",
                                             resource: node.resource,
-                                            amount: node.amount - (room.storage.store[node.resource] || 0)
+                                            amount: node.amount - (Game.rooms[room].storage.store[node.resource] || 0)
                                         }
                                         return;
                                     case "create":
@@ -381,7 +381,7 @@ var profiler = require("screeps-profiler"),
                                         Game.rooms[room].memory.labQueue = {
                                             type: "create",
                                             resource: node.resource,
-                                            amount: node.amount - (room.storage.store[node.resource] || 0),
+                                            amount: node.amount - (Game.rooms[room].storage.store[node.resource] || 0),
                                             children: _.map(node.children, (c) => c.resource)
                                         }
                                         _.forEach(node.children, (child) => {

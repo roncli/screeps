@@ -114,10 +114,14 @@ FillMinerals.fromObj = function(creep) {
 };
 
 FillMinerals.getLabTasks = function(room) {
+    "use strict";
+
     return [];
 };
 
 FillMinerals.getStorageTasks = function(room) {
+    "use strict";
+
     var tasks = [];
 
     // If the room only has storage and no terminal, minerals go to storage.
@@ -126,7 +130,7 @@ FillMinerals.getStorageTasks = function(room) {
     }
 
     // If the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
-    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
+    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity && room.memory.reserveMinerals) {
         _.forEach(room.memory.reserveMinerals, (amount, resource) => {
             if (!room.storage.store[resource]) {
                 tasks.push(new FillMinerals(room.storage.id, resource, amount));
@@ -140,6 +144,8 @@ FillMinerals.getStorageTasks = function(room) {
 };
 
 FillMinerals.getTerminalTasks = function(room) {
+    "use strict";
+
     if (room.terminal && _.sum(room.terminal.store) < room.terminal.storeCapacity) {
         return [new FillMinerals(room.terminal.id)];
     }

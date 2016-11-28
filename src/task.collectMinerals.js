@@ -1,11 +1,13 @@
 var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
-    CollectMinerals = function(id) {
+    CollectMinerals = function(id, resource, amount) {
         Task.call(this);
 
         this.type = "collectMinerals";
         this.id = id;
+        this.resource = resource;
+        this.amount = amount;
         this.object = Cache.getObjectById(id);
     };
     
@@ -37,6 +39,8 @@ CollectMinerals.prototype.run = function(creep) {
     // Get the resource we're going to use.
     if (this.object instanceof StructureLab) {
         minerals = [this.object.mineralType];
+    } else if (this.resource) {
+        minerals = [this.resource];
     } else {
         minerals = _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0);
     }
@@ -47,12 +51,20 @@ CollectMinerals.prototype.run = function(creep) {
         return;
     }
 
-    // Move to the object and collect from it.
+    // Move to the object.
     Pathing.moveTo(creep, this.object, 1);
+
+    // Collect from the object.
+    if (this.amount) {
+        creep.withdraw(this.object, minerals[0], Math.min(this.amount, creep.carryCapacity - _.sum(creep.carry)));
+        Task.prototype.complete.call(this, creep);
+        return;
+    }
+
     creep.withdraw(this.object, minerals[0]);
 
     // If we're full or there are no more minerals, complete task.
-    if (_.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
+    if (this.resource || _.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
         Task.prototype.complete.call(this, creep);
     }
 };
@@ -80,7 +92,9 @@ CollectMinerals.prototype.toObj = function(creep) {
     if (this.object) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.id
+            id: this.id,
+            resource: this.resource,
+            amount: this.amount
         }
     } else {
         delete creep.memory.currentTask;
@@ -90,7 +104,7 @@ CollectMinerals.prototype.toObj = function(creep) {
 CollectMinerals.fromObj = function(creep) {
     "use strict";
 
-    return new CollectMinerals(creep.memory.currentTask.id);
+    return new CollectMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resource, creep.memory.currentTask.amount);
 };
 
 CollectMinerals.getStorerTasks = function(room) {
@@ -109,6 +123,59 @@ CollectMinerals.getCleanupTasks = function(structures) {
     "use strict";
 
     return _.map(_.sortBy(_.filter(structures, (s) => (s.store || s instanceof StructureLab) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0)), (s) => (s instanceof StructureLab ? s.mineralAmount : _.sum(s.store) - s.store[RESOURCE_ENERGY])), (s) => new CollectMinerals(s.id));
+};
+
+CollectMinerals.getLabTasks = function(room) {
+    "use strict";
+
+    return [];
+};
+
+CollectMinerals.getStorageTasks = function(room) {
+    "use strict";
+
+    var tasks = [];
+
+    // We only need to transfer from storage when we have both storage and terminal.
+    if (room.storage && room.terminal && room.memory.reserveMinerals) {
+        _.forEach(room.storage.store, (amount, resource) => {
+            if (resource === RESOURCE_ENERGY) {
+                return;
+            }
+            if (!room.memory.reserveMinerals[resource]) {
+                tasks.push(new CollectMinerals(room.storage.id, resource, amount));
+            } else if (room.memory.reserveMinerals[resource] < amount) {
+                tasks.push(new CollectMinerals(room.storage.id, resource, amount - room.memory.reserveMinerals[resource]));
+            }
+        });
+    }
+
+    return tasks;
+};
+
+CollectMinerals.getTerminalTasks = function(room) {
+    "use strict";
+
+    var tasks;
+
+    // We only need to transfer from terminal when we have both storage and terminal.
+    if (room.storage && room.terminal && room.memory.reserveMinerals) {
+        _.forEach(room.terminal.store, (amount, resource) => {
+            if (resource === RESOURCE_ENERGY) {
+                return;
+            }
+            if (!room.memory.reserveMinerals[resource]) {
+                return;
+            }
+            if (!room.storage.store[resource]) {
+                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, room.memory.reserveMinerals[resource])));
+            } else if (room.storage.store[resource] < room.memory.reserveMinerals[resource]) {
+                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, room.memory.reserveMinerals[resource] - room.storage.store[resource])));
+            }
+        });
+    }
+
+    return tasks;
 };
 
 require("screeps-profiler").registerObject(CollectMinerals, "TaskCollectMinerals");

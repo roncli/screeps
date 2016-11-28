@@ -299,9 +299,9 @@ Base.prototype.run = function(room) {
         },
         collectMinerals: {
             storerTasks: TaskCollectMinerals.getStorerTasks(room),
-            labTasks: [],
-            storageTasks: [],
-            terminalTasks: []
+            labTasks: TaskCollectMinerals.getLabTasks(room),
+            storageTasks: TaskCollectMinerals.getStorageTasks(room),
+            terminalTasks: TaskCollectMinerals.getTerminalTasks(room)
         },
         fillEnergy: {
             extensionTasks: TaskFillEnergy.getExtensionTasks(room),

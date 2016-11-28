@@ -186,6 +186,17 @@ var Cache = require("cache"),
             if (!avoid) {
                 _.remove(Memory.avoidRooms, (r) => r === room);
             }
+        },
+
+        addSign: (room, text) => {
+            if (!Memory.signs) {
+                Memory.signs = {};
+            }
+            if (text) {
+                Memory.signs[room] = text;
+            } else {
+                delete Memory.signs(room);
+            }
         }
     };
 

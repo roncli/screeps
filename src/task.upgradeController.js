@@ -36,6 +36,10 @@ Upgrade.prototype.run = function(creep) {
     // Move to the controller and upgrade it.
     Pathing.moveTo(creep, this.controller, Math.max(Math.min(creep.pos.getRangeTo(this.controller) - 1, 3), 1));
     creep.transfer(this.controller, RESOURCE_ENERGY);
+
+    if (Memory.signs && Memory.signs[creep.room.name] && (!this.controller.sign || this.controller.sign.username !== "roncli")) {
+        creep.signController(this.controller, Memory.signs[creep.room.name])
+    }
 };
 
 Upgrade.prototype.canComplete = function(creep) {

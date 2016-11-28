@@ -64,6 +64,10 @@ Reserve.prototype.run = function(creep) {
 
             break;
     }
+
+    if (Memory.signs && Memory.signs[creep.room.name] && (!creep.room.controller.sign || creep.room.controller.sign.username !== "roncli")) {
+        creep.signController(creep.room.controller, Memory.signs[creep.room.name])
+    }
 };
 
 Reserve.prototype.canComplete = function(creep) {

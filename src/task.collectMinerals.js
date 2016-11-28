@@ -35,7 +35,11 @@ CollectMinerals.prototype.run = function(creep) {
     }
 
     // Get the resource we're going to use.
-    minerals = _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0);
+    if (this.object instanceof StructureLab) {
+        minerals = [this.object.mineralType];
+    } else {
+        minerals = _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0);
+    }
 
     // We're out of minerals, complete task.
     if (minerals.length === 0) {
@@ -48,7 +52,7 @@ CollectMinerals.prototype.run = function(creep) {
     creep.withdraw(this.object, minerals[0]);
 
     // If we're full or there are no more minerals, complete task.
-    if (_.sum(creep.carry) === creep.carryCapacity || _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) {
+    if (_.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
         Task.prototype.complete.call(this, creep);
     }
 };
@@ -63,7 +67,7 @@ CollectMinerals.prototype.canComplete = function(creep) {
     }
 
     // If we're full or there are no more minerals, complete task.
-    if (_.sum(creep.carry) === creep.carryCapacity || _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) {
+    if (_.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
         Task.prototype.complete.call(this, creep);
         return true;
     }
@@ -104,7 +108,7 @@ CollectMinerals.getStorerTasks = function(room) {
 CollectMinerals.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(structures, (s) => s.store && _.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)), (s) => _.sum(s.store) - s.store[RESOURCE_ENERGY]), (s) => new CollectMinerals(s.id));
+    return _.map(_.sortBy(_.filter(structures, (s) => (s.store || s instanceof StructureLab) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0)), (s) => (s instanceof StructureLab ? s.mineralAmount : _.sum(s.store) - s.store[RESOURCE_ENERGY])), (s) => new CollectMinerals(s.id));
 };
 
 require("screeps-profiler").registerObject(CollectMinerals, "TaskCollectMinerals");

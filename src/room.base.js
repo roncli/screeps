@@ -298,19 +298,24 @@ Base.prototype.run = function(room) {
             storerTasks: TaskCollectEnergy.getStorerTasks(room)
         },
         collectMinerals: {
-            storerTasks: TaskCollectMinerals.getStorerTasks(room)
+            storerTasks: TaskCollectMinerals.getStorerTasks(room),
+            labTasks: [],
+            storageTasks: [],
+            terminalTasks: []
         },
         fillEnergy: {
-            fillExtensionTasks: TaskFillEnergy.getFillExtensionTasks(room),
-            fillSpawnTasks: TaskFillEnergy.getFillSpawnTasks(room),
-            fillTowerTasks: TaskFillEnergy.getFillTowerTasks(room),
-            fillStorageTasks: TaskFillEnergy.getFillStorageTasks(room),
-            fillContainerTasks: TaskFillEnergy.getFillContainerTasks(room),
-            fillLabTasks: TaskFillEnergy.getFillLabTasks(room),
-            fillTerminalTask: terminalTask
+            extensionTasks: TaskFillEnergy.getExtensionTasks(room),
+            spawnTasks: TaskFillEnergy.getSpawnTasks(room),
+            towerTasks: TaskFillEnergy.getTowerTasks(room),
+            storageTasks: TaskFillEnergy.getStorageTasks(room),
+            containerTasks: TaskFillEnergy.getContainerTasks(room),
+            labTasks: TaskFillEnergy.getLabTasks(room),
+            terminalTask: terminalTask
         },
         fillMinerals: {
-            fillStorageTasks: TaskFillMinerals.getFillStorageTasks(room)
+            labTasks: TaskFillMinerals.getLabTasks(room),
+            storageTasks: TaskFillMinerals.getStorageTasks(room),
+            terminalTasks: TaskFillMinerals.getTerminalTasks(room)
         },
         heal: {
             tasks: TaskHeal.getTasks(room)

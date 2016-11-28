@@ -120,37 +120,37 @@ FillEnergy.fromObj = function(creep) {
     return new FillEnergy(creep.memory.currentTask.id);
 };
 
-FillEnergy.getFillExtensionTasks = function(room) {
+FillEnergy.getExtensionTasks = function(room) {
     "use strict";
 
     return _.map(_.sortBy(_.filter(Cache.extensionsInRoom(room), (e) => e.energy < e.energyCapacity), (e) => 50 * e.pos.x + e.pos.y), (e) => new FillEnergy(e.id));
 };
 
-FillEnergy.getFillSpawnTasks = function(room) {
+FillEnergy.getSpawnTasks = function(room) {
     "use strict";
 
     return _.map(_.filter(Cache.spawnsInRoom(room), (s) => s.energy < s.energyCapacity), (s) => new FillEnergy(s.id));
 };
 
-FillEnergy.getFillTowerTasks = function(room) {
+FillEnergy.getTowerTasks = function(room) {
     "use strict";
 
     return _.map(_.sortBy(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8), (t) => t.energy), (t) => new FillEnergy(t.id));
 };
 
-FillEnergy.getFillLabTasks = function(room) {
+FillEnergy.getLabTasks = function(room) {
     "use strict";
 
     return _.map(_.filter(Cache.labsInRoom(room), (t) => t.energy < t.energyCapacity), (t) => new FillEnergy(t.id));
 };
 
-FillEnergy.getFillContainerTasks = function(room) {
+FillEnergy.getContainerTasks = function(room) {
     "use strict";
 
     return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity)), (c) => c instanceof StructureStorage ? 1 : 2), (c) => new FillEnergy(c.id));
 };
 
-FillEnergy.getFillStorageTasks = function(room) {
+FillEnergy.getStorageTasks = function(room) {
     "use strict";
 
     if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {

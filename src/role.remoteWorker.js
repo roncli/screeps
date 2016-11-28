@@ -186,7 +186,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled containers.
-            _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks, tasks.fillEnergy.fillContainerTasks]), (task) => {
+            _.forEach([].concat.apply([], [tasks.fillEnergy.storageTasks, tasks.fillEnergy.containerTasks]), (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
@@ -203,6 +203,40 @@ var Cache = require("cache"),
                     _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
                     assigned = [];
                 }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled storage for minerals.
+            _.forEach(tasks.fillMinerals.storageTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Storage");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled terminals for minerals.
+            _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Terminal");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
             });
 
             if (creepsWithNoTask.length === 0) {

@@ -89,7 +89,7 @@ var Cache = require("cache"),
 
             // Check for unfilled extensions.
             _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
-                _.forEach(_.sortBy(tasks.fillEnergy.fillExtensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
+                _.forEach(_.sortBy(tasks.fillEnergy.extensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
                     var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                     if (energyMissing > 0) {
                         if (task.canAssign(creep)) {
@@ -108,7 +108,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled spawns.
-            _.forEach(tasks.fillEnergy.fillSpawnTasks, (task) => {
+            _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
                 var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
@@ -131,9 +131,9 @@ var Cache = require("cache"),
             }
 
             // Check for terminals.
-            if (tasks.fillEnergy.fillTerminalTask) {
+            if (tasks.fillEnergy.terminalTask) {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    if (tasks.fillEnergy.fillTerminalTask.canAssign(creep)) {
+                    if (tasks.fillEnergy.terminalTask.canAssign(creep)) {
                         creep.say("Terminal");
                         assigned.push(creep.name);
                     }
@@ -147,7 +147,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled containers.
-            _.forEach([].concat.apply([], [tasks.fillEnergy.fillStorageTasks, tasks.fillMinerals.fillStorageTasks]), (task) => {
+            _.forEach(tasks.fillEnergy.storageTasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
@@ -163,6 +163,40 @@ var Cache = require("cache"),
                     _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
                     assigned = [];
                 }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled storage for minerals.
+            _.forEach(tasks.fillMinerals.storageTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Storage");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled terminals for minerals.
+            _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Terminal");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
             });
 
             if (creepsWithNoTask.length === 0) {

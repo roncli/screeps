@@ -169,19 +169,20 @@ Base.prototype.run = function(room) {
         terminalTask = new TaskFillEnergy(room.terminal.id);
     }
 
-    if (room.terminal && Game.cpu.bucket >= 9000) {
+    if (room.terminal && terminalEnergy >= 1000 && Game.cpu.bucket >= 9000) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
         }
 
-        terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};}), (s) => s.resource !== RESOURCE_ENERGY);
+        terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {
+            return {resource: k, amount: Math.min(s, s - (room.memory.reserveMinerals ? (room.memory.reserveMinerals[resource] || 0) : 0) + (room.storage.store[resource] || 0))};
+        }), (s) => s.resource !== RESOURCE_ENERGY, s.amount > 0);
 
-        if (terminalMinerals.length > 0 && terminalEnergy >= 1000) {
+        if (terminalMinerals.length > 0) {
             _.forEach(_.sortBy(terminalMinerals, (s) => -s.amount), (topResource) => {
                 bestOrder = _.filter(Game.market.getAllOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0 && (!Memory.minimumSell[o.resourceType] || o.price >= Memory.minimumSell[o.resourceType])).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
                 if (bestOrder) {
                     transCost = Game.market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), room.name, bestOrder.roomName);
-                    terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
                     if (terminalEnergy > transCost) {
                         Game.market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), room.name);
                         dealMade = true;
@@ -201,7 +202,7 @@ Base.prototype.run = function(room) {
             });
         }
         
-        if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 500000 && terminalEnergy >= 1000) {
+        if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
             _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
                 var sellOrder, buyOrder;
 

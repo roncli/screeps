@@ -56,16 +56,17 @@ CollectMinerals.prototype.run = function(creep) {
 
     // Collect from the object.
     if (this.amount) {
-        creep.withdraw(this.object, minerals[0], Math.min(this.amount, creep.carryCapacity - _.sum(creep.carry)));
-        Task.prototype.complete.call(this, creep);
+        if (creep.withdraw(this.object, minerals[0], Math.min(this.amount, creep.carryCapacity - _.sum(creep.carry))) === OK) {
+            Task.prototype.complete.call(this, creep);
+        }
         return;
     }
 
-    creep.withdraw(this.object, minerals[0]);
-
-    // If we're full or there are no more minerals, complete task.
-    if (this.resource || _.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
-        Task.prototype.complete.call(this, creep);
+    if (creep.withdraw(this.object, minerals[0]) === OK) {
+        // If we're full or there are no more minerals, complete task.
+        if (this.resource || _.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
+            Task.prototype.complete.call(this, creep);
+        }
     }
 };
 

@@ -52,26 +52,24 @@ FillMinerals.prototype.run = function(creep) {
 
         // Move to the object and fill it.
         Pathing.moveTo(creep, this.object, 1);
-        creep.transfer(this.object, minerals[0]);
-
-        // If we are out of minerals, complete task.
-        if (_.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
-            Task.prototype.complete.call(this, creep);
+        if (creep.transfer(this.object, minerals[0]) === OK) {
+            // If we are out of minerals, complete task.
+            if (_.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
+                Task.prototype.complete.call(this, creep);
+            }
         }
     } else if (!this.amount) {
         // Move to the object and fill it.
         Pathing.moveTo(creep, this.object, 1);
-        creep.transfer(this.object, this.resource);
-
-        // Complete task.
-        Task.prototype.complete.call(this, creep);
+        if (creep.transfer(this.object, this.resource) === OK) {
+            Task.prototype.complete.call(this, creep);
+        }
     } else {
         // Move to the object and fill it.
         Pathing.moveTo(creep, this.object, 1);
-        creep.transfer(this.object, this.resource, Math.min(this.amount, creep.carry[this.resource]));
-
-        // Complete task.
-        Task.prototype.complete.call(this, creep);
+        if (creep.transfer(this.object, this.resource, Math.min(this.amount, creep.carry[this.resource])) === OK) {
+            Task.prototype.complete.call(this, creep);
+        }
     }
 };
 

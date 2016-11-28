@@ -240,7 +240,7 @@ var profiler = require("screeps-profiler"),
             var mineralOrders = {},
                 sellOrder;
 
-            if (Game.cpu.bucket > 9000) {
+            if (Game.cpu.bucket >= 9990) {
                 // Determine the minerals we need in each room and army.
                 _.forEach(Game.rooms, (room) => {
                     // Build the mineral data.

@@ -169,7 +169,7 @@ Base.prototype.run = function(room) {
         terminalTask = new TaskFillEnergy(room.terminal.id);
     }
 
-    if (room.terminal && terminalEnergy >= 1000 && Game.cpu.bucket >= 9000) {
+    if (room.terminal && terminalEnergy >= 1000 && Game.cpu.bucket >= 9990) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
         }

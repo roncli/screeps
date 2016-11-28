@@ -156,7 +156,7 @@ CollectMinerals.getStorageTasks = function(room) {
 CollectMinerals.getTerminalTasks = function(room) {
     "use strict";
 
-    var tasks;
+    var tasks = [];
 
     // We only need to transfer from terminal when we have both storage and terminal.
     if (room.storage && room.terminal && room.memory.reserveMinerals) {

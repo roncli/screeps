@@ -175,7 +175,7 @@ Base.prototype.run = function(room) {
         }
 
         terminalMinerals = _.filter(_.map(room.terminal.store, (s, k) => {
-            return {resource: k, amount: Math.min(s, s - (room.memory.reserveMinerals ? (room.memory.reserveMinerals[resource] || 0) : 0) + (room.storage.store[resource] || 0))};
+            return {resource: k, amount: Math.min(s, s - (room.memory.reserveMinerals ? (room.memory.reserveMinerals[k] || 0) : 0) + (room.storage.store[k] || 0))};
         }), (s) => s.resource !== RESOURCE_ENERGY, s.amount > 0);
 
         if (terminalMinerals.length > 0) {

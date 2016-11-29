@@ -9,7 +9,7 @@ var https = require("https"),
 
         switch (process.platform) {
             case "win32":
-                process.stdout.write("\x1B[2J");
+                console.log("\x1Bc");
                 break;
             default:
                 process.stdout.write(child_process.execSync("clear && printf '\\e[3J'"));

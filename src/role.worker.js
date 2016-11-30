@@ -151,6 +151,23 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled labs for minerals.
+            _.forEach(tasks.fillMinerals.labTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Storage");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for critical controllers to upgrade.
             _.forEach(tasks.upgradeController.criticalTasks, (task) => {
                 if (_.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "upgradeController" && c.memory.currentTask.room === task.room).length === 0) {
@@ -422,8 +439,23 @@ var Cache = require("cache"),
                 return;
             }
             
-            // Attempt to get energy from terminals.
+            // Attempt to get minerals from labs.
+            _.forEach(tasks.collectMinerals.labTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
 
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Attempt to get energy from terminals.
             if (tasks.collectEnergy.terminalTask) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (tasks.collectEnergy.terminalTask.canAssign(creep)) {

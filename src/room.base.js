@@ -136,7 +136,7 @@ Base.prototype.run = function(room) {
 
     var dealMade = false,
         flips = [], completed = [],
-        tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount;
+        tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved;
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {
@@ -293,6 +293,53 @@ Base.prototype.run = function(room) {
                     }
                 }
             }
+        }
+    }
+
+    // Update lab queue if necessary.
+    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create") {
+        switch (room.memory.labQueue.status) {
+            case "moving":
+                moved = true;
+                _.forEach(room.memory.labQueue.children, (resource) => {
+                    if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount) < room.memory.labQueue.amount) {
+                        moved = false;
+                        return false;
+                    }
+                });
+
+                if (moved) {
+                    room.memory.labQueue.status = "creating";
+                }
+                break;
+            case "creating":
+                _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1), (lab) => {
+                    lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1]));
+                });
+
+                if (!room.memory.labQueue.paused && _.sum(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
+                    room.memory.labQueue.status = "returning";
+                }
+                break;
+            case "returning":
+                if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (l) => l.mineralAmount) === 0) {
+                    delete room.memory.labQueue;
+                }
+                break;
+            default:
+                room.memory.labQueue.status = "moving";
+                room.memory.labQueue.sourceLabs = [];
+
+                // Determine which labs will be involved in the reaction.
+                _.forEach(Cache.labsInRoom(room), (lab) => {
+                    if (Utilities.objectsClosestToObj(Cache.labsInRoom(room), lab)[Cache.labsInRoom(room).length - 1].pos.getRangeTo(lab) <= 2) {
+                        room.memory.labQueue.sourceLabs.push(lab.id);
+                        if (room.memory.labQueue.sourceLabs.length >= 2) {
+                            return false;
+                        }
+                    }
+                });
+                break;
         }
     }
 

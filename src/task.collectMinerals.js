@@ -123,15 +123,29 @@ CollectMinerals.getCleanupTasks = function(structures) {
 CollectMinerals.getLabTasks = function(room) {
     "use strict";
 
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "returning") {
+        return _.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (l) => new CollectMinerals(l.id));
+    }
+
     return [];
 };
 
 CollectMinerals.getStorageTasks = function(room) {
     "use strict";
 
-    var tasks = [];
+    var tasks = [],
+        amount;
 
-    // We only need to transfer from storage when we have both storage and terminal.
+    // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room) >= 3) {
+        _.forEach(room.memory.labQueue.children, (resource) => {
+            if (amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount) < room.memory.labQueue.amount) {
+                tasks.push(new CollectMinerals(room.storage.id, resource, room.memory.labQueue.amount - amount));
+            }
+        });
+    }
+
+    // We only need to transfer from storage to terminal when we have both storage and terminal.
     if (room.storage && room.terminal && room.memory.reserveMinerals) {
         _.forEach(room.storage.store, (amount, resource) => {
             if (resource === RESOURCE_ENERGY) {

@@ -113,8 +113,19 @@ FillMinerals.fromObj = function(creep) {
 
 FillMinerals.getLabTasks = function(room) {
     "use strict";
+    
+    var tasks = [];
 
-    return [];
+    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.status === "moving") {
+        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount < room.memory.labQueue.amount) {
+            tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[0], room.memory.labQueue.children[0]));
+        }
+        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount < room.memory.labQueue.amount) {
+            tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[1], room.memory.labQueue.children[1]));
+        }
+    }
+
+    return tasks;
 };
 
 FillMinerals.getStorageTasks = function(room) {

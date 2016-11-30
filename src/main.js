@@ -400,7 +400,7 @@ var profiler = require("screeps-profiler"),
                                         Game.rooms[room].memory.labQueue = {
                                             type: "create",
                                             resource: node.resource,
-                                            amount: node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0)),
+                                            amount: Math.min(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0)), LAB_MINERAL_CAPACITY),
                                             children: _.map(node.children, (c) => c.resource)
                                         }
                                         _.forEach(node.children, (child) => {

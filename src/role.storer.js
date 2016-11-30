@@ -40,7 +40,7 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            max = Math.ceil((2 * length + 1) / 25);
+            max = Math.ceil((2 * length) / 30);
             if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 Storer.spawn(room);
             }

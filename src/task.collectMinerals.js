@@ -139,7 +139,7 @@ CollectMinerals.getStorageTasks = function(room) {
     // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
     if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3) {
         _.forEach(room.memory.labQueue.children, (resource) => {
-            if (amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount) < room.memory.labQueue.amount) {
+            if ((amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount)) < room.memory.labQueue.amount) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, room.memory.labQueue.amount - amount));
             }
         });

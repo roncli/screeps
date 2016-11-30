@@ -111,7 +111,7 @@ CollectMinerals.fromObj = function(creep) {
 CollectMinerals.getStorerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(Cache.containersInRoom(room), (c) => _.filter(_.keys(c.store), (m) => m !== RESOURCE_ENERGY && c.store[m] >= 200).length > 0), (c) => -_.sum(c.store)), (c) => new CollectMinerals(c.id));
+    return _.map(_.sortBy(_.filter(Cache.containersInRoom(room), (c) => _.filter(_.keys(c.store), (m) => m !== RESOURCE_ENERGY && c.store[m] >= 500).length > 0), (c) => -_.sum(c.store)), (c) => new CollectMinerals(c.id));
 };
 
 CollectMinerals.getCleanupTasks = function(structures) {

@@ -123,6 +123,15 @@ CollectMinerals.getCleanupTasks = function(structures) {
 CollectMinerals.getLabTasks = function(room) {
     "use strict";
 
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "creating") {
+        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount === 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount !== 0) {
+            return [new CollectMinerals(room.memory.labQueue.sourceLabs[1])];
+        }
+        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount !== 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount === 0) {
+            return [new CollectMinerals(room.memory.labQueue.sourceLabs[0])];
+        }
+    }
+
     if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "returning") {
         return _.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (l) => new CollectMinerals(l.id));
     }

@@ -117,6 +117,22 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Attempt to get minerals from labs.
+            _.forEach(tasks.collectMinerals.labTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled labs for minerals.
             _.forEach(tasks.fillMinerals.labTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
@@ -439,22 +455,6 @@ var Cache = require("cache"),
                 return;
             }
             
-            // Attempt to get minerals from labs.
-            _.forEach(tasks.collectMinerals.labTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Attempt to get energy from terminals.
             if (tasks.collectEnergy.terminalTask) {
                 _.forEach(creepsWithNoTask, (creep) => {

@@ -123,7 +123,7 @@ CollectMinerals.getCleanupTasks = function(structures) {
 CollectMinerals.getLabTasks = function(room) {
     "use strict";
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "returning") {
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "returning") {
         return _.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (l) => new CollectMinerals(l.id));
     }
 

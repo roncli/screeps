@@ -121,7 +121,7 @@ var Cache = require("cache"),
             _.forEach(tasks.fillMinerals.labTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
-                        creep.say("Storage");
+                        creep.say("Lab");
                         assigned.push(creep.name);
                     }
                 });

@@ -17,7 +17,7 @@ CollectMinerals.prototype.constructor = CollectMinerals;
 CollectMinerals.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
+    if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || creep.carry[RESOURCE_ENERGY] > 0) {
         return false;
     }
     

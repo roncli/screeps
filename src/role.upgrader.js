@@ -76,7 +76,7 @@ var Cache = require("cache"),
             }
 
             if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && room.storage.store[RESOURCE_GHODIUM_HYDRIDE] >= 30 * workCount) {
-                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room));
+                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 
             // Create the creep from the first listed spawn that is available, spawning only in the current room if they are being boosted.

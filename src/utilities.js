@@ -248,8 +248,14 @@ var Cache = require("cache"),
             return sourceLabs;
         },
 
-        getLabToBoostWith: (room) => {
+        getLabToBoostWith: (room, count) => {
             "use strict";
+
+            var labs = [];
+
+            if (!count) {
+                count = 1;
+            }
 
             var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
                 labToUse = null;
@@ -262,29 +268,33 @@ var Cache = require("cache"),
                 room.memory.labsInUse = [];
             }
 
-            // Try to use labs other than source labs.
-            labToUse = {
-                id: _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (lid) => liu.id).indexOf(l.id) === -1)[0].id,
-                pause: false
-            };
+            for (let index = 0; index < count; index++) {
+                // Try to use labs other than source labs.
+                labToUse = {
+                    id: _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0].id,
+                    pause: false
+                };
 
-            // If only source labs are left, we will need to pause the reaction and use one of them.
-            if (!labToUse.id) {
-                labToUse.id = _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1)[0];
-                labToUse.pause = true;
-                if (Cache.getObjectById(labToUse.id).mineralAmount > 0) {
-                    labToUse.status = "emptying";
-                    labToUse.oldResource = Cache.getObjectById(labToUse.id).mineralType;
-                    labToUse.oldAmount = Cache.getObjectById(labToUse.id).mineralAmount;
+                // If only source labs are left, we will need to pause the reaction and use one of them.
+                if (!labToUse.id) {
+                    labToUse.id = _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0];
+                    labToUse.pause = true;
+                    if (Cache.getObjectById(labToUse.id).mineralAmount > 0) {
+                        labToUse.status = "emptying";
+                        labToUse.oldResource = Cache.getObjectById(labToUse.id).mineralType;
+                        labToUse.oldAmount = Cache.getObjectById(labToUse.id).mineralAmount;
+                    }
                 }
+
+                // If no labs can be used, then we can't boost.
+                if (!labToUse.id) {
+                    return false;
+                }
+
+                labs.push(labToUse);
             }
 
-            // If no labs can be used, then we can't boost.
-            if (!labToUse.id) {
-                return false;
-            }
-
-            return labToUse;
+            return labs;
         },
 
         roomLabsArePaused: (room) => {

@@ -256,7 +256,7 @@ var Cache = require("cache"),
 
             // Try to use labs other than source labs.
             labToUse = {
-                id: _.filter(Cache.labsInRoom(room), (l) => _.map(room.memory.labsInUse, (lid) => liu.id).indexOf(l.id) === -1)[0].id,
+                id: _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (lid) => liu.id).indexOf(l.id) === -1)[0].id,
                 pause: false
             };
 

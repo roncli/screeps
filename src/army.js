@@ -19,13 +19,23 @@ var Cache = require("cache"),
             }
 
             // Reset army if we have no creeps.
-            if (Memory.army[army].directive !== "building" && Cache.creepsInArmy("all", army).length === 0 && !Memory.army[army].success) {
+            if (Memory.army[army].directive !== "preparing" && Memory.army[army].directive !== "building" && Cache.creepsInArmy("all", army).length === 0 && !Memory.army[army].success) {
                 Game.notify("Army " + army + " operation failed, restarting.");
-                Memory.army[army].directive = "building";
+                Memory.army[army].directive = "preparing";
             }
 
             // Determine conditions for next stage or success.
             switch (Memory.army[army].directive) {
+                case "preparing":
+                    if (!Memory.army[army].boostRoom) {
+                        Memory.army[army].directive = "building";
+                    } else if (
+                        (Game.rooms[Memory.army[army].boostRoom].storage.store[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (Memory.army[army].dismantler.maxCreeps + Memory.army[army].melee.maxCreeps + Memory.army[army].ranged.maxCreeps + Memory.army[army].healer.maxCreeps) &&
+                        (Game.rooms[Memory.army[army].boostRoom].storage.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * Memory.army[army].dismantler.units * Memory.army[army].dismantler.maxCreeps &&
+                        (Game.rooms[Memory.army[army].boostRoom].storage.store[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * Memory.army[army].healer.units * Memory.army[army].healer.maxCreeps
+                    ) {
+                        Memory.army[army].directive = "building";
+                    }
                 case "building":
                     if (_.filter(Cache.creepsInArmy("all", army), (c) => c.room.name !== Memory.army[army].buildRoom).length === 0 && _.filter(Cache.creepsInArmy("all", army), (c) => c.room.name === Memory.army[army].buildRoom).length >= Memory.army[army].dismantler.maxCreeps + Memory.army[army].healer.maxCreeps + Memory.army[army].melee.maxCreeps + Memory.army[army].ranged.maxCreeps) {
                         Memory.army[army].directive = "staging";

@@ -25,7 +25,7 @@ var Cache = require("cache"),
         spawn: (army) => {
             "use strict";
 
-            var body = [],
+            var body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE],
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -39,13 +39,30 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
+            if (Game.rooms[Memory.army[army].boostRoom] && !(labsToBoostWith = Utilities.getLabToBoostWith(room, 1))) {
+                return false;
+            }
+
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id])[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyRanged-" + army + "-" + Game.time.toFixed(0).substring(4), {role: "armyRanged", army: army});
+            name = spawnToUse.createCreep(body, "armyRanged-" + army + "-" + Game.time.toFixed(0).substring(4), {role: "armyRanged", army: army, labs: Game.rooms[Memory.army[army].boostRoom] ? _.map(labsToBoostWith, (l) => l.id) : []});
             Cache.spawning[spawnToUse.id] = true;
+
+            if (typeof name !== "number" && Game.rooms[Memory.army[army].boostRoom]) {
+                // Set the labs to be in use.
+                labsToBoostWith[0].creepToBoost = name;
+                labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
+                labsToBoostWith[0].amount = 30 * 5;
+                room.memory.labsInUse.push(labsToBoostWith[0]);
+
+                // If anything is coming to fill the labs, stop them.
+                _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
+                    delete creep.memory.currentTask;
+                });
+            }
 
             return typeof name !== "number";
         },
@@ -63,6 +80,20 @@ var Cache = require("cache"),
 
             switch (directive) {
                 case "building":
+                    // If not yet boosted, go get boosts.
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
+                        var task = new TaskRally(creep.memory.labs[0]);
+                        task.canAssign(creep);
+                        assigned.push(creep.name);
+                    });
+
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+
+                    if (creepsWithNoTask.length === 0) {
+                        return;
+                    }
+
                     // Rally to army's building location.
                     task = new TaskRally(Memory.army[army].buildRoom);
                     _.forEach(creepsWithNoTask, (creep) => {

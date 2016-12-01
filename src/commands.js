@@ -175,7 +175,7 @@ var Cache = require("cache"),
                 delete Memory.army[army];
             } else {
                 Memory.army[army] = options;
-                Memory.army[army].directive = "building";
+                Memory.army[army].directive = "preparing";
             }
         },
 

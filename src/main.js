@@ -55,7 +55,6 @@ var profiler = require("screeps-profiler"),
                 Cache.log.cpuUsed = Game.cpu.getUsed();
             });
 
-            console.log(JSON.stringify(Cache.log));
             Memory.console = Cache.log;
         },
 

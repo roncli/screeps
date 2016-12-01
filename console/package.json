@@ -18,6 +18,7 @@
         "url": "https://github.com/roncli/screeps.git"
     },
     "dependencies": {
+        "screeps-api": "0.2.8",
         "ws": "1.0.1"
     },
     "devDependencies": {},

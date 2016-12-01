@@ -1,8 +1,8 @@
 var https = require("https"),
+    Screeps = require("screeps-api"),
     child_process = require("child_process"),
-    WebSocketClient = require("./websocketclient"),
     config = require("./config"),
-    wsc,
+    screeps = new Screeps(config),
 
     clear = () => {
         "use strict";
@@ -20,6 +20,8 @@ var https = require("https"),
     report = (data) => {
         try {
             var output;
+
+            clear();
 
             console.log(new Date(data.date) + " - Tick " + data.tick);
             console.log("GCL " + data.gcl + " - " + data.progress.toFixed(0) + "/" + data.progressTotal.toFixed(0) + " - " + (100 * data.progress / data.progressTotal).toFixed(3) + "% - " + (data.progressTotal - data.progress).toFixed(0) + " to go");
@@ -158,122 +160,25 @@ var https = require("https"),
     run = () => {
         "use strict";
 
-        var authPost = "email=" + config.user + "&password=" + config.password,
-            id;
+        screeps.socket();
 
-        if (wsc) {
-            wsc.close();
-            return;
-        }
-
-        wsc = new WebSocketClient();
-        
-        wsc.onopen = (err) => {
-            var req;
-            
-            if (err) {
-                console.log(err);
-                return;
+        screeps.on("message", (msg) => {
+            if (msg.startsWith("auth ok")) {
+                screeps.subscribe("/console");
             }
-            
-            req = https.request({
-                host: "screeps.com",
-                path: "/api/auth/signin",
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Content-Length": Buffer.byteLength(authPost)
-                }
-            }, (res) => {
-                var signinResponse = "";
+        });
 
-                res.on("data", (chunk) => {
-                    signinResponse += chunk;
-                });
+        screeps.on("console", (msg) => {
+            if (msg[1].error) {
+                console.log(msg[1].error);
+            }
 
-                res.on("end", () => {
-                    try {
-                        var response = JSON.parse(signinResponse),
-                            token = response.token,
-                            req = https.request({
-                                host: "screeps.com",
-                                path: "/api/auth/me",
-                                method: "GET",
-                                headers: {
-                                    "X-Token": token,
-                                    "X-Username": config.user
-                                }
-                            }, (res) => {
-                                var meResponse = "";
-
-                                res.on("data", (chunk) => {
-                                    meResponse += chunk;
-                                });
-
-                                res.on("end", () => {
-                                    try {
-                                        var response = JSON.parse(meResponse);
-
-                                        id = response._id;
-                                        wsc.send("auth " + token);
-                                    } catch (err) {
-                                        wsc.reconnect();
-                                    }
-                                });
-                            });
-
-                        req.end();
-                    } catch (err) {
-                        run();
-                    }
-                });
+            Promise.resolve().then(() => screeps.memory.get("console")).then((memory) => {
+                report(memory);
+            }).catch((err) => {
+                console.log(err);
             });
-
-            req.write(authPost);
-            req.end();
-        };
-
-        wsc.onmessage = (message) => {
-            var data, reportData;
-
-            if (message.startsWith("auth ok")) {
-                wsc.send("subscribe user:" + id + "/console");
-            }
-
-            try {
-                clear();
-                JSON.parse(message)[1].messages.log.forEach((l) => {
-                    try {
-                        data = JSON.parse(l);
-                        report(data);
-                    } catch (err) {
-                        console.log(l);
-                        console.log("");
-                        console.log("");
-                        console.log("");
-                        console.log(err);
-                    }
-                });
-            } catch (err) {
-                clear();
-                console.log(message);
-                console.log("");
-                console.log("");
-                console.log("");
-                console.log(err);
-            }
-        };
-
-        wsc.onerror = (err) => {
-            wsc.reconnect();
-        };
-
-        wsc.onclose = (err) => {
-            wsc = null;
-            run();
-        };
-
-        wsc.open("wss://screeps.com/socket/websocket");
+        });
     };
 
 run();

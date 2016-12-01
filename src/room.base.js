@@ -310,7 +310,9 @@ Base.prototype.run = function(room) {
 
                 if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralType === room.memory.labQueue.children[0] && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralType === room.memory.labQueue.children[1]) {
                     _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                        lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1]));
+                        if (lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1])) === OK) {
+                            room.memory.labQueue.amount -= 5;
+                        }
                     });
                 }
 
@@ -320,7 +322,9 @@ Base.prototype.run = function(room) {
                 break;
             case "creating":
                 _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                    lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1]));
+                    if (lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1])) === OK) {
+                        room.memory.labQueue.amount -= 5;
+                    }
                 });
 
                 if (_.sum(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {

@@ -352,7 +352,7 @@ Base.prototype.run = function(room) {
                 default:
                     if (Cache.getObjectById(queue.id).pos.getRangeTo(Game.creeps[queue.creepToBoost]) <= 1 && Cache.getObjectById(queue.id).mineralType === queue.resource) {
                         if (Cache.getObjectById(queue.id).boostCreep(Game.creeps[queue.creepToBoost]) === OK) {
-                            _.remove(Game.creeps[queue.creepToBoost].memory.labs, queue.id);
+                            _.remove(Game.creeps[queue.creepToBoost].memory.labs, (l) => l === queue.id);
                             if (!queue.status || queue.oldAmount === 0) {
                                 boosted.push(queue);
                             } else {
@@ -370,7 +370,7 @@ Base.prototype.run = function(room) {
         });
 
         _.forEach(boosted, (queue) => {
-            _.remove(room.memory.labsInUse, queue);
+            _.remove(room.memory.labsInUse, (l) => l.id === queue.id);
         })
     }
 

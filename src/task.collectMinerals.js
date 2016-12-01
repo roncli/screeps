@@ -1,6 +1,7 @@
 var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
+    Utilities = require("utilities"),
     CollectMinerals = function(id, resource, amount) {
         Task.call(this);
 

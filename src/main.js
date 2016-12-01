@@ -56,6 +56,7 @@ var profiler = require("screeps-profiler"),
             });
 
             console.log(JSON.stringify(Cache.log));
+            Memory.console = Cache.log;
         },
 
         init: () => {

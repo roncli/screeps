@@ -128,13 +128,7 @@ var https = require("https"),
 
             data.spawns.forEach((s) => {
                 if (s.spawningName) {
-                    if (s.spawningHome) {
-                        console.log("    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for room " + s.spawningHome + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
-                    } else if (s.spawningArmy) {
-                        console.log("    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " for army " + s.spawningArmy + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
-                    } else {
-                        console.log("    " + s.room + " spawning " + s.spawningRole + " " + s.spawningName + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
-                    }
+                    console.log("    " + s.room + " spawning " + s.spawningName + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);
                 }
             });
 

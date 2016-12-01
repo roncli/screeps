@@ -333,10 +333,10 @@ Base.prototype.run = function(room) {
         }
     }
 
-    if (room.memory.labQueue) {
+    if (room.memory.labsInUse) {
         boosted = [];
 
-        _.forEach(room.memory.labQueue, (queue) => {
+        _.forEach(room.memory.labsInUse, (queue) => {
             switch (queue.status) {
                 case "emptying":
                     if (Cache.getObjectById(queue.id).mineralAmount === 0) {
@@ -370,7 +370,7 @@ Base.prototype.run = function(room) {
         });
 
         _.forEach(boosted, (queue) => {
-            _.remove(room.memory.labQueue, queue);
+            _.remove(room.memory.labsInUse, queue);
         })
     }
 

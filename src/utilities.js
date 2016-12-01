@@ -178,6 +178,8 @@ var Cache = require("cache"),
         },
 
         buildStructures: (room, structureType, structuresToBuild, buildAroundObj) => {
+            "use strict";
+
             var distanceFromSpawn = 1,
                 x, y, siteIsClear;
 
@@ -224,10 +226,14 @@ var Cache = require("cache"),
         },
         
         getBodypartCost: (body) => {
+            "use strict";
+
             return _.sum(_.map(body, (b) => BODYPART_COST[b]));
         },
 
         getSourceLabs: (room) => {
+            "use strict";
+
             var sourceLabs = [];
 
             _.forEach(Cache.labsInRoom(room), (lab) => {
@@ -243,6 +249,8 @@ var Cache = require("cache"),
         },
 
         getLabToBoostWith: (room) => {
+            "use strict";
+
             var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
                 labToUse = null;
 
@@ -264,6 +272,11 @@ var Cache = require("cache"),
             if (!labToUse.id) {
                 labToUse.id = _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1)[0];
                 labToUse.pause = true;
+                if (Cache.getObjectById(labToUse.id).mineralAmount > 0) {
+                    labToUse.status = "emptying";
+                    labToUse.oldResource = Cache.getObjectById(labToUse.id).mineralType;
+                    labToUse.oldAmount = Cache.getObjectById(labToUse.id).mineralAmount;
+                }
             }
 
             // If no labs can be used, then we can't boost.
@@ -272,6 +285,12 @@ var Cache = require("cache"),
             }
 
             return labToUse;
+        },
+
+        roomLabsArePaused: (room) => {
+            "use strict";
+
+            return room.memory.labsInUse && _.filter(room.memory.labsInUse, (l) => l.pause).length > 0;
         }
     };
 

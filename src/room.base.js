@@ -136,7 +136,7 @@ Base.prototype.run = function(room) {
 
     var dealMade = false,
         flips = [], completed = [],
-        tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved;
+        tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {
@@ -297,7 +297,7 @@ Base.prototype.run = function(room) {
     }
 
     // Update lab queue if necessary.
-    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create") {
+    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && !Utilities.roomLabsArePaused(room)) {
         switch (room.memory.labQueue.status) {
             case "moving":
                 moved = true;
@@ -313,11 +313,11 @@ Base.prototype.run = function(room) {
                 }
                 break;
             case "creating":
-                _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1), (lab) => {
+                _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
                     lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1]));
                 });
 
-                if (!room.memory.labQueue.paused && _.sum(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
+                if (_.sum(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
                     room.memory.labQueue.status = "returning";
                 }
                 break;
@@ -331,6 +331,47 @@ Base.prototype.run = function(room) {
                 room.memory.labQueue.sourceLabs = Utilities.getSourceLabs(room);
                 break;
         }
+    }
+
+    if (room.memory.labQueue) {
+        boosted = [];
+
+        _.forEach(room.memory.labQueue, (queue) => {
+            switch (queue.status) {
+                case "emptying":
+                    if (Cache.getObjectById(queue.id).mineralAmount === 0) {
+                        queue.status = "filling";
+                    }
+                    break;
+                case "filling":
+                    if (Cache.getObjectById(queue.id).mineralAmount === queue.amount && Cache.getObjectById(queue.id).mineralType === queue.resource) {
+                        queue.status = "waiting";
+                    }
+                    break;
+                case "waiting":
+                default:
+                    if (Cache.getObjectById(queue.id).pos.getRangeTo(Game.creeps[queue.creepToBoost]) <= 1 && Cache.getObjectById(queue.id).mineralType === queue.resource) {
+                        if (Cache.getObjectById(queue.id).boostCreep(Game.creeps[queue.creepToBoost]) === OK) {
+                            _.remove(Game.creeps[queue.creepToBoost].labs, queue.id);
+                            if (!queue.status || queue.oldAmount === 0) {
+                                boosted.push(queue);
+                            } else {
+                                queue.status = "refilling";
+                            }
+                        }
+                    }
+                    break;
+                case "refilling":
+                    if (Cache.getObjectById(queue.id).mineralAmount === queue.amount && Cache.getObjectById(queue.id).mineralType === queue.resource) {
+                        boosted.push(queue);
+                    }
+                    break;
+            }
+        });
+
+        _.forEach(boosted, (queue) => {
+            _.remove(room.memory.labQueue, queue);
+        })
     }
 
     // Spawn new creeps.

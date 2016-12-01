@@ -123,20 +123,30 @@ CollectMinerals.getCleanupTasks = function(structures) {
 CollectMinerals.getLabTasks = function(room) {
     "use strict";
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "creating") {
+    var tasks = [];
+
+    if (room.storage && room.memory.labsInRoom) {
+        _.forEach(_.filter(room.memory.labsInRoom, (l) => (!l.status || l.status === "emptying") && Cache.getObjectById(l.id).mineralType && Cache.getObjectById(l.id).mineralType !== l.resource), (lab) => {
+            tasks.push(new CollectMinerals(l.id));
+        });
+    }
+
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "creating" && !Utilities.roomLabsArePaused(room)) {
         if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount === 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount !== 0) {
-            return [new CollectMinerals(room.memory.labQueue.sourceLabs[1])];
+            tasks.push(new CollectMinerals(room.memory.labQueue.sourceLabs[1]));
         }
         if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount !== 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount === 0) {
-            return [new CollectMinerals(room.memory.labQueue.sourceLabs[0])];
+            tasks.push(new CollectMinerals(room.memory.labQueue.sourceLabs[0]));
         }
     }
 
     if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "returning") {
-        return _.map(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (l) => new CollectMinerals(l.id));
+        _.forEach(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (lab) => {
+            tasks.push(new CollectMinerals(l.id));
+        });
     }
 
-    return [];
+    return tasks;
 };
 
 CollectMinerals.getStorageTasks = function(room) {
@@ -145,8 +155,14 @@ CollectMinerals.getStorageTasks = function(room) {
     var tasks = [],
         amount;
 
+    if (room.storage && room.memory.labsInRoom) {
+        _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status)) && (!Cache.getObjectById(l.id).mineralType || Cache.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource))), (l) => {
+            tasks.push(new CollectMinerals(room.storage.id, l.status === "refilling" ? l.oldResource : l.resource, l.status === "refilling" ? l.oldAmount - Cache.getObjectById(l.id).mineralAmount : l.amount - Cache.getObjectById(l.id).mineralAmount));
+        });
+    }
+
     // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3) {
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3 && !Utilities.roomLabsArePaused(room)) {
         _.forEach(room.memory.labQueue.children, (resource) => {
             if ((amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount)) < room.memory.labQueue.amount) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, room.memory.labQueue.amount - amount));

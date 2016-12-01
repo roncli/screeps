@@ -26,18 +26,18 @@ var Cache = require("cache"),
             }
 
             // Output upgrader count in the report.
-                Cache.log.rooms[room.name].creeps.push({
-                    role: "upgrader",
-                    count: Cache.creepsInRoom("upgrader", room).length,
-                    max: max
-                });
+            Cache.log.rooms[room.name].creeps.push({
+                role: "upgrader",
+                count: Cache.creepsInRoom("upgrader", room).length,
+                max: max
+            });
         },
         
         spawn: (room) => {
             "use strict";
 
-            var body = [],
-                energy, count, spawnToUse, name;
+            var body = [], workCount = 0, canBoost = false,
+                energy, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -50,10 +50,12 @@ var Cache = require("cache"),
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 200); count++) {
                 body.push(WORK);
+                workCount++;
             }
 
             if (energy % 200 >= 150) {
                 body.push(WORK);
+                workCount++;
             }
 
             for (count = 0; count < Math.floor(energy / 200); count++) {
@@ -72,14 +74,31 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body)), (s) => s.room.name === room.name ? 0 : 1)[0];
+            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && room.storage.store[RESOURCE_GHODIUM_HYDRIDE] >= 30 * workCount) {
+                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room));
+            }
+
+            // Create the creep from the first listed spawn that is available, spawning only in the current room if they are being boosted.
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => (!canBoost || s.room.name === room.name) && !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body)), (s) => s.room.name === room.name ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "upgrader-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: room.name});
+            name = spawnToUse.createCreep(body, "upgrader-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: room.name, labs: canBoost ? [labToBoostWith.id] : []});
             if (spawnToUse.room.name === room.name) {
                 Cache.spawning[spawnToUse.id] = true;
+            }
+
+            if (typeof name !== "number" && canBoost) {
+                // Set the lab to be in use.
+                labToBoostWith.creepToBoost = name;
+                labToBoostWith.resource = RESOURCE_GHODIUM_HYDRIDE;
+                labToBoostWith.amount = 30 * workCount;
+                room.memory.labsInUse.push(labToBoostWith);
+
+                // If anything is coming to fill the lab, stop it.
+                _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
+                    delete creep.memory.currentTask;
+                });
             }
 
             return typeof name !== "number";
@@ -90,6 +109,20 @@ var Cache = require("cache"),
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("upgrader", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // If not yet boosted, go get boosts.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
+                var task = new TaskRally(creep.labs[0]);
+                task.canAssign(creep);
+                assigned.push(creep.name);
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

@@ -78,7 +78,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, undefined, {role: "remoteReserver", home: room.name, supportRoom: supportRoom.name});
+            name = spawnToUse.createCreep(body, "remoteReserver-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteReserver", home: room.name, supportRoom: supportRoom.name});
             if (spawnToUse.room.name === supportRoom.name) {
                 Cache.spawning[spawnToUse.id] = true;
             }

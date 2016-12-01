@@ -44,7 +44,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, undefined, {role: "armyRanged", army: army});
+            name = spawnToUse.createCreep(body, "armyRanged-" + army + "-" + Game.time.toFixed(0).substring(4), {role: "armyRanged", army: army});
             Cache.spawning[spawnToUse.id] = true;
 
             return typeof name !== "number";

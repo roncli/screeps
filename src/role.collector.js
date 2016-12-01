@@ -100,7 +100,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, undefined, {role: "collector", home: room.name, homeSource: id});
+            name = spawnToUse.createCreep(body, "collector-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "collector", home: room.name, homeSource: id});
             if (spawnToUse.room.name === room.name) {
                 Cache.spawning[spawnToUse.id] = true;
             }

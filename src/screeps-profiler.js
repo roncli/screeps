@@ -31,7 +31,6 @@ function setupProfiler() {
       }
     },
     reset: resetMemory,
-    print: Profiler.printProfile,
     output: Profiler.output,
   };
 
@@ -125,8 +124,8 @@ function profileObjectFunctions(object, label) {
 function profileFunction(fn, functionName) {
   const fnName = functionName || fn.name;
   if (!fnName) {
-    var Cache = require("cache");
-    Cache.log.events.push('Couldn\'t find a function name, will not profile this function.');
+    console.log('Couldn\'t find a function name for - ', fn);
+    console.log('Will not profile this function.');
     return fn;
   }
 
@@ -134,9 +133,8 @@ function profileFunction(fn, functionName) {
 }
 
 const Profiler = {
-  printProfile(numresults) {
-    var Cache = require("cache");
-    Cache.log.events.push(Profiler.output(numresults));
+  printProfile() {
+    console.log(Profiler.output());
   },
 
   emailProfile() {

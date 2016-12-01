@@ -328,17 +328,7 @@ Base.prototype.run = function(room) {
                 break;
             default:
                 room.memory.labQueue.status = "moving";
-                room.memory.labQueue.sourceLabs = [];
-
-                // Determine which labs will be involved in the reaction.
-                _.forEach(Cache.labsInRoom(room), (lab) => {
-                    if (Utilities.objectsClosestToObj(Cache.labsInRoom(room), lab)[Cache.labsInRoom(room).length - 1].pos.getRangeTo(lab) <= 2) {
-                        room.memory.labQueue.sourceLabs.push(lab.id);
-                        if (room.memory.labQueue.sourceLabs.length >= 2) {
-                            return false;
-                        }
-                    }
-                });
+                room.memory.labQueue.sourceLabs = Utilities.getSourceLabs(room);
                 break;
         }
     }

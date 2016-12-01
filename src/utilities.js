@@ -225,6 +225,53 @@ var Cache = require("cache"),
         
         getBodypartCost: (body) => {
             return _.sum(_.map(body, (b) => BODYPART_COST[b]));
+        },
+
+        getSourceLabs: (room) => {
+            var sourceLabs = [];
+
+            _.forEach(Cache.labsInRoom(room), (lab) => {
+                if (Utilities.objectsClosestToObj(Cache.labsInRoom(room), lab)[Cache.labsInRoom(room).length - 1].pos.getRangeTo(lab) <= 2) {
+                    sourceLabs.push(lab.id);
+                    if (sourceLabs.length >= 2) {
+                        return false;
+                    }
+                }
+            });
+
+            return sourceLabs;
+        },
+
+        getLabToBoostWith: (room) => {
+            var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
+                labToUse = null;
+
+            if (sourceLabs.length === 0) {
+                sourceLabs = Utilities.getSourceLabs(room);
+            }
+
+            if (!room.memory.labsInUse) {
+                room.memory.labsInUse = [];
+            }
+
+            // Try to use labs other than source labs.
+            labToUse = {
+                id: _.filter(Cache.labsInRoom(room), (l) => _.map(room.memory.labsInUse, (lid) => liu.id).indexOf(l.id) === -1)[0].id,
+                pause: false
+            };
+
+            // If only source labs are left, we will need to pause the reaction and use one of them.
+            if (!labToUse.id) {
+                labToUse.id = _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1)[0];
+                labToUse.pause = true;
+            }
+
+            // If no labs can be used, then we can't boost.
+            if (!labToUse.id) {
+                return false;
+            }
+
+            return labToUse;
         }
     };
 

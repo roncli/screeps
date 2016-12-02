@@ -251,15 +251,14 @@ var Cache = require("cache"),
         getLabToBoostWith: (room, count) => {
             "use strict";
 
-            var labs = [],
+            var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
+                labs = [],
+                labToUse = null;
                 lab;
 
             if (!count) {
                 count = 1;
             }
-
-            var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
-                labToUse = null;
 
             if (sourceLabs.length === 0) {
                 sourceLabs = Utilities.getSourceLabs(room);
@@ -271,9 +270,10 @@ var Cache = require("cache"),
 
             for (let index = 0; index < count; index++) {
                 // Try to use labs other than source labs.
+                labToUse = {};
                 lab = _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1);
 
-                if (lab) {
+                if (lab.length > 0) {
                     labToUse = {
                         id: lab[0].id,
                         pause: false
@@ -281,7 +281,7 @@ var Cache = require("cache"),
                 }
 
                 // If only source labs are left, we will need to pause the reaction and use one of them.
-                if (!lab || !labToUse.id) {
+                if (!labToUse || !labToUse.id) {
                     labToUse = {
                         id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0],
                         pause: true

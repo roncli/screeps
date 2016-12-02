@@ -40,7 +40,7 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            if (Game.rooms[Memory.army[army].boostRoom] && !(labsToBoostWith = Utilities.getLabToBoostWith(room, 2))) {
+            if (Game.rooms[Memory.army[army].boostRoom] && !(labsToBoostWith = Utilities.getLabToBoostWith(Game.rooms[Memory.army[army].boostRoom], 2))) {
                 return false;
             }
 
@@ -57,15 +57,15 @@ var Cache = require("cache"),
                 labsToBoostWith[0].creepToBoost = name;
                 labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
                 labsToBoostWith[0].amount = 30 * 5;
-                room.memory.labsInUse.push(labsToBoostWith[0]);
+                Game.rooms[Memory.army[army].boostRoom].memory.labsInUse.push(labsToBoostWith[0]);
 
                 labsToBoostWith[1].creepToBoost = name;
                 labsToBoostWith[1].resource = RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE;
                 labsToBoostWith[1].amount = 30 * Memory.army[army].healer.units;
-                room.memory.labsInUse.push(labsToBoostWith[1]);
+                Game.rooms[Memory.army[army].boostRoom].memory.labsInUse.push(labsToBoostWith[1]);
 
                 // If anything is coming to fill the labs, stop them.
-                _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
+                _.forEach(_.filter(Cache.creepsInRoom("all", Game.rooms[Memory.army[army].boostRoom]), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
                     delete creep.memory.currentTask;
                 });
             }

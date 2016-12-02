@@ -26,7 +26,7 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE],
-                energy, count, spawnToUse, name;
+                count, spawnToUse, name, labsToBoostWith;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {

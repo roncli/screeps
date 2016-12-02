@@ -253,7 +253,7 @@ var Cache = require("cache"),
 
             var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
                 labs = [],
-                labToUse = null;
+                labToUse = null,
                 lab;
 
             if (!count) {

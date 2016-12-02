@@ -128,7 +128,7 @@ CollectMinerals.getLabTasks = function(room) {
 
     if (room.storage && room.memory.labsInUse) {
         _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || l.status === "emptying") && Cache.getObjectById(l.id).mineralType && Cache.getObjectById(l.id).mineralType !== l.resource), (lab) => {
-            tasks.push(new CollectMinerals(l.id));
+            tasks.push(new CollectMinerals(lab.id));
         });
     }
 

@@ -251,7 +251,8 @@ var Cache = require("cache"),
         getLabToBoostWith: (room, count) => {
             "use strict";
 
-            var labs = [];
+            var labs = [],
+                lab;
 
             if (!count) {
                 count = 1;
@@ -270,15 +271,21 @@ var Cache = require("cache"),
 
             for (let index = 0; index < count; index++) {
                 // Try to use labs other than source labs.
-                labToUse = {
-                    id: _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0].id,
-                    pause: false
-                };
+                lab = _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1);
+
+                if (lab) {
+                    labToUse = {
+                        id: lab[0].id,
+                        pause: false
+                    };
+                }
 
                 // If only source labs are left, we will need to pause the reaction and use one of them.
-                if (!labToUse.id) {
-                    labToUse.id = _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0];
-                    labToUse.pause = true;
+                if (!lab || !labToUse.id) {
+                    labToUse = {
+                        id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0],
+                        pause: true
+                    }
                     if (Cache.getObjectById(labToUse.id).mineralAmount > 0) {
                         labToUse.status = "emptying";
                         labToUse.oldResource = Cache.getObjectById(labToUse.id).mineralType;

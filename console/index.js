@@ -160,7 +160,26 @@ var https = require("https"),
     run = () => {
         "use strict";
 
-        screeps.socket();
+        screeps.socket(() => {
+            screeps.ws.on("close", () => {
+                console.log("Client closed.  Reconnecting...");
+                screeps = null;
+                run();
+            });
+
+            screeps.ws.on("error", (err) => {
+                setTimeout((err) => {
+                    if (err.code === "ECONNREFUSED") {
+                        console.log("Connection refused.  Reconnecting...");
+                        screeps = null;
+                        run();
+                    } else {
+                        console.log("Error from socket:");
+                        console.log(err);
+                    }
+                });
+            });
+        });
 
         screeps.on("message", (msg) => {
             if (msg.startsWith("auth ok")) {

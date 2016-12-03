@@ -195,7 +195,7 @@ var Cache = require("cache"),
             if (text) {
                 Memory.signs[room] = text;
             } else {
-                delete Memory.signs(room);
+                delete Memory.signs[room];
             }
         }
     };

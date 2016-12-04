@@ -457,7 +457,7 @@ Base.prototype.run = function(room) {
         }
     };
 
-    if (room.terminal.store[RESOURCE_ENERGY] >= 2000) {
+    if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 2000) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(room.terminal.id);
     }
 

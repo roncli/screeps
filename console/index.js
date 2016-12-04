@@ -2,7 +2,7 @@ var https = require("https"),
     Screeps = require("screeps-api"),
     child_process = require("child_process"),
     config = require("./config"),
-    screeps = new Screeps(config),
+    screeps,
 
     clear = () => {
         "use strict";
@@ -159,6 +159,8 @@ var https = require("https"),
 
     run = () => {
         "use strict";
+
+        screeps = new Screeps(config);
 
         screeps.socket(() => {
             screeps.ws.on("close", () => {

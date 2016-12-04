@@ -124,7 +124,7 @@ var Cache = require("cache"),
 
         claimMine: (room) => {
             if (Game.rooms[room]) {
-                _.forEach(_.filter(Cache.creepsInRoom(room), (c) => c.role = "remoteReserver"), (creep) => {
+                _.forEach(_.filter(Cache.creepsInRoom(Game.rooms[room]), (c) => c.role = "remoteReserver"), (creep) => {
                     creep.claimController(Game.rooms[room].controller);
                 });
             }

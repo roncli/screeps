@@ -242,55 +242,49 @@ var profiler = require("screeps-profiler"),
                 _.forEach(Game.rooms, (room) => {
                     // Build the mineral data.
                     if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length >= 3) {
-                        Cache.minerals[room.name] = [];
-
-                        // Check for mineral harvesters.  Each one needs UO x30 per WORK body part.
-                        if (room.find(FIND_MINERALS).length > 0) {
-                            Cache.minerals[room.name].push({
-                                resource: RESOURCE_UTRIUM_OXIDE,
-                                amount: 30 * room.find(FIND_MINERALS).length * Math.floor(Math.floor(Math.min(room.energyCapacityAvailable, 4450) / 50) / 2.2)
-                            });
-                        }
-
-                        // Check for upgraders.  Each one needs GH x30 per WORK body part.
-                        Cache.minerals[room.name].push({
-                            resource: RESOURCE_GHODIUM_HYDRIDE,
-                            amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200)
-                        });
-
-                        // Check for workers.  Each one needs LH x30 per WORK body part.
-                        Cache.minerals[room.name].push({
-                            resource: RESOURCE_LEMERGIUM_HYDRIDE,
-                            amount: 30 * Math.floor((Math.min(room.energyCapacityAvailable, 3300) + 50) / 200)
-                        });
-                    }
-                });
-
-                _.forEach(Memory.army, (data, army) => {
-                    if (data.boostRoom) {
-                        // Check for units.  Each one needs XGHO2 per TOUGH body part, which each will have 5 of.
-                        if (data.dismantler.maxCreeps > 0 || data.melee.maxCreeps > 0 || data.ranged.maxCreeps > 0 || data.healer.maxCreeps > 0) {
-                            Cache.minerals[data.boostRoom].push({
-                                resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE,
-                                amount: 30 * 5 * (data.dismantler.maxCreeps + data.melee.maxCreeps + data.ranged.maxCreeps + data.healer.maxCreeps)
-                            });
-                        }
-
-                        // Check for dismantlers.  Each one needs XZH2O x30 per WORK body part.
-                        if (data.dismantler.maxCreeps > 0) {
-                            Cache.minerals[data.boostRoom].push({
-                                resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID,
-                                amount: 30 * data.dismantler.units * data.dismantler.maxCreeps
-                            });
-                        }
-
-                        // Check for healers.  Each one needs XLHO2 x30 per HEAL body part.
-                        if (data.healer.maxCreeps > 0) {
-                            Cache.minerals[data.boostRoom].push({
-                                resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE,
-                                amount: 30 * data.healer.units * data.healer.maxCreeps
-                            });
-                        }
+                        Cache.minerals[room.name] = [
+                            {resource: RESOURCE_HYDROGEN, amount: 3000},
+                            {resource: RESOURCE_OXYGEN, amount: 3000},
+                            {resource: RESOURCE_ZYNTHIUM, amount: 3000},
+                            {resource: RESOURCE_KEANIUM, amount: 3000},
+                            {resource: RESOURCE_UTRIUM, amount: 3000},
+                            {resource: RESOURCE_LEMERGIUM, amount: 3000},
+                            {resource: RESOURCE_CATALYST, amount: 3000},
+                            {resource: RESOURCE_HYDROXIDE, amount: 3000},
+                            {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
+                            {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
+                            {resource: RESOURCE_GHODIUM, amount: 3000},
+                            {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
+                            {resource: RESOURCE_UTRIUM_OXIDE, amount: 3000},
+                            {resource: RESOURCE_KEANIUM_HYDRIDE, amount: 3000},
+                            {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
+                            {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
+                            {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
+                            {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
+                            {resource: RESOURCE_ZYNTHIUM_OXIDE, amount: 3000},
+                            {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
+                            {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
+                            {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_UTRIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_KEANIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_ZYNTHIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_KEANIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 3000},
+                            {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 3000}
+                        ];
                     }
                 });
 

@@ -170,7 +170,7 @@ Base.prototype.run = function(room) {
         terminalEnergy = 0;
     }
 
-    if (terminalEnergy < 1000) {
+    if (room.terminal && terminalEnergy < 1000) {
         terminalTask = new TaskFillEnergy(room.terminal.id);
     }
 

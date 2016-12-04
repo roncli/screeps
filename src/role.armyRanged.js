@@ -44,7 +44,7 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id])[0];
+            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === Memory.army[army].region)[0];
             if (!spawnToUse) {
                 return false;
             }

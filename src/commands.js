@@ -122,6 +122,14 @@ var Cache = require("cache"),
             }
         },
 
+        claimMine: (room) => {
+            if (Game.rooms[room]) {
+                _.forEach(_.filter(Cache.creepsInRoom(room), (c) => c.role = "remoteReserver"), (creep) => {
+                    creep.claimController(Game.rooms[room].controller);
+                });
+            }
+        },
+
         dismantle: (x, y, room) => {
             "use strict";
 

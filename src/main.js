@@ -215,7 +215,7 @@ var profiler = require("screeps-profiler"),
                     spawning: c.spawning,
                     ttl: c.ticksToLive,
                     carryCapacity: c.carryCapacity,
-                    carryJSON: JSON.stringify(c.carry),
+                    carry: c.carry,
                     hits: c.hits,
                     hitsMax: c.hitsMax
                 });
@@ -228,8 +228,7 @@ var profiler = require("screeps-profiler"),
                     room: s.room.name,
                     spawningName: s.spawning ? s.spawning.name : undefined,
                     spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
-                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined,
-                    spawningRole: s.spawning ? Game.creeps[s.spawning.name].memory.role : undefined
+                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
                 });
             });
         },
@@ -477,6 +476,7 @@ var profiler = require("screeps-profiler"),
                         supportRoom: room.memory ? room.memory.supportRoom : undefined,
                         unobservable: true,
                         store: {},
+                        labs: [],
                         source: [],
                         creeps: []
                     }
@@ -487,6 +487,7 @@ var profiler = require("screeps-profiler"),
                         unobservable: false,
                         controller: !!room.controller,
                         store: {},
+                        labs: [],
                         source: [],
                         creeps: []
                     }
@@ -541,6 +542,8 @@ var profiler = require("screeps-profiler"),
                     if (room.terminal) {
                         Cache.log.rooms[room.name].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
                     }
+
+                    Cache.log.rooms[room.name].labs = _.map(Cache.labsInRoom(room), (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
 
                     _.forEach(room.find(FIND_SOURCES), (s) => {
                         Cache.log.rooms[room.name].source.push({

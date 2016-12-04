@@ -80,7 +80,7 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available, spawning only in the current room if they are being boosted.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => (!canBoost || s.room.name === room.name) && !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body)), (s) => s.room.name === room.name ? 0 : 1)[0];
+            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             if (!spawnToUse) {
                 return false;
             }

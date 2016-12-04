@@ -164,7 +164,12 @@ Base.prototype.run = function(room) {
     }
 
     // Check to see if we can do a deal in the terminal.
-    terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
+    if (room.terminal) {
+        terminalEnergy = room.terminal.store[RESOURCE_ENERGY] || 0;
+    } else {
+        terminalEnergy = 0;
+    }
+
     if (terminalEnergy < 1000) {
         terminalTask = new TaskFillEnergy(room.terminal.id);
     }

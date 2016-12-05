@@ -132,7 +132,7 @@ var Cache = {
     repairableStructuresInRoom: (room) => {
         "use strict";
 
-        return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s instanceof StructureWall || s instanceof StructureRoad || s instanceof StructureContainer)}));
+        return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => ((s.my || s instanceof StructureWall || s instanceof StructureRoad || s instanceof StructureContainer) && s.hits)}));
     },
 
     // Returns all extractors in the current room.

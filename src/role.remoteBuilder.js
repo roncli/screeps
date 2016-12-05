@@ -4,6 +4,7 @@ var Cache = require("cache"),
     TaskHarvest = require("task.harvest"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
+    TaskRepair = require("task.repair"),
 
     Builder = {
         checkSpawn: (room) => {
@@ -101,6 +102,26 @@ var Cache = require("cache"),
                     creep.say("Stomping");
                     assigned.push(creep.name);
                 }
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check critical repairs.
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
+                    if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
+                        if (task.canAssign(creep)) {
+                            creep.say("CritRepair");
+                            assigned.push(creep.name);
+                            return false;
+                        }
+                    }
+                });
             });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);

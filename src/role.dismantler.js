@@ -99,7 +99,7 @@ var Cache = require("cache"),
             }
 
             // Check for structures needing dismantling.
-            _.forEach(creepsWithNoTask, (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
                 _.forEach(tasks.dismantle.tasks, (task) => {
                     if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
                         return;

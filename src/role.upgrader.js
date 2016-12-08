@@ -22,7 +22,7 @@ var Cache = require("cache"),
             count = _.filter(Cache.creepsInRoom("upgrader", room), (c) => c.spawning || c.ticksToLive >= 150).length;
             max = 1;
 
-            if (count < max || (room.storage && room.storage.store[RESOURCE_ENERGY] > 900000)) {
+            if (count < max || (room.controller && room.controller.level < 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 900000)) {
                 Upgrader.spawn(room);
             }
 

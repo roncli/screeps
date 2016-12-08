@@ -103,7 +103,7 @@ var Cache = require("cache"),
 
             // Attempt to get minerals from containers.
             _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
@@ -120,7 +120,7 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);

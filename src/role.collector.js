@@ -314,7 +314,7 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.tasks, (task) => {
-                var energy = task.store[RESOURCE_ENERGY];
+                var energy = task.object.store[RESOURCE_ENERGY];
 
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {

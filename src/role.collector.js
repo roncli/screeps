@@ -314,17 +314,10 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.tasks, (task) => {
-                var energy = task.object.store[RESOURCE_ENERGY] - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "collectEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + c.carryCapacity;}, 0);
-
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
-                        energy -= creep.carryCapacity;
                         assigned.push(creep.name);
-                    }
-
-                    if (energy < 500) {
-                        return false;
                     }
                 });
                 _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);

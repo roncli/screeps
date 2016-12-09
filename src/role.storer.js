@@ -221,13 +221,13 @@ var Cache = require("cache"),
                     return;
                 }
                 var energy = (task.object.energy || _.sum(task.object.store) || 0) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === task.type && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carryCapacity - _.sum(c.carry));}, 0);
-                if (energy > 0) {
+                if (energy >= 500) {
                     _.forEach(creepsWithNoTask, (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Collecting");
                             assigned.push(creep.name);
                             energy -= (creep.carryCapacity - _.sum(creep.carry));
-                            if (energy <= 0) {
+                            if (energy < 500) {
                                 return false;
                             }
                         }

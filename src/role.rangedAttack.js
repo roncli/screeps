@@ -69,7 +69,7 @@ var Cache = require("cache"),
             }
             name = spawnToUse.createCreep(body, "rangedAttack-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "rangedAttack", home: room.name, defending: toRoom});
             if (spawnToUse.room.name === room.name) {
-                Cache.spawning[spawnToUse.id] = true;
+                Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
             return typeof name !== "number";

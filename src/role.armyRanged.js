@@ -49,7 +49,7 @@ var Cache = require("cache"),
                 return false;
             }
             name = spawnToUse.createCreep(body, "armyRanged-" + army + "-" + Game.time.toFixed(0).substring(4), {role: "armyRanged", army: army, labs: Game.rooms[Memory.army[army].boostRoom] ? _.map(labsToBoostWith, (l) => l.id) : []});
-            Cache.spawning[spawnToUse.id] = true;
+            Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && Game.rooms[Memory.army[army].boostRoom]) {
                 // Set the labs to be in use.

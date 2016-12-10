@@ -624,6 +624,11 @@ var profiler = require("screeps-profiler"),
                     }
                 }
 
+                // Army creeps should congratulate.
+                if (creep.memory.army && creep.room.name === Memory.army[creep.memory.army].attackRoom) {
+                    creep.say(["Congrats!", "You're our", "QA Dept!", ""][Game.time % 4], true);
+                }
+
                 // Happy new million!
                 switch (Game.time % 1000000) {
                     case 999990:

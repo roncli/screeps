@@ -377,7 +377,7 @@ Base.prototype.run = function(room) {
                     }
                     break;
                 case "refilling":
-                    if (Cache.getObjectById(queue.id).mineralAmount === queue.amount && Cache.getObjectById(queue.id).mineralType === queue.oldResource) {
+                    if (Cache.getObjectById(queue.id).mineralAmount === queue.oldAmount && Cache.getObjectById(queue.id).mineralType === queue.oldResource) {
                         boosted.push(queue);
                     }
                     break;

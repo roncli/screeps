@@ -18,7 +18,7 @@ FillMinerals.prototype.constructor = FillMinerals;
 FillMinerals.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || _.sum(creep.carry) === 0 || creep.carry[RESOURCE_ENERGY] === _.sum(creep.carry)) {
+    if (this.amount < 0 || creep.spawning || _.sum(creep.carry) === 0 || creep.carry[RESOURCE_ENERGY] === _.sum(creep.carry)) {
         return false;
     }
 
@@ -77,7 +77,7 @@ FillMinerals.prototype.run = function(creep) {
 FillMinerals.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!this.object) {
+    if (this.amount < 0 || !this.object) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

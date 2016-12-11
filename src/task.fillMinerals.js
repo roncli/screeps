@@ -117,8 +117,8 @@ FillMinerals.getLabTasks = function(room) {
     
     var tasks = [];
 
-    _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Cache.getObjectById(l.id).mineralType || Cache.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource))), (l) => {
-        tasks.push(new FillMinerals(l.id, l.status === "refilling" ? l.oldResource : l.resource, l.status === "refilling" ? (l.oldAmount - Cache.getObjectById(l.id).mineralAmount) : (l.amount - Cache.getObjectById(l.id).mineralAmount)));
+    _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Cache.getObjectById(l.id).mineralType || Cache.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource)) && (Cache.getObjectById(l.id).mineralAmount < (l.status === "refilling" ? l.oldAmount : l.amount))), (lab) => {
+        tasks.push(new FillMinerals(lab.id, lab.status === "refilling" ? lab.oldResource : lab.resource, (lab.status === "refilling" ? lab.oldAmount : lab.amount) - Cache.getObjectById(lab.id).mineralAmount));
     });
 
     if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && !Utilities.roomLabsArePaused(room)) {

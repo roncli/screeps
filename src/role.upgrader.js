@@ -75,7 +75,7 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && room.storage.store[RESOURCE_GHODIUM_HYDRIDE] >= 30 * workCount) {
+            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_GHODIUM_HYDRIDE], room.storage.store[RESOURCE_GHODIUM_ACID], room.storage.store[RESOURCE_CATALYZED_GHODIUM_ACID])) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 
@@ -92,7 +92,7 @@ var Cache = require("cache"),
             if (typeof name !== "number" && canBoost) {
                 // Set the lab to be in use.
                 labToBoostWith.creepToBoost = name;
-                labToBoostWith.resource = RESOURCE_GHODIUM_HYDRIDE;
+                labToBoostWith.resource = (room.storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_GHODIUM_ACID : ((room.storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE);
                 labToBoostWith.amount = 30 * workCount;
                 room.memory.labsInUse.push(labToBoostWith);
 

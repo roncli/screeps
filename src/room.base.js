@@ -153,12 +153,12 @@ Base.prototype.run = function(room) {
         // Transfer energy from near link to far link.
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         _.forEach(links, (link, index) => {
-            if (index === links.length - 1) {
+            if (index === 0) {
                 return;
             }
 
-            if (!links[links.length - 1].cooldown && links[links.length - 1].energy > 0 && link.energy <= 300) {
-                link.transferEnergy(links[links.length - 1]);
+            if (!links[0].cooldown && links[0].energy > 0 && link.energy <= 300) {
+                links[0].transferEnergy(link);
             }
         });
     }

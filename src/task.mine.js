@@ -27,7 +27,8 @@ Mine.prototype.canAssign = function(creep) {
 Mine.prototype.run = function(creep) {
     "use strict";
 
-    var container = Cache.getObjectById(creep.memory.container);
+    var container = Cache.getObjectById(creep.memory.container),
+        source;
     
     // Container is not found, complete the task.
     if (!container) {
@@ -43,10 +44,17 @@ Mine.prototype.run = function(creep) {
     // If we are at the container, get the source closest to the creep and attempt to harvest it.
     if (container.pos.x === creep.pos.x && container.pos.y === creep.pos.y && container.pos.roomName === creep.pos.roomName) {
         if (Memory.containerSource[creep.memory.container]) {
-            creep.harvest(Cache.getObjectById(Memory.containerSource[creep.memory.container]));
+            source = Cache.getObjectById(Memory.containerSource[creep.memory.container]);
         } else {
-            creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0]);
+            source = creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0]);
         }
+
+        // If we're harvesting a mineral, don't go over 1500.
+        if (source instanceof Mineral && _.sum(container.store) >= 1500) {
+            return;
+        }
+
+        creep.harvest(source);
 
         // Suicide creep if there's another one right here with a higher TTL.
         if (_.filter([].concat.apply([], [Cache.creepsInRoom("miner", creep.room), Cache.creepsInRoom("remoteMiner", creep.room)]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {

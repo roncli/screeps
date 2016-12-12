@@ -45,8 +45,8 @@ var Cache = require("cache"),
         spawn: (room, id) => {
             "use strict";
 
-            var body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-                energy, count, spawnToUse, name;
+            var body = [MOVE, WORK, WORK, WORK, WORK, WORK], workCount = 0, canBoost = false,
+                energy, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -75,23 +75,32 @@ var Cache = require("cache"),
                     body.push(WORK);
                     body.push(WORK);
                     body.push(WORK);
+                    workCount += 5;
                 }
 
                 if (energy % 550 >= 150) {
                     body.push(WORK);
+                    workCount++;
                 }
 
                 if (energy % 550 >= 250) {
                     body.push(WORK);
+                    workCount++;
                 }
 
                 if (energy % 550 >= 350) {
                     body.push(WORK);
+                    workCount++;
                 }
 
                 if (energy % 550 >= 450) {
                     body.push(WORK);
+                    workCount++;
                 }
+            }
+
+            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_UTRIUM_OXIDE], room.storage.store[RESOURCE_UTRIUM_ALKALIDE], room.storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE])) >= 30 * workCount) {
+                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 
             // Create the creep from the first listed spawn that is available.
@@ -99,8 +108,35 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "miner-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "miner", home: room.name, container: id});
+            name = spawnToUse.createCreep(body, "miner-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "miner", home: room.name, container: id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
+
+            if (typeof name !== "number" && canBoost) {
+                // Set the lab to be in use.
+                labToBoostWith.creepToBoost = name;
+                labToBoostWith.resource = (room.storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] >= 30 * workCount) ? RESOURCE_CATALYZED_UTRIUM_ALKALIDE : ((room.storage.store[RESOURCE_UTRIUM_ALKALIDE] >= 30 * workCount) ? RESOURCE_UTRIUM_ALKALIDE : RESOURCE_UTRIUM_OXIDE);
+                labToBoostWith.amount = 30 * workCount;
+                room.memory.labsInUse.push(labToBoostWith);
+
+                // If anything is coming to fill the lab, stop it.
+                _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
+                    delete creep.memory.currentTask;
+                });
+            }
+
+            // If not yet boosted, go get boosts.
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
+                var task = new TaskRally(creep.memory.labs[0]);
+                task.canAssign(creep);
+                assigned.push(creep.name);
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
 
             return typeof name !== "number";
         },

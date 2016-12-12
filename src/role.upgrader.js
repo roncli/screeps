@@ -86,9 +86,7 @@ var Cache = require("cache"),
                 return false;
             }
             name = spawnToUse.createCreep(body, "upgrader-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: room.name, labs: canBoost ? [labToBoostWith.id] : []});
-            if (spawnToUse.room.name === room.name) {
-                Cache.spawning[spawnToUse.id] = typeof name !== "number";
-            }
+            Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
                 // Set the lab to be in use.

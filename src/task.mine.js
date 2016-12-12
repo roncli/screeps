@@ -49,6 +49,11 @@ Mine.prototype.run = function(creep) {
             source = Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0];
         }
 
+        if (source instanceof Mineral && source.mineralAmount === 0) {
+            creep.say(":(", true);
+            creep.suicide();
+        }
+
         // If we're harvesting a mineral, don't go over 1500.
         if (source instanceof Mineral && _.sum(container.store) >= 1500) {
             return;

@@ -46,7 +46,7 @@ Mine.prototype.run = function(creep) {
         if (Memory.containerSource[creep.memory.container]) {
             source = Cache.getObjectById(Memory.containerSource[creep.memory.container]);
         } else {
-            source = creep.harvest(Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0]);
+            source = Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0];
         }
 
         // If we're harvesting a mineral, don't go over 1500.

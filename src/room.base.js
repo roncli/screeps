@@ -136,7 +136,7 @@ Base.prototype.run = function(room) {
 
     var dealMade = false,
         flips = [], completed = [],
-        tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
+        tasks, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {
@@ -150,15 +150,15 @@ Base.prototype.run = function(room) {
     }
 
     if (Cache.spawnsInRoom(room).length > 0) {
-        // Transfer energy from far links to near link.
+        // Transfer energy from near link to far link.
         links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
         _.forEach(links, (link, index) => {
-            if (index === 0) {
+            if (index === links.length - 1) {
                 return;
             }
 
-            if (!link.cooldown && link.energy > 0 && links[0].energy <= 300) {
-                link.transferEnergy(links[0]);
+            if (!links[links.length - 1].cooldown && links[links.length - 1].energy > 0 && link.energy <= 300) {
+                links[links.length - 1].transferEnergy(link);
             }
         });
     }
@@ -431,6 +431,7 @@ Base.prototype.run = function(room) {
             storageTasks: TaskFillEnergy.getStorageTasks(room),
             containerTasks: TaskFillEnergy.getContainerTasks(room),
             labTasks: TaskFillEnergy.getLabTasks(room),
+            linkTasks: TaskFillEnergy.getLinkTasks(room),
             terminalTask: terminalTask
         },
         fillMinerals: {

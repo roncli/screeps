@@ -18,7 +18,7 @@ FillEnergy.prototype.canAssign = function(creep) {
 
     var minEnergy;
 
-    if (creep.spawning || !creep.carry[RESOURCE_ENERGY]) {
+    if (creep.spawning || !creep.carry[RESOURCE_ENERGY] || (this.object.energyCapacity && this.object.energy === this.object.energyCapacity)) {
         return false;
     }
 
@@ -159,6 +159,19 @@ FillEnergy.getStorageTasks = function(room) {
         return [];
     }
 };
+
+FillEnergy.getLinkTasks = function(room) {
+    "use strict";
+
+    var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
+    
+    if (links.length > 0) {
+        links.shift();
+        return [new FillEnergy(links[0].id)];
+    } else {
+        return [];
+    }
+}
 
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
 module.exports = FillEnergy;

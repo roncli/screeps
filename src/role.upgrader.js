@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskCollectEnergy = require("task.collectEnergy"),
     TaskRally = require("task.rally"),
 
     Upgrader = {
@@ -141,6 +142,27 @@ var Cache = require("cache"),
                 assigned = [];
             });
             
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Attempt to get energy from the closest link.
+            _.forEach(creepsWithNoTask, (creep) => {
+                var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), creep),
+                    task;
+
+                if (links.length > 0 && links[0].energy > 0) {
+                    task = new TaskCollectEnergy(links[0].id);
+                    if (task.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                    }
+                }
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
             if (creepsWithNoTask.length === 0) {
                 return;
             }

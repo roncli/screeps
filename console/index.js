@@ -190,15 +190,15 @@ var https = require("https"),
         });
 
         screeps.on("console", (msg) => {
-            if (msg[1].error) {
-                console.log(msg[1].error);
-            }
-
             Promise.resolve().then(() => screeps.memory.get("console")).then((memory) => {
                 report(memory);
             }).catch((err) => {
                 console.log(err);
             });
+
+            if (msg[1].error) {
+                console.log(msg[1].error);
+            }
         });
     };
 

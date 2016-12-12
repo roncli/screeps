@@ -21,20 +21,20 @@ var Cache = require("cache"),
             _.forEach(Cache.containersInRoom(room), (container) => {
                 var closest = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0];
 
-                if (!Memory.lengthToStorage[container.id]) {
-                    if (closest instanceof Mineral) {
-                        max += 1;
-                    } else {
+                if (closest instanceof Mineral) {
+                    max += 1;
+                } else {
+                    if (!Memory.lengthToStorage[container.id]) {
                         Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
                     }
-                }
 
-                // Do not count completely mined up minerals.
-                if (closest instanceof Mineral && closest.mineralAmount === 0) {
-                    return;
-                }
+                    // Do not count completely mined up minerals.
+                    if (closest instanceof Mineral && closest.mineralAmount === 0) {
+                        return;
+                    }
 
-                length += Memory.lengthToStorage[container.id];
+                    length += Memory.lengthToStorage[container.id];
+                }
             });
 
             // If we don't have a storer for each container, spawn one.

@@ -128,6 +128,8 @@ var https = require("https"),
                 }
             });
 
+            data.spawns.sort((a, b) => a.room.localeCompare(b.room));
+
             data.spawns.forEach((s) => {
                 if (s.spawningName) {
                     console.log("    " + s.room + " spawning " + s.spawningName + " in " + s.spawningRemainingTime + "/" + s.spawningNeedTime);

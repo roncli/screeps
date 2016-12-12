@@ -136,7 +136,7 @@ Base.prototype.run = function(room) {
 
     var dealMade = false,
         flips = [], completed = [],
-        tasks, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
+        tasks, links, terminalMinerals, topResource, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {

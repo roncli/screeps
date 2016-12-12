@@ -18,6 +18,8 @@ var https = require("https"),
     },
 
     report = (data) => {
+        "use strict";
+        
         try {
             var output;
 
@@ -183,7 +185,7 @@ var https = require("https"),
                         console.log("Error from socket:");
                         console.log(err);
                     }
-                });
+                }, 5000);
             });
         });
 

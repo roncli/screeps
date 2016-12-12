@@ -166,7 +166,6 @@ FillEnergy.getLinkTasks = function(room) {
     var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
     
     if (links.length > 0) {
-        links.shift();
         return [new FillEnergy(links[0].id)];
     } else {
         return [];

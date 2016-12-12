@@ -158,7 +158,7 @@ Base.prototype.run = function(room) {
             }
 
             if (!links[links.length - 1].cooldown && links[links.length - 1].energy > 0 && link.energy <= 300) {
-                links[links.length - 1].transferEnergy(link);
+                link.transferEnergy(links[links.length - 1]);
             }
         });
     }

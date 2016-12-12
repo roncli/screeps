@@ -5,8 +5,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var length = 0,
-                max;
+            var length = 0, max = 0;
             
             // If there are no spawns, containers, or storages in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0 || !room.storage) {
@@ -24,7 +23,7 @@ var Cache = require("cache"),
 
                 if (!Memory.lengthToStorage[container.id]) {
                     if (closest instanceof Mineral) {
-                        Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
+                        max += 1;
                     } else {
                         Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
                     }
@@ -39,7 +38,7 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            max = Math.ceil((2 * length) / 30) + ((Memory.army && _.keys(Memory.army).length > 0) ? 1 : 0);
+            max += Math.ceil((2 * length) / 30) + ((Memory.army && _.keys(Memory.army).length > 0) ? 1 : 0);
             if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 Storer.spawn(room);
             }

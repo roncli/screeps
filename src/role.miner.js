@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskMine = require("task.mine"),
+    TaskRally = require("task.rally"),
 
     Miner = {
         checkSpawn: (room) => {

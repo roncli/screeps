@@ -116,7 +116,7 @@ var Cache = require("cache"),
             // If not yet boosted, go get boosts.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
                 var lab = _.filter(room.memory.labsInUse, (l) => l.id === creep.memory.labs[0]);
-                if (Cache.getObjectById(creep.memory.labs[0]).mineralAmount >= l.amount) {
+                if (Cache.getObjectById(creep.memory.labs[0]).mineralAmount >= lab.amount) {
                     var task = new TaskRally(creep.memory.labs[0]);
                     task.canAssign(creep);
                     assigned.push(creep.name);

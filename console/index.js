@@ -160,6 +160,8 @@ var https = require("https"),
     run = () => {
         "use strict";
 
+        var lastTick = 0;
+
         screeps = new Screeps(config);
 
         screeps.socket(() => {
@@ -191,7 +193,10 @@ var https = require("https"),
 
         screeps.on("console", (msg) => {
             Promise.resolve().then(() => screeps.memory.get("console")).then((memory) => {
-                report(memory);
+                if (memory.tick > lastTick) {
+                    lastTick = memory.tick;
+                    report(memory);
+                }
             }).catch((err) => {
                 console.log(err);
             });

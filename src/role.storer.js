@@ -23,9 +23,8 @@ var Cache = require("cache"),
                 var closest = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0];
 
                 if (!Memory.lengthToStorage[container.id]) {
-                    // Since minerals produce up to half as much as sources, count the length for half.
                     if (closest instanceof Mineral) {
-                        Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length / 2;
+                        Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
                     } else {
                         Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
                     }

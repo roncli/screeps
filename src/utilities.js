@@ -283,7 +283,7 @@ var Cache = require("cache"),
                 // If only source labs are left, we will need to pause the reaction and use one of them.
                 if (!labToUse || !labToUse.id) {
                     labToUse = {
-                        id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1)[0],
+                        id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l) === -1)[0],
                         pause: true
                     }
                     if (Cache.getObjectById(labToUse.id).mineralAmount > 0) {

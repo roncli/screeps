@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskRally = require("task.rally"),
 
     Storer = {
         checkSpawn: (room) => {
@@ -178,7 +179,7 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled containers.
+            // Check for unfilled storage.
             _.forEach(tasks.fillEnergy.storageTasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
                 if (energyMissing > 0) {
@@ -241,6 +242,7 @@ var Cache = require("cache"),
                     if (tasks.collectEnergy.terminalTask.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
+                        creep.memory.lastCollectEnergyWasStorage = false;
                     }
                 });
                 _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -257,6 +259,7 @@ var Cache = require("cache"),
                     _.forEach(creepsWithNoTask, (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Collecting");
+                            creep.memory.lastCollectEnergyWasStorage = false;
                             assigned.push(creep.name);
                             energy -= (creep.carryCapacity - _.sum(creep.carry));
                             if (energy < 500) {
@@ -272,9 +275,12 @@ var Cache = require("cache"),
             // As a last resort, get energy from containers.
             _.forEach(tasks.collectEnergy.tasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
+                    if (!creep.memory.lastCollectEnergyWasStorage && task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
+                        if (task.object instanceof StructureStorage) {
+                            creep.memory.lastCollectEnergyWasStorage = true;
+                        }
                     }
                 });
                 _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -284,6 +290,13 @@ var Cache = require("cache"),
             if (creepsWithNoTask.length === 0) {
                 return;
             }
+
+            // Rally to center.
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task = new TaskRally(creep.room.name);
+                task.range = 0;
+                task.canAssign(creep);
+            });
         }
     };
 

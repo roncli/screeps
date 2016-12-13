@@ -176,7 +176,7 @@ var https = require("https"),
             });
 
             screeps.ws.on("error", (err) => {
-                setTimeout((err) => {
+                setTimeout(() => {
                     if (err.code === "ECONNREFUSED") {
                         console.log("Connection refused.  Reconnecting...");
                         screeps = null;

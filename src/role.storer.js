@@ -293,7 +293,7 @@ var Cache = require("cache"),
 
             // Rally to center.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskRally(creep.room.name);
+                var task = new TaskRally(creep.room.terminal ? creep.room.terminal.id : creep.room.name);
                 task.range = 0;
                 task.canAssign(creep);
             });

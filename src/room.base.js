@@ -365,7 +365,7 @@ Base.prototype.run = function(room) {
                     break;
                 case "waiting":
                 default:
-                    if (Cache.getObjectById(queue.id).pos.getRangeTo(Game.creeps[queue.creepToBoost]) <= 1 && Cache.getObjectById(queue.id).mineralType === queue.resource) {
+                    if (Cache.getObjectById(queue.id).pos.getRangeTo(Game.creeps[queue.creepToBoost]) <= 1 && Cache.getObjectById(queue.id).mineralType === queue.resource && Cache.getObjectById(queue.id).mineralAmount === queue.amount) {
                         if (Cache.getObjectById(queue.id).boostCreep(Game.creeps[queue.creepToBoost]) === OK) {
                             _.remove(Game.creeps[queue.creepToBoost].memory.labs, (l) => l === queue.id);
                             if (!queue.status || queue.oldAmount === 0) {

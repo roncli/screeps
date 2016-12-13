@@ -18,6 +18,10 @@
         "url": "https://github.com/roncli/screeps.git"
     },
     "dependencies": {
+        "angular": "1.6.0",
+        "bootstrap": "3.3.7",
+        "express": "4.14.0",
+        "jquery": "3.1.1",
         "screeps-api": "0.2.8",
         "ws": "1.0.1"
     },

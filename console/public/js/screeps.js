@@ -74,14 +74,21 @@ var app = angular.module("screeps", []),
     app.directive("offline", function() {
         return {
             restrict: "E",
-            templateUrl: "/templates/offline.htm"
+            templateUrl: "/offline.htm"
         };
     });
 
     app.directive("error", function() {
         return {
             restrict: "E",
-            templateUrl: "/templates/error.htm"
+            templateUrl: "/error.htm"
+        };
+    });
+
+    app.directive("waiting", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/waiting.htm"
         };
     });
 

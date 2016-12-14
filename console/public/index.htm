@@ -7,13 +7,23 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css"/>
 </head>
 <body>
-    LOADED!
     <div class="container-fluid">
         <div class="col-xs-12">
             <offline ng-if="data.offline"></offline>
             <error ng-if="data.error"></error>
-            <div ng-if="!data.offline && !data.error">
-                Tick: {{data.memory.tick}}
+            <waiting ng-if="!data.memory"></waiting>
+            <div ng-if="!data.offline && !data.error && data.memory">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table">
+                            <tr>
+                                <td>{{data.memory.date}}</td>
+                                <th>Tick</th>
+                                <td>{{data.memory.tick}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

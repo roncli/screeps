@@ -8,7 +8,7 @@ module.exports = () => {
 
     var lastTick = 0,
         screeps = new Screeps(config),
-        wss = new WebSocket.Server({port: 3811});
+        wss = new WebSocket.Server({port: 8081});
 
     wss.broadcast = (message) => {
         message = JSON.stringify(message);

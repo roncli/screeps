@@ -91,6 +91,13 @@ var app = angular.module("screeps", []),
             templateUrl: "/waiting.htm"
         };
     });
+    
+    app.directive("rooms", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/rooms.htm"
+        };
+    });
 
     app.controller("screeps", ["$scope", function($scope) {
         $scope.data = data;
@@ -123,7 +130,7 @@ var app = angular.module("screeps", []),
     $(document).ready(function() {
         var createWebsocketClient = function() {
             var connected = false;
-            ws = new WebSocket("ws://localhost:3811");
+            ws = new WebSocket("wss://" + window.location.hostname + ":8081");
 
             ws.onopen = function() {
                 connected = true;

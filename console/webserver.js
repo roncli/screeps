@@ -9,7 +9,10 @@ module.exports = () => {
 
     // Only allow connections on the localhost.
     app.use((req, res, next) => {
-        if (req.headers.host === "localhost:3911") {
+        next();
+        return;
+        
+        if (req.headers.host === "localhost:8080") {
             next();
         } else {
             res.status(404).send("Not found");
@@ -65,7 +68,7 @@ module.exports = () => {
     });
 
     // Create the server.
-    server = app.listen(3911);
+    server = app.listen(8080);
 
     // Log any errors and restart the worker.
     process.on("uncaughtException", (err) => {

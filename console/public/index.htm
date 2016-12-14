@@ -1,0 +1,21 @@
+<html ng-app="screeps" ng-controller="screeps">
+<head>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+    <script src="/js/screeps.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+</head>
+<body>
+    LOADED!
+    <div class="container-fluid">
+        <div class="col-xs-12">
+            <offline ng-if="data.offline"></offline>
+            <error ng-if="data.error"></error>
+            <div ng-if="!data.offline && !data.error">
+                Tick: {{data.memory.tick}}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -51,8 +51,13 @@ module.exports = () => {
     app.get("/js/angular.min.js", (req, res) => {
         res.sendFile(__dirname + "/node_modules/angular/angular.min.js");
     });
+
+    // Moment.
+    app.get("/js/moment.min.js", (req, res) => {
+        res.sendFile(__dirname + "/node_modules/moment/min/moment.min.js");
+    });
     
-    // Force quit Descent DSN entirely.
+    // Force quit Screeps entirely.
     app.get("/quit", (req, res) => {
         res.status(200).send("The application has quit.  You will need to restart the server to continue.");
         server.close();

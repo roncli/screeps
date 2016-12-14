@@ -1,5 +1,5 @@
 /*jslint browser: true*/
-/*global $, WebSocket, angular*/
+/*global $, WebSocket, angular, moment*/
 
 var app = angular.module("screeps", []),
     data = {};
@@ -96,6 +96,7 @@ var app = angular.module("screeps", []),
         $scope.data = data;
 
         $scope.Math = Math;
+        $scope.moment = moment;
 
         $scope.getTimestamp = function(time) {
             var seconds = time / 1000,

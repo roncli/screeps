@@ -22,6 +22,16 @@ CollectMinerals.prototype.canAssign = function(creep) {
         return false;
     }
     
+    if (this.resource && this.amount) {
+        if (this.object instanceof StructureLab && this.object.mineralType !== this.resource && this.object.mineralAmount < this.amount) {
+            return false;
+        }
+
+        if (!(this.object instanceof StructureLab) && (this.object.store[this.resource] || 0) < this.amount) {
+            return false;
+        }
+    }
+    
     Task.prototype.assign.call(this, creep);
     return true;
 }

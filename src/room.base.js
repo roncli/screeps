@@ -327,8 +327,8 @@ Base.prototype.run = function(room) {
                     if (moved) {
                         room.memory.labQueue.status = "creating";
                     }
-                    break;
                 }
+                break;
             case "creating":
                 _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
                     if (lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1])) === OK) {

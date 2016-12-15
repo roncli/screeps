@@ -102,7 +102,7 @@
 <b>Mine Rooms</b>
 <div style="white-space: nowrap; overflow-x: scroll;">
     <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'mine'" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 500px; margin-right: 10px; vertical-align: top;">
-        <div class="panel-heading">{{name}} ({{room.region}})</div>
+        <div class="panel-heading">{{name}} ({{room.region}}, Supporting {{room.supportRoom}})</div>
         <div class="panel-body">
             <div style="display: flex;">
                 <div ng-if="room.unobservable">Unobservable</div>
@@ -154,7 +154,7 @@
 <b>Cleanup Rooms</b>
 <div style="white-space: nowrap; overflow-x: scroll;">
     <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'cleanup'" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 500px; margin-right: 10px; vertical-align: top;">
-        <div class="panel-heading">{{name}}</div>
+        <div class="panel-heading">{{name}} (Supporting {{room.supportRoom}})</div>
         <div class="panel-body">
             <div style="display: flex;">
                 <div ng-if="room.unobservable">Unobservable</div>

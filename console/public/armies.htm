@@ -1,0 +1,35 @@
+<b>Armies</b>
+<div style="white-space: nowrap; overflow-x: scroll;">
+    <div ng-repeat="(name, army) in data.memory.army" ng-class="{panel: true, 'panel-warning': army.directive === 'staging', 'panel-danger': ['dismantle', 'attack'].indexOf(army.directive) !== -1}" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+        <div class="panel-heading">{{name}}</div>
+        <div class="panel-body">
+            <div ng-if="army.boostRoom">
+                <b>Boost Room</b> {{army.boostRoom}}
+            </div>
+            <div ng-if="army.buildRoom">
+                <b>Build Room</b> {{army.buildRoom}}
+            </div>
+            <div ng-if="army.stageRoom">
+                <b>Staging Room</b> {{army.stagingRoom}}
+            </div>
+            <div ng-if="army.attackRoom">
+                <b>Attack Room</b> {{army.attackRoom}}
+            </div>
+            <div ng-if="army.dismantle">
+                <b>Initial structures to dismantle:</b> {{army.dismantle}}
+            </div>
+            <div ng-if="army.structures">
+                <b>Complete structures to dismantle:</b> {{army.structures}}
+            </div>
+            <div ng-if="army.constructionSites">
+                <b>Initial structures to dismantle:</b> {{army.constructionSites}}
+            </div>
+            <div ng-repeat="creeps in army.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
+                <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
+            </div>
+            <div ng-repeat="creep in data.memory.creeps" ng-if="creep.army === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
+                <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
+            </div>
+        </div>
+    </div>
+</div>

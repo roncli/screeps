@@ -92,10 +92,52 @@ var app = angular.module("screeps", []),
         };
     });
     
-    app.directive("rooms", function() {
+    app.directive("general", function() {
         return {
             restrict: "E",
-            templateUrl: "/rooms.htm"
+            templateUrl: "/general.htm"
+        };
+    });
+
+    app.directive("rcls", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/rcls.htm"
+        };
+    });
+
+    app.directive("bases", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/bases.htm"
+        };
+    });
+
+    app.directive("mines", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/mines.htm"
+        };
+    });
+
+    app.directive("cleanups", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/cleanups.htm"
+        };
+    });
+
+    app.directive("unknowns", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/unknowns.htm"
+        };
+    });
+
+    app.directive("armies", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/armies.htm"
         };
     });
 

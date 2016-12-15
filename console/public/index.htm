@@ -13,46 +13,13 @@
             <offline ng-if="data.offline"></offline>
             <error ng-if="data.error"></error>
             <waiting ng-if="!data.memory"></waiting>
-            <div ng-if="!data.offline && !data.error && data.memory">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div style="display: flex;">
-                            <div style="width: max-content; white-space: nowrap;">
-                                <b>GCL</b> {{data.memory.gcl}}
-                            </div>
-                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{data.memory.progress.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{data.memory.progressTotal.toFixed(0)}}" style="width: {{(100 * data.memory.progress / data.memory.progressTotal).toFixed(3)}}%; white-space: nowrap; color: black;">
-                                    {{data.memory.progress.toFixed(0)}}/{{data.memory.progressTotal.toFixed(0)}} ({{(100 * data.memory.progress / data.memory.progressTotal).toFixed(3)}}%)
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex;">
-                            <div class="progress" style="width: 200px; margin: 0; break-after: always;">
-                                <div ng-class="{'progress-bar': true, 'progress-bar-success': data.memory.cpuUsed <= data.memory.limit, 'progress-bar-danger': data.memory.cpuUsed > data.memory.limit}" role="progressbar" aria-valuenow="{{data.memory.cpuUsed.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{data.memory.limit.toFixed(0)}}" style="width: {{Math.min((100 * data.memory.cpuUsed / data.memory.limit).toFixed(3), 100)}}%; white-space: nowrap; color: black;">
-                                    <b>CPU</b> {{data.memory.cpuUsed.toFixed(2)}}/{{data.memory.limit.toFixed(0)}}
-                                </div>
-                            </div>
-                            <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
-                                <div ng-class="{'progress-bar': true, 'progress-bar-info': data.memory.bucket >= 9990, 'progress-bar-success': data.memory.bucket >= 9000 && data.memory.bucket < 9990, 'progress-bar-warning': data.memory.bucket >= 5000 && data.memory.bucket < 9000, 'progress-bar-danger': data.memory.bucket < 5000}" role="progressbar" aria-valuenow="{{data.memory.bucket.toFixed(0)}}" aria-valuemin="0" aria-valuemax="10000" style="width: {{Math.min((100 * data.memory.bucket / 10000).toFixed(3), 100)}}%; white-space: nowrap; color: black;">
-                                    <b>Bucket</b> {{data.memory.bucket.toFixed(0)}}
-                                </div>
-                            </div>
-                            <div style="width: max-content; white-space: nowrap;">
-                                <b>Tick Limit</b> {{data.memory.tickLimit}}
-                            </div>
-                        </div>
-                        <div style="display: flex;">
-                            <div style="width: 50%;">
-                                <b>Credits</b> {{data.memory.credits.toFixed(2)}}
-                            </div>
-                            <div style="width: 50%; text-align: right;">
-                                {{moment(data.memory.date).format("M/d/YYYY h:mm:ss a")}}
-                                <b>Tick</b> {{data.memory.tick}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <rooms ng-if="data.memory.rooms"></rooms>
+            <div ng-if="!data.offline && !data.error && data.memory" class="small">
+                <general></general>
+                <bases></bases>
+                <mines></mines>
+                <cleanups></cleanups>
+                <unknowns></unknowns>
+                <armies></armies>
             </div>
         </div>
     </div>

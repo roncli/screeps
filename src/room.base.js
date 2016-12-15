@@ -305,7 +305,7 @@ Base.prototype.run = function(room) {
     if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && !Utilities.roomLabsArePaused(room)) {
         switch (room.memory.labQueue.status) {
             case "moving":
-                if (!room.memory.labQueue.start || room.memory.labQueue.start + 100 < Game.time) {
+                if (!room.memory.labQueue.start || room.memory.labQueue.start + 250 < Game.time) {
                     delete room.memory.labQueue;
                 } else {
                     moved = true;

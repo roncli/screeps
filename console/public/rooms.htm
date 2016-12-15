@@ -93,8 +93,8 @@
             <div ng-repeat="spawn in data.memory.spawns" ng-if="spawn.room === name && spawn.spawningName">
                 <b>Spawning</b> {{spawn.spawningName}} {{spawn.spawningRemainingTime}}/{{spawn.spawningNeedTime}}
             </div>
-            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
-                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerUsername === 'invader', 'text-danger': hostile.ownerUsername !== 'invader'}">
+                <b>{{hostile.ownerUsername}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
             </div>
         </div>
     </div>
@@ -145,8 +145,8 @@
             <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
                 <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
             </div>
-            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
-                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerUsername === 'invader', 'text-danger': hostile.ownerUsername !== 'invader'}">
+                <b>{{hostile.ownerUsername}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
             </div>
         </div>
     </div>
@@ -179,8 +179,8 @@
             <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
                 <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
             </div>
-            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
-                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerUsername === 'invader', 'text-danger': hostile.ownerUsername !== 'invader'}">
+                <b>{{hostile.ownerUsername}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
             </div>
         </div>
     </div>
@@ -210,8 +210,8 @@
             <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
                 <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
             </div>
-            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
-                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerUsername === 'invader', 'text-danger': hostile.ownerUsername !== 'invader'}">
+                <b>{{hostile.ownerUsername}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
             </div>
         </div>
     </div>
@@ -247,9 +247,6 @@
             </div>
             <div ng-repeat="creep in data.memory.creeps" ng-if="creep.army === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
                 <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
-            </div>
-            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.army === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
-                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
             </div>
         </div>
     </div>

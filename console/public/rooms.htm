@@ -1,7 +1,7 @@
 <b>Base Rooms</b>
 <div style="white-space: nowrap; overflow-x: scroll;">
     <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'base'" ng-class="{panel: true, 'panel-primary': !room.unobservable && room.rcl && room.ttd > 1000, 'panel-warning': room.ttd <= 1000, 'panel-danger': room.unobservable || !room.rcl}" style="display: inline-block; width: 500px; margin-right: 10px; vertical-align: top;">
-        <div class="panel-heading">{{name}}</div>
+        <div class="panel-heading">{{name}} ({{room.region}})</div>
         <div class="panel-body">
             <div style="display: flex;">
                 <div ng-if="room.unobservable">Unobservable</div>
@@ -102,7 +102,7 @@
 <b>Mine Rooms</b>
 <div style="white-space: nowrap; overflow-x: scroll;">
     <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'mine'" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 500px; margin-right: 10px; vertical-align: top;">
-        <div class="panel-heading">{{name}}</div>
+        <div class="panel-heading">{{name}} ({{room.region}})</div>
         <div class="panel-body">
             <div style="display: flex;">
                 <div ng-if="room.unobservable">Unobservable</div>
@@ -146,6 +146,109 @@
                 <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
             </div>
             <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
+                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            </div>
+        </div>
+    </div>
+</div>
+<b>Cleanup Rooms</b>
+<div style="white-space: nowrap; overflow-x: scroll;">
+    <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'cleanup'" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 500px; margin-right: 10px; vertical-align: top;">
+        <div class="panel-heading">{{name}}</div>
+        <div class="panel-body">
+            <div style="display: flex;">
+                <div ng-if="room.unobservable">Unobservable</div>
+                <div ng-if="room.rcl" style="width: max-content; white-space: nowrap;">
+                    <b>RCL</b> {{room.rcl}}
+                    <b>TTD</b> {{room.ttd}}
+                </div>
+                <div ng-if="room.reservedUsername">
+                    <b>Reserved</b> {{room.reservedUsername}}
+                    <b>TTE</b> {{room.tte}}
+                </div>
+                <div ng-if="!room.reservedUsername && room.controller && !room.rcl">
+                    <b>Unowned</b>
+                </div>
+            </div>
+            <div ng-repeat="(store, storage) in room.store">
+                <b>{{store}}</b> {{storage[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{storage[0].resource}}.png" />
+            </div>
+            <div ng-repeat="creeps in room.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
+                <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
+            </div>
+            <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
+                <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
+            </div>
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
+                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            </div>
+        </div>
+    </div>
+</div>
+<b>Unknown Rooms</b>
+<div style="white-space: nowrap; overflow-x: scroll;">
+    <div ng-repeat="(name, room) in data.memory.rooms" ng-if="['base', 'mine', 'cleanup'].indexOf(room.type) === -1" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 500px; margin-right: 10px; vertical-align: top;">
+        <div class="panel-heading">{{name}}</div>
+        <div class="panel-body" ng-if="room">
+            <div style="display: flex;">
+                <div ng-if="room.unobservable">Unobservable</div>
+                <div ng-if="room.rcl" style="width: max-content; white-space: nowrap;">
+                    <b>RCL</b> {{room.rcl}}
+                    <b>TTD</b> {{room.ttd}}
+                </div>
+                <div ng-if="room.reservedUsername">
+                    <b>Reserved</b> {{room.reservedUsername}}
+                    <b>TTE</b> {{room.tte}}
+                </div>
+                <div ng-if="!room.reservedUsername && room.controller && !room.rcl">
+                    <b>Unowned</b>
+                </div>
+            </div>
+            <div ng-repeat="creeps in room.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
+                <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
+            </div>
+            <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
+                <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
+            </div>
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
+                <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+            </div>
+        </div>
+    </div>
+</div>
+<b>Armies</b>
+<div style="white-space: nowrap; overflow-x: scroll;">
+    <div ng-repeat="(name, army) in data.memory.army" ng-class="{panel: true, 'panel-warning': army.directive === 'staging', 'panel-danger': ['dismantle', 'attack'].indexOf(army.directive) !== -1}">
+        <div class="panel-heading">{{name}}</div>
+        <div class="panel-body">
+            <div ng-if="army.boostRoom">
+                <b>Boost Room</b> {{army.boostRoom}}
+            </div>
+            <div ng-if="army.buildRoom">
+                <b>Build Room</b> {{army.buildRoom}}
+            </div>
+            <div ng-if="army.stageRoom">
+                <b>Staging Room</b> {{army.stagingRoom}}
+            </div>
+            <div ng-if="army.attackRoom">
+                <b>Attack Room</b> {{army.attackRoom}}
+            </div>
+            <div ng-if="army.dismantle">
+                <b>Initial structures to dismantle:</b> {{army.dismantle}}
+            </div>
+            <div ng-if="army.structures">
+                <b>Complete structures to dismantle:</b> {{army.structures}}
+            </div>
+            <div ng-if="army.constructionSites">
+                <b>Initial structures to dismantle:</b> {{army.constructionSites}}
+            </div>
+            <div ng-repeat="creeps in army.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
+                <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
+            </div>
+            <div ng-repeat="creep in data.memory.creeps" ng-if="creep.army === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
+                <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
+            </div>
+            <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.army === name" class="{'text-warning': hostile.ownerName === 'invader', 'text-danger': hostile.ownerName !== 'invader'}">
                 <b>{{hostile.ownerName}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
             </div>
         </div>

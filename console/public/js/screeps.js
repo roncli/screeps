@@ -130,7 +130,7 @@ var app = angular.module("screeps", []),
     $(document).ready(function() {
         var createWebsocketClient = function() {
             var connected = false;
-            ws = new WebSocket("wss://" + window.location.hostname + ":8081");
+            ws = new WebSocket("ws://" + window.location.hostname + ":8081");
 
             ws.onopen = function() {
                 connected = true;

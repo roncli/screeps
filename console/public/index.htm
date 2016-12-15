@@ -27,6 +27,21 @@
                             </div>
                         </div>
                         <div style="display: flex;">
+                            <div class="progress" style="width: 200px; break-after: always;">
+                                <div ng-class="{'progress-bar': true, 'progress-bar-success': data.memory.cpuUsed <= data.memory.limit, 'progress-bar-danger': data.memory.cpuUsed > data.memory.limit}" role="progressbar" aria-valuenow="{{data.memory.cpuUsed.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{data.memory.limit.toFixed(0)}}" style="width: {{Math.min((100 * data.memory.cpuUsed / data.memory.limit).toFixed(3), 100)}}%; white-space: nowrap; color: black;">
+                                    <b>CPU</b> {{data.memory.cpuUsed.toFixed(2)}}/{{data.memory.limit.toFixed(0)}}
+                                </div>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
+                                <div ng-class="{'progress-bar': true, 'progress-bar-info': data.memory.bucket >= 9990, 'progress-bar-success': data.memory.bucket >= 9000 && data.memory.bucket < 9990, 'progress-bar-warning': data.memory.bucket >= 5000 && data.memory.bucket < 9000, 'progress-bar-danger': data.memory.bucket < 5000}" role="progressbar" aria-valuenow="{{data.memory.bucket.toFixed(0)}}" aria-valuemin="0" aria-valuemax="10000" style="width: {{Math.min((100 * data.memory.bucket / 10000).toFixed(3), 100)}}%; white-space: nowrap; color: black;">
+                                    <b>Bucket</b> {{data.memory.bucket.toFixed(0)}}
+                                </div>
+                            </div>
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Tick Limit</b> {{data.memory.tickLimit}}
+                            </div>
+                        </div>
+                        <div style="display: flex;">
                             <div style="width: 50%;">
                                 <b>Credits</b> {{data.memory.credits.toFixed(2)}}
                             </div>

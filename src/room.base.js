@@ -305,26 +305,30 @@ Base.prototype.run = function(room) {
     if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && !Utilities.roomLabsArePaused(room)) {
         switch (room.memory.labQueue.status) {
             case "moving":
-                moved = true;
-                _.forEach(room.memory.labQueue.children, (resource) => {
-                    if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount) < room.memory.labQueue.amount) {
-                        moved = false;
-                        return false;
-                    }
-                });
-
-                if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralType === room.memory.labQueue.children[0] && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralType === room.memory.labQueue.children[1]) {
-                    _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                        if (lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1])) === OK) {
-                            room.memory.labQueue.amount -= 5;
+                if (!room.memory.labQueue.start || room.memory.labQueue.start + 100 < Game.tick) {
+                    delete room.memory.labQueue;
+                } else {
+                    moved = true;
+                    _.forEach(room.memory.labQueue.children, (resource) => {
+                        if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount) < room.memory.labQueue.amount) {
+                            moved = false;
+                            return false;
                         }
                     });
-                }
 
-                if (moved) {
-                    room.memory.labQueue.status = "creating";
+                    if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralType === room.memory.labQueue.children[0] && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralType === room.memory.labQueue.children[1]) {
+                        _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                            if (lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1])) === OK) {
+                                room.memory.labQueue.amount -= 5;
+                            }
+                        });
+                    }
+
+                    if (moved) {
+                        room.memory.labQueue.status = "creating";
+                    }
+                    break;
                 }
-                break;
             case "creating":
                 _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labQueue.sourceLabs.indexOf(l.id) === -1 && (!room.memory.labsInUse || _.map(_.filter(room.memory.labsInUse, (l) => l.resource !== room.memory.labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
                     if (lab.runReaction(Cache.getObjectById(room.memory.labQueue.sourceLabs[0]), Cache.getObjectById(room.memory.labQueue.sourceLabs[1])) === OK) {

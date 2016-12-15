@@ -473,6 +473,7 @@ var profiler = require("screeps-profiler"),
                     Cache.log.rooms[room.name] = {
                         type: type,
                         supportRoom: room.memory ? room.memory.supportRoom : undefined,
+                        region: room.memory ? room.memory.region : undefined,
                         unobservable: false,
                         controller: !!room.controller,
                         store: {},

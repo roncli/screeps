@@ -537,6 +537,8 @@ var profiler = require("screeps-profiler"),
 
                     Cache.log.rooms[room.name].labs = _.map(Cache.labsInRoom(room), (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
 
+                    Cache.log.rooms[room.name].labQueue = room.memory.labQueue;
+
                     _.forEach(room.find(FIND_SOURCES), (s) => {
                         Cache.log.rooms[room.name].source.push({
                             sourceId: s.id,

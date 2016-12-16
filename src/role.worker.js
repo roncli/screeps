@@ -73,7 +73,7 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_LEMERGIUM_HYDRIDE], room.storage.store[RESOURCE_LEMERGIUM_ACID], room.storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID])) >= 30 * workCount) {
+            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, room.storage.store[RESOURCE_LEMERGIUM_ACID] || 0, room.storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0)) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 

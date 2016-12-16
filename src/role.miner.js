@@ -100,7 +100,7 @@ var Cache = require("cache"),
                 }
             }
 
-            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_UTRIUM_OXIDE], room.storage.store[RESOURCE_UTRIUM_ALKALIDE], room.storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE])) >= 30 * workCount) {
+            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_UTRIUM_OXIDE] || 0, room.storage.store[RESOURCE_UTRIUM_ALKALIDE] || 0, room.storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] || 0)) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 

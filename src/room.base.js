@@ -304,6 +304,10 @@ Base.prototype.run = function(room) {
     // Update lab queue if necessary.
     if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && !Utilities.roomLabsArePaused(room)) {
         switch (room.memory.labQueue.status) {
+            case "clearing":
+                if (Cache.labsInRoom(room).length - room.memory.labsInUse.length  > 2 && _.filter(Cache.labsInRoom(room), (l) => room.memory.labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
+                    room.memory.labQueue.status = "moving";
+                }
             case "moving":
                 if (!room.memory.labQueue.start || room.memory.labQueue.start + 500 < Game.time) {
                     delete room.memory.labQueue;
@@ -346,7 +350,7 @@ Base.prototype.run = function(room) {
                 }
                 break;
             default:
-                room.memory.labQueue.status = "moving";
+                room.memory.labQueue.status = "clearing";
                 room.memory.labQueue.sourceLabs = Utilities.getSourceLabs(room);
                 break;
         }

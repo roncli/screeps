@@ -194,7 +194,7 @@ Base.prototype.run = function(room) {
                         if (amount > 0) {
                             Game.market.deal(bestOrder.id, amount, room.name);
                             dealMade = true;
-                            room.memory.labQueue.amount -= Math.min(room.memory.labQueue.amount, bestOrder.amount);
+                            room.memory.labQueue.amount -= amount;
                         }
                     }
                 }

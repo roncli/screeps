@@ -15,11 +15,11 @@ var Cache = require("cache"),
             }
 
             // If there is not enough energy in storage, ignore the room.
+            count = _.filter(Cache.creepsInRoom("upgrader", room), (c) => c.spawning || c.ticksToLive >= 150).length;
             if (!room.storage || room.storage.store[RESOURCE_ENERGY] < 100000) {
                 max = 0;
             } else {
                 // If we have less than max upgraders, spawn an upgrader.
-                count = _.filter(Cache.creepsInRoom("upgrader", room), (c) => c.spawning || c.ticksToLive >= 150).length;
                 max = 1;
             }
 

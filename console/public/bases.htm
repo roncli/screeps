@@ -4,7 +4,10 @@
         <div class="panel-heading">{{name}} ({{room.region}})</div>
         <div class="panel-body">
             <div ng-repeat="(store, storage) in room.store">
-                <b>{{store}}</b> {{storage[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{storage[0].resource}}.png" />
+                <b>{{store}}</b> {{storage[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{storage[0].resource}}.png" /> <span ng-class="{glyphicon: true, 'glyphicon-plus': !expanded[name][store], 'glyphicon-minus': expanded[name][store]}" ng-click="expanded[name][store] = !expanded[name][store]" style="cursor: pointer;" />
+                <div ng-repeat="resource in storage" ng-if="expanded[name][store] && $index !== 0" style="margin-left: 50px;">
+                    {{resource.amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{resource.resource}}.png" />
+                </div>
             </div>
             <div ng-if="room.energyCapacityAvailable">
                 <div style="display: flex;">

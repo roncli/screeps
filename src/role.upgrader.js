@@ -28,11 +28,13 @@ var Cache = require("cache"),
             }
 
             // Output upgrader count in the report.
-            Cache.log.rooms[room.name].creeps.push({
-                role: "upgrader",
-                count: Cache.creepsInRoom("upgrader", room).length,
-                max: max
-            });
+            if (count > 0 || max > 0) {
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "upgrader",
+                    count: Cache.creepsInRoom("upgrader", room).length,
+                    max: max
+                });
+            }
         },
         
         spawn: (room) => {

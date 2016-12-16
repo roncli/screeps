@@ -170,7 +170,7 @@ Base.prototype.run = function(room) {
         terminalEnergy = 0;
     }
 
-    if (room.terminal && terminalEnergy < 1000) {
+    if (room.terminal && terminalEnergy < 1000 && (!room.memory.labQueue || room.memory.labQueue.type !== "buy")) {
         terminalTask = new TaskFillEnergy(room.terminal.id);
     }
 
@@ -305,7 +305,7 @@ Base.prototype.run = function(room) {
     if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && !Utilities.roomLabsArePaused(room)) {
         switch (room.memory.labQueue.status) {
             case "clearing":
-                if (Cache.labsInRoom(room).length - room.memory.labsInUse.length  > 2 && _.filter(Cache.labsInRoom(room), (l) => room.memory.labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
+                if (Cache.labsInRoom(room).length - room.memory.labsInUse.length > 2 && _.filter(Cache.labsInRoom(room), (l) => room.memory.labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
                     room.memory.labQueue.status = "moving";
                 }
             case "moving":

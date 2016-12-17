@@ -204,7 +204,7 @@ Base.prototype.run = function(room) {
                 }
             }
 
-            if (room.memory.labQueue.amount <= 0) {
+            if (room.memory.labQueue && room.memory.labQueue.amount <= 0) {
                 delete room.memory.labQueue;
             }
         } else {

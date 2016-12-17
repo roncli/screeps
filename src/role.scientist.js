@@ -41,8 +41,8 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the total energy in the room, limited to 3300.
-            energy = Math.min(room.energyCapacityAvailable, 3300);
+            // Get the total energy in the room, limited to 2500.
+            energy = Math.min(room.energyCapacityAvailable, 2500);
 
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 150); count++) {

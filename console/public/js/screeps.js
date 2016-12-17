@@ -2,7 +2,9 @@
 /*global $, WebSocket, angular, moment*/
 
 var app = angular.module("screeps", []),
-    data = {};
+    data = {
+        start: {}
+    };
 
 (() => {
     "use strict";
@@ -196,6 +198,25 @@ var app = angular.module("screeps", []),
                 switch (message.message) {
                     case "data":
                         data.memory = message.data;
+                        
+                        // Setup start ticks
+                        if (!data.start.gcl || data.memory.progress < data.start.gcl.progress) {
+                            data.start.gcl = {
+                                progress: data.memory.progress,
+                                date: data.memory.date
+                            }
+                        }
+                        if (data.memory.rooms) {
+                            for (let name in data.memory.rooms) {
+                                let room = data.memory.rooms[name];
+                                if (!data.start[name] || room.progress < data.start[name].progress) {
+                                    data.start[name] = {
+                                        progress: room.progress,
+                                        date: data.memory.date
+                                    }
+                                }
+                            }
+                        }
                         
                         scope.$apply();
                         break;

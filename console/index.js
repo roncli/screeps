@@ -15,7 +15,7 @@ if (cluster.isMaster) {
     cluster.on("disconnect", (worker) => {
         "use strict";
 
-        if (worker.suicide) {
+        if (worker.exitedAfterDisconnect) {
             // Worker was intentionally disconnected, end the application.
             if (webServerWorker.isConnected()) {
                 webServerWorker.kill();

@@ -82,9 +82,8 @@ module.exports = () => {
             }
         } finally {
             setTimeout(() => {
-                cluster.worker.disconnect();
                 process.exit();
-            });
+            }, 5000);
         }
     });
 };

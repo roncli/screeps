@@ -472,7 +472,7 @@ Base.prototype.run = function(room) {
         }
     };
 
-    if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 2000 && (!room.memory.labQueue || room.memory.labQueue.type !== "buy")) {
+    if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 3000 && (!room.memory.labQueue || room.memory.labQueue.type !== "buy")) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(room.terminal.id);
     }
 

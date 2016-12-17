@@ -378,6 +378,7 @@ var profiler = require("screeps-profiler"),
                                             type: "buy",
                                             resource: node.resource,
                                             amount: 5 * Math.ceil(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)) / 5),
+                                            price: node.buyPrice,
                                             start: Game.time
                                         }
                                         return;

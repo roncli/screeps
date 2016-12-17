@@ -183,18 +183,22 @@ Base.prototype.run = function(room) {
             // Buy what we need to for the lab queue.
             bestOrder = _.filter(Game.market.getAllOrders(), (o) => o.resourceType === room.memory.labQueue.resource && o.type === "sell" && o.amount > 0).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
             if (bestOrder) {
-                transCost = Game.market.calcTransactionCost(Math.min(room.memory.labQueue.amount, bestOrder.amount), room.name, bestOrder.roomName);
-                if (terminalEnergy > transCost) {
-                    Game.market.deal(bestOrder.id, Math.min(room.memory.labQueue.amount, bestOrder.amount), room.name);
-                    dealMade = true;
-                    room.memory.labQueue.amount -= Math.min(room.memory.labQueue.amount, bestOrder.amount);
+                if (bestOrder.price > room.memory.labQueue.price) {
+                    delete room.memory.labQueue;
                 } else {
-                    if (terminalEnergy > 0) {
-                        amount = Math.floor(Math.min(room.memory.labQueue.amount, bestOrder.amount) * terminalEnergy / transCost);
-                        if (amount > 0) {
-                            Game.market.deal(bestOrder.id, amount, room.name);
-                            dealMade = true;
-                            room.memory.labQueue.amount -= amount;
+                    transCost = Game.market.calcTransactionCost(Math.min(room.memory.labQueue.amount, bestOrder.amount), room.name, bestOrder.roomName);
+                    if (terminalEnergy > transCost) {
+                        Game.market.deal(bestOrder.id, Math.min(room.memory.labQueue.amount, bestOrder.amount), room.name);
+                        dealMade = true;
+                        room.memory.labQueue.amount -= Math.min(room.memory.labQueue.amount, bestOrder.amount);
+                    } else {
+                        if (terminalEnergy > 0) {
+                            amount = Math.floor(Math.min(room.memory.labQueue.amount, bestOrder.amount) * terminalEnergy / transCost);
+                            if (amount > 0) {
+                                Game.market.deal(bestOrder.id, amount, room.name);
+                                dealMade = true;
+                                room.memory.labQueue.amount -= amount;
+                            }
                         }
                     }
                 }

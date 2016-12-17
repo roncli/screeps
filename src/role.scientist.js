@@ -339,7 +339,8 @@ var Cache = require("cache"),
             }
 
             // Rally remaining creeps.
-            _.forEach(TaskRally.getHarvesterTasks(creepsWithNoTask), (task) => {
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task = new TaskRally(room.terminal.id);
                 task.canAssign(task.creep);
             });
         }

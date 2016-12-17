@@ -129,59 +129,28 @@ var Cache = require("cache"),
             }
 
             // Check for dropped resources in current room if there are no hostiles.
-            if (Cache.hostilesInRoom(room).length === 0) {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                        if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                            return;
-                        }
-                        if (task.canAssign(creep)) {
-                            creep.say("Pickup");
-                            assigned.push(creep.name);
-                            return false;
-                        }
+            if (!room.controller || room.controller.level < 6) {
+                if (Cache.hostilesInRoom(room).length === 0) {
+                    _.forEach(creepsWithNoTask, (creep) => {
+                        _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                            if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                                return;
+                            }
+                            if (task.canAssign(creep)) {
+                                creep.say("Pickup");
+                                assigned.push(creep.name);
+                                return false;
+                            }
+                        });
                     });
-                });
-            }
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Attempt to get minerals from labs.
-            _.forEach(tasks.collectMinerals.labTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for unfilled labs for minerals.
-            _.forEach(tasks.fillMinerals.labTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Lab");
-                        assigned.push(creep.name);
-                    }
-                });
+                }
 
                 _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
                 assigned = [];
-            });
 
-            if (creepsWithNoTask.length === 0) {
-                return;
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             }
 
             // Check for unfilled storage for minerals.
@@ -307,29 +276,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for unfilled labs.
-            _.forEach(tasks.fillEnergy.labTasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("LabEnergy");
-                            assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
-            });
-            
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Check for 1-progress construction sites.
             _.forEach(_.filter(tasks.build.tasks, (t) => t.constructionSite.progressTotal === 1), (task) => {
                 var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(task.constructionSite.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
@@ -367,22 +313,6 @@ var Cache = require("cache"),
                 _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
                 assigned = [];
             });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for terminals.
-            if (tasks.fillEnergy.terminalTask) {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (tasks.fillEnergy.terminalTask.canAssign(creep)) {
-                        creep.say("Terminal");
-                        assigned.push(creep.name);
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
 
             if (creepsWithNoTask.length === 0) {
                 return;
@@ -457,38 +387,6 @@ var Cache = require("cache"),
                 }
             }
 
-            // Attempt to get minerals from terminals.
-            _.forEach(tasks.collectMinerals.terminalTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Attempt to get minerals from storage.
-            _.forEach(tasks.collectMinerals.storageTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            
             // Attempt to get energy from terminals.
             if (tasks.collectEnergy.terminalTask) {
                 _.forEach(creepsWithNoTask, (creep) => {

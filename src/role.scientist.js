@@ -340,7 +340,7 @@ var Cache = require("cache"),
 
             // Rally remaining creeps.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskRally(room.terminal.id);
+                var task = new TaskRally(room.terminal.id, creep);
                 task.canAssign(task.creep);
             });
         }

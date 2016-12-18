@@ -242,7 +242,7 @@ var profiler = require("screeps-profiler"),
             if (Game.cpu.bucket >= 9990) {
                 // Determine the minerals we need in each room and army.
                 _.forEach(Game.rooms, (room) => {
-                    if (!room.name || Memory.rooms[room.name].labQueue) {
+                    if (room.unobservable || !room.terminal || Memory.rooms[room.name].labQueue) {
                         return;
                     }
                     

@@ -242,6 +242,10 @@ var profiler = require("screeps-profiler"),
             if (Game.cpu.bucket >= 9990) {
                 // Determine the minerals we need in each room and army.
                 _.forEach(Game.rooms, (room) => {
+                    if (Memory.rooms[room.name].labQueue) {
+                        return;
+                    }
+                    
                     // Build the mineral data.
                     if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length >= 3) {
                         Cache.minerals[room.name] = [
@@ -286,6 +290,10 @@ var profiler = require("screeps-profiler"),
 
                 // Create a hierarchy of each mineral's components.
                 _.forEach(Cache.minerals, (minerals, room) => {
+                    if (Memory.rooms[room].labQueue) {
+                        return;
+                    }
+                    
                     _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
                             node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
@@ -303,6 +311,10 @@ var profiler = require("screeps-profiler"),
 
                 // Determine how many of each mineral needs to be saved in each room.
                 _.forEach(Cache.minerals, (minerals, room) => {
+                    if (Memory.rooms[room].labQueue) {
+                        return;
+                    }
+                    
                     Memory.rooms[room].reserveMinerals = {};
                     _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
@@ -331,6 +343,10 @@ var profiler = require("screeps-profiler"),
 
                 // Assign the market values and determine whether we should buy or create the minerals.
                 _.forEach(Cache.minerals, (minerals, room) => {
+                    if (Memory.rooms[room].labQueue) {
+                        return;
+                    }
+                    
                     _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
                             var buyPrice;

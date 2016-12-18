@@ -136,6 +136,14 @@ CollectMinerals.getLabTasks = function(room) {
 
     var tasks = [];
 
+    if (room.memory.labsInUse) {
+        _.forEach(room.memory.labsInUse, (lab) => {
+            if (!Game.creeps[lab.creepToBoost]) {
+                tasks.push(new CollectMinerals(lab.id));
+            }
+        });
+    }
+
     if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "clearing") {
         _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
             tasks.push(new CollectMinerals(lab.id));

@@ -278,6 +278,29 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled storage.
+            _.forEach(tasks.fillEnergy.storageTasks, (task) => {
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (!creep.memory.lastCollectEnergyWasStorage && task.canAssign(creep)) {
+                            creep.say("Storage");
+                            assigned.push(creep.name);
+                            energyMissing -= _.sum(creep.carry);
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Attempt to get minerals from terminals.
             _.forEach(tasks.collectMinerals.terminalTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {

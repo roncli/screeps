@@ -142,6 +142,10 @@ CollectMinerals.getLabTasks = function(room) {
                 tasks.push(new CollectMinerals(lab.id));
             }
         });
+
+        _.forEach(tasks, (task) => {
+            _.remove(room.memory.labsInUse, (l) => l.id === task.id);
+        });
     }
 
     if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "clearing") {

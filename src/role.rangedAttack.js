@@ -19,9 +19,11 @@ var Cache = require("cache"),
             if (Memory.maxCreeps.rangedAttack) {
                 _.forEach(Memory.maxCreeps.rangedAttack[room.name], (value, toRoom) => {
                     var count = _.filter(Cache.creepsInRoom("rangedAttack", room), (c) => c.memory.defending === toRoom).length;
-
                     num += count;
-                    max += value.maxCreeps;
+
+                    if (Game.rooms[toRoom].memory.harvested >= 30000 || Cache.hostilesInRoom(Game.rooms[toRoom]).length > 0) {
+                        max += value.maxCreeps;
+                    }
 
                     if (count < value.maxCreeps) {
                         Ranged.spawn(room, toRoom);

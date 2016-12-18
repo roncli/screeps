@@ -59,7 +59,9 @@ Mine.prototype.run = function(creep) {
             return;
         }
 
-        creep.harvest(source);
+        if (creep.harvest(source) === OK) {
+            creep.room.memory.harvested = (creep.room.memory.harvested || 30000) + (creep.getActiveBodyparts(WORK) * 2);
+        }
 
         // Suicide creep if there's another one right here with a higher TTL.
         if (_.filter([].concat.apply([], [Cache.creepsInRoom("miner", creep.room), Cache.creepsInRoom("remoteMiner", creep.room)]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {

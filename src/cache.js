@@ -153,7 +153,21 @@ var Cache = {
     hostilesInRoom: (room) => {
         "use strict";
 
-        return hostilesInRoom[room.name] ? hostilesInRoom[room.name] : (hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1));
+        var hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : (hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1));
+
+        if (!room.memory.hostiles) {
+            room.memory.hostiles = [];
+        }
+
+        _.forEach(hostiles, (hostile) => {
+            if (room.memory.hostiles.indexOf(hostile.id) !== -1) {
+                room.memory.harvested = 0;
+            }
+        });
+
+        room.memory.hostiles = _.map(hostiles, (h) => h.id);
+
+        return hostiles;
     },
 
     // Get the cost matrix for a room.

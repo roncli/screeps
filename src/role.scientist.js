@@ -219,6 +219,22 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for terminals.
+            if (tasks.fillEnergy.terminalTask) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (tasks.fillEnergy.terminalTask.canAssign(creep)) {
+                        creep.say("Terminal");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled extensions.
             _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
                 _.forEach(_.sortBy(tasks.fillEnergy.extensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {
@@ -257,22 +273,6 @@ var Cache = require("cache"),
                     assigned = [];
                 }
             });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for terminals.
-            if (tasks.fillEnergy.terminalTask) {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (tasks.fillEnergy.terminalTask.canAssign(creep)) {
-                        creep.say("Terminal");
-                        assigned.push(creep.name);
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
 
             if (creepsWithNoTask.length === 0) {
                 return;

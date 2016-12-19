@@ -702,7 +702,7 @@ var profiler = require("screeps-profiler"),
                 } else {
                     // RIP & Pepperonis :(
                     delete creep.memory.currentTask;
-                    if (!creep.spawning && creep.ticksToLive < 150) {
+                    if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "defender", "healer", "meleeAttack", "rangedAttack", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                         creep.suicide();
                     }
                 }

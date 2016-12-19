@@ -121,7 +121,7 @@ FillMinerals.getLabTasks = function(room) {
         tasks.push(new FillMinerals(lab.id, lab.status === "refilling" ? lab.oldResource : lab.resource, (lab.status === "refilling" ? lab.oldAmount : lab.amount) - Cache.getObjectById(lab.id).mineralAmount));
     });
 
-    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && !Utilities.roomLabsArePaused(room)) {
+    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.status === "moving" && !Utilities.roomLabsArePaused(room)) {
         if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount < room.memory.labQueue.amount) {
             tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[0], room.memory.labQueue.children[0], room.memory.labQueue.amount - Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount));
         }

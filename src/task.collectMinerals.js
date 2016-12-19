@@ -160,7 +160,7 @@ CollectMinerals.getLabTasks = function(room) {
         });
     }
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "creating" && !Utilities.roomLabsArePaused(room)) {
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "creating" && !Utilities.roomLabsArePaused(room)) {
         if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount === 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount !== 0) {
             tasks.push(new CollectMinerals(room.memory.labQueue.sourceLabs[1]));
         }
@@ -169,7 +169,7 @@ CollectMinerals.getLabTasks = function(room) {
         }
     }
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "returning") {
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "returning") {
         _.forEach(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (lab) => {
             tasks.push(new CollectMinerals(lab.id));
         });
@@ -193,7 +193,7 @@ CollectMinerals.getStorageTasks = function(room) {
     }
 
     // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.type === "create" && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3 && !Utilities.roomLabsArePaused(room)) {
+    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3 && !Utilities.roomLabsArePaused(room)) {
         _.forEach(room.memory.labQueue.children, (resource) => {
             if ((amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount)) < room.memory.labQueue.amount) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, room.memory.labQueue.amount - amount));

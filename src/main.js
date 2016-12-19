@@ -242,7 +242,7 @@ var profiler = require("screeps-profiler"),
             if (Game.cpu.bucket >= 9990) {
                 // Determine the minerals we need in each room and army.
                 _.forEach(Game.rooms, (room) => {
-                    if (room.unobservable || !room.terminal || !room.terminal.my || Memory.rooms[room.name].labQueue) {
+                    if (room.unobservable || !room.terminal || !room.terminal.my) {
                         return;
                     }
                     
@@ -290,10 +290,6 @@ var profiler = require("screeps-profiler"),
 
                 // Create a hierarchy of each mineral's components.
                 _.forEach(Cache.minerals, (minerals, room) => {
-                    if (Memory.rooms[room].labQueue) {
-                        return;
-                    }
-                    
                     _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
                             node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
@@ -311,10 +307,6 @@ var profiler = require("screeps-profiler"),
 
                 // Determine how many of each mineral needs to be saved in each room.
                 _.forEach(Cache.minerals, (minerals, room) => {
-                    if (Memory.rooms[room].labQueue) {
-                        return;
-                    }
-                    
                     Memory.rooms[room].reserveMinerals = {};
                     _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
@@ -343,10 +335,6 @@ var profiler = require("screeps-profiler"),
 
                 // Assign the market values and determine whether we should buy or create the minerals.
                 _.forEach(Cache.minerals, (minerals, room) => {
-                    if (Memory.rooms[room].labQueue) {
-                        return;
-                    }
-                    
                     _.forEach(minerals, (mineral) => {
                         var fx = (node, innerFx) => {
                             var buyPrice;
@@ -379,11 +367,6 @@ var profiler = require("screeps-profiler"),
                     if (!Game.rooms[room].memory.labQueue) {
                         _.forEach(minerals, (mineral) => {
                             var fx = (node, innerFx) => {
-                                // If we're already set to buy a mineral, we're done.
-                                if (Game.rooms[room].memory.labQueue && Game.rooms[room].memory.labQueue.type === "buy") {
-                                    return;
-                                }
-
                                 // If we have the requested mineral, we're done.
                                 if ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0) >= node.amount) {
                                     return;
@@ -392,18 +375,18 @@ var profiler = require("screeps-profiler"),
                                 switch (node.action) {
                                     case "buy":
                                         // We should buy the mineral from the market.
-                                        Game.rooms[room].memory.labQueue = {
-                                            type: "buy",
-                                            resource: node.resource,
-                                            amount: 5 * Math.ceil(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)) / 5),
-                                            price: node.buyPrice,
-                                            start: Game.time
+                                        if (!Game.rooms[room].memory.buyQueue) {
+                                            Game.rooms[room].memory.buyQueue = {
+                                                resource: node.resource,
+                                                amount: 5 * Math.ceil(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)) / 5),
+                                                price: node.buyPrice,
+                                                start: Game.time
+                                            }
                                         }
-                                        return;
+                                        break;
                                     case "create":
                                         // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
                                         Game.rooms[room].memory.labQueue = {
-                                            type: "create",
                                             resource: node.resource,
                                             amount: 5 * Math.ceil(Math.min(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)), LAB_MINERAL_CAPACITY) / 5),
                                             children: _.map(node.children, (c) => c.resource),
@@ -412,6 +395,7 @@ var profiler = require("screeps-profiler"),
                                         _.forEach(node.children, (child) => {
                                             innerFx(child, innerFx);
                                         });
+                                        break;
                                 }
                             };
 
@@ -557,6 +541,7 @@ var profiler = require("screeps-profiler"),
                     Cache.log.rooms[room.name].labs = _.map(Cache.labsInRoom(room), (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
 
                     Cache.log.rooms[room.name].labQueue = room.memory.labQueue;
+                    Cache.log.rooms[room.name].buyQueue = room.memory.buyQueue;
 
                     _.forEach(room.find(FIND_SOURCES), (s) => {
                         Cache.log.rooms[room.name].source.push({

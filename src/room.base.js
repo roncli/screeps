@@ -180,33 +180,33 @@ Base.prototype.run = function(room) {
             Memory.minimumSell = {};
         }
 
-        if (room.memory.labQueue && room.memory.labQueue.type === "buy") {
+        if (room.memory.buyQueue) {
             // Buy what we need to for the lab queue.
-            bestOrder = _.filter(Game.market.getAllOrders(), (o) => o.resourceType === room.memory.labQueue.resource && o.type === "sell" && o.amount > 0).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
+            bestOrder = _.filter(Game.market.getAllOrders(), (o) => o.resourceType === room.memory.buyQueue.resource && o.type === "sell" && o.amount > 0).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(room.name, a.roomName, true) - Game.map.getRoomLinearDistance(room.name, b.roomName, true)))[0];
             if (bestOrder) {
-                if (bestOrder.price > room.memory.labQueue.price) {
-                    delete room.memory.labQueue;
+                if (bestOrder.price > room.memory.buyQueue.price) {
+                    delete room.memory.buyQueue;
                 } else {
-                    transCost = Game.market.calcTransactionCost(Math.min(room.memory.labQueue.amount, bestOrder.amount), room.name, bestOrder.roomName);
+                    transCost = Game.market.calcTransactionCost(Math.min(room.memory.buyQueue.amount, bestOrder.amount), room.name, bestOrder.roomName);
                     if (terminalEnergy > transCost) {
-                        Game.market.deal(bestOrder.id, Math.min(room.memory.labQueue.amount, bestOrder.amount), room.name);
+                        Game.market.deal(bestOrder.id, Math.min(room.memory.buyQueue.amount, bestOrder.amount), room.name);
                         dealMade = true;
-                        room.memory.labQueue.amount -= Math.min(room.memory.labQueue.amount, bestOrder.amount);
+                        room.memory.buyQueue.amount -= Math.min(room.memory.buyQueue.amount, bestOrder.amount);
                     } else {
                         if (terminalEnergy > 0) {
-                            amount = Math.floor(Math.min(room.memory.labQueue.amount, bestOrder.amount) * terminalEnergy / transCost);
+                            amount = Math.floor(Math.min(room.memory.buyQueue.amount, bestOrder.amount) * terminalEnergy / transCost);
                             if (amount > 0) {
                                 Game.market.deal(bestOrder.id, amount, room.name);
                                 dealMade = true;
-                                room.memory.labQueue.amount -= amount;
+                                room.memory.buyQueue.amount -= amount;
                             }
                         }
                     }
                 }
             }
 
-            if (room.memory.labQueue && room.memory.labQueue.amount <= 0) {
-                delete room.memory.labQueue;
+            if (room.memory.buyQueue && room.memory.buyQueue.amount <= 0) {
+                delete room.memory.buyQueue;
             }
         } else {
             // Sell what we have in excess.
@@ -307,7 +307,7 @@ Base.prototype.run = function(room) {
     }
 
     // Update lab queue if necessary.
-    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.type === "create" && !Utilities.roomLabsArePaused(room)) {
+    if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && !Utilities.roomLabsArePaused(room)) {
         switch (room.memory.labQueue.status) {
             case "clearing":
                 if (Cache.labsInRoom(room).length - room.memory.labsInUse.length > 2 && _.filter(Cache.labsInRoom(room), (l) => room.memory.labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
@@ -451,7 +451,7 @@ Base.prototype.run = function(room) {
         }
     };
 
-    if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 3000 && (!room.memory.labQueue || room.memory.labQueue.type !== "buy")) {
+    if (room.terminal && room.terminal.store[RESOURCE_ENERGY] >= 3000 && !room.memory.buyQueue) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(room.terminal.id);
     }
 

@@ -54,24 +54,23 @@ var Cache = require("cache"),
                 return false;
             }
 
-            // Get the energy available, limiting to 4450.
-            energy = Math.min(room.energyCapacityAvailable, 4450);
+            // Get the energy available, limiting to 4500.
+            energy = Math.min(room.energyCapacityAvailable, 4500);
 
             // Do something different for minerals.
             if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
                 body = [];
 
                 // Create the body based on the energy.
-                for (count = 0; count < Math.floor(energy / 550); count++) {
+                for (count = 0; count < Math.floor(energy / 450); count++) {
                     body.push(MOVE);
                 }
 
-                if (energy % 550 >= 50) {
+                if (energy % 450 >= 50) {
                     body.push(MOVE);
                 }
 
-                for (count = 0; count < Math.floor(energy / 550); count++) {
-                    body.push(WORK);
+                for (count = 0; count < Math.floor(energy / 450); count++) {
                     body.push(WORK);
                     body.push(WORK);
                     body.push(WORK);
@@ -79,22 +78,17 @@ var Cache = require("cache"),
                     workCount += 5;
                 }
 
-                if (energy % 550 >= 150) {
+                if (energy % 450 >= 150) {
                     body.push(WORK);
                     workCount++;
                 }
 
-                if (energy % 550 >= 250) {
+                if (energy % 450 >= 250) {
                     body.push(WORK);
                     workCount++;
                 }
 
-                if (energy % 550 >= 350) {
-                    body.push(WORK);
-                    workCount++;
-                }
-
-                if (energy % 550 >= 450) {
+                if (energy % 450 >= 350) {
                     body.push(WORK);
                     workCount++;
                 }

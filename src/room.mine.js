@@ -80,8 +80,8 @@ Mine.prototype.run = function(room) {
 
     if (this.stage === 1) {
         // Spawn new creeps.
-        RoleRemoteBuilder.checkSpawn(room);
         RoleRemoteReserver.checkSpawn(room);
+        RoleRemoteBuilder.checkSpawn(room);
 
         // Get tasks.
         if (!room.unobservable) {
@@ -93,8 +93,8 @@ Mine.prototype.run = function(room) {
         }
 
         // Assign tasks to creeps.                    
-        RoleRemoteBuilder.assignTasks(room);
         RoleRemoteReserver.assignTasks(room);
+        RoleRemoteBuilder.assignTasks(room);
 
         if (!room.unobservable) {
             // Check to see if we have built containers.  If so, move to stage 2.
@@ -155,10 +155,10 @@ Mine.prototype.run = function(room) {
             }
 
             // Spawn new creeps.
+            RoleRemoteReserver.checkSpawn(room);
             RoleRemoteMiner.checkSpawn(room);
             RoleRemoteWorker.checkSpawn(room);
             RoleRemoteStorer.checkSpawn(room);
-            RoleRemoteReserver.checkSpawn(room);
             if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
                 RoleDismantler.checkSpawn(room, supportRoom);
             }
@@ -214,10 +214,10 @@ Mine.prototype.run = function(room) {
         }
 
         // Assign tasks to creeps.                    
+        RoleRemoteReserver.assignTasks(room, tasks);
         RoleRemoteMiner.assignTasks(room, tasks);
         RoleRemoteWorker.assignTasks(room, tasks);
         RoleRemoteStorer.assignTasks(room, tasks);
-        RoleRemoteReserver.assignTasks(room, tasks);
         RoleDismantler.assignTasks(room, tasks);
     }
 };

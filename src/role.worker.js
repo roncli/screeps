@@ -25,11 +25,13 @@ var Cache = require("cache"),
             }
 
             // Output worker count in the report.
-            Cache.log.rooms[room.name].creeps.push({
-                role: "worker",
-                count: Cache.creepsInRoom("worker", room).length,
-                max: max
-            });
+            if (count > 0 || max > 0) {
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "worker",
+                    count: Cache.creepsInRoom("worker", room).length,
+                    max: max
+                });
+            }
         },
         
         spawn: (room) => {

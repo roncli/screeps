@@ -38,7 +38,10 @@ Harvest.prototype.run = function(creep) {
     // Move to the source and harvest it.
     Pathing.moveTo(creep, source, 1);
     if (creep.harvest(source) === OK) {
-        creep.room.memory.harvested = (creep.room.memory.harvested || 30000) + (creep.getActiveBodyparts(WORK) * 2);
+        if (creep.room.memory.harvested === undefined) {
+            creep.room.memory.harvested = 30000;
+        }
+        creep.room.memory.harvested += (creep.getActiveBodyparts(WORK) * 2);
     }
 };
 

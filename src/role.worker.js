@@ -5,7 +5,7 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
 
     Worker = {
-        checkSpawn: (room) => {
+        checkSpawn: (room, canSpawn) => {
             "use strict";
 
             var count, sources, max;
@@ -18,7 +18,7 @@ var Cache = require("cache"),
 
             // If we have less than max workers, spawn a worker.
             count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.spawning || c.ticksToLive >= (room.storage ? 150 : 300)).length;
-            max = room.storage ? 1 : 2;
+            max = canSpawn ? (room.storage ? 1 : 2) : 0;
 
             if (count < max) {
                 Worker.spawn(room);

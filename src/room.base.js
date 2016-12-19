@@ -402,27 +402,6 @@ Base.prototype.run = function(room) {
         })
     }
 
-    // Spawn new creeps.
-    RoleWorker.checkSpawn(room);
-    RoleMiner.checkSpawn(room);
-    RoleStorer.checkSpawn(room);
-    RoleScientist.checkSpawn(room);
-    RoleMeleeAttack.checkSpawn(room);
-    RoleRangedAttack.checkSpawn(room);
-    RoleHealer.checkSpawn(room);
-    RoleDefender.checkSpawn(room);
-    if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
-        RoleDismantler.checkSpawn(room, supportRoom);
-    }
-    RoleCollector.checkSpawn(room);
-    RoleClaimer.checkSpawn(room);
-    if (room.controller && room.controller.level < 8) {
-        RoleUpgrader.checkSpawn(room);
-    }
-    if (Cache.haulers[room.name]) {
-        RoleHauler.checkSpawn(room);
-    }
-
     // Get the tasks needed for this room.
     tasks = {
         build: {
@@ -495,6 +474,27 @@ Base.prototype.run = function(room) {
         });
     }
     
+    // Spawn new creeps.
+    RoleWorker.checkSpawn(room, !room.storage || room.storage.store[RESOURCE_ENERGY] >= 50000 || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks > 0);
+    RoleMiner.checkSpawn(room);
+    RoleStorer.checkSpawn(room);
+    RoleScientist.checkSpawn(room);
+    RoleMeleeAttack.checkSpawn(room);
+    RoleRangedAttack.checkSpawn(room);
+    RoleHealer.checkSpawn(room);
+    RoleDefender.checkSpawn(room);
+    if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
+        RoleDismantler.checkSpawn(room, supportRoom);
+    }
+    RoleCollector.checkSpawn(room);
+    RoleClaimer.checkSpawn(room);
+    if (room.controller && room.controller.level < 8) {
+        RoleUpgrader.checkSpawn(room);
+    }
+    if (Cache.haulers[room.name]) {
+        RoleHauler.checkSpawn(room);
+    }
+
     // Assign tasks to creeps.                    
     RoleWorker.assignTasks(room, tasks);
     RoleMiner.assignTasks(room, tasks);

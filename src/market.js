@@ -1,10 +1,14 @@
-var orders = undefined,
+var Cache = require("cache"),
+    orders = undefined,
 
     Market = {
         getAllOrders: () => {
             "use strict";
 
             if (!orders || Game.cpu.bucket >= 9990) {
+                if (!orders) {
+                    Cache.log.events.push("System reset.")
+                }
                 orders = Game.market.getAllOrders();
             }
             

@@ -106,6 +106,29 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled towers.
+            _.forEach(tasks.fillEnergy.towerTasks, (task) => {
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Tower");
+                            assigned.push(creep.name);
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+            
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Attempt to get minerals from labs.
             _.forEach(tasks.collectMinerals.labTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
@@ -169,29 +192,6 @@ var Cache = require("cache"),
                 assigned = [];
             });
 
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for unfilled towers.
-            _.forEach(tasks.fillEnergy.towerTasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Tower");
-                            assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
-            });
-            
             if (creepsWithNoTask.length === 0) {
                 return;
             }

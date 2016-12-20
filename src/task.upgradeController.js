@@ -1,12 +1,14 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Pathing = require("pathing"),
+    Utilities = require("utilities"),
     Upgrade = function(room) {
         Task.call(this);
 
         this.type = "upgradeController";
         this.room = room;
         this.controller = Game.rooms[room].controller;
-};
+    };
     
 Upgrade.prototype = Object.create(Task.prototype);
 Upgrade.prototype.constructor = Upgrade;
@@ -31,6 +33,15 @@ Upgrade.prototype.run = function(creep) {
     if (!this.controller) {
         Task.prototype.complete.call(this, creep);
         return;
+    }
+    
+    // If we are an upgrader, try to get energy from the closest link.
+    if (creep.memory.role === "upgrader") {
+        let links = Utilities.objectsClosestToObj(Cache.linksInRoom(creep.room), creep);
+
+        if (links.length > 0 && links[0].energy > 0 && creep.pos.getRangeTo(links[0]) <= 1) {
+            creep.withdraw(links[0], RESOURCE_ENERGY);
+        }
     }
 
     // Move to the controller and upgrade it.

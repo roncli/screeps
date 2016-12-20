@@ -27,6 +27,7 @@ var Cache = require("cache"),
                         _.remove(orders, (m) => m.id === orderId);
                     } else {
                         order.amount -= amount;
+                        Cache.log.events.push(order.resource + " x" + amount + " completed, " + order.amount + " remaining.");
                     }
                 }
             }

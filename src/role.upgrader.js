@@ -49,7 +49,7 @@ var Cache = require("cache"),
             }
             
             // Check if we have a link in range of the controller and build the creep accordingly.
-            if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller)[0].getRangeTo(room.controller) <= 2) {
+            if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller)[0].pos.getRangeTo(room.controller) <= 2) {
                 // Get the total energy in the room, limited to 4100, or 1950 at RCL 8.
                 energy = Math.min(room.energyCapacityAvailable, room.controller.level === 8 ? 1950 : 4100);
     

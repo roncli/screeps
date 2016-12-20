@@ -239,7 +239,7 @@ Base.prototype.run = function(room) {
             }
             
             // Find an order to flip if we haven't made a deal and we have enough energy.
-            if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
+            if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 100000) {
                 _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
                     var sellOrder, buyOrder;
 
@@ -281,27 +281,6 @@ Base.prototype.run = function(room) {
                         }
                     }
                 });
-
-                if (!dealMade) {
-                    // Attempt to sell excess energy.
-                    bestOrder = _.sortBy(_.filter(Game.market.getAllOrders(), (o) => o.resourceType === RESOURCE_ENERGY && o.type === "buy" && o.amount > 0), (o) => -((o.price * o.amount + Game.market.calcTransactionCost(o.amount, room.name, o.roomName)) / o.amount))[0];
-                    if (bestOrder) {
-                        transCost = Game.market.calcTransactionCost(bestOrder.amount, room.name, bestOrder.roomName);
-                        if (terminalEnergy > transCost + room.terminal.store[RESOURCE_ENERGY]) {
-                            // Game.market.deal(bestOrder.id, bestOrder.amount, room.name);
-                            Cache.log.events.push("Would be selling", bestOrder.amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", transCost)
-                        } else {
-                            Cache.log.events.push("Would be filling terminal with energy.")
-                            if (terminalEnergy > 0) {
-                                amount = Math.floor(bestOrder.amount * (terminalEnergy / (bestOrder.amount + transCost)));
-                                if (amount > 0) {
-                                    // Game.market.deal(bestOrder.id, amount, room.name);
-                                    Cache.log.events.push("Would be selling", amount, "energy to", bestOrder.roomName, "for", bestOrder.price, "at a cost of", Game.market.calcTransactionCost(amount, room.name, bestOrder.roomName))
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }

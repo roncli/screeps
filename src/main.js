@@ -370,7 +370,7 @@ var profiler = require("screeps-profiler"),
                         _.forEach(minerals, (mineral) => {
                             var fx = (node, innerFx) => {
                                 // If we have the requested mineral, we're done.
-                                if ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0) >= node.amount) {
+                                if ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", Game.rooms[room]), (c) => c.carry[node.resource] || 0) >= node.amount) {
                                     return;
                                 }
 

@@ -41,41 +41,71 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [], workCount = 0, canBoost = false,
-                energy, count, spawnToUse, name, labToBoostWith;
+                links, energy, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
+            
+            // Check if we have a link in range of the controller and build the creep accordingly.
+            if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller)[0].getRangeTo(room.controller) <= 2) {
+                // Get the total energy in the room, limited to 4100, or 1950 at RCL 8.
+                energy = Math.min(room.energyCapacityAvailable, room.controller.level === 8 ? 1950 : 4100);
+    
+                // Create the body based on the energy.
+                for (count = 0; count < Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250); count++) {
+                    body.push(WORK);
+                    body.push(WORK);
+                    workCount += 2;
+                }
+    
+                if ((energy - Math.ceil(energy / 3200) * 50) % 250 >= 150) {
+                    body.push(WORK);
+                    workCount++;
+                }
 
-            // Get the total energy in the room, limited to 3300, or 3000 at RCL 8.
-            energy = Math.min(room.energyCapacityAvailable, room.controller.level === 8 ? 3000 : 3300);
+                for (count = 0; count < Math.ceil(energy / 3200); count++) {
+                    body.push(CARRY);
+                }
 
-            // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200); count++) {
-                body.push(WORK);
-                workCount++;
-            }
-
-            if (energy % 200 >= 150) {
-                body.push(WORK);
-                workCount++;
-            }
-
-            for (count = 0; count < Math.floor(energy / 200); count++) {
-                body.push(CARRY);
-            }
-
-            if (energy % 200 >= 100 && energy % 200 < 150) {
-                body.push(CARRY);
-            }
-
-            for (count = 0; count < Math.floor(energy / 200); count++) {
-                body.push(MOVE);
-            }
-
-            if (energy % 200 >= 50) {
-                body.push(MOVE);
+                for (count = 0; count < Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250); count++) {
+                    body.push(MOVE);
+                }
+    
+                if ((energy - Math.ceil(energy / 3200) * 50) % 250 >= 50) {
+                    body.push(MOVE);
+                }
+            } else {
+                // Get the total energy in the room, limited to 3300, or 3000 at RCL 8.
+                energy = Math.min(room.energyCapacityAvailable, room.controller.level === 8 ? 3000 : 3300);
+    
+                // Create the body based on the energy.
+                for (count = 0; count < Math.floor(energy / 200); count++) {
+                    body.push(WORK);
+                    workCount++;
+                }
+    
+                if (energy % 200 >= 150) {
+                    body.push(WORK);
+                    workCount++;
+                }
+    
+                for (count = 0; count < Math.floor(energy / 200); count++) {
+                    body.push(CARRY);
+                }
+    
+                if (energy % 200 >= 100 && energy % 200 < 150) {
+                    body.push(CARRY);
+                }
+    
+                for (count = 0; count < Math.floor(energy / 200); count++) {
+                    body.push(MOVE);
+                }
+    
+                if (energy % 200 >= 50) {
+                    body.push(MOVE);
+                }
             }
 
             if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, room.storage.store[RESOURCE_GHODIUM_ACID] || 0, room.storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {

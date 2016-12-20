@@ -241,177 +241,175 @@ var profiler = require("screeps-profiler"),
             var mineralOrders = {},
                 sellOrder;
 
-            if (Game.cpu.bucket >= 9990) {
-                // Determine the minerals we need in each room and army.
-                _.forEach(Game.rooms, (room) => {
-                    if (room.unobservable || !room.terminal || !room.terminal.my) {
-                        return;
+            // Determine the minerals we need in each room and army.
+            _.forEach(Game.rooms, (room) => {
+                if (room.unobservable || !room.terminal || !room.terminal.my) {
+                    return;
+                }
+                
+                // Build the mineral data.
+                if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length >= 3) {
+                    Cache.minerals[room.name] = [
+                        {resource: RESOURCE_HYDROGEN, amount: 3000},
+                        {resource: RESOURCE_OXYGEN, amount: 3000},
+                        {resource: RESOURCE_ZYNTHIUM, amount: 3000},
+                        {resource: RESOURCE_KEANIUM, amount: 3000},
+                        {resource: RESOURCE_UTRIUM, amount: 3000},
+                        {resource: RESOURCE_LEMERGIUM, amount: 3000},
+                        {resource: RESOURCE_CATALYST, amount: 3000},
+                        {resource: RESOURCE_HYDROXIDE, amount: 3000},
+                        {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
+                        {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
+                        {resource: RESOURCE_GHODIUM, amount: 3000},
+                        {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
+                        {resource: RESOURCE_UTRIUM_OXIDE, amount: 3000},
+                        {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
+                        {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
+                        {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
+                        {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
+                        {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
+                        {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
+                        {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_UTRIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 3000},
+                        {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 3000}
+                    ];
+                }
+            });
+
+            // Create a hierarchy of each mineral's components.
+            _.forEach(Cache.minerals, (minerals, room) => {
+                _.forEach(minerals, (mineral) => {
+                    var fx = (node, innerFx) => {
+                        node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
+
+                        _.forEach(node.children, (child) => {
+                            child.amount = node.amount;
+
+                            innerFx(child, innerFx);
+                        });
                     }
-                    
-                    // Build the mineral data.
-                    if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length >= 3) {
-                        Cache.minerals[room.name] = [
-                            {resource: RESOURCE_HYDROGEN, amount: 3000},
-                            {resource: RESOURCE_OXYGEN, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM, amount: 3000},
-                            {resource: RESOURCE_KEANIUM, amount: 3000},
-                            {resource: RESOURCE_UTRIUM, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM, amount: 3000},
-                            {resource: RESOURCE_CATALYST, amount: 3000},
-                            {resource: RESOURCE_HYDROXIDE, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
-                            {resource: RESOURCE_GHODIUM, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 3000}
-                        ];
-                    }
+
+                    fx(mineral, fx);
                 });
+            });
 
-                // Create a hierarchy of each mineral's components.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    _.forEach(minerals, (mineral) => {
-                        var fx = (node, innerFx) => {
-                            node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
-
-                            _.forEach(node.children, (child) => {
-                                child.amount = node.amount;
-
-                                innerFx(child, innerFx);
-                            });
+            // Determine how many of each mineral needs to be saved in each room.
+            _.forEach(Cache.minerals, (minerals, room) => {
+                Memory.rooms[room].reserveMinerals = {};
+                _.forEach(minerals, (mineral) => {
+                    var fx = (node, innerFx) => {
+                        if (!Memory.rooms[room].reserveMinerals[node.resource]) {
+                            Memory.rooms[room].reserveMinerals[node.resource] = 0;
                         }
+                        Memory.rooms[room].reserveMinerals[node.resource] += node.amount;
 
-                        fx(mineral, fx);
-                    });
-                });
-
-                // Determine how many of each mineral needs to be saved in each room.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    Memory.rooms[room].reserveMinerals = {};
-                    _.forEach(minerals, (mineral) => {
-                        var fx = (node, innerFx) => {
-                            if (!Memory.rooms[room].reserveMinerals[node.resource]) {
-                                Memory.rooms[room].reserveMinerals[node.resource] = 0;
-                            }
-                            Memory.rooms[room].reserveMinerals[node.resource] += node.amount;
-
-                            _.forEach(node.children, (child) => {
-                                innerFx(child, innerFx);
-                            });
-                        }
-
-                        fx(mineral, fx);
-                    });
-                });
-
-                // Get market values for each mineral.
-                _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
-                    sellOrder = _.sortBy(_.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
-
-                    if (sellOrder) {
-                        mineralOrders[resource] = sellOrder;
+                        _.forEach(node.children, (child) => {
+                            innerFx(child, innerFx);
+                        });
                     }
+
+                    fx(mineral, fx);
                 });
+            });
 
-                // Assign the market values and determine whether we should buy or create the minerals.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    _.forEach(minerals, (mineral) => {
-                        var fx = (node, innerFx) => {
-                            var buyPrice;
+            // Get market values for each mineral.
+            _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
+                sellOrder = _.sortBy(_.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
 
-                            node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
+                if (sellOrder) {
+                    mineralOrders[resource] = sellOrder;
+                }
+            });
 
-                            _.forEach(node.children, (child) => {
-                                innerFx(child, innerFx);
-                            });
+            // Assign the market values and determine whether we should buy or create the minerals.
+            _.forEach(Cache.minerals, (minerals, room) => {
+                _.forEach(minerals, (mineral) => {
+                    var fx = (node, innerFx) => {
+                        var buyPrice;
 
-                            if (!node.children || node.children.length === 0) {
-                                node.action = "buy";
+                        node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
+
+                        _.forEach(node.children, (child) => {
+                            innerFx(child, innerFx);
+                        });
+
+                        if (!node.children || node.children.length === 0) {
+                            node.action = "buy";
+                        } else {
+                            buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
+                            if (node.buyPrice > buyPrice) {
+                                node.action = "create";
+                                node.buyPrice = buyPrice;
                             } else {
-                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
-                                if (node.buyPrice > buyPrice) {
-                                    node.action = "create";
-                                    node.buyPrice = buyPrice;
-                                } else {
-                                    node.action = "buy";
-                                }
+                                node.action = "buy";
+                            }
+                        }
+                    };
+
+                    fx(mineral, fx);
+                });
+            });
+
+            // Set room lab queue.
+            _.forEach(Cache.minerals, (minerals, room) => {
+                var hasBuyQueue = !!Game.rooms[room].memory.buyQueue;
+                var hasLabQueue = !!Game.rooms[room].memory.labQueue;
+                if (!hasBuyQueue || !hasLabQueue) {
+                    _.forEach(minerals, (mineral) => {
+                        var fx = (node, innerFx) => {
+                            // If we have the requested mineral, we're done.
+                            if ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", Game.rooms[room]), (c) => c.carry[node.resource] || 0) >= node.amount) {
+                                return;
+                            }
+
+                            switch (node.action) {
+                                case "buy":
+                                    // We should buy the mineral from the market.
+                                    if (!Game.rooms[room].memory.buyQueue) {
+                                        Game.rooms[room].memory.buyQueue = {
+                                            resource: node.resource,
+                                            amount: 5 * Math.ceil(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)) / 5),
+                                            price: node.buyPrice,
+                                            start: Game.time
+                                        };
+                                    }
+                                    break;
+                                case "create":
+                                    // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
+                                    if (!hasLabQueue) {
+                                        Game.rooms[room].memory.labQueue = {
+                                            resource: node.resource,
+                                            amount: 5 * Math.ceil(Math.min(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)), LAB_MINERAL_CAPACITY) / 5),
+                                            children: _.map(node.children, (c) => c.resource),
+                                            start: Game.time
+                                        };
+                                    }
+
+                                    _.forEach(node.children, (child) => {
+                                        innerFx(child, innerFx);
+                                    });
+
+                                    break;
                             }
                         };
 
                         fx(mineral, fx);
                     });
-                });
-
-                // Set room lab queue.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    var hasBuyQueue = !!Game.rooms[room].memory.buyQueue;
-                    var hasLabQueue = !!Game.rooms[room].memory.labQueue;
-                    if (!hasBuyQueue || !hasLabQueue) {
-                        _.forEach(minerals, (mineral) => {
-                            var fx = (node, innerFx) => {
-                                // If we have the requested mineral, we're done.
-                                if ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", Game.rooms[room]), (c) => c.carry[node.resource] || 0) >= node.amount) {
-                                    return;
-                                }
-
-                                switch (node.action) {
-                                    case "buy":
-                                        // We should buy the mineral from the market.
-                                        if (!Game.rooms[room].memory.buyQueue) {
-                                            Game.rooms[room].memory.buyQueue = {
-                                                resource: node.resource,
-                                                amount: 5 * Math.ceil(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)) / 5),
-                                                price: node.buyPrice,
-                                                start: Game.time
-                                            };
-                                        }
-                                        break;
-                                    case "create":
-                                        // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
-                                        if (!hasLabQueue) {
-                                            Game.rooms[room].memory.labQueue = {
-                                                resource: node.resource,
-                                                amount: 5 * Math.ceil(Math.min(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)), LAB_MINERAL_CAPACITY) / 5),
-                                                children: _.map(node.children, (c) => c.resource),
-                                                start: Game.time
-                                            };
-                                        }
-
-                                        _.forEach(node.children, (child) => {
-                                            innerFx(child, innerFx);
-                                        });
-
-                                        break;
-                                }
-                            };
-
-                            fx(mineral, fx);
-                        });
-                    }
-                });
-            }
+                }
+            });
         },
 
         rooms: () => {

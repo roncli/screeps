@@ -3,7 +3,8 @@
 
 var app = angular.module("screeps", []),
     data = {
-        start: {}
+        start: {},
+        messages: []
     };
 
 (() => {
@@ -142,7 +143,14 @@ var app = angular.module("screeps", []),
             templateUrl: "/armies.htm"
         };
     });
-
+    
+    app.directive("events", function() {
+        return {
+            restrict: "E",
+            templateUrl: "/events.htm"
+        };
+    });
+    
     app.controller("screeps", ["$scope", function($scope) {
         $scope.data = data;
 
@@ -174,7 +182,7 @@ var app = angular.module("screeps", []),
     $(document).ready(function() {
         var createWebsocketClient = function() {
             var connected = false;
-            ws = new WebSocket("ws://" + window.location.hostname + ":8081");
+            ws = new WebSocket("wss://" + window.location.hostname + ":8081");
 
             ws.onopen = function() {
                 connected = true;
@@ -218,10 +226,26 @@ var app = angular.module("screeps", []),
                             }
                         }
                         
+                        if (data.memory.events && data.memory.events.length > 0) {
+                            for (let event in data.memory.events) {
+                                data.messages.push({
+                                    date: moment(scope.data.memory.date) || moment(),
+                                    tick: scope.data.memory.tick,
+                                    message: JSON.stringify(data.memory.events[event]),
+                                    type: "info"
+                                });
+                            }
+                        }
+                        
                         scope.$apply();
                         break;
                     case "error":
-                        // TODO: Show error.
+                        data.messages.push({
+                            date: moment(scope.data.memory.date) || moment(),
+                            tick: scope.data.memory.tick,
+                            message: message.type + " " + JSON.stringify(message.data),
+                            type: "error"
+                        });
                         
                         scope.$apply();
                         break;

@@ -440,7 +440,8 @@ Base.prototype.run = function(room) {
         },
         repair: {
             tasks: TaskRepair.getTasks(room),
-            criticalTasks: TaskRepair.getCriticalTasks(room)
+            criticalTasks: TaskRepair.getCriticalTasks(room),
+            towerTasks: TaskRepair.getTowerTasks(room)
         },
         upgradeController: {
             tasks: TaskUpgradeController.getTasks(room),

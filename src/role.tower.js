@@ -3,8 +3,6 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var filteredTasks;
-
             // Find hostiles to attack.
             if (tasks.rangedAttack.tasks.length > 0) {
                 _.forEach(Cache.towersInRoom(room), (tower) => {
@@ -13,11 +11,10 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for critical repairs under 10000 hits.
-            filteredTasks = _.filter(tasks.repair.criticalTasks, (t) => t.structure.hits < 10000);
-            if (filteredTasks.length > 0) {
+            // Check for tower repairs.
+            if (tasks.repair.towerTasks.length > 0) {
                 _.forEach(Cache.towersInRoom(room), (tower) => {
-                    tower.repair(filteredTasks[0].structure);
+                    tower.repair(tasks.repair.towerTasks[0].structure);
                 });
                 return;
             }

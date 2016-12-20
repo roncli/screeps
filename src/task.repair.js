@@ -71,6 +71,12 @@ Repair.fromObj = function(creep) {
     return new Repair(creep.memory.currentTask.id);
 };
 
+Repair.getTowerTasks = function(room) {
+    "use strict";
+
+    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.25), (s) => new Repair(s.id)), (s) => s.structure.hits);
+};
+
 Repair.getCriticalTasks = function(room) {
     "use strict";
 

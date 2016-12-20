@@ -6,6 +6,7 @@ var profiler = require("screeps-profiler"),
     Army = require("army"),
     Cache = require("cache"),
     Commands = require("commands"),
+    Market = require("market"),
     Minerals = require("minerals"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
@@ -70,6 +71,7 @@ var profiler = require("screeps-profiler"),
                 Army: Army,
                 Cache: Cache,
                 Commands: Commands,
+                Market: Market,
                 Minerals: Minerals,
                 Role: {
                     ArmyDismantler: RoleArmyDismantler,
@@ -325,8 +327,8 @@ var profiler = require("screeps-profiler"),
                 });
 
                 // Get market values for each mineral.
-                _.forEach(_.uniq(_.map(Game.market.getAllOrders(), (o) => o.resourceType)), (resource) => {
-                    sellOrder = _.sortBy(_.filter(Game.market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
+                _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
+                    sellOrder = _.sortBy(_.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
 
                     if (sellOrder) {
                         mineralOrders[resource] = sellOrder;

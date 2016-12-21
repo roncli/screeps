@@ -431,7 +431,7 @@ var profiler = require("screeps-profiler"),
             _.forEach(Memory.baseMatrixes, (matrix, room) => {
                 let tempMatrix, costMatrix;
                 
-                if (!Game.rooms[room] || Game.rooms[room].unobservable || matrix.status === "complete") {
+                if (!Game.rooms[room] || Game.rooms[room].unobservable || matrix.status === "complete" || Cache.spawnsInRoom(Game.rooms[room]).length === 0) {
                     return;
                 }
                 
@@ -462,7 +462,7 @@ var profiler = require("screeps-profiler"),
                                 return false;
                             }
                             
-                            if (PathFinder.search(Cache.spawnsInRoom(Game.rooms[room]), {pos: new RoomPosition(matrix.x, matrix.y, room)}, {
+                            if (PathFinder.search(Cache.spawnsInRoom(Game.rooms[room])[0].pos, {pos: new RoomPosition(matrix.x, matrix.y, room)}, {
                                 roomCallback: () => {
                                     return tempMatrix;
                                 },

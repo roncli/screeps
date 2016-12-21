@@ -5,7 +5,7 @@ var Cache = require("cache"),
         getAllOrders: () => {
             "use strict";
 
-            if (!orders || Game.cpu.bucket >= 9990) {
+            if (!orders || Game.cpu.bucket >= Memory.marketBucket) {
                 if (!orders) {
                     Cache.log.events.push("System reset.")
                 }

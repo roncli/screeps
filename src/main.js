@@ -438,7 +438,7 @@ var profiler = require("screeps-profiler"),
                 // Step 1, create the room's initial matrix with structures defined.
                 if (!matrix.status) {
                     costMatrix = new PathFinder.CostMatrix();
-                    _.forEach(_.filter(Cache.repairableStructuresInRoom(Game.rooms[room]), (s) !(s instanceof StructureRoad)), (structure) => {
+                    _.forEach(_.filter(Cache.repairableStructuresInRoom(Game.rooms[room]), (s) => !(s instanceof StructureRoad)), (structure) => {
                         costMatrix.set(structure.pos.x, structure.pos.y, 255);
                     });
                     matrix.tempMatrix = costMatrix.serialize();

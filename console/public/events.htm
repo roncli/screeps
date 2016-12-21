@@ -1,4 +1,4 @@
 <b>Events</b>
-<div ng-repeat="event in data.messages | orderBy:'-'" ng-class="{'bg-error': event.type === 'error', 'bg-info': event.type !== 'error'}">
+<div ng-repeat="event in data.messages | orderBy:'-'" ng-class="{'bg-danger': event.type === 'error', 'bg-info': event.type !== 'error'}">
     {{moment(event.date).format("M/D/YYYY h:mm:ss a")}} - {{event.tick}} - {{event.message}}
 </div>

@@ -17,11 +17,12 @@ var Cache = require("cache"),
         deal: (orderId, amount, yourRoomName) => {
             "use strict";
             
-            var ret;
+            var ret = Game.market.deal(orderId, amount, yourRoomName);
             
-            if ((ret = Game.market.deal(orderId, amount, yourRoomName)) === OK) {
-                let order = _.filter(Market.orders, (m) => m.id === orderId)[0];
-                if (order) {
+            if (ret === OK) {
+                let index = _.findIndex(orders, (m) => m.id === orderId);
+                if (index !== -1) {
+                    let order = Market.orders[index];
                     if (order.amount <= amount) {
                         Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id)
                         _.remove(Market.orders, (m) => m.id === orderId);

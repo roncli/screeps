@@ -1,5 +1,4 @@
-var cluster = require("cluster"),
-    WebSocket = require("ws"),
+var WebSocket = require("ws"),
     Screeps = require("screeps-api"),
     config = require("./config");
 

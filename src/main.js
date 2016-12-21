@@ -428,10 +428,10 @@ var profiler = require("screeps-profiler"),
                 Memory.baseMatrixes = {};
             }
             
-            _.forEach(_.filter(Memory.baseMatrixes, (m) => m.status !== "complete"), (matrix, room) => {
+            _.forEach(Memory.baseMatrixes, (matrix, room) => {
                 let tempMatrix, costMatrix;
                 
-                if (!Game.rooms[room] || Game.rooms[room].unobservable) {
+                if (!Game.rooms[room] || Game.rooms[room].unobservable || m.status === "complete") {
                     return;
                 }
                 

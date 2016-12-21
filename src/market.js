@@ -24,11 +24,11 @@ var Cache = require("cache"),
                 let order = _.filter(orders, (m) => m.id === orderId)[0];
                 if (order) {
                     if (order.amount <= amount) {
-                        Cache.log.events.push(order.resourceType + " x" + amount + " completed, sold out " + order.id)
+                        Cache.log.events.push(order.resourceType + " x" + amount + " @ " +  order.price + " completed, sold out " + order.id)
                         _.remove(orders, (m) => m.id === orderId);
                     } else {
                         order.amount -= amount;
-                        Cache.log.events.push(order.resourceType + " x" + amount + " completed, " + order.amount + " remaining on " + order.id);
+                        Cache.log.events.push(order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.amount + " remaining on " + order.id);
                     }
                 }
             }

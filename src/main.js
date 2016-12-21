@@ -431,6 +431,10 @@ var profiler = require("screeps-profiler"),
             _.forEach(_.filter(Memory.baseMatrixes, (m) => m.status !== "complete"), (matrix, room) => {
                 let tempMatrix, costMatrix;
                 
+                if (!Game.rooms[room] || Game.rooms[room].unobservable) {
+                    return;
+                }
+                
                 // Step 1, create the room's initial matrix with structures defined.
                 if (!matrix.status) {
                     costMatrix = new PathFinder.CostMatrix();

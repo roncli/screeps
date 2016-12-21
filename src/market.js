@@ -20,7 +20,7 @@ var Cache = require("cache"),
             var ret = Game.market.deal(orderId, amount, yourRoomName);
             
             if (ret === OK) {
-                let index = _.findIndex(orders, (m) => m.id === orderId);
+                let index = _.findIndex(Market.orders, (m) => m.id === orderId);
                 if (index !== -1) {
                     let order = Market.orders[index];
                     if (order.amount <= amount) {

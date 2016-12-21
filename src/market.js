@@ -1,18 +1,17 @@
 var Cache = require("cache"),
-    orders = undefined,
 
     Market = {
         getAllOrders: () => {
             "use strict";
 
-            if (!orders || Game.cpu.bucket >= Memory.marketBucket) {
-                if (!orders) {
+            if (!Market.orders || Game.cpu.bucket >= Memory.marketBucket) {
+                if (!Market.orders) {
                     Cache.log.events.push("System reset.")
                 }
-                orders = Game.market.getAllOrders();
+                Market.orders = Game.market.getAllOrders();
             }
             
-            return orders;
+            return Market.orders;
         },
         
         deal: (orderId, amount, yourRoomName) => {
@@ -21,11 +20,11 @@ var Cache = require("cache"),
             var ret;
             
             if ((ret = Game.market.deal(orderId, amount, yourRoomName)) === OK) {
-                let order = _.filter(orders, (m) => m.id === orderId)[0];
+                let order = _.filter(Market.orders, (m) => m.id === orderId)[0];
                 if (order) {
                     if (order.amount <= amount) {
                         Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id)
-                        _.remove(orders, (m) => m.id === orderId);
+                        _.remove(Market.orders, (m) => m.id === orderId);
                     } else {
                         order.amount -= amount;
                         Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " " + order.amount + " remaining on " + order.id);

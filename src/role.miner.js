@@ -75,7 +75,7 @@ var Cache = require("cache"),
                     body.push(WORK);
                     body.push(WORK);
                     body.push(WORK);
-                    workCount += 5;
+                    workCount += 4;
                 }
 
                 if (energy % 450 >= 150) {

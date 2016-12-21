@@ -1,5 +1,5 @@
 /*jslint browser: true*/
-/*global $, WebSocket, angular, moment*/
+/*global $, WebSocket, angular, moment, config*/
 
 var app = angular.module("screeps", []),
     data = {
@@ -182,7 +182,7 @@ var app = angular.module("screeps", []),
     $(document).ready(function() {
         var createWebsocketClient = function() {
             var connected = false;
-            ws = new WebSocket("ws://" + window.location.hostname + ":8081");
+            ws = new WebSocket(config.scheme + window.location.hostname + ":" + config.port);
 
             ws.onopen = function() {
                 connected = true;
@@ -212,7 +212,7 @@ var app = angular.module("screeps", []),
                             data.start.gcl = {
                                 progress: data.memory.progress,
                                 date: data.memory.date
-                            }
+                            };
                         }
                         if (data.memory.rooms) {
                             for (let name in data.memory.rooms) {
@@ -221,7 +221,7 @@ var app = angular.module("screeps", []),
                                     data.start[name] = {
                                         progress: room.progress,
                                         date: data.memory.date
-                                    }
+                                    };
                                 }
                             }
                         }

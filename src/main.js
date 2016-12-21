@@ -386,6 +386,8 @@ var profiler = require("screeps-profiler"),
                                                 price: node.buyPrice,
                                                 start: Game.time
                                             };
+
+                                            Memory.minimumSell[node.resource] = Math.min(Memory.minimumSell[node.resource] || Infinity, node.buyPrice);
                                         }
                                         break;
                                     case "create":
@@ -401,6 +403,10 @@ var profiler = require("screeps-profiler"),
 
                                         _.forEach(node.children, (child) => {
                                             innerFx(child, innerFx);
+
+                                            if (node.action === "create" && node.children.length > 0) {
+                                                Memory.minimumSell[node.resource] = Math.min(Memory.minimumSell[node.resource] || Infinity, _.sum(node.children, (c) => c.price));
+                                            }
                                         });
 
                                         break;

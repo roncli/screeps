@@ -50,6 +50,7 @@ var profiler = require("screeps-profiler"),
                 main.init();
                 main.log();
                 main.minerals();
+                main.baseMatrixes();
                 main.rooms();
                 main.army();
                 main.creeps();
@@ -418,6 +419,70 @@ var profiler = require("screeps-profiler"),
                     }
                 });
             }
+        },
+        
+        baseMatrixes: () => {
+            "use strict";
+            
+            if (!Memory.baseMatrixes) {
+                Memory.baseMatrixes = {};
+            }
+            
+            _.forEach(_.filter(Memory.baseMatrixes, (m) => m.status !== "complete"), (matrix, room) => {
+                let tempMatrix, costMatrix;
+                
+                // Step 1, create the room's initial matrix with structures defined.
+                if (!matrix.status) {
+                    costMatrix = new PathFinder.CostMatrix();
+                    _.forEach(Cache.repairableStructuresInRoom(Game.rooms[room]), (structure) => {
+                        costMatrix.set(structure.pos.x, structure.pos.y, 255);
+                    });
+                    matrix.tempMatrix = costMatrix.serialize();
+                    matrix.costMatrix = costMatrix.serialize();
+                    matrix.status = "building";
+                    matrix.x = 0;
+                    matrix.y = 0;
+                }
+                
+                // Step 2, try to get to each position within the room.  If it fails, set the terrain as unwalkable.
+                if (matrix.status === "building") {
+                    tempMatrix = PathFinder.CostMatrix.deserialize(matrix.tempMatrix);
+                    costMatrix = PathFinder.CostMatrix.deserialize(matrix.costMatrix);
+
+                    for (; matrix.x < 50; matrix.x++) {
+                        for (; matrix.y < 50; matrix.y++) {
+                            // Break if CPU is too high, try again later.
+                            if (Game.cpu.getUsed() >= 250) {
+                                matrix.costMatrix = costMatrix.serialize();
+                                Cache.log.events.push("Timeout, " + matrix.x + "," + matrix.y);
+                                return false;
+                            }
+                            
+                            if (PathFinder.search(Cache.spawnsInRoom(Game.rooms[room]).pos, {pos: new RoomPosition(matrix.x, matrix.y, room)}, {
+                                roomCallback: () => {
+                                    return tempMatrix;
+                                },
+                                maxOps: 10000,
+                                maxRooms: 1
+                            }).incomplete) {
+                                Cache.log.events.push("Unreachable, " + matrix.x + "," + matrix.y);
+                                costMatrix.set(matrix.x, matrix.y, 255);
+                            }
+                        }
+                    }
+                    
+                    // Set ramparts back to 0.
+                    _.forEach(_.filter(Cache.repairableStructuresInRoom(Game.rooms[room]), (s) => s instanceof StructureRampart), (structure) => {
+                        costMatrix.set(structure.pos.x, structure.pos.y, 0);
+                    });
+                    
+                    delete matrix.tempMatrix;
+                    delete matrix.x;
+                    delete matrix.y;
+                    matrix.costMatrix = costMatrix.serialize();
+                    matrix.status = "complete";
+                }
+            });
         },
 
         rooms: () => {

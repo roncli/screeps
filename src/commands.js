@@ -205,6 +205,10 @@ var Cache = require("cache"),
             } else {
                 delete Memory.signs[room];
             }
+        },
+        
+        resetMatrix: (room) => {
+            Memory.baseMatrixes[room] = {};
         }
     };
 

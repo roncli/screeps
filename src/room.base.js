@@ -240,7 +240,7 @@ Base.prototype.run = function(room) {
             }
             
             // Find an order to flip if we haven't made a deal and we have enough energy.
-            if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > 100000) {
+            if (!dealMade && room.storage && room.storage.store[RESOURCE_ENERGY] > Memory.marketEnergy) {
                 _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
                     var sellOrder, buyOrder;
 
@@ -456,7 +456,7 @@ Base.prototype.run = function(room) {
     }
     
     // Spawn new creeps.
-    RoleWorker.checkSpawn(room, !room.storage || room.storage.store[RESOURCE_ENERGY] >= 250000 || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks > 0);
+    RoleWorker.checkSpawn(room, !room.storage || room.storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks > 0);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
     RoleScientist.checkSpawn(room);

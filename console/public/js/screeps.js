@@ -182,7 +182,7 @@ var app = angular.module("screeps", []),
     $(document).ready(function() {
         var createWebsocketClient = function() {
             var connected = false;
-            ws = new WebSocket(config.scheme + window.location.hostname + ":" + config.port);
+            ws = new WebSocket(config.ws.scheme + window.location.hostname + ":" + config.ws.port);
 
             ws.onopen = function() {
                 connected = true;

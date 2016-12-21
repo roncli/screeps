@@ -1,75 +1,83 @@
 var Cache = require("cache"),
+    Functions = require("functions"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
     RoleArmyMelee = require("role.armyMelee"),
     RoleArmyRanged = require("role.armyRanged"),
-    TaskHeal = require("task.heal"), 
-    TaskMeleeAttack = require("task.meleeAttack"),
-    TaskRally = require("task.rally"),
-    TaskRangedAttack = require("task.rangedAttack"),
 
     Army = {
-        run: (army) => {
+        run: (name) => {
+            var army = Memory.army[name],
+                allCreepsInArmy = Cache.creepsInArmy("all", name),
+                boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store,
+                armyAttackRoom = Game.rooms[army.attackRoom],
+                armyDismantlers = army.dismantler,
+                armyHealers = army.healer,
+                armyMelees = army.melee,
+                armyRangeds = army.ranged,
+                hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES),
+                hostiles, tasks;
+            
             // Delete the army if we're successful.
-            if (Cache.creepsInArmy("all", army).length === 0 && Memory.army[army].success) {
-                Game.notify("Army " + army + " operation successful!");
-                delete Memory.army[army];
+            if (allCreepsInArmy.length === 0 && army.success) {
+                Game.notify("Army " + name + " operation successful!");
+                delete Memory.army[name];
                 return;
             }
 
             // Reset army if we have no creeps.
-            if (Memory.army[army].directive !== "preparing" && Memory.army[army].directive !== "building" && Cache.creepsInArmy("all", army).length === 0 && !Memory.army[army].success) {
-                Game.notify("Army " + army + " operation failed, restarting.");
-                Memory.army[army].directive = "preparing";
+            if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
+                Game.notify("Army " + name + " operation failed, restarting.");
+                army.directive = "preparing";
             }
 
             // Determine conditions for next stage or success.
-            switch (Memory.army[army].directive) {
+            switch (army.directive) {
                 case "preparing":
-                    if (!Memory.army[army].boostRoom) {
-                        Memory.army[army].directive = "building";
+                    if (!army.boostRoom) {
+                        army.directive = "building";
                     } else if (
-                        (Game.rooms[Memory.army[army].boostRoom].storage.store[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (Memory.army[army].dismantler.maxCreeps + Memory.army[army].melee.maxCreeps + Memory.army[army].ranged.maxCreeps + Memory.army[army].healer.maxCreeps) &&
-                        (Game.rooms[Memory.army[army].boostRoom].storage.store[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * Memory.army[army].dismantler.units * Memory.army[army].dismantler.maxCreeps &&
-                        (Game.rooms[Memory.army[army].boostRoom].storage.store[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * Memory.army[army].healer.units * Memory.army[army].healer.maxCreeps
+                        (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (armyDismantlers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps + armyHealers.maxCreeps) &&
+                        (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * armyDismantlers.units * armyDismantlers.maxCreeps &&
+                        (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * armyHealers.units * armyHealers.maxCreeps
                     ) {
-                        Memory.army[army].directive = "building";
+                        army.directive = "building";
                     }
                 case "building":
-                    if (_.filter(Cache.creepsInArmy("all", army), (c) => c.room.name !== Memory.army[army].buildRoom).length === 0 && _.filter(Cache.creepsInArmy("all", army), (c) => c.room.name === Memory.army[army].buildRoom).length >= Memory.army[army].dismantler.maxCreeps + Memory.army[army].healer.maxCreeps + Memory.army[army].melee.maxCreeps + Memory.army[army].ranged.maxCreeps) {
-                        Memory.army[army].directive = "staging";
+                    if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === army.buildRoom).length >= armyDismantlers.maxCreeps + armyHealers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps) {
+                        army.directive = "staging";
                     }
                     break;
                 case "staging":
-                    if (_.filter(Cache.creepsInArmy("all", army), (c) => c.room.name !== Memory.army[army].stageRoom).length === 0) {
-                        Memory.army[army].directive = "dismantle";
+                    if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.stageRoom).length === 0) {
+                        army.directive = "dismantle";
                     }
                     break;
                 case "dismantle":
-                    if (Game.rooms[Memory.army[army].attackRoom]) {
-                        Memory.army[army].dismantle = _.filter(Memory.army[army].dismantle, (d) => Cache.getObjectById(d));
+                    if (armyAttackRoom) {
+                        army.dismantle = _.filter(army.dismantle, (d) => Cache.getObjectById(d));
 
-                        if (Memory.army[army].dismantle.length === 0) {
-                            Memory.army[army].directive = "attack";
+                        if (army.dismantle.length === 0) {
+                            army.directive = "attack";
                         }
                     }
                     break;
                 case "attack":
-                    if (Game.rooms[Memory.army[army].attackRoom]) {
-                        if (!Memory.army[army].reinforce && _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && Game.rooms[Memory.army[army].attackRoom].find(FIND_CONSTRUCTION_SITES).length === 0) {
-                            Memory.army[army].success = true;
+                    if (armyAttackRoom) {
+                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && hostileConstructionSites.length === 0) {
+                            army.success = true;
                         }
                     }
                     break;
             }
 
             // Check spawns if we're building.
-            if (Memory.army[army].directive === "building" || Memory.army[army].reinforce) {
-                RoleArmyDismantler.checkSpawn(army);
-                RoleArmyHealer.checkSpawn(army);
-                RoleArmyMelee.checkSpawn(army);
-                RoleArmyRanged.checkSpawn(army);
+            if (army.directive === "building" || army.reinforce) {
+                RoleArmyDismantler.checkSpawn(name);
+                RoleArmyHealer.checkSpawn(name);
+                RoleArmyMelee.checkSpawn(name);
+                RoleArmyRanged.checkSpawn(name);
             }
 
             // Create tasks.
@@ -77,32 +85,33 @@ var Cache = require("cache"),
                 melee: { tasks: [] },
                 ranged: { tasks: [] },
                 heal: {
-                    tasks: _.map(_.sortBy(_.filter(Cache.creepsInArmy("all", army), (c) => c.hits < c.hitsMax), (c) => -(c.hitsMax - c.hits)), (c) => new TaskHeal(c.id))
+                    tasks: _.map(_.sortBy(_.filter(allCreepsInArmy, Functions.filterNotMaxHits), Functions.sortMostMissingHits), Functions.mapNewTaskHeal)
                 },
                 rally: { tasks: [] },
             };
 
-            if (Game.rooms[Memory.army[army].attackRoom]) {
-                switch (Memory.army[army].directive) {
+            if (armyAttackRoom) {
+                switch (army.directive) {
                     case "dismantle":
-                        if (Memory.army[army].dismantle.length > 0) {
-                            tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => c.pos.getRangeTo(Cache.getObjectById(Memory.army[army].dismantle[0])) <= 2), (c) => new TaskRangedAttack(c.id));
+                        if (army.dismantle.length > 0) {
+                            tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => c.pos.getRangeTo(Cache.getObjectById(army.dismantle[0])) <= 2), Functions.mapNewTaskRangedAttack);
                         }
-                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => Utilities.objectsClosestToObj(Cache.creepsInArmy(army), c)[0] <= 3), (c) => new TaskMeleeAttack(c.id));
+                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(Cache.creepsInArmy(name), c)[0] <= 3), Functions.mapNewTaskMeleeAttack);
                         break;
                     case "attack":
-                        tasks.melee.tasks = _.map(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => new TaskMeleeAttack(c.id));
-                        tasks.ranged.tasks = _.map(Cache.hostilesInRoom(Game.rooms[Memory.army[army].attackRoom]), (c) => new TaskRangedAttack(c.id));
-                        tasks.rally.tasks = _.map(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES), (c) => new TaskRally(c.id));
+                        hostiles = Cache.hostilesInRoom(armyAttackRoom);
+                        tasks.melee.tasks = _.map(hostiles, (c) => Functions.mapNewTaskMeleeAttack);
+                        tasks.ranged.tasks = _.map(hostiles, (c) => Functions.mapNewTaskRangedAttack);
+                        tasks.rally.tasks = _.map(hostileConstructionSites, (c) => Functions.mapNewTaskRally);
                         break;
                 }
             }
 
             // Assign tasks.
-            RoleArmyDismantler.assignTasks(army, Memory.army[army].directive, tasks);
-            RoleArmyHealer.assignTasks(army, Memory.army[army].directive, tasks);
-            RoleArmyMelee.assignTasks(army, Memory.army[army].directive, tasks);
-            RoleArmyRanged.assignTasks(army, Memory.army[army].directive, tasks);
+            RoleArmyDismantler.assignTasks(name, army.directive, tasks);
+            RoleArmyHealer.assignTasks(name, army.directive, tasks);
+            RoleArmyMelee.assignTasks(name, army.directive, tasks);
+            RoleArmyRanged.assignTasks(name, army.directive, tasks);
         }
     };
 

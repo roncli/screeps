@@ -473,6 +473,7 @@ var profiler = require("screeps-profiler"),
                                 costMatrix.set(matrix.x, matrix.y, 255);
                             }
                         }
+                        matrix.y = 0;
                     }
                     
                     // Set ramparts back to 0.

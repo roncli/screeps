@@ -458,7 +458,6 @@ var profiler = require("screeps-profiler"),
                             // Break if CPU is too high, try again later.
                             if (Game.cpu.getUsed() >= 250) {
                                 matrix.costMatrix = costMatrix.serialize();
-                                Cache.log.events.push("Timeout, " + matrix.x + "," + matrix.y);
                                 return false;
                             }
                             
@@ -469,7 +468,6 @@ var profiler = require("screeps-profiler"),
                                 maxOps: 10000,
                                 maxRooms: 1
                             }).incomplete) {
-                                Cache.log.events.push("Unreachable, " + matrix.x + "," + matrix.y);
                                 costMatrix.set(matrix.x, matrix.y, 255);
                             }
                         }

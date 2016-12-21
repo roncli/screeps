@@ -462,7 +462,7 @@ var profiler = require("screeps-profiler"),
                                 return false;
                             }
                             
-                            if (PathFinder.search(Cache.spawnsInRoom(Game.rooms[room])[0].pos, {pos: new RoomPosition(matrix.x, matrix.y, room)}, {
+                            if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, room), {pos: Cache.spawnsInRoom(Game.rooms[room])[0].pos, range: 1}, {
                                 roomCallback: () => {
                                     return tempMatrix;
                                 },

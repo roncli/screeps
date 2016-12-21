@@ -17,7 +17,6 @@ var creepsInRoom = {},
         creepTasks: {},
         roomTypes: {},
         spawning: {},
-        haulers: {},
         minerals: {},
         log: {},
     
@@ -42,7 +41,6 @@ var creepsInRoom = {},
             Cache.creepTasks = {};
             Cache.roomTypes = {};
             Cache.spawning = {};
-            Cache.haulers = {};
             Cache.minerals = {};
     
             Cache.log = {

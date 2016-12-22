@@ -32,7 +32,7 @@ var Functions = {
     },
 
     filterNotAllied: (c) => {
-        !c.owner || Memory.allies.indexOf(c.owner.username) === -1
+        return !c.owner || Memory.allies.indexOf(c.owner.username) === -1
     },
     
     filterNotControllerOrRampart: (s) => {

@@ -182,11 +182,12 @@ var Filters = require("filters"),
         getCostMatrix: (room) => {
             "use strict";
             
-            var roomName = room.name;
+            var roomName = room.name,
+                matrix;
     
             if (!costMatricies[roomName]) {
-                let matrix = new PathFinder.CostMatrix();
-    
+                matrix = new PathFinder.CostMatrix();
+
                 _.forEach(room.find(FIND_STRUCTURES), eachSetCostMatrixFromStructure, this);
     
                 _.forEach(room.find(FIND_CONSTRUCTION_SITES), eachSetCostMatrixFromConstructionSites, this);

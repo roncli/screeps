@@ -8,11 +8,14 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var num = 0, max = 0;
+            var claimer = Memory.maxCreeps.claimer,
+                roomName = room.name,
+                num = 0,
+                max = 0;
             
             // Loop through the room claimers to see if we need to spawn a creep.
-            if (Memory.maxCreeps.claimer) {
-                _.forEach(Memory.maxCreeps.claimer[room.name], (value, toRoom) => {
+            if (claimer) {
+                _.forEach(claimer[roomName], (value, toRoom) => {
                     var count = _.filter(Cache.creepsInRoom("claimer", room), (c) => c.memory.claim === toRoom).length;
 
                     num += count;
@@ -26,7 +29,7 @@ var Cache = require("cache"),
 
             // Output claimer count in the report.
             if (max > 0) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "claimer",
                     count: num,
                     max: max
@@ -37,24 +40,12 @@ var Cache = require("cache"),
         spawn: (room, toRoom) => {
             "use strict";
 
-            var body = [],
-                energy, count, spawnToUse, name;
+            var body = [CLAIM, MOVE],
+                spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
-            }
-
-            // Get the total energy in the room, limited to 650.
-            energy = Math.min(room.energyCapacityAvailable, 650);
-
-            // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 650); count++) {
-                body.push(CLAIM);
-            }
-
-            for (count = 0; count < Math.floor(energy / 650); count++) {
-                body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.

@@ -8,7 +8,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var max = 0,
+            var spawns = Cache.spawnsInRoom(room),
+                max = 0,
                 count, sources, capacity, adjustment;
             
             // If there is storage and containers in the room, ignore the room.
@@ -17,12 +18,12 @@ var Cache = require("cache"),
             }
 
             // If there are no spawns in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0) {
+            if (spawns.length === 0) {
                 return;
             }
 
             // If there is only one energy source, ignore the room.
-            sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0]);
+            sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0]);
             if (sources.length <= 1) {
                 return;
             }
@@ -32,6 +33,8 @@ var Cache = require("cache"),
 
             //  Loop through sources to see if we have anything we need to spawn.
             _.forEach(sources, (source, index) => {
+                var sourceId = source.id;
+                
                 // Skip the first index.
                 if (index === 0) {
                     return;
@@ -40,9 +43,9 @@ var Cache = require("cache"),
                 max += 3 * adjustment;
 
                 // If we have less than max collectors, spawn a collector.
-                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.homeSource === source.id).length;
+                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.homeSource === sourceId).length;
                 if (count < 3 * adjustment) {
-                    Collector.spawn(room, source.id);
+                    Collector.spawn(room, sourceId);
                 }
             });
 
@@ -60,7 +63,8 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -69,39 +73,41 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 3300.
             energy = Math.min(room.energyCapacityAvailable, 3300);
+            units = Math.floor(energy / 200);
+            remainder = energy % 200;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(WORK);
             }
 
-            if (energy % 200 >= 150) {
+            if (remainder >= 150) {
                 body.push(WORK);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
             }
 
-            if (energy % 200 >= 100 && energy % 200 < 150) {
+            if (remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 200 >= 50) {
+            if (remainder >= 50) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === room.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "collector-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "collector", home: room.name, homeSource: id});
-            if (spawnToUse.room.name === room.name) {
+            name = spawnToUse.createCreep(body, "collector-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "collector", home: roomName, homeSource: id});
+            if (spawnToUse.room.name === roomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

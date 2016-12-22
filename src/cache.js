@@ -14,11 +14,29 @@ var Filters = require("filters"),
     costMatricies = {},
     objects = {},
 
+    filterResetHarvestedCount = (hostile) => {
+        if (hostile.room.memory.hostiles.indexOf(hostile.id) !== -1) {
+            hostile.room.memory.harvested = 0;
+        }
+    },
+
+    eachSetCostMatrixFromStructure = (structure) => {
+        if (structure instanceof StructureRoad) {
+            this.matrix.set(structure.pos.x, structure.pos.y, 1);
+        } else if (!(structure instanceof StructureContainer) && (!(structure instanceof StructureRampart) || !structure.my)) {
+            this.matrix.set(structure.pos.x, structure.pos.y, 255);
+        }
+    },
+
+    eachSetCostMatrixFromConstructionSites = (structure) => {
+        this.matrix.set(structure.pos.x, structure.pos.y, 5);
+    },
+
     Cache = {
         creepTasks: {},
         roomTypes: {},
         spawning: {},
-        minerals: {},
+        minerals: [],
         log: {},
     
         // Reset the cache.
@@ -41,7 +59,7 @@ var Filters = require("filters"),
             Cache.creepTasks = {};
             Cache.roomTypes = {};
             Cache.spawning = {};
-            Cache.minerals = {};
+            Cache.minerals = [];
     
             Cache.log = {
                 events: [],
@@ -153,11 +171,7 @@ var Filters = require("filters"),
                 room.memory.hostiles = [];
             }
     
-            _.forEach(hostiles, (hostile) => {
-                if (room.memory.hostiles.indexOf(hostile.id) !== -1) {
-                    room.memory.harvested = 0;
-                }
-            });
+            _.forEach(hostiles, filterResetHarvestedCount);
     
             room.memory.hostiles = _.map(hostiles, (h) => h.id);
     
@@ -173,17 +187,9 @@ var Filters = require("filters"),
             if (!costMatricies[roomName]) {
                 let matrix = new PathFinder.CostMatrix();
     
-                _.forEach(room.find(FIND_STRUCTURES), (structure) => {
-                    if (structure instanceof StructureRoad) {
-                        matrix.set(structure.pos.x, structure.pos.y, 1);
-                    } else if (structure.structureType !== STRUCTURE_CONTAINER && (structure.structureType !== STRUCTURE_RAMPART || !structure.my)) {
-                        matrix.set(structure.pos.x, structure.pos.y, 255);
-                    }
-                });
+                _.forEach(room.find(FIND_STRUCTURES), eachSetCostMatrixFromStructure, this);
     
-                _.forEach(room.find(FIND_CONSTRUCTION_SITES), (structure) => {
-                    matrix.set(structure.pos.x, structure.pos.y, 5);
-                });
+                _.forEach(room.find(FIND_CONSTRUCTION_SITES), eachSetCostMatrixFromConstructionSites, this);
 
                 costMatricies[roomName] = matrix;
             }

@@ -67,7 +67,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (armyAttackRoom) {
-                        if (!army.reinforce && armyAttackRoom.find(FIND_HOSTILE_STRUCTURES, {filter: Filters.notControllerOrRampart}).length === 0 && hostileConstructionSites.length === 0) {
+                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), Filters.notControllerOrRampart).length === 0 && hostileConstructionSites.length === 0) {
                             army.success = true;
                         }
                     }

@@ -188,9 +188,9 @@ var Filters = require("filters"),
             if (!costMatricies[roomName]) {
                 matrix = new PathFinder.CostMatrix();
 
-                _.forEach(room.find(FIND_STRUCTURES), eachSetCostMatrixFromStructure, this);
+                _.forEach(room.find(FIND_STRUCTURES), eachSetCostMatrixFromStructure, matrix);
     
-                _.forEach(room.find(FIND_CONSTRUCTION_SITES), eachSetCostMatrixFromConstructionSites, this);
+                _.forEach(room.find(FIND_CONSTRUCTION_SITES), eachSetCostMatrixFromConstructionSites, matrix);
 
                 costMatricies[roomName] = matrix;
             }

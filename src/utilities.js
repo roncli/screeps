@@ -10,6 +10,8 @@ var Cache = require("cache"),
         objectsClosestToObj: (objects, obj) => {
             "use strict";
 
+            var objId = obj.id;
+
             if (objects.length === 0) {
                 return [];
             }
@@ -19,20 +21,21 @@ var Cache = require("cache"),
             }
             
             var objList = _.map(objects, (o) => {
-                var range;
+                var oId = o.id,
+                    range;
                 
-                if (Memory.ranges && Memory.ranges[obj.id] && Memory.ranges[obj.id][o.id]) {
-                    range = Memory.ranges[obj.id][o.id];
+                if (Memory.ranges && Memory.ranges[objId] && Memory.ranges[objId][oId]) {
+                    range = Memory.ranges[objId][oId];
                 } else {
                     range = obj.pos.getRangeTo(o);
                     if (!(o instanceof Creep) && !(obj instanceof Creep)) {
                         if (!Memory.ranges) {
                             Memory.ranges = {};
                         }
-                        if (!Memory.ranges[obj.id]) {
-                            Memory.ranges[obj.id] = {};
+                        if (!Memory.ranges[objId]) {
+                            Memory.ranges[objId] = {};
                         }
-                        Memory.ranges[obj.id][o.id] = range;
+                        Memory.ranges[objId][oId] = range;
                     }
                 }
 
@@ -42,15 +45,15 @@ var Cache = require("cache"),
                 };
             });
             
-            objList.sort((a, b) => {
-                return a.distance - b.distance;
-            });
+            objList.sort((a, b) => a.distance - b.distance);
             
             return _.map(objList, (o) => o.object);
         },
 
         objectsClosestToObjByPath: (objects, obj, range) => {
             "use strict";
+
+            var objId = obj.id;
 
             if (objects.length === 0) {
                 return [];
@@ -65,20 +68,21 @@ var Cache = require("cache"),
             }
             
             var objList = _.map(objects, (o) => {
-                var distance;
+                var oId = o.id,
+                    distance;
                 
-                if (Memory.distances && Memory.distances[obj.id] && Memory.distances[obj.id][o.id]) {
-                    distance = Memory.distances[obj.id][o.id];
+                if (Memory.distances && Memory.distances[objId] && Memory.distances[objId][oId]) {
+                    distance = Memory.distances[objId][oId];
                 } else {
                     distance = PathFinder.search(obj.pos, {pos: o.pos, range: range}, {swampCost: 1, maxOps: obj.pos.roomName === o.pos.roomName ? 2000 : 100000}).path.length;
                     if (!(o instanceof Creep) && !(obj instanceof Creep)) {
                         if (!Memory.distances) {
                             Memory.distances = {};
                         }
-                        if (!Memory.distances[obj.id]) {
-                            Memory.distances[obj.id] = {};
+                        if (!Memory.distances[objId]) {
+                            Memory.distances[objId] = {};
                         }
-                        Memory.distances[obj.id][o.id] = distance;
+                        Memory.distances[objId][oId] = distance;
                     }
                 }
 
@@ -88,9 +92,7 @@ var Cache = require("cache"),
                 };
             });
             
-            objList.sort((a, b) => {
-                return a.distance - b.distance;
-            });
+            objList.sort((a, b) => a.distance - b.distance);
             
             return _.map(objList, (o) => o.object);
         },
@@ -122,19 +124,22 @@ var Cache = require("cache"),
             "use strict";
 
             var siteClear = true,
-                room = Game.rooms[pos.roomName],
+                x = pos.x,
+                y = pos.y,
+                roomName = pos.roomName,
+                room = Game.rooms[roomName],
                 structures;
             
             // Cannot be a wall or have walls on opposite sides.
             if (
-                new RoomPosition(pos.x, pos.y, pos.roomName).lookFor(LOOK_TERRAIN)[0] === "wall" ||
+                new RoomPosition(x, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" ||
                 (
-                    new RoomPosition(pos.x - 1, pos.y, pos.roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
-                    new RoomPosition(pos.x + 1, pos.y, pos.roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
+                    new RoomPosition(x - 1, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
+                    new RoomPosition(x + 1, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
                 ) ||
                 (
-                    new RoomPosition(pos.x, pos.y - 1, pos.roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
-                    new RoomPosition(pos.x, pos.y + 1, pos.roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
+                    new RoomPosition(x, y - 1, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
+                    new RoomPosition(x, y + 1, roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
                 )
             ) {
                 return false;
@@ -157,8 +162,7 @@ var Cache = require("cache"),
             }
             
             // Cannot be within 4 squares of the room controller.
-            siteClear = pos.getRangeTo(room.controller) > 4;
-            if (!siteClear) {
+            if (pos.getRangeTo(room.controller) <= 4) {
                 return false;
             }
 
@@ -181,11 +185,14 @@ var Cache = require("cache"),
             "use strict";
 
             var distanceFromSpawn = 1,
+                buildAroundPos = buildAroundObj.pos,
+                buildAroundx = buildAroundPos.x,
+                buildAroundy = buildAroundPos.y,
                 x, y, siteIsClear;
 
             while (structuresToBuild > 0 && distanceFromSpawn < 50) {
-                for (x = buildAroundObj.pos.x - distanceFromSpawn; x <= buildAroundObj.pos.x + distanceFromSpawn; x += 2) {
-                    for (y = buildAroundObj.pos.y - distanceFromSpawn; y <= buildAroundObj.pos.y + distanceFromSpawn; y += (Math.abs(buildAroundObj.pos.x - x) === distanceFromSpawn ? 2 : 2 * distanceFromSpawn)) {
+                for (x = buildAroundx - distanceFromSpawn; x <= buildAroundx + distanceFromSpawn; x += 2) {
+                    for (y = buildAroundy - distanceFromSpawn; y <= buildAroundy + distanceFromSpawn; y += (Math.abs(buildAroundx - x) === distanceFromSpawn ? 2 : 2 * distanceFromSpawn)) {
                         // Don't check outside of the room.
                         if (x < 1 || x > 48 || y < 1 || y > 48) {
                             continue;
@@ -234,10 +241,11 @@ var Cache = require("cache"),
         getSourceLabs: (room) => {
             "use strict";
 
-            var sourceLabs = [];
+            var labs = Cache.labsInRoom(room),
+                sourceLabs = [];
 
-            _.forEach(Cache.labsInRoom(room), (lab) => {
-                if (Utilities.objectsClosestToObj(Cache.labsInRoom(room), lab)[Cache.labsInRoom(room).length - 1].pos.getRangeTo(lab) <= 2) {
+            _.forEach(labs, (lab) => {
+                if (Utilities.objectsClosestToObj(labs, lab)[labs.length - 1].pos.getRangeTo(lab) <= 2) {
                     sourceLabs.push(lab.id);
                     if (sourceLabs.length >= 2) {
                         return false;
@@ -251,10 +259,11 @@ var Cache = require("cache"),
         getLabToBoostWith: (room, count) => {
             "use strict";
 
-            var sourceLabs = (room.memory.labQueue && room.memory.labQueue.sourceLabs) ? room.memory.labQueue.sourceLabs : [],
+            var labQueue = room.memory.labQueue,
+                sourceLabs = (labQueue && labQueue.sourceLabs) ? labQueue.sourceLabs : [],
                 labs = [],
                 labToUse = null,
-                lab;
+                lab, labUsed;
 
             if (!count) {
                 count = 1;
@@ -286,10 +295,12 @@ var Cache = require("cache"),
                         id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l) === -1)[0],
                         pause: true
                     }
-                    if (Cache.getObjectById(labToUse.id).mineralAmount > 0) {
+                    
+                    labUsed = Cache.getObjectById(labToUse.id);
+                    if (labUsed.mineralAmount > 0) {
                         labToUse.status = "emptying";
-                        labToUse.oldResource = Cache.getObjectById(labToUse.id).mineralType;
-                        labToUse.oldAmount = Cache.getObjectById(labToUse.id).mineralAmount;
+                        labToUse.oldResource = labUsed.mineralType;
+                        labToUse.oldAmount = labUsed.mineralAmount;
                     }
                 }
 

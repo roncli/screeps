@@ -1,12 +1,13 @@
 var Cache = require("cache"),
-    Filters = require("filters"),
-    Maps = require("maps"),
-    Sorts = require("sorts"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
     RoleArmyMelee = require("role.armyMelee"),
     RoleArmyRanged = require("role.armyRanged"),
+    TaskHeal = require("task.heal"),
+    TaskMeleeAttack = require("task.meleeAttack"),
+    TaskRally = require("task.rally"),
+    TaskRangedAttack = require("task.rangedAttack"),
 
     Army = {
         run: (name) => {
@@ -67,7 +68,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (armyAttackRoom) {
-                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), Filters.notControllerOrRampart).length === 0 && hostileConstructionSites.length === 0) {
+                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && hostileConstructionSites.length === 0) {
                             army.success = true;
                         }
                     }
@@ -87,7 +88,7 @@ var Cache = require("cache"),
                 melee: { tasks: [] },
                 ranged: { tasks: [] },
                 heal: {
-                    tasks: _.map(_.sortBy(_.filter(allCreepsInArmy, Filters.notMaxHits), Sorts.mostMissingHits), Maps.newTaskHeal)
+                    tasks: _.map(_.sortBy(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax), (c) => -(c.hitsMax - c.hits)), (c) => new TaskHeal(c.id))
                 },
                 rally: { tasks: [] },
             };
@@ -96,15 +97,15 @@ var Cache = require("cache"),
                 switch (army.directive) {
                     case "dismantle":
                         if (army.dismantle.length > 0) {
-                            tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => c.pos.getRangeTo(Cache.getObjectById(army.dismantle[0])) <= 2), Maps.newTaskRangedAttack);
+                            tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => c.pos.getRangeTo(Cache.getObjectById(army.dismantle[0])) <= 2), (c) => new TaskRangedAttack(c.id));
                         }
-                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0] <= 3), Maps.newTaskMeleeAttack);
+                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0] <= 3), (c) => new TaskMeleeAttack(c.id));
                         break;
                     case "attack":
                         hostiles = Cache.hostilesInRoom(armyAttackRoom);
-                        tasks.melee.tasks = _.map(hostiles, (c) => Maps.newTaskMeleeAttack);
-                        tasks.ranged.tasks = _.map(hostiles, (c) => Maps.newTaskRangedAttack);
-                        tasks.rally.tasks = _.map(hostileConstructionSites, (c) => Maps.newTaskRally);
+                        tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
+                        tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
+                        tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
                         break;
                 }
             }

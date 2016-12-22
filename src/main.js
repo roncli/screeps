@@ -6,11 +6,8 @@ var profiler = require("screeps-profiler"),
     Army = require("army"),
     Cache = require("cache"),
     Commands = require("commands"),
-    Filters = require("filters"),
-    Maps = require("maps"),
     Market = require("market"),
     Minerals = require("minerals"),
-    Sorts = require("sorts"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -76,8 +73,6 @@ var profiler = require("screeps-profiler"),
                 Army: Army,
                 Cache: Cache,
                 Commands: Commands,
-                Filters: Filters,
-                Maps: Maps,
                 Market: Market,
                 Minerals: Minerals,
                 Role: {
@@ -111,7 +106,6 @@ var profiler = require("screeps-profiler"),
                     Cleanup: RoomCleanup,
                     Mine: RoomMine
                 },
-                Sorts: Sorts,
                 Utilities: Utilities
             };
             

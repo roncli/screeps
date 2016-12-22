@@ -7,7 +7,11 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var count, sources, max;
+            var upgraders = Cache.creepsInRoom("upgrader", room),
+                storage = room.storage,
+                storageEnergy = storage.store[RESOURCE_ENERGY],
+                controller = room.controller,
+                count, sources, max;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -15,15 +19,15 @@ var Cache = require("cache"),
             }
 
             // If there is not enough energy in storage, ignore the room.
-            count = _.filter(Cache.creepsInRoom("upgrader", room), (c) => c.spawning || c.ticksToLive >= 150).length;
-            if (!room.storage || room.storage.store[RESOURCE_ENERGY] < Memory.upgradeEnergy) {
+            count = _.filter(upgraders, (c) => c.spawning || c.ticksToLive >= 150).length;
+            if (!storage || storageEnergy < Memory.upgradeEnergy) {
                 max = 0;
             } else {
                 // If we have less than max upgraders, spawn an upgrader.
                 max = 1;
             }
 
-            if (count < max || (room.controller && room.controller.level < 8 && room.storage && room.storage.store[RESOURCE_ENERGY] > 900000)) {
+            if (count < max || (controller && controller.level < 8 && storage && storageEnergy > 900000)) {
                 Upgrader.spawn(room);
             }
 
@@ -31,7 +35,7 @@ var Cache = require("cache"),
             if (count > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "upgrader",
-                    count: Cache.creepsInRoom("upgrader", room).length,
+                    count: upgraders.length,
                     max: max
                 });
             }
@@ -40,8 +44,13 @@ var Cache = require("cache"),
         spawn: (room) => {
             "use strict";
 
-            var body = [], workCount = 0, canBoost = false,
-                links, energy, count, spawnToUse, name, labToBoostWith;
+            var body = [],
+                controller = room.controller,
+                workCount = 0,
+                storage = room.storage,
+                canBoost = false,
+                roomName = room.name,
+                energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -49,18 +58,20 @@ var Cache = require("cache"),
             }
             
             // Check if we have a link in range of the controller and build the creep accordingly.
-            if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller)[0].pos.getRangeTo(room.controller) <= 2) {
+            if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), controller)[0].pos.getRangeTo(controller) <= 2) {
                 // Get the total energy in the room, limited to 4100, or 1950 at RCL 8.
-                energy = Math.min(room.energyCapacityAvailable, room.controller.level === 8 ? 1950 : 4100);
+                energy = Math.min(room.energyCapacityAvailable, controller.level === 8 ? 1950 : 4100);
+                units = Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250);
+                remainder = (energy - Math.ceil(energy / 3200) * 50) % 250;
     
                 // Create the body based on the energy.
-                for (count = 0; count < Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(WORK);
                     body.push(WORK);
                     workCount += 2;
                 }
     
-                if ((energy - Math.ceil(energy / 3200) * 50) % 250 >= 150) {
+                if (remainder >= 150) {
                     body.push(WORK);
                     workCount++;
                 }
@@ -69,46 +80,48 @@ var Cache = require("cache"),
                     body.push(CARRY);
                 }
 
-                for (count = 0; count < Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(MOVE);
                 }
     
-                if ((energy - Math.ceil(energy / 3200) * 50) % 250 >= 50) {
+                if (remainder >= 50) {
                     body.push(MOVE);
                 }
             } else {
                 // Get the total energy in the room, limited to 3300, or 3000 at RCL 8.
-                energy = Math.min(room.energyCapacityAvailable, room.controller.level === 8 ? 3000 : 3300);
+                energy = Math.min(room.energyCapacityAvailable, controller.level === 8 ? 3000 : 3300);
+                units = Math.floor(energy / 200);
+                remainder = energy % 200;
     
                 // Create the body based on the energy.
-                for (count = 0; count < Math.floor(energy / 200); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(WORK);
                     workCount++;
                 }
     
-                if (energy % 200 >= 150) {
+                if (remainder >= 150) {
                     body.push(WORK);
                     workCount++;
                 }
     
-                for (count = 0; count < Math.floor(energy / 200); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(CARRY);
                 }
     
-                if (energy % 200 >= 100 && energy % 200 < 150) {
+                if (remainder >= 100 && remainder < 150) {
                     body.push(CARRY);
                 }
     
-                for (count = 0; count < Math.floor(energy / 200); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(MOVE);
                 }
     
-                if (energy % 200 >= 50) {
+                if (remainder >= 50) {
                     body.push(MOVE);
                 }
             }
 
-            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, room.storage.store[RESOURCE_GHODIUM_ACID] || 0, room.storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {
+            if (workCount > 0 && storage && Cache.labsInRoom(room).length > 0 && (Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 
@@ -117,13 +130,13 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "upgrader-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: room.name, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
                 // Set the lab to be in use.
                 labToBoostWith.creepToBoost = name;
-                labToBoostWith.resource = (room.storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_GHODIUM_ACID : ((room.storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE);
+                labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_GHODIUM_ACID : ((storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE);
                 labToBoostWith.amount = 30 * workCount;
                 room.memory.labsInUse.push(labToBoostWith);
 
@@ -140,7 +153,8 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("upgrader", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [];
+                assigned = [],
+                controller = room.controller;
 
             if (creepsWithNoTask.length === 0) {
                 return;
@@ -162,7 +176,7 @@ var Cache = require("cache"),
 
             // Check for controllers to upgrade.
             _.forEach(tasks.upgradeController.tasks, (task) => {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
+                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, controller), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Controller");
                         assigned.push(creep.name);
@@ -176,9 +190,9 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Attempt to get energy from the closest link.
+            // Attempt to get energy from the closest link to the controller.
             _.forEach(creepsWithNoTask, (creep) => {
-                var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), creep),
+                var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), controller),
                     task;
 
                 if (links.length > 0 && links[0].energy > 0) {

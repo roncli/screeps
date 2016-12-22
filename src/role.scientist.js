@@ -7,16 +7,18 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var max = 1,
-                count, sources;
+            var controller = room.controller,
+                scientists = Cache.creepsInRoom("scientist", room),
+                max = 1,
+                count;
             
             // If the room's controller is not 6 or higher, ignore the room.
-            if (!room.controller || room.controller < 6) {
+            if (!controller || controller.level < 6) {
                 return;
             }
 
             // If we have less than max scientists, spawn a scientist.
-            count = _.filter(Cache.creepsInRoom("scientist", room), (c) => c.spawning || c.ticksToLive >= 150).length;
+            count = _.filter(scientists, (c) => c.spawning || c.ticksToLive >= 150).length;
 
             if (count < max) {
                 Scientist.spawn(room);
@@ -25,7 +27,7 @@ var Cache = require("cache"),
             // Output scientist count in the report.
             Cache.log.rooms[room.name].creeps.push({
                 role: "scientist",
-                count: Cache.creepsInRoom("scientist", room).length,
+                count: scientists.length,
                 max: max
             });
         },
@@ -33,41 +35,45 @@ var Cache = require("cache"),
         spawn: (room) => {
             "use strict";
 
-            var body = [], workCount = 0, canBoost = false,
-                energy, count, spawnToUse, name, labToBoostWith;
+            var spawns = Cache.spawnsInRoom(room),
+                body = [],
+                roomName = room.name,
+                energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Get the total energy in the room, limited to 2500.
             energy = Math.min(room.energyCapacityAvailable, 2500);
+            units = Math.floor(energy / 150);
+            remainder = energy % 150;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 150); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
                 body.push(CARRY);
             }
 
-            if (energy % 150 >= 100) {
+            if (remainder >= 100) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 150); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 150 >= 50) {
+            if (remainder >= 50) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "scientist-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "scientist", home: room.name, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "scientist-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";

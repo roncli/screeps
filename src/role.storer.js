@@ -6,10 +6,15 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var length = 0, max = 0;
+            var containers = Cache.containersInRoom(room),
+                length = 0,
+                max = 0,
+                controller = room.controller,
+                army = Memory.army,
+                storers = Cache.creepsInRoom("storer", room);
             
             // If there are no spawns, containers, or storages in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0 || !room.storage) {
+            if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage) {
                 return;
             }
 
@@ -19,7 +24,7 @@ var Cache = require("cache"),
             }
 
             // Determine the number storers needed.
-            _.forEach(Cache.containersInRoom(room), (container) => {
+            _.forEach(containers, (container) => {
                 var closest = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0];
 
                 if (closest instanceof Mineral) {
@@ -36,8 +41,8 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            max += Math.ceil((2 * length) / ((room.controller && room.controller.level >= 6) ? 35 : 30)) + ((Memory.army && _.keys(Memory.army).length > 0) ? 1 : 0);
-            if (_.filter(Cache.creepsInRoom("storer", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
+            max += Math.ceil((2 * length) / ((controller && controller.level >= 6) ? 35 : 30)) + ((army && _.keys(army).length > 0) ? 1 : 0);
+            if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 Storer.spawn(room);
             }
 
@@ -45,7 +50,7 @@ var Cache = require("cache"),
             if (max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "storer",
-                    count: Cache.creepsInRoom("storer", room).length,
+                    count: storers.length,
                     max: max
                 });
             }        
@@ -54,7 +59,9 @@ var Cache = require("cache"),
         spawn: (room) => {
             "use strict";
 
-            var body, spawnToUse, name;
+            var spawns = Cache.spawnsInRoom(room),
+                roomName = room.name,
+                body, spawnToUse, name;
 
             switch (room.controller.level) {
                 case 7:
@@ -69,16 +76,16 @@ var Cache = require("cache"),
             }
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "storer-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "storer", home: room.name});
+            name = spawnToUse.createCreep(body, "storer-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "storer", home: roomName});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";

@@ -8,7 +8,9 @@ var Cache = require("cache"),
         checkSpawn: (room, canSpawn) => {
             "use strict";
 
-            var count, sources, max;
+            var workers = Cache.creepsInRoom("worker", room),
+                storage = room.storage,
+                count, sources, max;
             
             // If there are no energy sources, ignore the room.
             sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0]);
@@ -17,8 +19,8 @@ var Cache = require("cache"),
             }
 
             // If we have less than max workers, spawn a worker.
-            count = _.filter(Cache.creepsInRoom("worker", room), (c) => c.spawning || c.ticksToLive >= (room.storage ? 150 : 300)).length;
-            max = canSpawn ? (room.storage ? 1 : 2) : 0;
+            count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage ? 150 : 300)).length;
+            max = canSpawn ? (storage ? 1 : 2) : 0;
 
             if (count < max) {
                 Worker.spawn(room);
@@ -28,7 +30,7 @@ var Cache = require("cache"),
             if (count > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "worker",
-                    count: Cache.creepsInRoom("worker", room).length,
+                    count: workers.length,
                     max: max
                 });
             }
@@ -37,60 +39,67 @@ var Cache = require("cache"),
         spawn: (room) => {
             "use strict";
 
-            var body = [], workCount = 0, canBoost = false,
-                energy, count, spawnToUse, name, labToBoostWith;
+            var body = [],
+                spawns = Cache.spawnsInRoom(room),
+                workCount = 0,
+                storage = room.storage,
+                canBoost = false,
+                roomName = room.name,
+                energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Get the total energy in the room, limited to 3300.
             energy = Math.min(room.energyCapacityAvailable, 3300);
+            units = Math.floor(energy / 200);
+            remainder = energy % 200;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(WORK);
                 workCount++;
             }
 
-            if (energy % 200 >= 150) {
+            if (remainder >= 150) {
                 body.push(WORK);
                 workCount++;
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
             }
 
-            if (energy % 200 >= 100 && energy % 200 < 150) {
+            if (remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 200 >= 50) {
+            if (remainder >= 50) {
                 body.push(MOVE);
             }
 
-            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, room.storage.store[RESOURCE_LEMERGIUM_ACID] || 0, room.storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0)) >= 30 * workCount) {
+            if (workCount > 0 && storage && Cache.labsInRoom(room).length > 0 && (Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0)) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "worker-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "worker", home: room.name, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), Cache.spawnsInRoom(room)[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "worker-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "worker", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
                 // Set the lab to be in use.
                 labToBoostWith.creepToBoost = name;
-                labToBoostWith.resource = (room.storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_LEMERGIUM_ACID : ((room.storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE);
+                labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_LEMERGIUM_ACID : ((storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE);
                 labToBoostWith.amount = 30 * workCount;
                 room.memory.labsInUse.push(labToBoostWith);
 
@@ -107,7 +116,8 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [];
+                assigned = [],
+                controller = room.controller;
 
             if (creepsWithNoTask.length === 0) {
                 return;
@@ -131,7 +141,7 @@ var Cache = require("cache"),
             }
 
             // Check for dropped resources in current room if there are no hostiles.
-            if (!room.controller || room.controller.level < 6) {
+            if (!controller || controller.level < 6) {
                 if (Cache.hostilesInRoom(room).length === 0) {
                     _.forEach(creepsWithNoTask, (creep) => {
                         _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
@@ -192,7 +202,7 @@ var Cache = require("cache"),
             // Check for critical controllers to upgrade.
             _.forEach(tasks.upgradeController.criticalTasks, (task) => {
                 if (_.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "upgradeController" && c.memory.currentTask.room === task.room).length === 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, controller), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("CritCntrlr");
                             assigned.push(creep.name);
@@ -372,7 +382,7 @@ var Cache = require("cache"),
             }
 
             // Check for controllers to upgrade under RCL 8.
-            if (room.controller && room.controller.level < 8) {
+            if (controller && controller.level < 8) {
                 _.forEach(tasks.upgradeController.tasks, (task) => {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
                         if (task.canAssign(creep)) {

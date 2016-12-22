@@ -52,7 +52,7 @@ var Cache = require("cache"),
 
             var body = [],
                 roomName = room.name,
-                energy, count, spawnToUse, name;
+                energy, units, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -61,9 +61,13 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 7500.
             energy = Math.min(room.energyCapacityAvailable, 7500);
+            units = Math.floor(energy / 300);
 
-            for (count = 0; count < Math.floor(energy / 300); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
+            }
+
+            for (count = 0; count < units; count++) {
                 body.push(HEAL);
             }
 

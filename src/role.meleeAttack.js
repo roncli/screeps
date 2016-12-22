@@ -52,7 +52,7 @@ var Cache = require("cache"),
 
             var body = [],
                 roomName = room.name,
-                energy, count, spawnToUse, name;
+                energy, units, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -61,10 +61,14 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 3250.
             energy = Math.min(room.energyCapacityAvailable, 3250);
+            units = Math.floor(energy / 130);
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 130); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
+            }
+
+            for (count = 0; count < units; count++) {
                 body.push(ATTACK);
             }
 

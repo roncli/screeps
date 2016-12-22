@@ -132,7 +132,7 @@ var Filters = require("filters"),
         repairableStructuresInRoom: (room) => {
             "use strict";
     
-            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: Filters.isRepairable}));
+            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), Filters.isRepairable));
         },
     
         // Returns all extractors in the current room.

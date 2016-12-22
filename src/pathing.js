@@ -228,12 +228,12 @@ var Cache = require("cache"),
                     startPos = path[index - 1];
                 }
 
-                switch (posX - startPos.x) {
+                switch (pos.x - startPos.x) {
                     // Vertical movement
                     case 0:
                     case -49:
                     case 49:
-                        switch (posY - startPos.y) {
+                        switch (pos.y - startPos.y) {
                             // No movement
                             case 0:
                             case -49:
@@ -252,7 +252,7 @@ var Cache = require("cache"),
                     // Right movement
                     case 1:
                     case -48:
-                        switch (posY - startPos.y) {
+                        switch (pos.y - startPos.y) {
                             // Right
                             case 0:
                             case -49:
@@ -271,7 +271,7 @@ var Cache = require("cache"),
                     // Left movement
                     case -1:
                     case 48:
-                        switch (posY - startPos.y) {
+                        switch (pos.y - startPos.y) {
                             // Left
                             case 0:
                             case -49:

@@ -65,7 +65,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (armyAttackRoom) {
-                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && hostileConstructionSites.length === 0) {
+                        if (!army.reinforce && armyAttackRoom.find(FIND_HOSTILE_STRUCTURES, {filter: Functions.filterNotControllerOrRampart}).length === 0 && hostileConstructionSites.length === 0) {
                             army.success = true;
                         }
                     }
@@ -96,7 +96,7 @@ var Cache = require("cache"),
                         if (army.dismantle.length > 0) {
                             tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => c.pos.getRangeTo(Cache.getObjectById(army.dismantle[0])) <= 2), Functions.mapNewTaskRangedAttack);
                         }
-                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(Cache.creepsInArmy(name), c)[0] <= 3), Functions.mapNewTaskMeleeAttack);
+                        tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0] <= 3), Functions.mapNewTaskMeleeAttack);
                         break;
                     case "attack":
                         hostiles = Cache.hostilesInRoom(armyAttackRoom);

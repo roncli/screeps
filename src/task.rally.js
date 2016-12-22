@@ -10,9 +10,6 @@ var Task = require("task"),
         this.creep = creep;
         this.rallyPoint = Cache.getObjectById(id);
         if (!this.rallyPoint) {
-            this.rallyPoint = Game.flags[id];
-        }
-        if (!this.rallyPoint) {
             this.rallyPoint = new RoomPosition(25, 25, id);
             this.range = 5;
         }

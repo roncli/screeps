@@ -5,21 +5,22 @@ let depth = 0;
 function setupProfiler() {
   depth = 0; // reset depth, this needs to be done each tick.
   Game.profiler = {
-    stream(duration, filter) {
-      setupMemory('stream', duration || 10, filter);
+    stream(duration, filter, startsWith) {
+      setupMemory('stream', duration || 10, filter, startsWith);
     },
-    email(duration, filter) {
-      setupMemory('email', duration || 100, filter);
+    email(duration, filter, startsWith) {
+      setupMemory('email', duration || 100, filter, startsWith);
     },
-    profile(duration, filter) {
-      setupMemory('profile', duration || 100, filter);
+    profile(duration, filter, startsWith) {
+      setupMemory('profile', duration || 100, filter, startsWith);
     },
-    background(filter) {
-      setupMemory('background', false, filter);
+    background(filter, startsWith) {
+      setupMemory('background', false, filter, startsWith);
     },
     restart() {
       if (Profiler.isProfiling()) {
         const filter = Memory.profiler.filter;
+        const startsWith = Memory.profiler.startsWith;
         let duration = false;
         if (!!Memory.profiler.disableTick) {
           // Calculate the original duration, profile is enabled on the tick after the first call,
@@ -37,7 +38,7 @@ function setupProfiler() {
   overloadCPUCalc();
 }
 
-function setupMemory(profileType, duration, filter) {
+function setupMemory(profileType, duration, filter, startsWith) {
   resetMemory();
   const disableTick = Number.isInteger(duration) ? Game.time + duration : false;
   if (!Memory.profiler) {
@@ -48,6 +49,7 @@ function setupMemory(profileType, duration, filter) {
       disableTick,
       type: profileType,
       filter,
+      startsWith,
     };
   }
 }
@@ -69,6 +71,10 @@ function getFilter() {
   return Memory.profiler.filter;
 }
 
+function getStartsWith() {
+  return Memory.profiler.startsWith;
+}
+
 const functionBlackList = [
   'getUsed', // Let's avoid wrapping this... may lead to recursion issues and should be inexpensive.
   'constructor', // es6 class constructors need to be called with `new`
@@ -77,7 +83,7 @@ const functionBlackList = [
 function wrapFunction(name, originalFunction) {
   return function wrappedFunction() {
     if (Profiler.isProfiling()) {
-      const nameMatchesFilter = name === getFilter();
+      const nameMatchesFilter = Memory.profiler.startsWith ? name.startsWith(getFilter()) : (name === getFilter());
       const start = Game.cpu.getUsed();
       if (nameMatchesFilter) {
         depth++;

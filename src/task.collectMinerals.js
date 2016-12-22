@@ -202,15 +202,15 @@ CollectMinerals.getStorageTasks = function(room) {
     }
 
     // We only need to transfer from storage to terminal when we have both storage and terminal.
-    if (room.storage && room.terminal && room.memory.reserveMinerals) {
+    if (room.storage && room.terminal && Memory.reserveMinerals) {
         _.forEach(room.storage.store, (amount, resource) => {
             if (resource === RESOURCE_ENERGY) {
                 return;
             }
-            if (!room.memory.reserveMinerals[resource]) {
+            if (!Memory.reserveMinerals[resource]) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, amount));
-            } else if (room.memory.reserveMinerals[resource] < amount) {
-                tasks.push(new CollectMinerals(room.storage.id, resource, amount - room.memory.reserveMinerals[resource]));
+            } else if (Memory.reserveMinerals[resource] < amount) {
+                tasks.push(new CollectMinerals(room.storage.id, resource, amount - Memory.reserveMinerals[resource]));
             }
         });
     }
@@ -224,18 +224,18 @@ CollectMinerals.getTerminalTasks = function(room) {
     var tasks = [];
 
     // We only need to transfer from terminal when we have both storage and terminal.
-    if (room.storage && room.terminal && room.memory.reserveMinerals) {
+    if (room.storage && room.terminal && Memory.reserveMinerals) {
         _.forEach(room.terminal.store, (amount, resource) => {
             if (resource === RESOURCE_ENERGY) {
                 return;
             }
-            if (!room.memory.reserveMinerals[resource]) {
+            if (!Memory.reserveMinerals[resource]) {
                 return;
             }
             if (!room.storage.store[resource]) {
-                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, room.memory.reserveMinerals[resource])));
-            } else if (room.storage.store[resource] < room.memory.reserveMinerals[resource]) {
-                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, room.memory.reserveMinerals[resource] - room.storage.store[resource])));
+                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, Memory.reserveMinerals[resource])));
+            } else if (room.storage.store[resource] < Memory.reserveMinerals[resource]) {
+                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, Memory.reserveMinerals[resource] - room.storage.store[resource])));
             }
         });
     }

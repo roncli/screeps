@@ -558,7 +558,7 @@ var profiler = require("screeps-profiler"),
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
                 var roomName = room.name,
-                    roomMemory = room.memory,
+                    roomMemory = Memory.rooms[roomName],
                     type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",
                     repairableStructures, constructionSites, towers, labs;
 

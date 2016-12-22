@@ -147,11 +147,13 @@ Mine.prototype.run = function(room) {
                 Cache.creepsInRoom("remoteReserver", room).length === 0
             ) {
                 this.stage = 1;
+                return;
             }
         } else {
             // Check to see if we lost built containers.  If so, move to stage 1.
             if (Cache.containersInRoom(room).length !== room.find(FIND_SOURCES).length) {
                 this.stage = 1;
+                return;
             }
 
             // Spawn new creeps.

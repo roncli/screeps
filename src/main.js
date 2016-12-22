@@ -363,37 +363,46 @@ var profiler = require("screeps-profiler"),
                 });
 
                 // Set room lab queue.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    var hasBuyQueue = !!Game.rooms[room].memory.buyQueue;
-                    var hasLabQueue = !!Game.rooms[room].memory.labQueue;
+                _.forEach(Cache.minerals, (minerals, roomName) => {
+                    var room = Game.rooms[roomName],
+                        roomMemory = room.memory,
+                        storageStore = room.storage.store,
+                        terminalStore = room.terminal.store,
+                        allCreepsInRoom = Cache.creepsInRoom("all", room),
+                        hasBuyQueue = !!roomMemory.buyQueue,
+                        hasLabQueue = !!roomMemory.labQueue;
+                    
                     if (!hasBuyQueue || !hasLabQueue) {
                         _.forEach(minerals, (mineral) => {
                             var fx = (node, innerFx) => {
+                                var resource = node.resource,
+                                    resourceAmountInRoom = (storageStore[resource] || 0) + (terminalStore[resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[resource] || 0);
+
                                 // If we have the requested mineral, we're done.
-                                if ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", Game.rooms[room]), (c) => c.carry[node.resource] || 0) >= node.amount) {
+                                if (resourceAmountInRoom >= node.amount) {
                                     return;
                                 }
 
                                 switch (node.action) {
                                     case "buy":
                                         // We should buy the mineral from the market.
-                                        if (!Game.rooms[room].memory.buyQueue) {
-                                            Game.rooms[room].memory.buyQueue = {
-                                                resource: node.resource,
-                                                amount: 5 * Math.ceil(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)) / 5),
+                                        if (!roomMemory.buyQueue) {
+                                            roomMemory.buyQueue = {
+                                                resource: resource,
+                                                amount: 5 * Math.ceil(node.amount - resourceAmountInRoom / 5),
                                                 price: node.buyPrice,
                                                 start: Game.time
                                             };
 
-                                            Memory.minimumSell[node.resource] = Math.min(Memory.minimumSell[node.resource] || Infinity, node.buyPrice);
+                                            Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
                                         }
                                         break;
                                     case "create":
                                         // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
                                         if (!hasLabQueue) {
-                                            Game.rooms[room].memory.labQueue = {
-                                                resource: node.resource,
-                                                amount: 5 * Math.ceil(Math.min(node.amount - ((Game.rooms[room].storage.store[node.resource] || 0) + (Game.rooms[room].terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)), LAB_MINERAL_CAPACITY) / 5),
+                                            roomMemory.labQueue = {
+                                                resource: resource,
+                                                amount: 5 * Math.ceil(Math.min(node.amount - resourceAmountInRoom, LAB_MINERAL_CAPACITY) / 5),
                                                 children: _.map(node.children, (c) => c.resource),
                                                 start: Game.time
                                             };
@@ -403,7 +412,7 @@ var profiler = require("screeps-profiler"),
                                             innerFx(child, innerFx);
 
                                             if (node.action === "create" && node.children.length > 0) {
-                                                Memory.minimumSell[node.resource] = Math.min(Memory.minimumSell[node.resource] || Infinity, _.sum(node.children, (c) => c.price));
+                                                Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
                                             }
                                         });
 
@@ -425,17 +434,19 @@ var profiler = require("screeps-profiler"),
                 Memory.baseMatrixes = {};
             }
             
-            _.forEach(Memory.baseMatrixes, (matrix, room) => {
-                let tempMatrix, costMatrix;
+            _.forEach(Memory.baseMatrixes, (matrix, roomName) => {
+                var room = Game.rooms[roomName],
+                    tempMatrix, costMatrix, repairableStructuresInRoom;
                 
-                if (!Game.rooms[room] || Game.rooms[room].unobservable || matrix.status === "complete" || Cache.spawnsInRoom(Game.rooms[room]).length === 0) {
+                if (!room || room.unobservable || matrix.status === "complete" || Cache.spawnsInRoom(room).length === 0) {
                     return;
                 }
                 
                 // Step 1, create the room's initial matrix with structures defined.
+                repairableStructuresInRoom = Cache.repairableStructuresInRoom(room);
                 if (!matrix.status) {
                     costMatrix = new PathFinder.CostMatrix();
-                    _.forEach(_.filter(Cache.repairableStructuresInRoom(Game.rooms[room]), (s) => !(s instanceof StructureRoad)), (structure) => {
+                    _.forEach(_.filter(repairableStructuresInRoom, (s) => !(s instanceof StructureRoad)), (structure) => {
                         costMatrix.set(structure.pos.x, structure.pos.y, 255);
                     });
                     matrix.tempMatrix = costMatrix.serialize();
@@ -458,7 +469,7 @@ var profiler = require("screeps-profiler"),
                                 return false;
                             }
                             
-                            if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, room), {pos: Cache.spawnsInRoom(Game.rooms[room])[0].pos, range: 1}, {
+                            if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, roomName), {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {
                                 roomCallback: () => {
                                     return tempMatrix;
                                 },
@@ -472,7 +483,7 @@ var profiler = require("screeps-profiler"),
                     }
                     
                     // Set ramparts back to 0.
-                    _.forEach(_.filter(Cache.repairableStructuresInRoom(Game.rooms[room]), (s) => s instanceof StructureRampart), (structure) => {
+                    _.forEach(_.filter(repairableStructuresInRoom, (s) => s instanceof StructureRampart), (structure) => {
                         costMatrix.set(structure.pos.x, structure.pos.y, 0);
                     });
                     
@@ -492,10 +503,13 @@ var profiler = require("screeps-profiler"),
 
             // Loop through each creep to deserialize their task and see if it is completed.
             _.forEach(Game.creeps, (creep) => {
+                var creepTask;
+
                 if (creep.memory.currentTask) {
+                    creepTask = Cache.creepTasks[creep.name];
                     taskDeserialization(creep);
-                    if (Cache.creepTasks[creep.name]) {
-                        Cache.creepTasks[creep.name].canComplete(creep);
+                    if (creepTask) {
+                        creepTask.canComplete(creep);
                     }
                 }
             });
@@ -518,35 +532,42 @@ var profiler = require("screeps-profiler"),
             });
 
             // See if there is some energy balancing we can do.
-            rooms = _.sortBy(_.filter(Game.rooms, (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType && Memory.rooms[r.name].roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY]);
+            rooms = _.sortBy(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY]);
             if (rooms.length > 1) {
                 energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
                     var otherRoom = rooms[rooms.length - index - 1],
+                        roomStorageEnergy = room.storage.store[RESOURCE_ENERGY],
+                        otherRoomStorageEnergy = otherRoom.storage.store[RESOURCE_ENERGY],
+                        otherRoomTerminal = otherRoom.terminal,
+                        otherRoomTerminalEnergy = otherRoomTerminal.store[RESOURCE_ENERGY],
                         transCost;
                     
-                    if (room.storage.store[RESOURCE_ENERGY] >= otherRoom.storage.store[RESOURCE_ENERGY] || room.storage.store[RESOURCE_ENERGY] + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoom.storage.store[RESOURCE_ENERGY] + otherRoom.terminal.store[RESOURCE_ENERGY] < energyGoal + 10000) {
+                    if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
                         return false;
                     }
 
-                    if (otherRoom.terminal.store[RESOURCE_ENERGY] >= 1000) {
-                        transCost = Game.market.calcTransactionCost(otherRoom.terminal.store[RESOURCE_ENERGY], otherRoom.name, room.name);
+                    if (otherRoomTerminalEnergy >= 1000) {
+                        transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoom.name, room.name);
 
-                        otherRoom.terminal.send(RESOURCE_ENERGY, Math.floor(otherRoom.terminal.store[RESOURCE_ENERGY] * (otherRoom.terminal.store[RESOURCE_ENERGY] / (otherRoom.terminal.store[RESOURCE_ENERGY] + transCost))), room.name);
+                        otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), room.name);
                     }
                 });
             }
 
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
-                var type = Memory.rooms[room.name] && Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type ? Memory.rooms[room.name].roomType.type : "unknown";
+                var roomName = room.name,
+                    roomMemory = room.memory,
+                    type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",
+                    repairableStructures, constructionSites, towers, labs;
 
                 // Log room data.
                 if (room.unobservable) {
-                    Cache.log.rooms[room.name] = {
+                    Cache.log.rooms[roomName] = {
                         type: type,
-                        supportRoom: room.memory && room.memory.roomType ? room.memory.roomType.supportRoom : undefined,
-                        region: room.memory ? room.memory.region : undefined,
+                        supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : undefined,
+                        region: roomMemory ? roomMemory.region : undefined,
                         unobservable: true,
                         store: {},
                         labs: [],
@@ -554,10 +575,15 @@ var profiler = require("screeps-profiler"),
                         creeps: []
                     }
                 } else {
-                    Cache.log.rooms[room.name] = {
+                    repairableStructures = Cache.repairableStructuresInRoom(room),
+                    constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES),
+                    towers = Cache.towersInRoom(room),
+                    labs = Cache.labsInRoom(room);
+
+                    Cache.log.rooms[roomName] = {
                         type: type,
-                        supportRoom: room.memory && room.memory.roomType ? room.memory.roomType.supportRoom : undefined,
-                        region: room.memory ? room.memory.region : undefined,
+                        supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : undefined,
+                        region: roomMemory ? roomMemory.region : undefined,
                         unobservable: false,
                         controller: !!room.controller,
                         store: {},
@@ -566,25 +592,25 @@ var profiler = require("screeps-profiler"),
                         creeps: []
                     }
 
-                    if (Cache.log.rooms[room.name].controller) {
-                        Cache.log.rooms[room.name].rcl = room.controller.level;
+                    if (Cache.log.rooms[roomName].controller) {
+                        Cache.log.rooms[roomName].rcl = room.controller.level;
                         if (room.controller.owner) {
-                            Cache.log.rooms[room.name].ownerUsername = room.controller.owner.username;
+                            Cache.log.rooms[roomName].ownerUsername = room.controller.owner.username;
                         }
-                        Cache.log.rooms[room.name].progress = room.controller.progress;
-                        Cache.log.rooms[room.name].progressTotal = room.controller.progressTotal;
-                        Cache.log.rooms[room.name].ttd = room.controller.ticksToDowngrade
+                        Cache.log.rooms[roomName].progress = room.controller.progress;
+                        Cache.log.rooms[roomName].progressTotal = room.controller.progressTotal;
+                        Cache.log.rooms[roomName].ttd = room.controller.ticksToDowngrade
                     }
 
                     if (room.controller && room.controller.reservation) {
-                        Cache.log.rooms[room.name].reservedUsername = room.controller.reservation.username;
-                        Cache.log.rooms[room.name].tte = room.controller.reservation.ticksToEnd;
+                        Cache.log.rooms[roomName].reservedUsername = room.controller.reservation.username;
+                        Cache.log.rooms[roomName].tte = room.controller.reservation.ticksToEnd;
                     }
 
-                    _.forEach(_.filter(Cache.repairableStructuresInRoom(room), (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
+                    _.forEach(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
                         Cache.log.structures.push({
                             structureId: s.id,
-                            room: room.name,
+                            room: roomName,
                             x: s.pos.x,
                             y: s.pos.y,
                             structureType: s.structureType,
@@ -593,37 +619,37 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
-                    Cache.log.rooms[room.name].lowestWall = _.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits)[0];
+                    Cache.log.rooms[roomName].lowestWall = _.sortBy(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits)[0];
 
                     if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
-                        Cache.log.rooms[room.name].energyAvailable = room.energyAvailable;
-                        Cache.log.rooms[room.name].energyCapacityAvailable = room.energyCapacityAvailable;
+                        Cache.log.rooms[roomName].energyAvailable = room.energyAvailable;
+                        Cache.log.rooms[roomName].energyCapacityAvailable = room.energyCapacityAvailable;
                     }
 
-                    Cache.log.rooms[room.name].constructionProgress = _.sum(_.map(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progress));
-                    Cache.log.rooms[room.name].constructionProgressTotal = _.sum(_.map(room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progressTotal));
+                    Cache.log.rooms[roomName].constructionProgress = _.sum(_.map(constructionSites, (c) => c.progress));
+                    Cache.log.rooms[roomName].constructionProgressTotal = _.sum(_.map(constructionSites, (c) => c.progressTotal));
 
-                    Cache.log.rooms[room.name].towerEnergy = _.sum(_.map(Cache.towersInRoom(room), (t) => t.energy));
-                    Cache.log.rooms[room.name].towerEnergyCapacity = _.sum(_.map(Cache.towersInRoom(room), (t) => t.energyCapacity));
+                    Cache.log.rooms[roomName].towerEnergy = _.sum(_.map(towers, (t) => t.energy));
+                    Cache.log.rooms[roomName].towerEnergyCapacity = _.sum(_.map(towers, (t) => t.energyCapacity));
 
-                    Cache.log.rooms[room.name].labEnergy = _.sum(_.map(Cache.labsInRoom(room), (l) => l.energy));
-                    Cache.log.rooms[room.name].labEnergyCapacity = _.sum(_.map(Cache.labsInRoom(room), (l) => l.energyCapacity));
+                    Cache.log.rooms[roomName].labEnergy = _.sum(_.map(labs, (l) => l.energy));
+                    Cache.log.rooms[roomName].labEnergyCapacity = _.sum(_.map(labs, (l) => l.energyCapacity));
 
                     if (room.storage) {
-                        Cache.log.rooms[room.name].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});
+                        Cache.log.rooms[roomName].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});
                     }
 
                     if (room.terminal) {
-                        Cache.log.rooms[room.name].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
+                        Cache.log.rooms[roomName].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
                     }
 
-                    Cache.log.rooms[room.name].labs = _.map(Cache.labsInRoom(room), (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
+                    Cache.log.rooms[roomName].labs = _.map(labs, (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
 
-                    Cache.log.rooms[room.name].labQueue = room.memory.labQueue;
-                    Cache.log.rooms[room.name].buyQueue = room.memory.buyQueue;
+                    Cache.log.rooms[roomName].labQueue = roomMemory.labQueue;
+                    Cache.log.rooms[roomName].buyQueue = roomMemory.buyQueue;
 
                     _.forEach(room.find(FIND_SOURCES), (s) => {
-                        Cache.log.rooms[room.name].source.push({
+                        Cache.log.rooms[roomName].source.push({
                             sourceId: s.id,
                             resource: RESOURCE_ENERGY,
                             amount: s.energy,
@@ -633,7 +659,7 @@ var profiler = require("screeps-profiler"),
                     });
 
                     _.forEach(room.find(FIND_MINERALS), (m) => {
-                        Cache.log.rooms[room.name].source.push({
+                        Cache.log.rooms[roomName].source.push({
                             sourceId: m.id,
                             resource: m.mineralType,
                             amount: m.mineralAmount,
@@ -645,7 +671,7 @@ var profiler = require("screeps-profiler"),
                         Cache.log.hostiles.push({
                             creepId: h.id,
                             ownerUsername: h.owner.username,
-                            room: room.name,
+                            room: roomName,
                             x: h.pos.x,
                             y: h.pos.y,
                             ttl: h.ticksToLive,
@@ -655,10 +681,10 @@ var profiler = require("screeps-profiler"),
                     });
                 }
 
-                if (Cache.roomTypes[room.name]) {
-                    Cache.roomTypes[room.name].run(room);
-                    if (Memory.rooms[room.name].roomType && Memory.rooms[room.name].roomType.type === Cache.roomTypes[room.name].type) {
-                        Cache.roomTypes[room.name].toObj(room);
+                if (Cache.roomTypes[roomName]) {
+                    Cache.roomTypes[roomName].run(room);
+                    if (roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
+                        Cache.roomTypes[roomName].toObj(room);
                     }
                 }
             });

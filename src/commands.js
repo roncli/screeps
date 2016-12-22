@@ -103,6 +103,7 @@ var Cache = require("cache"),
             }
         },
 
+        // Claim a room that's currently being reserved.  Only works if you already have a reserver on the controller.
         claimMine: (room) => {
             if (Game.rooms[room]) {
                 _.forEach(Cache.creepsInRoom("remoteReserver", Game.rooms[room]), (creep) => {
@@ -111,6 +112,7 @@ var Cache = require("cache"),
             }
         },
 
+        // Dismantle structures at a location.
         dismantle: (x, y, room) => {
             "use strict";
 
@@ -125,28 +127,33 @@ var Cache = require("cache"),
             Memory.dismantle[room].push({x: x, y: y});
         },
 
+        // Stop a creep from moving.
         stopCreep: (name) => {
             if (Game.creeps[name]) {
                 Game.creeps[name].memory.stop = true;
             }
         },
 
+        // Start a creep moving again.
         startCreep: (name) => {
             if (Game.creeps[name]) {
                 delete Game.creeps[name].memory.stop;
             }
         },
 
+        // Start all creeps moving.
         startAllCreeps: () => {
             _.forEach(Game.creeps, (creep) => {
                 delete creep.memory.stop;
             });
         },
 
+        // Set a container's source.  Useful when you want to have a container for a source be at a location different than default.
         setContainerSource: (containerId, sourceId) => {
             Memory.containerSource[containerId] = sourceId;
         },
 
+        // Adds an ally.  All creeps belonging to this user will not be attacked.
         addAlly: (name) => {
             if (!Memory.allies) {
                 Memory.allies = [];
@@ -155,10 +162,12 @@ var Cache = require("cache"),
             Memory.allies.push(name);
         },
 
+        // Removes an ally.
         removeAlly: (name) => {
             _.pull(Memory.allies, name);
         },
 
+        // Creates an army.  TODO: Better options.
         createArmy: (army, options) => {
             if (options === undefined) {
                 delete Memory.army[army];
@@ -168,6 +177,7 @@ var Cache = require("cache"),
             }
         },
 
+        // Avoids a room or not.
         avoidRoom: (room, avoid) => {
             if (avoid && Memory.avoidRooms.indexOf(room) === -1) {
                 Memory.avoidRooms.push(room);
@@ -177,6 +187,7 @@ var Cache = require("cache"),
             }
         },
 
+        // Adds a sign to a room.  When a reserver or upgrader is near the controller, it will apply the sign.
         addSign: (room, text) => {
             if (!Memory.signs) {
                 Memory.signs = {};
@@ -188,6 +199,7 @@ var Cache = require("cache"),
             }
         },
         
+        // Resets a wartime cost matrix for a room.  It will be automatically recalculated.
         resetMatrix: (room) => {
             Memory.baseMatrixes[room] = {};
         }

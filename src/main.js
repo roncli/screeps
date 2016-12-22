@@ -506,8 +506,8 @@ var profiler = require("screeps-profiler"),
                 var creepTask;
 
                 if (creep.memory.currentTask) {
-                    creepTask = Cache.creepTasks[creep.name];
                     taskDeserialization(creep);
+                    creepTask = Cache.creepTasks[creep.name];
                     if (creepTask) {
                         creepTask.canComplete(creep);
                     }

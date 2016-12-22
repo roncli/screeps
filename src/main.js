@@ -6,8 +6,11 @@ var profiler = require("screeps-profiler"),
     Army = require("army"),
     Cache = require("cache"),
     Commands = require("commands"),
+    Filters = require("filters"),
+    Maps = require("maps"),
     Market = require("market"),
     Minerals = require("minerals"),
+    Sorts = require("sorts"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -16,11 +19,14 @@ var profiler = require("screeps-profiler"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
     RoleDefender = require("role.defender"),
+    RoleDismantler = require("role.dismantler"),
     RoleHealer = require("role.healer"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
     RoleRangedAttack = require("role.rangedAttack"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
+    RoleRemoteCollector = require("role.remoteCollector"),
+    RoleRemoteDismantler = require("role.remoteDismantler"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteReserver = require("role.remoteReserver"),
     RoleRemoteStorer = require("role.remoteStorer"),
@@ -53,15 +59,14 @@ var profiler = require("screeps-profiler"),
                 main.rooms();
                 main.army();
                 main.creeps();
-
-                Cache.log.cpuUsed = Game.cpu.getUsed();
+                main.finalize();
             });
-
-            Memory.console = Cache.log;
         },
 
         init: () => {
             "use strict";
+
+            var generationTick = Game.time % 1500;
 
             // Reset the cache.
             Cache.reset();
@@ -71,6 +76,8 @@ var profiler = require("screeps-profiler"),
                 Army: Army,
                 Cache: Cache,
                 Commands: Commands,
+                Filters: Filters,
+                Maps: Maps,
                 Market: Market,
                 Minerals: Minerals,
                 Role: {
@@ -81,11 +88,14 @@ var profiler = require("screeps-profiler"),
                     Claimer: RoleClaimer,
                     Collector: RoleCollector,
                     Defender: RoleDefender,
+                    Dismantler: RoleDismantler,
                     Healer: RoleHealer,
                     MeleeAttack: RoleMeleeAttack,
                     Miner: RoleMiner,
                     RangedAttack: RoleRangedAttack,
                     RemoteBuilder: RoleRemoteBuilder,
+                    RemoteCollector: RoleRemoteCollector,
+                    RemoteDismantler: RoleRemoteDismantler,
                     RemoteMiner: RoleRemoteMiner,
                     RemoteReserver: RoleRemoteReserver,
                     RemoteStorer: RoleRemoteStorer,
@@ -101,6 +111,7 @@ var profiler = require("screeps-profiler"),
                     Cleanup: RoomCleanup,
                     Mine: RoomMine
                 },
+                Sorts: Sorts,
                 Utilities: Utilities
             };
             
@@ -172,23 +183,25 @@ var profiler = require("screeps-profiler"),
             delete Memory.flags;
 
             // Every generation, clear cache.
-            if (Game.time % 1500 === 0) {
-                delete Memory.lengthToStorage;
-            }
-            if (Game.time % 1500 === 100) {
-                delete Memory.lengthToContainer;
-            }
-            if (Game.time % 1500 === 200) {
-                delete Memory.lengthToController;
-            }
-            if (Game.time % 1500 === 300) {
-                delete Memory.distances;
-            }
-            if (Game.time % 1500 === 400) {
-                delete Memory.ranges;
-            }
-            if (Game.time % 1500 === 500) {
-                Memory.paths = {};
+            switch (generationTick) {
+                case 0:
+                    delete Memory.lengthToStorage;
+                    break;
+                case 100:
+                    delete Memory.lengthToContainer;
+                    break;
+                case 200:
+                    delete Memory.lengthToController;
+                    break;
+                case 300:
+                    delete Memory.distances;
+                    break;
+                case 400:
+                    delete Memory.ranges;
+                    break;
+                case 500:
+                    Memory.paths = {};
+                    break;
             }
         },
 
@@ -238,91 +251,77 @@ var profiler = require("screeps-profiler"),
 
         minerals: () => {
             var mineralOrders = {},
-                sellOrder;
+                minerals, sellOrder;
 
             if (Game.cpu.bucket >= 9990) {
-                // Determine the minerals we need in each room and army.
-                _.forEach(Game.rooms, (room) => {
-                    if (room.unobservable || !room.terminal || !room.terminal.my) {
-                        return;
+                // Determine the minerals we need.
+                minerals = [
+                    {resource: RESOURCE_HYDROGEN, amount: 3000},
+                    {resource: RESOURCE_OXYGEN, amount: 3000},
+                    {resource: RESOURCE_ZYNTHIUM, amount: 3000},
+                    {resource: RESOURCE_KEANIUM, amount: 3000},
+                    {resource: RESOURCE_UTRIUM, amount: 3000},
+                    {resource: RESOURCE_LEMERGIUM, amount: 3000},
+                    {resource: RESOURCE_CATALYST, amount: 3000},
+                    {resource: RESOURCE_HYDROXIDE, amount: 3000},
+                    {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
+                    {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
+                    {resource: RESOURCE_GHODIUM, amount: 3000},
+                    {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
+                    {resource: RESOURCE_UTRIUM_OXIDE, amount: 3000},
+                    {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
+                    {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
+                    {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
+                    {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
+                    {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
+                    {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
+                    {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_UTRIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 3000},
+                    {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 3000}
+                ];
+
+                _.forEach(minerals, (mineral) => {
+                    var fx = (node, innerFx) => {
+                        node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
+
+                        _.forEach(node.children, (child) => {
+                            child.amount = node.amount;
+
+                            innerFx(child, innerFx);
+                        });
                     }
-                    
-                    // Build the mineral data.
-                    if (room.memory.roomType && room.memory.roomType.type === "base" && room.terminal && Cache.labsInRoom(room).length >= 3) {
-                        Cache.minerals[room.name] = [
-                            {resource: RESOURCE_HYDROGEN, amount: 3000},
-                            {resource: RESOURCE_OXYGEN, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM, amount: 3000},
-                            {resource: RESOURCE_KEANIUM, amount: 3000},
-                            {resource: RESOURCE_UTRIUM, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM, amount: 3000},
-                            {resource: RESOURCE_CATALYST, amount: 3000},
-                            {resource: RESOURCE_HYDROXIDE, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
-                            {resource: RESOURCE_GHODIUM, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_UTRIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 3000},
-                            {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 3000}
-                        ];
-                    }
-                });
 
-                // Create a hierarchy of each mineral's components.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    _.forEach(minerals, (mineral) => {
-                        var fx = (node, innerFx) => {
-                            node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
-
-                            _.forEach(node.children, (child) => {
-                                child.amount = node.amount;
-
-                                innerFx(child, innerFx);
-                            });
-                        }
-
-                        fx(mineral, fx);
-                    });
+                    fx(mineral, fx);
                 });
 
                 // Determine how many of each mineral needs to be saved in each room.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    Memory.rooms[room].reserveMinerals = {};
-                    _.forEach(minerals, (mineral) => {
-                        var fx = (node, innerFx) => {
-                            if (!Memory.rooms[room].reserveMinerals[node.resource]) {
-                                Memory.rooms[room].reserveMinerals[node.resource] = 0;
-                            }
-                            Memory.rooms[room].reserveMinerals[node.resource] += node.amount;
-
-                            _.forEach(node.children, (child) => {
-                                innerFx(child, innerFx);
-                            });
+                Memory.reserveMinerals = {};
+                _.forEach(minerals, (mineral) => {
+                    var fx = (node, innerFx) => {
+                        if (!Memory.reserveMinerals[node.resource]) {
+                            Memory.reserveMinerals[node.resource] = 0;
                         }
+                        Memory.reserveMinerals[node.resource] += node.amount;
 
-                        fx(mineral, fx);
-                    });
+                        _.forEach(node.children, (child) => {
+                            innerFx(child, innerFx);
+                        });
+                    }
+
+                    fx(mineral, fx);
                 });
 
                 // Get market values for each mineral.
@@ -335,8 +334,14 @@ var profiler = require("screeps-profiler"),
                 });
 
                 // Assign the market values and determine whether we should buy or create the minerals.
-                _.forEach(Cache.minerals, (minerals, room) => {
-                    _.forEach(minerals, (mineral) => {
+                _.forEach(Game.rooms, (room, roomName) => {
+                    if (room.unobservable || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
+                        return;
+                    }
+                    Cache.minerals[roomName] = _.cloneDeep(minerals);
+                    
+                    // Build the mineral data.
+                    _.forEach(Cache.minerals[roomName], (mineral) => {
                         var fx = (node, innerFx) => {
                             var buyPrice;
 
@@ -787,6 +792,11 @@ var profiler = require("screeps-profiler"),
                     }
                 }
             });
+        },
+
+        finalize: () => {
+            Cache.log.cpuUsed = Game.cpu.getUsed();
+            Memory.console = Cache.log;
         }
     };
 

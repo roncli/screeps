@@ -24,7 +24,7 @@ var Filters = require("filters"),
         creepTasks: {},
         roomTypes: {},
         spawning: {},
-        minerals: [],
+        minerals: {},
         log: {},
     
         // Reset the cache.
@@ -47,7 +47,7 @@ var Filters = require("filters"),
             Cache.creepTasks = {};
             Cache.roomTypes = {};
             Cache.spawning = {};
-            Cache.minerals = [];
+            Cache.minerals = {};
     
             Cache.log = {
                 events: [],

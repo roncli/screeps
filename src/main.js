@@ -683,7 +683,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Cache.roomTypes[roomName]) {
                     Cache.roomTypes[roomName].run(room);
-                    if (roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
+                    if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
                         Cache.roomTypes[roomName].toObj(room);
                     }
                 }

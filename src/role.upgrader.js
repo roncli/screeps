@@ -11,7 +11,7 @@ var Cache = require("cache"),
                 storage = room.storage,
                 storageEnergy = storage.store[RESOURCE_ENERGY],
                 controller = room.controller,
-                count, sources, max;
+                count, max;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {

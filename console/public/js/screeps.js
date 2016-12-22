@@ -250,6 +250,8 @@ var app = angular.module("screeps", []),
                         scope.$apply();
                         break;
                 }
+                
+                data.messages = data.message.slice(Math.max(data.message.length - 100, 1));
             };
         };
 

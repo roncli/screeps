@@ -7,7 +7,8 @@ var Cache = require("cache"),
         checkSpawn: (armyName) => {
             "use strict";
 
-            var count = _.filter(Cache.creepsInArmy("armyDismantler", armyName), (c) => c.spawning || c.ticksToLive > 300).length, max = Memory.army[armyName].dismantler.maxCreeps;
+            var count = _.filter(Cache.creepsInArmy("armyDismantler", armyName), (c) => c.spawning || c.ticksToLive > 300).length,
+                max = Memory.army[armyName].dismantler.maxCreeps;
 
             if (count < max) {
                 Dismantler.spawn(armyName);
@@ -29,6 +30,7 @@ var Cache = require("cache"),
             var army = Memory.army[armyName],
                 dismantlerUnits = army.dismantler.units,
                 boostRoom = Game.rooms[army.boostRoom],
+                labsInUse = boostRoom.memory.labsInUse,
                 body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE],
                 count, spawnToUse, name, labsToBoostWith;
 
@@ -60,12 +62,12 @@ var Cache = require("cache"),
                 labsToBoostWith[0].creepToBoost = name;
                 labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
                 labsToBoostWith[0].amount = 30 * 5;
-                boostRoom.memory.labsInUse.push(labsToBoostWith[0]);
+                labsInUse.push(labsToBoostWith[0]);
 
                 labsToBoostWith[1].creepToBoost = name;
                 labsToBoostWith[1].resource = RESOURCE_CATALYZED_ZYNTHIUM_ACID;
                 labsToBoostWith[1].amount = 30 * dismantlerUnits;
-                boostRoom.memory.labsInUse.push(labsToBoostWith[1]);
+                labsInUse.push(labsToBoostWith[1]);
 
                 // If anything is coming to fill the labs, stop them.
                 _.forEach(_.filter(Cache.creepsInRoom("all", boostRoom), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {

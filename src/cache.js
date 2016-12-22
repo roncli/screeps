@@ -143,6 +143,10 @@ var creepsInRoom = {},
         // Return all hostile creeps in the current room.
         hostilesInRoom: (room) => {
             "use strict";
+
+            if (!room) {
+                return [];
+            }
     
             var hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : (hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1));
     

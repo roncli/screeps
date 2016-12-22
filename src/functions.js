@@ -8,7 +8,7 @@ var Functions = {
     },
     
     filterIsExtractor: (s) => {
-        s instanceof StructureExtractor;
+        return s instanceof StructureExtractor;
     },
     
     filterIsLab: (s) => {

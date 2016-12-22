@@ -17,19 +17,8 @@ Reserve.prototype.canAssign = function(creep) {
         return false;
     }
 
-    switch (creep.memory.role) {
-        case "reserver":
-            if (!creep.room.controller || creep.room.controller.my) {
-                return false;
-            }
-            break;
-        case "remoteReserver":
-            if (!Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
-                return false;
-            }
-            break;
-        default:
-            return false;
+    if (!Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
+        return false;
     }
 
     Task.prototype.assign.call(this, creep);
@@ -42,28 +31,13 @@ Reserve.prototype.run = function(creep) {
     // R.I.P. Pete Burns
     creep.say(["You", "spin", "me", "right", "round", "baby", "right", "round", "like a", "record", "baby", "right", "round", "round", "round", ""][Game.time % 16], true);
 
-    switch (creep.memory.role) {
-        case "reserver":
-            if (!creep.room.controller) {
-                Task.prototype.complete.call(this, creep);
-                return;
-            }
-            
-            Pathing.moveTo(creep, creep.room.controller, 1);
-            creep.reserveController(creep.room.controller);
-
-            break;
-        case "remoteReserver":
-            if (!Game.rooms[creep.memory.home].controller) {
-                Task.prototype.complete.call(this, creep);
-                return;
-            }
-            
-            Pathing.moveTo(creep, Game.rooms[creep.memory.home].controller, 1);
-            creep.reserveController(Game.rooms[creep.memory.home].controller);
-
-            break;
+    if (!Game.rooms[creep.memory.home].controller) {
+        Task.prototype.complete.call(this, creep);
+        return;
     }
+    
+    Pathing.moveTo(creep, Game.rooms[creep.memory.home].controller, 1);
+    creep.reserveController(Game.rooms[creep.memory.home].controller);
 
     if (Memory.signs && Memory.signs[creep.room.name] && (!creep.room.controller.sign || creep.room.controller.sign.username !== "roncli")) {
         creep.signController(creep.room.controller, Memory.signs[creep.room.name])
@@ -77,19 +51,9 @@ Reserve.prototype.canComplete = function(creep) {
         return true;
     }
 
-    switch (creep.memory.role) {
-        case "reserver":
-            if (!creep.room.controller || creep.room.controller.my) {
-                Task.prototype.complete.call(this, creep);
-                return true;
-            }
-            break;
-        case "remoteReserver":
-            if (!Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
-                Task.prototype.complete.call(this, creep);
-                return true;
-            }
-            break;
+    if (!Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
+        Task.prototype.complete.call(this, creep);
+        return true;
     }
 
     return false;

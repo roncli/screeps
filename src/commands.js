@@ -84,25 +84,6 @@ var Cache = require("cache"),
             }
         },
 
-        // Reserve a room.
-        reserveRoom: (fromRoom, toRoom, reserve) => {
-            "use strict";
-
-            if (!Memory.maxCreeps.reserver) {
-                Memory.maxCreeps.reserver = {};
-            }
-
-            if (!Memory.maxCreeps.reserver[fromRoom]) {
-                Memory.maxCreeps.reserver[fromRoom] = {};
-            }
-            
-            if (reserve) {
-                Memory.maxCreeps.reserver[fromRoom][toRoom] = true;
-            } else {
-                delete Memory.maxCreeps.reserver[fromRoom][toRoom];
-            }
-        },
-
         // Claim a room.
         claimRoom: (fromRoom, toRoom, claim) => {
             "use strict";

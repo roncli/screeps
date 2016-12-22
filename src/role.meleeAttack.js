@@ -21,7 +21,7 @@ var Cache = require("cache"),
                     var count = _.filter(Cache.creepsInRoom("meleeAttack", room), (c) => c.memory.defending === toRoom).length;
                     num += count;
 
-                    if (Game.rooms[toRoom].memory.harvested >= 30000 || Cache.hostilesInRoom(Game.rooms[toRoom]).length > 0) {
+                    if ((Game.rooms[toRoom] && Game.rooms[toRoom].memory.harvested >= 30000) || Cache.hostilesInRoom(Game.rooms[toRoom]).length > 0) {
                         max += value.maxCreeps;
                     }
 

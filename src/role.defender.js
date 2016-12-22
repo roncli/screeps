@@ -23,7 +23,7 @@ var Cache = require("cache"),
                 _.forEach(defender[roomName], (value, toRoomName) => {
                     var count = _.filter(Cache.creepsInRoom("defender", room), (c) => c.memory.defending === toRoomName).length,
                         toRoom = Game.rooms[toRoomName],
-                        maxCreeps = value.maxCreeps,
+                        maxCreeps = value.maxCreeps;
                     
                     num += count;
 

@@ -7,19 +7,23 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var max = 0;
+            var max = 0,
+                miners;
 
             // If there are no spawns or containers in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || Cache.containersInRoom(room).length === 0) {
                 return;
             }
+            
+            miners = Cache.creepsInRoom("miner", room);
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
-                var source;
+                var source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
+                    conatinerId = container.id;
                 
                 // If this container is for a mineral, check to make sure it has resources.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
+                if ((Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
                     if (source.mineralAmount === 0) {
                         return;
                     }
@@ -28,8 +32,8 @@ var Cache = require("cache"),
                 max += 1;
 
                 // If we don't have a miner for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("miner", room), (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === container.id).length === 0) {
-                    Miner.spawn(room, container.id);
+                if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === conatinerId).length === 0) {
+                    Miner.spawn(room, conatinerId);
                 }
             });
 
@@ -37,7 +41,7 @@ var Cache = require("cache"),
             if (max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "miner",
-                    count: Cache.creepsInRoom("miner", room).length,
+                    count: miners.length,
                     max: max
                 });
             }        
@@ -46,31 +50,38 @@ var Cache = require("cache"),
         spawn: (room, id) => {
             "use strict";
 
-            var body = [MOVE, WORK, WORK, WORK, WORK, WORK], workCount = 0, canBoost = false,
-                energy, count, spawnToUse, name, labToBoostWith;
+            var spawns = Cache.spawnsInRoom(room),
+                body = [MOVE, WORK, WORK, WORK, WORK, WORK],
+                workCount = 0,
+                storage = room.storage,
+                canBoost = false,
+                roomName = room.name,
+                energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Get the energy available, limiting to 4500.
             energy = Math.min(room.energyCapacityAvailable, 4500);
+            units = Math.floor(energy / 450);
+            remainder = energy % 450;
 
             // Do something different for minerals.
             if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
                 body = [];
 
                 // Create the body based on the energy.
-                for (count = 0; count < Math.floor(energy / 450); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(MOVE);
                 }
 
-                if (energy % 450 >= 50) {
+                if (remainder >= 50) {
                     body.push(MOVE);
                 }
 
-                for (count = 0; count < Math.floor(energy / 450); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(WORK);
                     body.push(WORK);
                     body.push(WORK);
@@ -78,38 +89,38 @@ var Cache = require("cache"),
                     workCount += 4;
                 }
 
-                if (energy % 450 >= 150) {
+                if (remainder >= 150) {
                     body.push(WORK);
                     workCount++;
                 }
 
-                if (energy % 450 >= 250) {
+                if (remainder >= 250) {
                     body.push(WORK);
                     workCount++;
                 }
 
-                if (energy % 450 >= 350) {
+                if (remainder >= 350) {
                     body.push(WORK);
                     workCount++;
                 }
             }
 
-            if (workCount > 0 && room.storage && Cache.labsInRoom(room).length > 0 && (Math.max(room.storage.store[RESOURCE_UTRIUM_OXIDE] || 0, room.storage.store[RESOURCE_UTRIUM_ALKALIDE] || 0, room.storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] || 0)) >= 30 * workCount) {
+            if (workCount > 0 && storage && Cache.labsInRoom(room).length > 0 && (Math.max(storage.store[RESOURCE_UTRIUM_OXIDE] || 0, storage.store[RESOURCE_UTRIUM_ALKALIDE] || 0, storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] || 0)) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "miner-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "miner", home: room.name, container: id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "miner-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "miner", home: roomName, container: id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
                 // Set the lab to be in use.
                 labToBoostWith.creepToBoost = name;
-                labToBoostWith.resource = (room.storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] >= 30 * workCount) ? RESOURCE_CATALYZED_UTRIUM_ALKALIDE : ((room.storage.store[RESOURCE_UTRIUM_ALKALIDE] >= 30 * workCount) ? RESOURCE_UTRIUM_ALKALIDE : RESOURCE_UTRIUM_OXIDE);
+                labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_UTRIUM_ALKALIDE] >= 30 * workCount) ? RESOURCE_CATALYZED_UTRIUM_ALKALIDE : ((storage.store[RESOURCE_UTRIUM_ALKALIDE] >= 30 * workCount) ? RESOURCE_UTRIUM_ALKALIDE : RESOURCE_UTRIUM_OXIDE);
                 labToBoostWith.amount = 30 * workCount;
                 room.memory.labsInUse.push(labToBoostWith);
 

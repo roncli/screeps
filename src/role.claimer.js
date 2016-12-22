@@ -40,16 +40,17 @@ var Cache = require("cache"),
         spawn: (room, toRoom) => {
             "use strict";
 
-            var body = [CLAIM, MOVE],
+            var spawns = Cache.spawnsInRoom(room),
+                body = [CLAIM, MOVE],
                 spawnToUse, name;
 
             // Fail if all the spawns are busy.
-            if (_.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             if (!spawnToUse) {
                 return false;
             }

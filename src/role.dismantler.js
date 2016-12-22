@@ -1,7 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
-    TaskCollectEnergy = require("task.collectEnergy"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair"),
@@ -40,7 +39,9 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -49,39 +50,41 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 3300.
             energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
+            units = Math.floor(energy / 200);
+            remainder = energy % 200;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(WORK);
             }
 
-            if (energy % 200 >= 150) {
+            if (remainder >= 150) {
                 body.push(WORK);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
             }
 
-            if (energy % 200 >= 100 && energy % 200 < 150) {
+            if (remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 200 >= 50) {
+            if (remainder >= 50) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "dismantler-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "dismantler", home: room.name, supportRoom: supportRoom.name});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "dismantler-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "dismantler", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -92,14 +95,15 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("dismantler", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [];
+                assigned = [],
+                roomName = room.name;
 
             if (creepsWithNoTask.length === 0) {
                 return;
             }
 
             // Check critical repairs.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== room.name), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== roomName), (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
                     if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {
@@ -195,7 +199,7 @@ var Cache = require("cache"),
             }
 
             // Check for structures needing dismantling.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
                 _.forEach(tasks.dismantle.tasks, (task) => {
                     if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
                         return;

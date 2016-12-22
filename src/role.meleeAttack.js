@@ -8,7 +8,10 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var num = 0, max = 0;
+            var meleeAttack = Memory.maxCreeps.meleeAttack,
+                roomName = room.name,
+                num = 0,
+                max = 0;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -16,24 +19,27 @@ var Cache = require("cache"),
             }
 
             // Loop through the room melee attackers to see if we need to spawn a creep.
-            if (Memory.maxCreeps.meleeAttack) {
-                _.forEach(Memory.maxCreeps.meleeAttack[room.name], (value, toRoom) => {
-                    var count = _.filter(Cache.creepsInRoom("meleeAttack", room), (c) => c.memory.defending === toRoom).length;
+            if (meleeAttack) {
+                _.forEach(meleeAttack[roomName], (value, toRoomName) => {
+                    var count = _.filter(Cache.creepsInRoom("meleeAttack", room), (c) => c.memory.defending === toRoomName).length,
+                        toRoom = Game.rooms[toRoomName],
+                        maxCreeps = value.maxCreeps;
+                        
                     num += count;
 
-                    if ((Game.rooms[toRoom] && Game.rooms[toRoom].memory.harvested >= 30000) || Cache.hostilesInRoom(Game.rooms[toRoom]).length > 0) {
-                        max += value.maxCreeps;
+                    if ((toRoom && toRoom.memory.harvested >= 30000) || Cache.hostilesInRoom(toRoom).length > 0) {
+                        max += maxCreeps;
                     }
 
-                    if (count < value.maxCreeps) {
-                        Melee.spawn(room, toRoom);
+                    if (count < maxCreeps) {
+                        Melee.spawn(room, toRoomName);
                     }
                 });
             }
 
             // Output melee attacker count in the report.
             if (max > 0) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "meleeAttack",
                     count: num,
                     max: max
@@ -41,10 +47,11 @@ var Cache = require("cache"),
             }        
         },
         
-        spawn: (room, toRoom) => {
+        spawn: (room, toRoomName) => {
             "use strict";
 
             var body = [],
+                roomName = room.name,
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -58,19 +65,16 @@ var Cache = require("cache"),
             // Create the body based on the energy.
             for (count = 0; count < Math.floor(energy / 130); count++) {
                 body.push(MOVE);
-            }
-
-            for (count = 0; count < Math.floor(energy / 130); count++) {
                 body.push(ATTACK);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === room.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "meleeAttack-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "meleeAttack", home: room.name, defending: toRoom});
-            if (spawnToUse.room.name === room.name) {
+            name = spawnToUse.createCreep(body, "meleeAttack-" + toRoomName + "-" + Game.time.toFixed(0).substring(4), {role: "meleeAttack", home: roomName, defending: toRoomName});
+            if (spawnToUse.room.name === roomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

@@ -8,7 +8,10 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var num = 0, max = 0;
+            var healer = Memory.maxCreeps.healer,
+                roomName = room.name,
+                num = 0,
+                max = 0;
             
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
@@ -16,24 +19,27 @@ var Cache = require("cache"),
             }
 
             // Loop through the room healers to see if we need to spawn a creep.
-            if (Memory.maxCreeps.healer) {
-                _.forEach(Memory.maxCreeps.healer[room.name], (value, toRoom) => {
-                    var count = _.filter(Cache.creepsInRoom("healer", room), (c) => c.memory.defending === toRoom).length;
+            if (healer) {
+                _.forEach(healer[roomName], (value, toRoomName) => {
+                    var count = _.filter(Cache.creepsInRoom("healer", room), (c) => c.memory.defending === toRoomName).length,
+                        toRoom = Game.rooms[toRoomName],
+                        maxCreeps = value.maxCreeps;
+                    
                     num += count;
 
-                    if ((Game.rooms[toRoom] && Game.rooms[toRoom].memory.harvested >= 30000) || Cache.hostilesInRoom(Game.rooms[toRoom]).length > 0) {
-                        max += value.maxCreeps;
+                    if ((toRoom && toRoom.memory.harvested >= 30000) || Cache.hostilesInRoom(toRoom).length > 0) {
+                        max += maxCreeps;
                     }
 
-                    if (count < value.maxCreeps) {
-                        Healer.spawn(room, toRoom);
+                    if (count < maxCreeps) {
+                        Healer.spawn(room, toRoomName);
                     }
                 });
             }
 
             // Output healer count in the report.
             if (max > 0) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "healer",
                     count: num,
                     max: max
@@ -41,10 +47,11 @@ var Cache = require("cache"),
             }        
         },
         
-        spawn: (room, toRoom) => {
+        spawn: (room, toRoomName) => {
             "use strict";
 
             var body = [],
+                roomName = room.name,
                 energy, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -57,19 +64,16 @@ var Cache = require("cache"),
 
             for (count = 0; count < Math.floor(energy / 300); count++) {
                 body.push(MOVE);
-            }
-
-            for (count = 0; count < Math.floor(energy / 300); count++) {
                 body.push(HEAL);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === room.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "healer-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "healer", home: room.name, defending: toRoom});
-            if (spawnToUse.room.name === room.name) {
+            name = spawnToUse.createCreep(body, "healer-" + toRoomName + "-" + Game.time.toFixed(0).substring(4), {role: "healer", home: roomName, defending: toRoomName});
+            if (spawnToUse.room.name === roomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

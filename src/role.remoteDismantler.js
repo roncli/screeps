@@ -10,7 +10,8 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var max = 1;
+            var dismantlers = Cache.creepsInRoom("remoteDismantler", room),
+                max = 1;
 
             if (!supportRoom) {
                 supportRoom = room;
@@ -22,7 +23,7 @@ var Cache = require("cache"),
             }
 
             // If we don't have a remote dismantler for this room, spawn one.
-            if (_.filter(Cache.creepsInRoom("remoteDismantler", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
+            if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 RemoteDismantler.spawn(room, supportRoom);
             }
 
@@ -30,7 +31,7 @@ var Cache = require("cache"),
             if (max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteDismantler",
-                    count: Cache.creepsInRoom("remoteDismantler", room).length,
+                    count: dismantlers.length,
                     max: max
                 });
             }        
@@ -40,7 +41,9 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -49,39 +52,41 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 3300.
             energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
+            units = Math.floor(energy / 200);
+            remainder = energy % 200;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(WORK);
             }
 
-            if (energy % 200 >= 150) {
+            if (remainder >= 150) {
                 body.push(WORK);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
             }
 
-            if (energy % 200 >= 100 && energy % 200 < 150) {
+            if (remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 200 >= 50) {
+            if (remainder >= 50) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteDismantler-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteDismantler", home: room.name, supportRoom: supportRoom.name});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteDismantler-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteDismantler", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -92,14 +97,15 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteDismantler", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [];
+                assigned = [],
+                roomName = room.name;
 
             if (creepsWithNoTask.length === 0) {
                 return;
             }
 
             // Check for enemy construction sites and rally to them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
                 if (room.find(FIND_HOSTILE_CONSTRUCTION_SITES).length > 0) {
                     var task = new TaskRally(room.find(FIND_HOSTILE_CONSTRUCTION_SITES)[0].id);
                     task.canAssign(creep);
@@ -116,7 +122,7 @@ var Cache = require("cache"),
             }
 
             // Check for structures needing dismantling.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
                 _.forEach(tasks.remoteDismantle.cleanupTasks, (task) => {
                     if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
                         return;
@@ -137,7 +143,7 @@ var Cache = require("cache"),
             }
 
             // Check critical repairs.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== room.name), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== roomName), (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
                     if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {

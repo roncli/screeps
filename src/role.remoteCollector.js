@@ -8,7 +8,8 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var max = 8;
+            var collectors = Cache.creepsInRoom("remoteCollector", room),
+                max = 8;
 
             if (!supportRoom) {
                 supportRoom = room;
@@ -20,14 +21,14 @@ var Cache = require("cache"),
             }
 
             // If we don't have enough remote collectors for this room, spawn one.
-            if (_.filter(Cache.creepsInRoom("remoteCollector", room), (c) => c.spawning || c.ticksToLive >= 300).length < max) {
+            if (_.filter(collectors, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 RemoteCollector.spawn(room, supportRoom);
             }
 
             if (max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteCollector",
-                    count: Cache.creepsInRoom("remoteCollector", room).length,
+                    count: collectors.length,
                     max: max
                 });
             }
@@ -37,7 +38,9 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, spawnToUse, name, count;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, spawnToUse, name, count;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -46,24 +49,25 @@ var Cache = require("cache"),
 
             // Get the total energy in the support room, limited to 2400.
             energy = Math.min(supportRoom.energyCapacityAvailable, 2400);
+            units = Math.floor(energy / 150);
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 150); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 150); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteCollector-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteCollector", home: room.name, supportRoom: supportRoom.name});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteCollector-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteCollector", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -74,7 +78,8 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteCollector", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [];
+                assigned = [],
+                roomName = room.name;
 
             if (creepsWithNoTask.length === 0) {
                 return;
@@ -103,7 +108,7 @@ var Cache = require("cache"),
 
             // Attempt to get minerals from containers.
             _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
@@ -120,7 +125,7 @@ var Cache = require("cache"),
 
             // Attempt to get energy from containers.
             _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
+                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);

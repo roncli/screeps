@@ -9,13 +9,21 @@ var Cache = require("cache"),
             "use strict";
 
             var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
+                supportRoomName = supportRoom.name,
+                spawns = Cache.spawnsInRoom(supportRoom),
+                controller = room.controller,
+                reservers = Cache.creepsInRoom("remoteReserver", room),
                 count = 0,
-                max = 0;
+                max = 0,
+                id, reservation;
             
             // If there are no spawns in the support room, or the room is unobservable, or there is no controller in the room, ignore the room.
-            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || !room.controller) {
+            if (spawns.length === 0 || room.unobservable || !controller) {
                 return;
             }
+            
+            id = controller.id;
+            reservation = controller.reservation;
 
             // Init road length cache.
             if (!Memory.lengthToController) {
@@ -23,16 +31,16 @@ var Cache = require("cache"),
             }
 
             // Calculate path length from controller to support room's storage.
-            if (!Memory.lengthToController[room.controller.id]) {
-                Memory.lengthToController[room.controller.id] = {};
+            if (!Memory.lengthToController[id]) {
+                Memory.lengthToController[id] = {};
             }
-            if (!Memory.lengthToController[room.controller.id][supportRoom.name]) {
-                Memory.lengthToController[room.controller.id][supportRoom.name] = PathFinder.search(room.controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+            if (!Memory.lengthToController[id][supportRoomName]) {
+                Memory.lengthToController[id][supportRoomName] = PathFinder.search(controller.pos, {pos: spawns[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
             }
 
-            count = _.filter(Cache.creepsInRoom("remoteReserver", room), (c) => c.spawning || c.ticksToLive > Memory.lengthToController[room.controller.id][supportRoom.name]).length;
+            count = _.filter(reservers, (c) => c.spawning || c.ticksToLive > Memory.lengthToController[id][supportRoomName]).length;
 
-            if (!room.controller.reservation || room.controller.reservation.ticksToEnd < 4000) {
+            if (!reservation || reservation.ticksToEnd < 4000) {
                 max += 1;
             }
 
@@ -44,7 +52,7 @@ var Cache = require("cache"),
             if (count > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteReserver",
-                    count: Cache.creepsInRoom("remoteReserver", room).length,
+                    count: reservers.length,
                     max: max
                 });
             }        
@@ -54,7 +62,9 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -63,23 +73,24 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 16250.
             energy = Math.min(supportRoom.energyCapacityAvailable, 16250);
+            units = Math.floor(energy / 650);
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 650); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CLAIM);
             }
 
-            for (count = 0; count < Math.floor(energy / 650); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteReserver-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteReserver", home: room.name, supportRoom: supportRoom.name});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteReserver-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteReserver", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

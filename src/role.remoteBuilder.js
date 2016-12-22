@@ -10,7 +10,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
+            var roomName = room.name,
+                supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 max = 1,
                 num;
 
@@ -20,12 +21,12 @@ var Cache = require("cache"),
             }
 
             // If we don't find a remote builder, spawn a new remote builder.
-            if ((num = Cache.creepsInRoom("remoteBuilder", room).length) === 0) {
+            if ((num = Cache.creepsInRoom("remoteBuilder", room).length) < max) {
                 Builder.spawn(room, supportRoom);
             }
 
             // Output remote builder count in the report.
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "remoteBuilder",
                     count: num,
                     max: max
@@ -36,7 +37,9 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -45,39 +48,41 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 3300.
             energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
+            units = Math.floor(energy / 200);
+            remainder = energy % 200;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(WORK);
             }
 
-            if (energy % 200 >= 150) {
+            if (remainder >= 150) {
                 body.push(WORK);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(CARRY);
             }
 
-            if (energy % 200 >= 100 && energy % 200 < 150) {
+            if (remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 200); count++) {
+            for (count = 0; count < units; count++) {
                 body.push(MOVE);
             }
 
-            if (energy % 200 >= 50) {
+            if (remainder >= 50) {
                 body.push(MOVE);
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteBuilder-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteBuilder", home: room.name, supportRoom: supportRoom.name});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteBuilder-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteBuilder", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

@@ -7,7 +7,10 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
+            var roomName = room.name,
+                supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
+                supportRoomName = supportRoom.name,
+                miners = Cache.creepsInRoom("remoteMiner", room),
                 max = 0;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
@@ -22,14 +25,15 @@ var Cache = require("cache"),
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(Cache.containersInRoom(room), (container) => {
-                var source;
+                var containerId = container.id,
+                    source;
 
                 // Calculate path length from container to support room's storage.
-                if (!Memory.lengthToContainer[container.id]) {
-                    Memory.lengthToContainer[container.id] = {};
+                if (!Memory.lengthToContainer[containerId]) {
+                    Memory.lengthToContainer[containerId] = {};
                 }
-                if (!Memory.lengthToContainer[container.id][supportRoom.name]) {
-                    Memory.lengthToContainer[container.id][supportRoom.name] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+                if (!Memory.lengthToContainer[containerId][supportRoomName]) {
+                    Memory.lengthToContainer[containerId][supportRoomName] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
                 }
 
                 // If this container is for a mineral, check to make sure it has resources.
@@ -42,16 +46,16 @@ var Cache = require("cache"),
                 max += 1;
 
                 // If we don't have a remote miner for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("remoteMiner", room), (c) => (c.spawning || c.ticksToLive >= 150 + Memory.lengthToContainer[container.id][supportRoom.name] * 3) && c.memory.container === container.id).length === 0) {
-                    Miner.spawn(room, supportRoom, container.id);
+                if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150 + Memory.lengthToContainer[containerId][supportRoomName] * 3) && c.memory.container === containerId).length === 0) {
+                    Miner.spawn(room, supportRoom, containerId);
                 }
             });
 
             // Output miner count in the report.
             if (max > 0) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "remoteMiner",
-                    count: Cache.creepsInRoom("remoteMiner", room).length,
+                    count: miners.length,
                     max: max
                 });
             }        
@@ -61,62 +65,60 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
-            // Get the energy available, limiting to 4450.
-            energy = Math.min(supportRoom.energyCapacityAvailable, 4450);
-
             // Do something different for minerals.
             if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
                 body = [];
 
+                // Get the energy available, limiting to 4500.
+                energy = Math.min(supportRoom.energyCapacityAvailable, 4500);
+                units = Math.floor(energy / 450);
+                remainder = energy % 450;
 
                 // Create the body based on the energy.
-                for (count = 0; count < Math.floor(energy / 550); count++) {
+                for (count = 0; count < units; count++) {
                     body.push(MOVE);
                 }
 
-                if (energy % 550 >= 50) {
+                if (remainder >= 50) {
                     body.push(MOVE);
                 }
 
-                for (count = 0; count < Math.floor(energy / 550); count++) {
-                    body.push(WORK);
+                for (count = 0; count < units; count++) {
                     body.push(WORK);
                     body.push(WORK);
                     body.push(WORK);
                     body.push(WORK);
                 }
 
-                if (energy % 550 >= 150) {
+                if (remainder >= 150) {
                     body.push(WORK);
                 }
 
-                if (energy % 550 >= 250) {
+                if (remainder >= 250) {
                     body.push(WORK);
                 }
 
-                if (energy % 550 >= 350) {
-                    body.push(WORK);
-                }
-
-                if (energy % 550 >= 450) {
+                if (remainder >= 350) {
                     body.push(WORK);
                 }
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteMiner-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteMiner", home: room.name, supportRoom: supportRoom.name, container: id});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteMiner-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteMiner", home: roomName, supportRoom: supportRoomName, container: id});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

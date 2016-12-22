@@ -11,27 +11,32 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
+            var roomName = room.name,
+                supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
+                supportRoomName = supportRoom.name,
+                containers = Cache.containersInRoom(room),
+                workers = Cache.creepsInRoom("remoteWorker", room),
                 max = 0;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
-            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || Cache.containersInRoom(room).length === 0) {
+            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
                 return;
             }
 
             // Loop through containers to see if we have anything we need to spawn.
-            _.forEach(Cache.containersInRoom(room), (container) => {
-                var source;
+            _.forEach(containers, (container) => {
+                var source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
+                    containerId = container.id;
 
                 // If this container is for a mineral, skip it.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
+                if (source instanceof Mineral) {
                     return;
                 }
 
                 max += 1;
 
-                if (_.filter(Cache.creepsInRoom("remoteWorker", room), (c) => (c.spawning || c.ticksToLive >= 150 + (Memory.lengthToContainer && Memory.lengthToContainer[container.id] && Memory.lengthToContainer[container.id][supportRoom.name] ? Memory.lengthToContainer[container.id][supportRoom.name] : 0) * 2) && c.memory.container === container.id).length === 0) {
-                    Worker.spawn(room, supportRoom, container.id);
+                if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (Memory.lengthToContainer && Memory.lengthToContainer[containerId] && Memory.lengthToContainer[containerId][supportRoomName] ? Memory.lengthToContainer[containerId][supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
+                    Worker.spawn(room, supportRoom, containerId);
                 }
 
                 // Only 1 worker per room.
@@ -40,9 +45,9 @@ var Cache = require("cache"),
 
             // Output remote worker count in the report.
             if (max > 0) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "remoteWorker",
-                    count: Cache.creepsInRoom("remoteWorker", room).length,
+                    count: workers.length,
                     max: max
                 });
             }        
@@ -52,7 +57,9 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                energy, count, spawnToUse, name;
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, secondUnits, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -61,26 +68,29 @@ var Cache = require("cache"),
 
             // Get the total energy in the room, limited to 2750.
             energy = Math.min(supportRoom.energyCapacityAvailable, 2750);
+            units = Math.floor(energy / 200);
+            secondUnits = Math.floor((energy - 1000) / 150);
+            remainder = energy % 200;
 
             // Create the body based on the energy.
-            for (count = 0; count < Math.floor(energy / 200) && count < 5; count++) {
+            for (count = 0; count < units && count < 5; count++) {
                 body.push(WORK);
             }
 
-            if (energy < 1000 && energy % 200 >= 150) {
+            if (energy < 1000 && remainder >= 150) {
                 body.push(WORK);
             }
 
-            for (count = 0; count < Math.floor(energy / 200) && count < 5; count++) {
+            for (count = 0; count < units && count < 5; count++) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor((energy - 1000) / 150); count++) {
+            for (count = 0; count < secondUnits; count++) {
                 body.push(CARRY);
                 body.push(CARRY);
             }
 
-            if (energy < 1000 && energy % 200 >= 100 && energy % 200 < 150) {
+            if (energy < 1000 && remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
@@ -88,15 +98,15 @@ var Cache = require("cache"),
                 body.push(CARRY);
             }
 
-            for (count = 0; count < Math.floor(energy / 200) && count < 5; count++) {
+            for (count = 0; count < units && count < 5; count++) {
                 body.push(MOVE);
             }
 
-            for (count = 0; count < Math.floor((energy - 1000) / 150); count++) {
+            for (count = 0; count < secondUnits; count++) {
                 body.push(MOVE);
             }
 
-            if (energy < 1000 && energy % 200 >= 50) {
+            if (energy < 1000 && remainder >= 50) {
                 body.push(MOVE);
             }
 
@@ -105,12 +115,12 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteWorker-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteWorker", home: room.name, supportRoom: supportRoom.name, container: id});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteWorker-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteWorker", home: roomName, supportRoom: supportRoomName, container: id});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -121,8 +131,7 @@ var Cache = require("cache"),
             "use strict";
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteWorker", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [],
-                sites;
+                assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;
@@ -130,7 +139,8 @@ var Cache = require("cache"),
 
             // Check for 1-progress construction sites.
             _.forEach(creepsWithNoTask, (creep) => {
-                sites = _.filter(creep.room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progressTotal === 1);
+                var sites = _.filter(creep.room.find(FIND_MY_CONSTRUCTION_SITES), (c) => c.progressTotal === 1);
+                
                 if (sites.length > 0) {
                     var task = new TaskBuild(sites[0].id);
                     if (task.canAssign(creep)) {

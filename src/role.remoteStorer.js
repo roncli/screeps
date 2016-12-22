@@ -8,20 +8,25 @@ var Cache = require("cache"),
             "use strict";
 
             var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
-                max = 0, foundFirstSource = false;
+                containers = Cache.containersInRoom(room),
+                storers = Cache.creepsInRoom("remoteStorer", room),
+                max = 0,
+                foundFirstSource = false;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
-            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || Cache.containersInRoom(room).length === 0) {
+            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
                 return;
             }
 
             // Loop through containers to see if we have anything we need to spawn.
-            _.forEach(Cache.containersInRoom(room), (container) => {
+            _.forEach(containers, (container) => {
                 var count = 0,
-                    source, length;
+                    source = source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
+                    id = container.id,
+                    length;
 
                 // If this container is for a mineral, bail if there are no minerals left.  If it's not a mineral, start counter at -1 since it has a worker on it already.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
+                if (source instanceof Mineral) {
                     if (source.mineralAmount === 0) {
                         return;
                     }
@@ -32,22 +37,22 @@ var Cache = require("cache"),
                 }
 
                 // Calculate the length the storers need to travel.
-                length = Memory.lengthToContainer[container.id][supportRoom.name];
+                length = Memory.lengthToContainer[id][supportRoom.name];
 
                 // Calculate number of storers needed.
                 count += Math.max(Math.ceil(length / [20, 20, 20, 20, 32, 48, 60, 64, 64][supportRoom.controller.level]), 0);
                 max += count;
 
                 // If we don't have enough remote storers for this container, spawn one.
-                if (_.filter(Cache.creepsInRoom("remoteStorer", room), (c) => (c.spawning || c.ticksToLive >= 150 + (length * 2)) && c.memory.container === container.id).length < count) {
-                    Storer.spawn(room, supportRoom, container.id);
+                if (_.filter(storers, (c) => (c.spawning || c.ticksToLive >= 150 + (length * 2)) && c.memory.container === id).length < count) {
+                    Storer.spawn(room, supportRoom, id);
                 }
             });
 
             if (max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteStorer",
-                    count: Cache.creepsInRoom("remoteStorer", room).length,
+                    count: storers.length,
                     max: max
                 });
             }
@@ -56,7 +61,9 @@ var Cache = require("cache"),
         spawn: (room, supportRoom, id) => {
             "use strict";
 
-            var body, spawnToUse, name;
+            var roomName = room.name,
+                supportRoomName = supportRoom.name,
+                body = [], spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -83,12 +90,12 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoom.name ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteStorer-" + room.name + "-" + Game.time.toFixed(0).substring(4), {role: "remoteStorer", home: room.name, supportRoom: supportRoom.name, container: id});
-            if (spawnToUse.room.name === supportRoom.name) {
+            name = spawnToUse.createCreep(body, "remoteStorer-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteStorer", home: roomName, supportRoom: supportRoomName, container: id});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 

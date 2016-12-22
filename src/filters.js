@@ -1,52 +1,48 @@
-var Functions = {
-    filterIsContainer: (s) => {
+var Filters = {
+    isContainer: (s) => {
         return s instanceof StructureContainer;
     },
     
-    filterIsExtension: (s) => {
+    isExtension: (s) => {
         return s instanceof StructureExtension;
     },
     
-    filterIsExtractor: (s) => {
+    isExtractor: (s) => {
         return s instanceof StructureExtractor;
     },
     
-    filterIsLab: (s) => {
+    isLab: (s) => {
         return s instanceof StructureLab;
     },
     
-    filterIsLink: (s) => {
+    isLink: (s) => {
         return s instanceof StructureLink;
     },
     
-    filterIsRepairable: (s) => {
+    isRepairable: (s) => {
         return ((s.my || s instanceof StructureWall || s instanceof StructureRoad || s instanceof StructureContainer) && s.hits);
     },
     
-    filterIsSpawn: (s) => {
+    isSpawn: (s) => {
         return s instanceof StructureSpawn;
     },
     
-    filterIsTower: (s) => {
+    isTower: (s) => {
         return s instanceof StructureTower;
     },
 
-    filterNotAllied: (c) => {
+    notAllied: (c) => {
         return !c.owner || Memory.allies.indexOf(c.owner.username) === -1
     },
     
-    filterNotControllerOrRampart: (s) => {
+    notControllerOrRampart: (s) => {
         return !(s instanceof StructureController) && !(s instanceof StructureRampart)
     },
     
-    filterNotMaxHits: (o) => {
+    notMaxHits: (o) => {
         return o.hits < o.hitsMax;
-    },
-    
-    sortMostMissingHits: (o) => {
-        return -(o.hitsMax - o.hits);
     }
 };
 
-require("screeps-profiler").registerObject(Functions, "Functions");
-module.exports = Functions;
+require("screeps-profiler").registerObject(Filters, "Filters");
+module.exports = Filters;

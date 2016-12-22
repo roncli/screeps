@@ -1,6 +1,7 @@
 var Cache = require("cache"),
-    Functions = require("functions"),
+    Filters = require("filters"),
     Maps = require("maps"),
+    Sorts = require("sorts"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -66,7 +67,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (armyAttackRoom) {
-                        if (!army.reinforce && armyAttackRoom.find(FIND_HOSTILE_STRUCTURES, {filter: Functions.filterNotControllerOrRampart}).length === 0 && hostileConstructionSites.length === 0) {
+                        if (!army.reinforce && armyAttackRoom.find(FIND_HOSTILE_STRUCTURES, {filter: Filters.notControllerOrRampart}).length === 0 && hostileConstructionSites.length === 0) {
                             army.success = true;
                         }
                     }
@@ -86,7 +87,7 @@ var Cache = require("cache"),
                 melee: { tasks: [] },
                 ranged: { tasks: [] },
                 heal: {
-                    tasks: _.map(_.sortBy(_.filter(allCreepsInArmy, Functions.filterNotMaxHits), Functions.sortMostMissingHits), Maps.newTaskHeal)
+                    tasks: _.map(_.sortBy(_.filter(allCreepsInArmy, Filters.notMaxHits), Sorts.mostMissingHits), Maps.newTaskHeal)
                 },
                 rally: { tasks: [] },
             };

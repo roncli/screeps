@@ -455,7 +455,7 @@ Base.prototype.run = function(room) {
     }
     
     // Spawn new creeps.
-    RoleWorker.checkSpawn(room, !room.storage || room.storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks > 0);
+    RoleWorker.checkSpawn(room, !room.storage || room.storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks.length > 0 || _.filter(tasks.repair.tasks, (t) => (t.object instanceof StructureWall || t.object instanceof StructureRampart) && t.object.hits < 1000000).length > 0);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
     RoleScientist.checkSpawn(room);

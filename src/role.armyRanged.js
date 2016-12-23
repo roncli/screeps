@@ -28,10 +28,13 @@ var Cache = require("cache"),
 
             var army = Memory.army[armyName],
                 rangedUnits = army.ranged.units,
-                boostRoom = Game.rooms[army.boostRoom],
-                labsInUse = boostRoom.memory.labsInUse,
                 body = [],
-                count, spawnToUse, name, labsToBoostWith;
+                boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
+
+            if (army.boostRoom) {
+                boostRoom = Game.rooms[army.boostRoom];
+                labsInUse = boostRoom.memory.labsInUse;
+            }
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {

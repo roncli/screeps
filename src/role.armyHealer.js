@@ -44,11 +44,11 @@ var Cache = require("cache"),
                 body.push(TOUGH);
             }
             
-            for (count = 0; count < dismantlerUnits - 1; count++) {
+            for (count = 0; count < healerUnits - 1; count++) {
                 body.push(HEAL);
             }
 
-            for (count = 0; count < dismantlerUnits + 5; count++) {
+            for (count = 0; count < healerUnits + 5; count++) {
                 body.push(MOVE);
             }
             

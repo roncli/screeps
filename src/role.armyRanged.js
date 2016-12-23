@@ -43,11 +43,11 @@ var Cache = require("cache"),
                 body.push(TOUGH);
             }
             
-            for (count = 0; count < dismantlerUnits; count++) {
+            for (count = 0; count < rangedUnits; count++) {
                 body.push(RANGED_ATTACK);
             }
 
-            for (count = 0; count < dismantlerUnits + 5; count++) {
+            for (count = 0; count < rangedUnits + 5; count++) {
                 body.push(MOVE);
             }
 

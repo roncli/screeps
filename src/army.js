@@ -19,9 +19,12 @@ var Cache = require("cache"),
                 armyHealers = army.healer,
                 armyMelees = army.melee,
                 armyRangeds = army.ranged,
-                hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES),
-                hostiles, tasks;
+                hostileConstructionSites, hostiles, tasks;
             
+            if (armyAttackRoom) {
+                hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+            }
+
             // Delete the army if we're successful.
             if (allCreepsInArmy.length === 0 && army.success) {
                 Game.notify("Army " + name + " operation successful!");

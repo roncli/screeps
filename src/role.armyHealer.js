@@ -44,13 +44,15 @@ var Cache = require("cache"),
                 body.push(TOUGH);
             }
             
-            for (count = 0; count < dismantlerUnits; count++) {
+            for (count = 0; count < dismantlerUnits - 1; count++) {
                 body.push(HEAL);
             }
 
             for (count = 0; count < dismantlerUnits + 5; count++) {
                 body.push(MOVE);
             }
+            
+            body.push(HEAL);
 
             if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, 2))) {
                 return false;

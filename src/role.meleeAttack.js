@@ -28,7 +28,7 @@ var Cache = require("cache"),
                         
                     num += count;
 
-                    if ((toRoom && toRoom.memory.harvested >= 30000) || Cache.hostilesInRoom(toRoom).length > 0) {
+                    if ((toRoom && toRoom.memory.harvested >= 30000) || (toRoom && Cache.hostilesInRoom(toRoom).length > 0)) {
                         max += maxCreeps;
                     }
 

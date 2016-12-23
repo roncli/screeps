@@ -185,7 +185,7 @@ CollectMinerals.getStorageTasks = function(room) {
         amount;
 
     if (room.storage && room.memory.labsInUse) {
-        _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status)) && (!Cache.getObjectById(l.id).mineralType || Cache.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource))), (l) => {
+        _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Cache.getObjectById(l.id).mineralType || Cache.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource))), (l) => {
             if ((l.status === "refilling" ? (l.oldAmount - Cache.getObjectById(l.id).mineralAmount) : (l.amount - Cache.getObjectById(l.id).mineralAmount)) > 0) {
                 tasks.push(new CollectMinerals(room.storage.id, l.status === "refilling" ? l.oldResource : l.resource, l.status === "refilling" ? (l.oldAmount - Cache.getObjectById(l.id).mineralAmount) : (l.amount - Cache.getObjectById(l.id).mineralAmount)));
             }

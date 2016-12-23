@@ -136,10 +136,10 @@ var Cache = require("cache"),
                                 task.canAssign(creep);
                                 assigned.push(creep.name);
                             }
-
-                            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                            assigned = [];
                         });
+
+                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                        assigned = [];
 
                         if (creepsWithNoTask.length === 0) {
                             return;

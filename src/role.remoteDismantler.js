@@ -28,7 +28,7 @@ var Cache = require("cache"),
             }
 
             // Output remote dismantler count in the report.
-            if (max > 0) {
+            if (dismantlers.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteDismantler",
                     count: dismantlers.length,

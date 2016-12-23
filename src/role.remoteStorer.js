@@ -49,7 +49,7 @@ var Cache = require("cache"),
                 }
             });
 
-            if (max > 0) {
+            if (storers.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteStorer",
                     count: storers.length,

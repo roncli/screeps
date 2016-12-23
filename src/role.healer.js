@@ -8,7 +8,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var healer = Memory.maxCreeps.healer,
+            var healers = Cache.creepsInRoom("healer", room),
+                healer = Memory.maxCreeps.healer,
                 roomName = room.name,
                 num = 0,
                 max = 0;
@@ -21,7 +22,7 @@ var Cache = require("cache"),
             // Loop through the room healers to see if we need to spawn a creep.
             if (healer) {
                 _.forEach(healer[roomName], (value, toRoomName) => {
-                    var count = _.filter(Cache.creepsInRoom("healer", room), (c) => c.memory.defending === toRoomName).length,
+                    var count = _.filter(healers, (c) => c.memory.defending === toRoomName).length,
                         toRoom = Game.rooms[toRoomName],
                         maxCreeps = value.maxCreeps;
                     
@@ -38,10 +39,10 @@ var Cache = require("cache"),
             }
 
             // Output healer count in the report.
-            if (max > 0) {
+            if (healers.length > 0 || max > 0) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "healer",
-                    count: num,
+                    count: healers.length,
                     max: max
                 });
             }        

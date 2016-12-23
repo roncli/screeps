@@ -32,7 +32,7 @@ var Cache = require("cache"),
             }
 
             // Output upgrader count in the report.
-            if (count > 0 || max > 0) {
+            if (upgraders.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "upgrader",
                     count: upgraders.length,

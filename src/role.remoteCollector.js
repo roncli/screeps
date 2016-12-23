@@ -25,7 +25,7 @@ var Cache = require("cache"),
                 RemoteCollector.spawn(room, supportRoom);
             }
 
-            if (max > 0) {
+            if (collectors.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteCollector",
                     count: collectors.length,

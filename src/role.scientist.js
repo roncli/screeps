@@ -25,11 +25,13 @@ var Cache = require("cache"),
             }
 
             // Output scientist count in the report.
-            Cache.log.rooms[room.name].creeps.push({
-                role: "scientist",
-                count: scientists.length,
-                max: max
-            });
+            if (scientists.length > 0 || max > 0) {
+                Cache.log.rooms[room.name].creeps.push({
+                    role: "scientist",
+                    count: scientists.length,
+                    max: max
+                });
+            }
         },
         
         spawn: (room) => {

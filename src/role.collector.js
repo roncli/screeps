@@ -10,6 +10,7 @@ var Cache = require("cache"),
 
             var spawns = Cache.spawnsInRoom(room),
                 max = 0,
+                collectors = Cache.creepsInRoom("collector", room),
                 count, sources, capacity, adjustment;
             
             // If there is storage and containers in the room, ignore the room.
@@ -43,17 +44,17 @@ var Cache = require("cache"),
                 max += 3 * adjustment;
 
                 // If we have less than max collectors, spawn a collector.
-                count = _.filter(Cache.creepsInRoom("collector", room), (c) => c.memory.homeSource === sourceId).length;
+                count = _.filter(collectors, (c) => c.memory.homeSource === sourceId).length;
                 if (count < 3 * adjustment) {
                     Collector.spawn(room, sourceId);
                 }
             });
 
             // Output collector count in the report.
-            if (max > 0) {
+            if (collectors.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "collector",
-                    count: Cache.creepsInRoom("collector", room).length,
+                    count: collectors.length,
                     max: max
                 });
             }        

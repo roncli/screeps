@@ -9,7 +9,8 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var max = 1;
+            var max = 1,
+                dismantlers = Cache.creepsInRoom("dismantler", room);
 
             if (!supportRoom) {
                 supportRoom = room;
@@ -26,10 +27,10 @@ var Cache = require("cache"),
             }
 
             // Output dismantler count in the report.
-            if (max > 0) {
+            if (dismantlers.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "dismantler",
-                    count: Cache.creepsInRoom("dismantler", room).length,
+                    count: dismantlers.length,
                     max: max
                 });
             }        

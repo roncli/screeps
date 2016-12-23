@@ -49,7 +49,7 @@ var Cache = require("cache"),
             }
 
             // Output remote reserver count in the report.
-            if (count > 0 || max > 0) {
+            if (reservers.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "remoteReserver",
                     count: reservers.length,

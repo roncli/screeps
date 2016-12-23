@@ -10,13 +10,14 @@ var Cache = require("cache"),
 
             var claimer = Memory.maxCreeps.claimer,
                 roomName = room.name,
+                claimers = Cache.creepsInRoom("claimer", room),
                 num = 0,
                 max = 0;
             
             // Loop through the room claimers to see if we need to spawn a creep.
             if (claimer) {
                 _.forEach(claimer[roomName], (value, toRoom) => {
-                    var count = _.filter(Cache.creepsInRoom("claimer", room), (c) => c.memory.claim === toRoom).length;
+                    var count = _.filter(claimers, (c) => c.memory.claim === toRoom).length;
 
                     num += count;
                     max += 1;
@@ -28,10 +29,10 @@ var Cache = require("cache"),
             }
 
             // Output claimer count in the report.
-            if (max > 0) {
+            if (claimers.length > 0 || max > 0) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "claimer",
-                    count: num,
+                    count: claimers.length,
                     max: max
                 });
             }        

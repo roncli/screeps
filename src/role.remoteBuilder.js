@@ -26,11 +26,13 @@ var Cache = require("cache"),
             }
 
             // Output remote builder count in the report.
+            if (num > 0 || max > 0) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "remoteBuilder",
                     count: num,
                     max: max
                 });
+            }
         },
         
         spawn: (room, supportRoom) => {

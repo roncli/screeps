@@ -8,7 +8,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var meleeAttack = Memory.maxCreeps.meleeAttack,
+            var melee = Cache.creepsInRoom("meleeAttack", room),
+                meleeAttack = Memory.maxCreeps.meleeAttack,
                 roomName = room.name,
                 num = 0,
                 max = 0;
@@ -21,7 +22,7 @@ var Cache = require("cache"),
             // Loop through the room melee attackers to see if we need to spawn a creep.
             if (meleeAttack) {
                 _.forEach(meleeAttack[roomName], (value, toRoomName) => {
-                    var count = _.filter(Cache.creepsInRoom("meleeAttack", room), (c) => c.memory.defending === toRoomName).length,
+                    var count = _.filter(melee, (c) => c.memory.defending === toRoomName).length,
                         toRoom = Game.rooms[toRoomName],
                         maxCreeps = value.maxCreeps;
                         
@@ -38,10 +39,10 @@ var Cache = require("cache"),
             }
 
             // Output melee attacker count in the report.
-            if (max > 0) {
+            if (melee.length > 0 || max > 0) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "meleeAttack",
-                    count: num,
+                    count: melee.length,
                     max: max
                 });
             }        

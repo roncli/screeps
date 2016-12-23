@@ -47,7 +47,7 @@ var Cache = require("cache"),
             }
 
             // Output storer count in the report.
-            if (max > 0) {
+            if (storers.length > 0 || max > 0) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "storer",
                     count: storers.length,

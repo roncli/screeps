@@ -7,7 +7,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var rangedAttack = Memory.maxCreeps.rangedAttack,
+            var ranged = Cache.creepsInRoom("rangedAttack", room),
+                rangedAttack = Memory.maxCreeps.rangedAttack,
                 roomName = room.name,
                 num = 0,
                 max = 0;
@@ -20,7 +21,7 @@ var Cache = require("cache"),
             // Loop through the room ranged attackers to see if we need to spawn a creep.
             if (rangedAttack) {
                 _.forEach(rangedAttack[roomName], (value, toRoomName) => {
-                    var count = _.filter(Cache.creepsInRoom("rangedAttack", room), (c) => c.memory.defending === toRoomName).length,
+                    var count = _.filter(ranged, (c) => c.memory.defending === toRoomName).length,
                         toRoom = Game.rooms[toRoomName],
                         maxCreeps = value.maxCreeps;
                     
@@ -37,10 +38,10 @@ var Cache = require("cache"),
             }
 
             // Output ranged attacker count in the report.
-            if (max > 0) {
+            if (ranged.length > 0 || max > 0) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "rangedAttack",
-                    count: num,
+                    count: ranged.length,
                     max: max
                 });
             }        

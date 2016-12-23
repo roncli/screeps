@@ -30,7 +30,7 @@ var Cache = require("cache"),
                 rangedUnits = army.ranged.units,
                 boostRoom = Game.rooms[army.boostRoom],
                 labsInUse = boostRoom.memory.labsInUse,
-                body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE],
+                body = [],
                 count, spawnToUse, name, labsToBoostWith;
 
             // Fail if all the spawns are busy.
@@ -39,8 +39,15 @@ var Cache = require("cache"),
             }
 
             // Create the body of the army.
-            for (count = 0; count < rangedUnits; count++) {
+            for (count = 0; count < 5; count++) {
+                body.push(TOUGH);
+            }
+            
+            for (count = 0; count < dismantlerUnits; count++) {
                 body.push(RANGED_ATTACK);
+            }
+
+            for (count = 0; count < dismantlerUnits + 5; count++) {
                 body.push(MOVE);
             }
 

@@ -251,7 +251,7 @@ var app = angular.module("screeps", []),
                         break;
                 }
                 
-                data.messages = data.message.slice(Math.max(data.message.length - 100, 1));
+                data.messages = data.messages.slice(Math.max(data.messages.length - 100, 0));
             };
         };
 

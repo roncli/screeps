@@ -296,6 +296,9 @@ var Cache = require("cache"),
                         pause: true
                     }
                     
+                    if (!labToUse.id) {
+                        return false;
+                    }
                     labUsed = Cache.getObjectById(labToUse.id);
                     if (labUsed.mineralAmount > 0) {
                         labToUse.status = "emptying";

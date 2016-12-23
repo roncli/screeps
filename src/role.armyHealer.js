@@ -33,8 +33,8 @@ var Cache = require("cache"),
                 boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
                 
             if (army.boostRoom) {
-                boostRoom = Game.rooms[army.boostRoom],
-                labsInUse = boostRoom.memory.labsInUse,
+                boostRoom = Game.rooms[army.boostRoom];
+                labsInUse = boostRoom.memory.labsInUse;
             }
 
             // Fail if all the spawns are busy.

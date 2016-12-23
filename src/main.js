@@ -247,7 +247,7 @@ var profiler = require("screeps-profiler"),
             var mineralOrders = {},
                 minerals, sellOrder;
 
-            if (Game.cpu.bucket >= 9990) {
+            if (Game.cpu.bucket >= Memory.marketBucket) {
                 // Determine the minerals we need.
                 minerals = [
                     {resource: RESOURCE_HYDROGEN, amount: 3000},

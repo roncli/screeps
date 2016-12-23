@@ -134,8 +134,8 @@ var Cache = require("cache"),
                     });
                     break;
                 case "dismantle":
-                    // If we're more than 2 unit from the closest healer, run towards it.
-                    healers = Cache.creepsInArmy("healer", armyName);
+                    // If we're more than 2 units from the closest healer, run towards it.
+                    healers = Cache.creepsInArmy("armyHealer", armyName);
                     if (healers.length > 0) {
                         _.forEach(creepsWithNoTask, (creep) => {
                             var closest = Utilities.objectsClosestToObj(healers, creep),

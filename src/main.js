@@ -696,6 +696,7 @@ var profiler = require("screeps-profiler"),
                 // Log army data.
                 Cache.log.army[army] = {
                     directive: value.directive,
+                    boostRoom: value.boostRoom,
                     buildRoom: value.buildRoom,
                     stageRoom: value.stageRoom,
                     attackRoom: value.attackRoom,

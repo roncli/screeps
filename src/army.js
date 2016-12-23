@@ -13,16 +13,19 @@ var Cache = require("cache"),
         run: (name) => {
             var army = Memory.army[name],
                 allCreepsInArmy = Cache.creepsInArmy("all", name),
-                boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store,
                 armyAttackRoom = Game.rooms[army.attackRoom],
                 armyDismantlers = army.dismantler,
                 armyHealers = army.healer,
                 armyMelees = army.melee,
                 armyRangeds = army.ranged,
-                hostileConstructionSites, hostiles, tasks;
+                boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
             
             if (armyAttackRoom) {
                 hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+            }
+            
+            if (army.boostRoom) {
+                boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store
             }
 
             // Delete the army if we're successful.

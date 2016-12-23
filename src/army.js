@@ -102,9 +102,7 @@ var Cache = require("cache"),
             if (armyAttackRoom) {
                 switch (army.directive) {
                     case "dismantle":
-                        if (army.dismantle.length > 0) {
-                            tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => c.pos.getRangeTo(Cache.getObjectById(army.dismantle[0])) <= 2), (c) => new TaskRangedAttack(c.id));
-                        }
+                        tasks.ranged.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3), (c) => new TaskRangedAttack(c.id));
                         tasks.melee.tasks = _.map(_.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3), (c) => new TaskMeleeAttack(c.id));
                         break;
                     case "attack":

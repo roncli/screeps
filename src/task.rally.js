@@ -63,6 +63,11 @@ Rally.prototype.run = function(creep) {
         creep.heal(creep);
     }
 
+    // If the creep has a ranged attack part. mass attack.
+    if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
+        creep.rangedMassAttack();
+    }
+
     // Always complete the task.
     Task.prototype.complete.call(this, creep);
 };

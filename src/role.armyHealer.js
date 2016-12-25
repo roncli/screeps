@@ -230,6 +230,22 @@ var Cache = require("cache"),
                         }
                     });
 
+                    // Rally to any hostile construction sites.
+                    _.forEach(tasks.rally.tasks, (task) => {
+                        _.forEach(creepsWithNoTask, (creep) => {
+                            task.canAssign(creep);
+                            assigned.push(creep.name);
+                            return false;
+                        });
+
+                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                        assigned = [];
+
+                        if (creepsWithNoTask.length === 0) {
+                            return;
+                        }
+                    });
+
                     // Rally to army's attack location.
                     task = new TaskRally(attackRoomName);
                     _.forEach(creepsWithNoTask, (creep) => {

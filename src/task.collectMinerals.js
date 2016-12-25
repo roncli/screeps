@@ -149,7 +149,7 @@ CollectMinerals.getLabTasks = function(room) {
     }
 
     if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "clearing") {
-        _.forEach(_.filter(Cache.labsInRoom(room), (l) => room.memory.labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
+        _.forEach(_.filter(Cache.labsInRoom(room), (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
             tasks.push(new CollectMinerals(lab.id));
         });
     }

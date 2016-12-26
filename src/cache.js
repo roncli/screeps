@@ -182,7 +182,7 @@ var creepsInRoom = {},
                     }
                 });
     
-                _.forEach(room.find(FIND_CONSTRUCTION_SITES), (structure) => {
+                _.forEach(room.find(FIND_MY_CONSTRUCTION_SITES), (structure) => {
                     matrix.set(structure.pos.x, structure.pos.y, 5);
                 });
 

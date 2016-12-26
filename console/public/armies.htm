@@ -28,7 +28,7 @@
                 <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
             </div>
             <div ng-repeat="creep in data.memory.creeps" ng-if="creep.army === name" ng-class="{'text-warning': creep.hits < creep.hitsMax && creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
-                <b>{{creep.name}}</b> {{creep.room}} {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
+                <b>{{creep.name}}</b> {{creep.room}} {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}% <b>TTL</b> {{creep.ttl}}
             </div>
         </div>
     </div>

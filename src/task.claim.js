@@ -13,7 +13,9 @@ Claim.prototype.constructor = Claim;
 Claim.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || creep.memory.role !== "claimer" || !creep.room.controller || creep.room.controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
+    var controller = creep.room.controller;
+
+    if (creep.spawning || creep.memory.role !== "claimer" || !controller || controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
         return false;
     }
     

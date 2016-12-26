@@ -18,16 +18,18 @@ CollectMinerals.prototype.constructor = CollectMinerals;
 CollectMinerals.prototype.canAssign = function(creep) {
     "use strict";
 
+    var obj = this.object;
+
     if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || creep.carry[RESOURCE_ENERGY] > 0) {
         return false;
     }
     
     if (this.resource && this.amount) {
-        if (this.object instanceof StructureLab && this.object.mineralType !== this.resource && this.object.mineralAmount < this.amount) {
+        if (obj instanceof StructureLab && obj.mineralType !== this.resource && obj.mineralAmount < this.amount) {
             return false;
         }
 
-        if (!(this.object instanceof StructureLab) && (this.object.store[this.resource] || 0) < this.amount) {
+        if (!(obj instanceof StructureLab) && (obj.store[this.resource] || 0) < this.amount) {
             return false;
         }
     }
@@ -39,21 +41,27 @@ CollectMinerals.prototype.canAssign = function(creep) {
 CollectMinerals.prototype.run = function(creep) {
     "use strict";
 
-    var minerals;
+    var obj = this.object,
+        objStore = obj.store,
+        resource = this.resource,
+        creepCarry = creep.carry,
+        creepCarryCapacity = creep.carryCapacity,
+        amount = this.amount,
+        minerals;
 
     // Object not found, complete task.
-    if (!this.object) {
+    if (!obj) {
         Task.prototype.complete.call(this, creep);
         return;
     }
 
     // Get the resource we're going to use.
-    if (this.object instanceof StructureLab) {
-        minerals = [this.object.mineralType];
-    } else if (this.resource) {
-        minerals = [this.resource];
+    if (obj instanceof StructureLab) {
+        minerals = [obj.mineralType];
+    } else if (resource) {
+        minerals = [resource];
     } else {
-        minerals = _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0);
+        minerals = _.filter(_.keys(objStore), (m) => m !== RESOURCE_ENERGY && objStore[m] > 0);
     }
 
     // We're out of minerals, complete task.
@@ -63,19 +71,19 @@ CollectMinerals.prototype.run = function(creep) {
     }
 
     // Move to the object.
-    Pathing.moveTo(creep, this.object, 1);
+    Pathing.moveTo(creep, obj, 1);
 
     // Collect from the object.
-    if (this.amount) {
-        if (creep.withdraw(this.object, minerals[0], Math.min(this.amount, creep.carryCapacity - _.sum(creep.carry))) === OK) {
+    if (amount) {
+        if (creep.withdraw(obj, minerals[0], Math.min(amount, creepCarryCapacity - _.sum(creepCarry))) === OK) {
             Task.prototype.complete.call(this, creep);
         }
         return;
     }
 
-    if (creep.withdraw(this.object, minerals[0]) === OK) {
+    if (creep.withdraw(obj, minerals[0]) === OK) {
         // If we're full or there are no more minerals, complete task.
-        if (this.resource || _.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
+        if (resource || _.sum(creepCarry) === creepCarryCapacity || (objStore && _.filter(_.keys(objStore), (m) => m !== RESOURCE_ENERGY && objStore[m] > 0).length === 0) || (obj instanceof StructureLab && obj.mineralAmount === 0)) {
             Task.prototype.complete.call(this, creep);
         }
     }
@@ -134,43 +142,54 @@ CollectMinerals.getCleanupTasks = function(structures) {
 CollectMinerals.getLabTasks = function(room) {
     "use strict";
 
-    var tasks = [];
+    var roomMemory = room.memory,
+        labsInUse = roomMemory.labsInUse,
+        labQueue = roomMemory.labQueue,
+        status = labQueue.status,
+        roomStorage = room.storage,
+        labs = Cache.labsInRoom(room),
+        tasks = [],
+        sourceLabs;
 
-    if (room.memory.labsInUse) {
-        _.forEach(room.memory.labsInUse, (lab) => {
+    if (labQueue) {
+        sourceLabs = labQueue.sourceLabs;
+    }
+
+    if (labsInUse) {
+        _.forEach(labsInUse, (lab) => {
             if (!Game.creeps[lab.creepToBoost]) {
                 tasks.push(new CollectMinerals(lab.id));
             }
         });
 
         _.forEach(tasks, (task) => {
-            _.remove(room.memory.labsInUse, (l) => l.id === task.id);
+            _.remove(labsInUse, (l) => l.id === task.id);
         });
     }
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "clearing") {
-        _.forEach(_.filter(Cache.labsInRoom(room), (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
+    if (roomStorage && labQueue && status === "clearing") {
+        _.forEach(_.filter(labs, (l) => _.map(labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
             tasks.push(new CollectMinerals(lab.id));
         });
     }
 
-    if (room.storage && room.memory.labsInUse) {
-        _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || l.status === "emptying") && Cache.getObjectById(l.id).mineralType && Cache.getObjectById(l.id).mineralType !== l.resource), (lab) => {
+    if (roomStorage && labsInUse) {
+        _.forEach(_.filter(labsInUse, (l) => (!l.status || l.status === "emptying") && Cache.getObjectById(l.id).mineralType && Cache.getObjectById(l.id).mineralType !== l.resource), (lab) => {
             tasks.push(new CollectMinerals(lab.id));
         });
     }
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "creating" && !Utilities.roomLabsArePaused(room)) {
-        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount === 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount !== 0) {
-            tasks.push(new CollectMinerals(room.memory.labQueue.sourceLabs[1]));
+    if (roomStorage && labQueue && status === "creating" && !Utilities.roomLabsArePaused(room)) {
+        if (Cache.getObjectById(sourceLabs[0]).mineralAmount === 0 && Cache.getObjectById(sourceLabs[1]).mineralAmount !== 0) {
+            tasks.push(new CollectMinerals(sourceLabs[1]));
         }
-        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount !== 0 && Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount === 0) {
-            tasks.push(new CollectMinerals(room.memory.labQueue.sourceLabs[0]));
+        if (Cache.getObjectById(sourceLabs[0]).mineralAmount !== 0 && Cache.getObjectById(sourceLabs[1]).mineralAmount === 0) {
+            tasks.push(new CollectMinerals(sourceLabs[0]));
         }
     }
 
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "returning") {
-        _.forEach(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === room.memory.labQueue.resource), (lab) => {
+    if (roomStorage && labQueue && status === "returning") {
+        _.forEach(_.filter(labs, (l) => l.mineralType === labQueue.resource), (lab) => {
             tasks.push(new CollectMinerals(lab.id));
         });
     }

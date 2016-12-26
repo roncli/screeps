@@ -27,15 +27,17 @@ Build.prototype.canAssign = function(creep) {
 Build.prototype.run = function(creep) {
     "use strict";
 
+    var site = this.constructionSite;
+
     // Check for complete construction.
-    if (!this.constructionSite) {
+    if (!site) {
         Task.prototype.complete.call(this, creep);
         return;
     }
     
     // Move to the construction site and build it.
-    Pathing.moveTo(creep, this.constructionSite, Math.max(Math.min(creep.pos.getRangeTo(this.constructionSite) - 1, 3), 1));
-    creep.build(this.constructionSite, RESOURCE_ENERGY);
+    Pathing.moveTo(creep, site, Math.max(Math.min(creep.pos.getRangeTo(site) - 1, 3), 1));
+    creep.build(site, RESOURCE_ENERGY);
 };
 
 Build.prototype.canComplete = function(creep) {

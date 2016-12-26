@@ -145,13 +145,13 @@ CollectMinerals.getLabTasks = function(room) {
     var roomMemory = room.memory,
         labsInUse = roomMemory.labsInUse,
         labQueue = roomMemory.labQueue,
-        status = labQueue.status,
         roomStorage = room.storage,
         labs = Cache.labsInRoom(room),
         tasks = [],
-        sourceLabs;
+        status, sourceLabs;
 
     if (labQueue) {
+        status = labQueue.status,
         sourceLabs = labQueue.sourceLabs;
     }
 

@@ -786,6 +786,63 @@ var profiler = require("screeps-profiler"),
                 }
 
                 if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
+                    // Ensure creeps try to move off of the sides of the room if they're not moving anywhere else this turn.
+                    if (creep.pos.x === 0) {
+                        switch (Math.floor(Math.random() * 3)) {
+                            case 0:
+                                creep.move(RIGHT);
+                                break;
+                            case 1:
+                                creep.move(TOP_RIGHT);
+                                break;
+                            case 2:
+                                creep.move(BOTTOM_RIGHT);
+                                break;
+                        }
+                    }
+
+                    if (creep.pos.x === 49) {
+                        switch (Math.floor(Math.random() * 3)) {
+                            case 0:
+                                creep.move(LEFT);
+                                break;
+                            case 1:
+                                creep.move(TOP_LEFT);
+                                break;
+                            case 2:
+                                creep.move(BOTTOM_LEFT);
+                                break;
+                        }
+                    }
+
+                    if (creep.pos.y === 0) {
+                        switch (Math.floor(Math.random() * 3)) {
+                            case 0:
+                                creep.move(BOTTOM);
+                                break;
+                            case 1:
+                                creep.move(BOTTOM_RIGHT);
+                                break;
+                            case 2:
+                                creep.move(BOTTOM_LEFT);
+                                break;
+                        }
+                    }
+
+                    if (creep.pos.y === 49) {
+                        switch (Math.floor(Math.random() * 3)) {
+                            case 0:
+                                creep.move(TOP);
+                                break;
+                            case 1:
+                                creep.move(TOP_RIGHT);
+                                break;
+                            case 2:
+                                creep.move(TOP_LEFT);
+                                break;
+                        }
+                    }
+
                     Cache.creepTasks[creep.name].run(creep);
 
                     // Purge current task if the creep is in a new room.
@@ -806,8 +863,9 @@ var profiler = require("screeps-profiler"),
                         });
                     }
                 } else {
-                    // RIP & Pepperonis :(
                     delete creep.memory.currentTask;
+
+                    // RIP & Pepperonis :(
                     if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "defender", "healer", "meleeAttack", "rangedAttack", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                         creep.suicide();
                     }

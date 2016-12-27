@@ -75,7 +75,7 @@ var Cache = require("cache"),
             }
 
             // Do something different for minerals.
-            if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
+            if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Game.getObjectById(id))[0] instanceof Mineral) {
                 body = [];
 
                 // Get the energy available, limiting to 4500.

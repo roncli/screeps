@@ -6,7 +6,7 @@ var Task = require("task"),
 
         this.type = "meleeAttack";
         this.id = id;
-        this.enemy = Cache.getObjectById(id);
+        this.enemy = Game.getObjectById(id);
     };
     
 Melee.prototype = Object.create(Task.prototype);

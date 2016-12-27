@@ -9,7 +9,7 @@ var Task = require("task"),
         this.id = id;
         this.resource = resource;
         this.amount = amount;
-        this.object = Cache.getObjectById(id);
+        this.object = Game.getObjectById(id);
     };
     
 FillMinerals.prototype = Object.create(Task.prototype);
@@ -117,16 +117,16 @@ FillMinerals.getLabTasks = function(room) {
     
     var tasks = [];
 
-    _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Cache.getObjectById(l.id).mineralType || Cache.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource)) && (Cache.getObjectById(l.id).mineralAmount < (l.status === "refilling" ? l.oldAmount : l.amount))), (lab) => {
-        tasks.push(new FillMinerals(lab.id, lab.status === "refilling" ? lab.oldResource : lab.resource, (lab.status === "refilling" ? lab.oldAmount : lab.amount) - Cache.getObjectById(lab.id).mineralAmount));
+    _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Game.getObjectById(l.id).mineralType || Game.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource)) && (Game.getObjectById(l.id).mineralAmount < (l.status === "refilling" ? l.oldAmount : l.amount))), (lab) => {
+        tasks.push(new FillMinerals(lab.id, lab.status === "refilling" ? lab.oldResource : lab.resource, (lab.status === "refilling" ? lab.oldAmount : lab.amount) - Game.getObjectById(lab.id).mineralAmount));
     });
 
     if (room.storage && Cache.labsInRoom(room).length >= 3 && room.memory.labQueue && room.memory.labQueue.status === "moving" && !Utilities.roomLabsArePaused(room)) {
-        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount < room.memory.labQueue.amount) {
-            tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[0], room.memory.labQueue.children[0], room.memory.labQueue.amount - Cache.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount));
+        if (Game.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount < room.memory.labQueue.amount) {
+            tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[0], room.memory.labQueue.children[0], room.memory.labQueue.amount - Game.getObjectById(room.memory.labQueue.sourceLabs[0]).mineralAmount));
         }
-        if (Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount < room.memory.labQueue.amount) {
-            tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[1], room.memory.labQueue.children[1], room.memory.labQueue.amount - Cache.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount));
+        if (Game.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount < room.memory.labQueue.amount) {
+            tasks.push(new FillMinerals(room.memory.labQueue.sourceLabs[1], room.memory.labQueue.children[1], room.memory.labQueue.amount - Game.getObjectById(room.memory.labQueue.sourceLabs[1]).mineralAmount));
         }
     }
 

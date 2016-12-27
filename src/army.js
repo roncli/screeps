@@ -65,7 +65,7 @@ var Cache = require("cache"),
                     break;
                 case "dismantle":
                     if (armyAttackRoom) {
-                        army.dismantle = _.filter(army.dismantle, (d) => Cache.getObjectById(d));
+                        army.dismantle = _.filter(army.dismantle, (d) => Game.getObjectById(d));
 
                         if (army.dismantle.length === 0) {
                             army.directive = "attack";

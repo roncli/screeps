@@ -10,7 +10,6 @@ var creepsInRoom = {},
     extractorsInRoom = {},
     hostilesInRoom = {},
     costMatricies = {},
-    objects = {},
 
     Cache = {
         creepTasks: {},
@@ -35,7 +34,6 @@ var creepsInRoom = {},
             extractorsInRoom = {};
             hostilesInRoom = {};
             costMatricies = {};
-            objects = {};
             Cache.creepTasks = {};
             Cache.roomTypes = {};
             Cache.spawning = {};
@@ -190,13 +188,6 @@ var creepsInRoom = {},
             }
             
             return costMatricies[roomName];
-        },
-    
-        // Get object by ID.
-        getObjectById: (id) => {
-            "use strict";
-    
-            return objects[id] ? objects[id] : (objects[id] = Game.getObjectById(id));
         }
     };
 

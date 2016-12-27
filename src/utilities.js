@@ -299,7 +299,7 @@ var Cache = require("cache"),
                     if (!labToUse.id) {
                         return false;
                     }
-                    labUsed = Cache.getObjectById(labToUse.id);
+                    labUsed = Game.getObjectById(labToUse.id);
                     if (labUsed.mineralAmount > 0) {
                         labToUse.status = "emptying";
                         labToUse.oldResource = labUsed.mineralType;

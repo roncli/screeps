@@ -133,22 +133,22 @@ var profiler = require("screeps-profiler"),
                 }
             });
             _.forEach(Memory.lengthToContainer, (value, id) => {
-                if (!Cache.getObjectById(id)) {
+                if (!Game.getObjectById(id)) {
                     delete Memory.lengthToContainer[id];
                 }
             });
             _.forEach(Memory.lengthToController, (value, id) => {
-                if (!Cache.getObjectById(id)) {
+                if (!Game.getObjectById(id)) {
                     delete Memory.lengthToController[id];
                 }
             });
             _.forEach(Memory.lengthToStorage, (value, id) => {
-                if (!Cache.getObjectById(id)) {
+                if (!Game.getObjectById(id)) {
                     delete Memory.lengthToStorage[id];
                 }
             });
             _.forEach(Memory.containerSource, (value, id) => {
-                if (!Cache.getObjectById(id)) {
+                if (!Game.getObjectById(id)) {
                     delete Memory.containerSource[id];
                 }
             });

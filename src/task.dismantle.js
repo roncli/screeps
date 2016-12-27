@@ -1,12 +1,11 @@
 var Task = require("task"),
-    Cache = require("cache"),
     Pathing = require("pathing"),
     Dismantle = function(id) {
         Task.call(this);
 
         this.type = "dismantle";
         this.id = id;
-        this.structure = Cache.getObjectById(id);
+        this.structure = Game.getObjectById(id);
     };
     
 Dismantle.prototype = Object.create(Task.prototype);

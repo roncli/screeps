@@ -1,13 +1,12 @@
 var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
-    Utilities = require("utilities"),
     CollectEnergy = function(id) {
         Task.call(this);
 
         this.type = "collectEnergy";
         this.id = id;
-        this.object = Cache.getObjectById(id);
+        this.object = Game.getObjectById(id);
     };
     
 CollectEnergy.prototype = Object.create(Task.prototype);

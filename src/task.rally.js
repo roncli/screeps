@@ -8,7 +8,7 @@ var Task = require("task"),
         this.type = "rally";
         this.id = id;
         this.creep = creep;
-        this.rallyPoint = Cache.getObjectById(id);
+        this.rallyPoint = Game.getObjectById(id);
         if (!this.rallyPoint) {
             this.rallyPoint = new RoomPosition(25, 25, id);
             this.range = 5;

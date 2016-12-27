@@ -334,8 +334,8 @@ Base.prototype.run = function(room) {
     if (storage && labs.length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
         let sourceLabs = labQueue.sourceLabs || [],
             children = labQueue.children || [],
-            sourceLab0 = Cache.getObjectById(sourceLabs[0]),
-            sourceLab1 = Cache.getObjectById(sourceLabs[1]),
+            sourceLab0 = Game.getObjectById(sourceLabs[0]),
+            sourceLab1 = Game.getObjectById(sourceLabs[1]),
             resource = labQueue.resource;
         
         switch (labQueue.status) {
@@ -397,7 +397,7 @@ Base.prototype.run = function(room) {
         boosted = [];
 
         _.forEach(labsInUse, (queue) => {
-            var lab = Cache.getObjectById(queue.id);
+            var lab = Game.getObjectById(queue.id);
             
             switch (queue.status) {
                 case "emptying":

@@ -1,12 +1,11 @@
 var Task = require("task"),
-    Cache = require("cache"),
     Pathing = require("pathing"),
     Heal = function(id) {
         Task.call(this);
         
         this.type = "heal";
         this.id = id;
-        this.ally = Cache.getObjectById(id);
+        this.ally = Game.getObjectById(id);
     };
     
 Heal.prototype = Object.create(Task.prototype);

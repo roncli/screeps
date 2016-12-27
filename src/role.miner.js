@@ -69,7 +69,7 @@ var Cache = require("cache"),
             remainder = energy % 450;
 
             // Do something different for minerals.
-            if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Cache.getObjectById(id))[0] instanceof Mineral) {
+            if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Game.getObjectById(id))[0] instanceof Mineral) {
                 body = [];
 
                 // Create the body based on the energy.

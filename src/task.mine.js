@@ -14,7 +14,7 @@ Mine.prototype.constructor = Mine;
 Mine.prototype.canAssign = function(creep) {
     "use strict";
 
-    var container = Cache.getObjectById(creep.memory.container);
+    var container = Game.getObjectById(creep.memory.container);
 
     if (creep.spawning || !container || creep.getActiveBodyparts(WORK) === 0) {
         return false;
@@ -27,7 +27,7 @@ Mine.prototype.canAssign = function(creep) {
 Mine.prototype.run = function(creep) {
     "use strict";
 
-    var container = Cache.getObjectById(creep.memory.container),
+    var container = Game.getObjectById(creep.memory.container),
         source;
     
     // Container is not found, complete the task.
@@ -44,7 +44,7 @@ Mine.prototype.run = function(creep) {
     // If we are at the container, get the source closest to the creep and attempt to harvest it.
     if (container.pos.x === creep.pos.x && container.pos.y === creep.pos.y && container.pos.roomName === creep.pos.roomName) {
         if (Memory.containerSource[creep.memory.container]) {
-            source = Cache.getObjectById(Memory.containerSource[creep.memory.container]);
+            source = Game.getObjectById(Memory.containerSource[creep.memory.container]);
         } else {
             source = Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0];
         }
@@ -77,7 +77,7 @@ Mine.prototype.run = function(creep) {
 Mine.prototype.canComplete = function(creep) {
     "use strict";
 
-    if (!Cache.getObjectById(creep.memory.container) || creep.getActiveBodyparts(WORK) === 0) {
+    if (!Game.getObjectById(creep.memory.container) || creep.getActiveBodyparts(WORK) === 0) {
         return true;
     }
     return false;

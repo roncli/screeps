@@ -1,5 +1,4 @@
 var Task = require("task"),
-    Cache = require("cache"),
     Pathing = require("pathing"),
     Harvest = function() {
         Task.call(this);
@@ -13,7 +12,7 @@ Harvest.prototype.constructor = Harvest;
 Harvest.prototype.canAssign = function(creep) {
     "use strict";
 
-    var source = Cache.getObjectById(creep.memory.homeSource);
+    var source = Game.getObjectById(creep.memory.homeSource);
 
     if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
         return false;
@@ -21,13 +20,12 @@ Harvest.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Harvest.prototype.run = function(creep) {
     "use strict";
 
-    var source = Cache.getObjectById(creep.memory.homeSource),
-        pos;
+    var source = Game.getObjectById(creep.memory.homeSource);
     
     // No sources found or the source is drained, complete task.
     if (!source || source.energy === 0) {
@@ -48,7 +46,7 @@ Harvest.prototype.run = function(creep) {
 Harvest.prototype.canComplete = function(creep) {
     "use strict";
 
-    var source = Cache.getObjectById(creep.memory.homeSource);
+    var source = Game.getObjectById(creep.memory.homeSource);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
@@ -62,7 +60,7 @@ Harvest.prototype.toObj = function(creep) {
 
     creep.memory.currentTask = {
         type: this.type
-    }
+    };
 };
 
 Harvest.fromObj = function(creep) {

@@ -7,7 +7,7 @@ var Task = require("task"),
 
         this.type = "build";
         this.id = id;
-        this.constructionSite = Cache.getObjectById(id);
+        this.constructionSite = Game.getObjectById(id);
     };
     
 Build.prototype = Object.create(Task.prototype);

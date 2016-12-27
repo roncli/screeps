@@ -176,7 +176,7 @@ var Cache = require("cache"),
 
                     // Serialize the path.
                     if (creepMemory._pathing) {
-                        creepMemory._pathing.path = Pathing.serializePath(creepPos, path.path)
+                        creepMemory._pathing.path = Pathing.serializePath(creepPos, path.path);
                         creepMemory._pathing.restartOn = restartOn;
                     } else {
                         creepMemory._pathing = {

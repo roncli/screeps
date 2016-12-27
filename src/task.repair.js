@@ -6,7 +6,7 @@ var Task = require("task"),
 
         this.type = "repair";
         this.id = id;
-        this.structure = Cache.getObjectById(id);
+        this.structure = Game.getObjectById(id);
     };
     
 Repair.prototype = Object.create(Task.prototype);

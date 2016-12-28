@@ -19,6 +19,11 @@ var Cache = require("cache"),
                 armyMelees = army.melee,
                 armyRangeds = army.ranged,
                 boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
+
+            // Bail if scheduled for the future.
+            if (army.scheduled && army.scheduled > Game.time) {
+                return;
+            }
             
             if (armyAttackRoom) {
                 hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);

@@ -6,6 +6,12 @@
             <div ng-if="army.boostRoom">
                 <b>Boost Room</b> {{army.boostRoom}}
             </div>
+            <div ng-if="army.scheduled">
+                <b>Scheduled</b> {{army.scheduled}}
+            </div>
+            <div ng-if="army.portals">
+                <b>Portals</b> {{army.portals.join(",")}}
+            </div>
             <div ng-if="army.buildRoom">
                 <b>Build Room</b> {{army.buildRoom}}
             </div>

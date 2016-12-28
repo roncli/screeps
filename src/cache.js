@@ -197,7 +197,7 @@ var creepsInRoom = {},
                     matrix.set(structure.pos.x, structure.pos.y, 5);
                 });
                 
-                _.forEach(room.portalsInRoom(room), (structure) => {
+                _.forEach(Cache.portalsInRoom(room), (structure) => {
                     matrix.set(structure.pos.x, structure.pos.y, 5);
                 });
                 

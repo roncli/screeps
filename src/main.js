@@ -277,14 +277,14 @@ var profiler = require("screeps-profiler"),
                     {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
                     {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
                     {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 3000}
+                    {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000},
+                    {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000}
                 ];
 
                 _.forEach(minerals, (mineral) => {

@@ -137,7 +137,8 @@ var Cache = require("cache"),
                     break;
                 case "dismantle":
                     // Return to army's staging location if missing 1000 hits.
-                    if (stageRoomName !== attackRoomName) {
+                    healers = Cache.creepsInArmy("armyHealer", armyName);
+                    if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
@@ -154,7 +155,6 @@ var Cache = require("cache"),
                     }
 
                     // If we're more than 2 units from the closest healer, run towards it.
-                    healers = Cache.creepsInArmy("armyHealer", armyName);
                     if (healers.length > 0) {
                         _.forEach(creepsWithNoTask, (creep) => {
                             var closest = Utilities.objectsClosestToObj(healers, creep),
@@ -176,7 +176,9 @@ var Cache = require("cache"),
                     }
                     
                     // Remove any creeps that need healing.
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+                    if (healers.length > 0) {
+                        _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+                    }
 
                     // Dismantle a dismantle location if it can be seen.
                     if (attackRoom && dismantle.length > 0) {
@@ -204,7 +206,8 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     // Return to army's staging location if missing 1000 hits.
-                    if (stageRoomName !== attackRoomName) {
+                    healers = Cache.creepsInArmy("armyHealer", armyName);
+                    if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
@@ -221,7 +224,9 @@ var Cache = require("cache"),
                     }
 
                     // Remove any creeps that need healing.
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+                    if (healers.length > 0) {
+                        _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
+                    }
 
                     if (attackRoom) {
                         structures = _.sortBy(_.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));

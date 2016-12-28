@@ -128,7 +128,7 @@ var Cache = require("cache"),
                         if (creep.memory.portals && creep.memory.portals.length > 0) {
                             if (creep.memory.portals[0] === creep.room.name) {
                                 creep.memory.portaling = true;
-                                task = new TaskRally(Cache.portalsInRoom(room)[0].id);
+                                task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
                             } else {
                                 task = new TaskRally(creep.memory.portals[0]);
                             }

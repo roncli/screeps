@@ -8,6 +8,7 @@ var creepsInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
     extractorsInRoom = {},
+    portalsInRoom = {},
     hostilesInRoom = {},
     costMatricies = {},
 
@@ -32,6 +33,7 @@ var creepsInRoom = {},
             linksInRoom = {};
             repairableStructuresInRoom = {};
             extractorsInRoom = {};
+            portalsInRoom = {};
             hostilesInRoom = {};
             costMatricies = {};
             Cache.creepTasks = {};
@@ -136,6 +138,13 @@ var creepsInRoom = {},
             "use strict";
     
             return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : (extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s instanceof StructureExtractor)}));
+        },
+        
+        // Returns all portals in the current room.
+        portalsInRoom: (room) => {
+            "use strict";
+            
+            return portalsInRoom[room.name] ? portalsInRoom[room.name] : (portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s instanceof StructurePortal}));
         },
     
         // Return all hostile creeps in the current room.

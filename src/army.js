@@ -83,10 +83,10 @@ var Cache = require("cache"),
 
             // Check spawns if we're building.
             if (army.directive === "building" || army.reinforce) {
-                RoleArmyDismantler.checkSpawn(name);
-                RoleArmyHealer.checkSpawn(name);
-                RoleArmyMelee.checkSpawn(name);
-                RoleArmyRanged.checkSpawn(name);
+                RoleArmyDismantler.checkSpawn(name, army.portals);
+                RoleArmyHealer.checkSpawn(name, army.portals);
+                RoleArmyMelee.checkSpawn(name, army.portals);
+                RoleArmyRanged.checkSpawn(name, army.portals);
             }
 
             // Create tasks.

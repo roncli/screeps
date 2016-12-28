@@ -4,14 +4,14 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
 
     Healer = {
-        checkSpawn: (armyName) => {
+        checkSpawn: (armyName, portals) => {
             "use strict";
 
             var count = _.filter(Cache.creepsInArmy("armyHealer", armyName), (c) => c.spawning || c.ticksToLive > 300).length,
                 max = Memory.army[armyName].healer.maxCreeps;
 
             if (count < max) {
-                Healer.spawn(armyName);
+                Healer.spawn(armyName, portals);
             }
 
             // Output healer count in the report.
@@ -24,7 +24,7 @@ var Cache = require("cache"),
             }        
         },
         
-        spawn: (armyName) => {
+        spawn: (armyName, portals) => {
             "use strict";
 
             var army = Memory.army[armyName],
@@ -66,7 +66,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyHealer-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : []});
+            name = spawnToUse.createCreep(body, "armyHealer-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && boostRoom) {
@@ -125,6 +125,19 @@ var Cache = require("cache"),
                     task = new TaskRally(army.buildRoom);
                     _.forEach(creepsWithNoTask, (creep) => {
                         creep.say("Building");
+                        if (creep.memory.portaling && creep.memory.portals[0] !== creep.room) {
+                            creep.memory.portals.shift();
+                        }
+                        if (creep.memory.portals && creep.memory.portals.length > 0) {
+                            if (creep.memory.portals[0] === creep.room) {
+                                creep.memory.portaling = true;
+                                task = new TaskRally(Cache.portalsInRoom(room)[0]);
+                            } else {
+                                task = new TaskRally(creep.memory.portals[0]);
+                            }
+                        } else {
+                            task = new TaskRally(army.buildRoom);
+                        }
                         task.canAssign(creep);
                     });
                     break;

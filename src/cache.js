@@ -197,6 +197,10 @@ var creepsInRoom = {},
                     matrix.set(structure.pos.x, structure.pos.y, 5);
                 });
                 
+                _.forEach(room.portalsInRoom(room), (structure) => {
+                    matrix.set(structure.pos.x, structure.pos.y, 5);
+                });
+                
                 _.forEach(_.filter(room.find(FIND_HOSTILE_CREEPS), (c) => c.owner.username === "Source Keeper"), (creep) => {
                     for (let x = creep.pos.x - 3; x < creep.pos.x + 3; x++) {
                         for (let y = creep.pos.y - 3; y < creep.pos.y + 3; y++) {

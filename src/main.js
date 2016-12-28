@@ -389,7 +389,7 @@ var profiler = require("screeps-profiler"),
                                         if (!roomMemory.buyQueue) {
                                             roomMemory.buyQueue = {
                                                 resource: resource,
-                                                amount: 5 * Math.ceil(node.amount - resourceAmountInRoom / 5),
+                                                amount: 5 * Math.ceil((node.amount - resourceAmountInRoom) / 5),
                                                 price: node.buyPrice,
                                                 start: Game.time
                                             };

@@ -169,6 +169,10 @@ var creepsInRoom = {},
 
             var roomName = room.name;
     
+            if (!room || room.unobservable) {
+                return new PathFinder.CostMatrix();
+            }
+    
             if (!costMatricies[roomName]) {
                 let matrix = new PathFinder.CostMatrix();
     

@@ -5,9 +5,6 @@ var Cache = require("cache"),
             "use strict";
 
             if (!Market.orders || Game.cpu.bucket >= Memory.marketBucket) {
-                if (!Market.orders) {
-                    Cache.log.events.push("System reset.")
-                }
                 Market.orders = Game.market.getAllOrders();
             }
             

@@ -38,6 +38,7 @@ var profiler = require("screeps-profiler"),
     RoomMine = require("room.mine"),
     taskDeserialization = require("taskDeserialization"),
     roomDeserialization = require("roomDeserialization"),
+    reset,
     unobservableRooms,
 
     main = {
@@ -64,7 +65,13 @@ var profiler = require("screeps-profiler"),
             "use strict";
 
             var generationTick = Game.time % 1500;
-
+            
+            if (!reset)
+            {
+                reset = true;
+                Cache.log.events.push("System reset.")
+            }
+            
             // Reset the cache.
             Cache.reset();
 

@@ -30,10 +30,10 @@ var Cache = require("cache"),
 
                     if ((toRoom && toRoom.memory.harvested >= 30000) || (toRoom && Cache.hostilesInRoom(toRoom).length > 0)) {
                         max += maxCreeps;
-                    }
 
-                    if (count < maxCreeps) {
-                        Melee.spawn(room, toRoomName);
+                        if (count < maxCreeps) {
+                            Melee.spawn(room, toRoomName);
+                        }
                     }
                 });
             }

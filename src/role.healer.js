@@ -30,10 +30,10 @@ var Cache = require("cache"),
 
                     if ((toRoom && toRoom.memory.harvested >= 30000) || Cache.hostilesInRoom(toRoom).length > 0) {
                         max += maxCreeps;
-                    }
-
-                    if (count < maxCreeps) {
-                        Healer.spawn(room, toRoomName);
+                        
+                        if (count < maxCreeps) {
+                            Healer.spawn(room, toRoomName);
+                        }
                     }
                 });
             }

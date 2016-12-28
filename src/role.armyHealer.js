@@ -125,7 +125,7 @@ var Cache = require("cache"),
                     task = new TaskRally(army.buildRoom);
                     _.forEach(creepsWithNoTask, (creep) => {
                         creep.say("Building");
-                        if (creep.memory.portaling && creep.memory.portals[0] !== creep.room) {
+                        if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
                             creep.memory.portals.shift();
                         }
                         if (creep.memory.portals && creep.memory.portals.length > 0) {

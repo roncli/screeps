@@ -66,15 +66,15 @@ var profiler = require("screeps-profiler"),
 
             var generationTick = Game.time % 1500;
             
-            if (!reset)
-            {
-                reset = true;
-                Cache.log.events.push("System reset.")
-            }
-            
             // Reset the cache.
             Cache.reset();
 
+            if (!reset)
+            {
+                reset = true;
+                Cache.log.events.push("System reset.");
+            }
+            
             // Export global objects to Game.cmd for use from console.
             Game.cmd = {
                 Army: Army,

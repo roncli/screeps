@@ -220,7 +220,7 @@ Base.prototype.run = function(room) {
             Memory.minimumSell = {};
         }
 
-        if (buyQueue) {
+        if (buyQueue && storageStore[RESOURCE_ENERGY] >= 10000) {
             // Buy what we need to for the lab queue.
             bestOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === buyQueue.resource && o.type === "sell" && o.amount > 0).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
             if (bestOrder) {

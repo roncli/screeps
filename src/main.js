@@ -308,7 +308,7 @@ var profiler = require("screeps-profiler"),
                         if (!Memory.reserveMinerals[node.resource]) {
                             Memory.reserveMinerals[node.resource] = 0;
                         }
-                        Memory.reserveMinerals[node.resource] += node.amount;
+                        Memory.reserveMinerals[node.resource] = Math.min(Memory.reserveMinerals[node.resource] + node.amount, 20000);
 
                         _.forEach(node.children, (child) => {
                             innerFx(child, innerFx);

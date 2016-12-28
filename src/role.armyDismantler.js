@@ -132,7 +132,7 @@ var Cache = require("cache"),
                                 creep.memory.portaling = true;
                                 task = new TaskRally(Cache.portalsInRoom(room)[0]);
                             } else {
-                                task = new TaskRally(creep.memory.portals[0]);
+                                task = new TaskRally(creep.memory.portals[0].id);
                             }
                         } else {
                             task = new TaskRally(army.buildRoom);

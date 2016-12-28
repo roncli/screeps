@@ -121,11 +121,15 @@ var Cache = require("cache"),
                     // Rally to army's building location.
                     _.forEach(creepsWithNoTask, (creep) => {
                         creep.say("Building");
+                        if (creep.memory.portaling && creep.memory.portals[0] !== creep.room) {
+                            creep.memory.portals.shift();
+                        }
                         if (creep.memory.portals && creep.memory.portals.length > 0) {
                             if (creep.memory.portals[0] === creep.room) {
-                                task = new TaskPortal(creep.memory.portals[0]);
+                                creep.memory.portaling = true;
+                                task = new TaskRally(Cache.portalsInRoom(room)[0]);
                             } else {
-                                task = new TaskRally(creep.memory.portals[0]);
+                                task = new TaskRally(creep.memory.portals[0].id);
                             }
                         } else {
                             task = new TaskRally(army.buildRoom);

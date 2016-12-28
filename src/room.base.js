@@ -488,7 +488,7 @@ Base.prototype.run = function(room) {
         }
     };
 
-    if (terminal && terminalStore[RESOURCE_ENERGY] >= 5000 && !buyQueue) {
+    if (terminal && terminalStore[RESOURCE_ENERGY] >= 5000 && (!buyQueue || storageStore[RESOURCE_ENERGY] < 10000)) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
     }
 

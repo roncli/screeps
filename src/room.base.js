@@ -215,7 +215,7 @@ Base.prototype.run = function(room) {
         terminalTask = new TaskFillEnergy(terminalId);
     }
 
-    if (terminal && terminalEnergy >= 1000) {
+    if (terminal && terminalEnergy >= 1000 && storageStore[RESOURCE_ENERGY] >= 10000) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
         }

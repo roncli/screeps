@@ -36,7 +36,7 @@ Ranged.prototype.run = function(creep) {
     // If this has attack body parts, use different logic.
     if (creep.getActiveBodyparts(ATTACK) > 0) {
         // Move and attack.
-        Pathing.moveTo(creep, this.enemy, 1);
+        Pathing.moveTo(creep, this.enemy);
         if (creep.attack(this.enemy) === ERR_NOT_IN_RANGE) {
             // Heal self if possible available.
             if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.hitsMax) {

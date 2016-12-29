@@ -1,4 +1,5 @@
 var Task = require("task"),
+    TaskCollectEnergy = require("taskCollectEnergy"),
     Pathing = require("pathing"),
     Pickup = function(id) {
         Task.call(this);
@@ -36,6 +37,13 @@ Pickup.prototype.run = function(creep) {
     if (creep.pickup(this.resource) === OK) {
         // Task always is completed one way or another upon successful transfer.
         Task.prototype.complete.call(this, creep);
+
+        // If there is a container here, change the task.
+        let structures = _.filter(creep.room.lookForAt(LOOK_STRUCTURES, this.resource), (s) => s instanceof StructureContainer && s.store[RESOURCE_ENERGY]);
+        if (structures.length > 0) {
+            let task = new TaskCollectEnergy(structures[0].id);
+            task.canAssign(creep);
+        }
     }
 };
 

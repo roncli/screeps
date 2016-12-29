@@ -1,5 +1,5 @@
 var Task = require("task"),
-    TaskCollectEnergy = require("taskCollectEnergy"),
+    TaskCollectEnergy = require("task.collectEnergy"),
     Pathing = require("pathing"),
     Pickup = function(id) {
         Task.call(this);

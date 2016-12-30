@@ -349,7 +349,7 @@ var profiler = require("screeps-profiler"),
                             var buyPrice;
 
                             node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
-                            node.amount = Math.max(node.amount - ((room.storage.store[node.resource] || 0) + (room.terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all"), (c) => c.carry[node.resource] || 0)), 0);
+                            node.amount = Math.max(node.amount - ((room.storage.store[node.resource] || 0) + (room.terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)), 0);
 
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);

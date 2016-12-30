@@ -433,6 +433,9 @@ var profiler = require("screeps-profiler"),
 
                                         if (node.action === "create" && node.children.length > 0) {
                                             Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
+                                            if (Memory.minimumSell[resource] === 0) {
+                                                delete Memory.minimumSell[resource];
+                                            }
                                         }
 
                                         break;

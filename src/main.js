@@ -364,7 +364,7 @@ var profiler = require("screeps-profiler"),
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
                                     if (node.amount < lowest) {
-                                        use = true;
+                                        use = node;
                                         lowest = node.amount;
                                     }
                                 } else {

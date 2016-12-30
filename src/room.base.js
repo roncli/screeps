@@ -244,6 +244,9 @@ Base.prototype.run = function(room) {
                         }
                     }
                 }
+            } else {
+                delete memory.buyQueue;
+                buyQueue = undefined;
             }
 
             if (buyQueue && buyQueue.amount <= 0) {

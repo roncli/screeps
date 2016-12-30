@@ -336,7 +336,9 @@ var profiler = require("screeps-profiler"),
 
                 // Assign the market values and determine whether we should buy or create the minerals.
                 _.forEach(Game.rooms, (room, roomName) => {
-                    if (room.unobservable || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
+                    var lowest = Infinity;
+                    
+                    if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
                         return;
                     }
                     Cache.minerals[roomName] = _.cloneDeep(minerals);
@@ -347,6 +349,7 @@ var profiler = require("screeps-profiler"),
                             var buyPrice;
 
                             node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
+                            node.amount = Math.max(node.amount - ((room.storage.store[node.resource] || 0) + (room.terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all"), (c) => c.carry[node.resource] || 0)), 0);
 
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);
@@ -359,6 +362,9 @@ var profiler = require("screeps-profiler"),
                                 if (node.buyPrice > buyPrice) {
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
+                                    if (node.amount < lowest) {
+                                        node.use = true;
+                                    }
                                 } else {
                                     node.action = "buy";
                                 }
@@ -377,16 +383,16 @@ var profiler = require("screeps-profiler"),
                         terminalStore = room.terminal.store,
                         allCreepsInRoom = Cache.creepsInRoom("all", room),
                         hasBuyQueue = !!roomMemory.buyQueue,
-                        hasLabQueue = !!roomMemory.labQueue;
+                        hasLabQueue = !!roomMemory.labQueue,
+                        foundUse = false;
                     
                     if (!hasBuyQueue || !hasLabQueue) {
                         _.forEach(minerals, (mineral) => {
-                            var fx = (node, innerFx) => {
-                                var resource = node.resource,
-                                    resourceAmountInRoom = (storageStore[resource] || 0) + (terminalStore[resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[resource] || 0);
+                            var fx = (node, innerFx, foundUse) => {
+                                var resource = node.resource;
 
                                 // If we have the requested mineral, we're done.
-                                if (resourceAmountInRoom >= node.amount) {
+                                if (node.amount <= 0) {
                                     return;
                                 }
 
@@ -396,7 +402,7 @@ var profiler = require("screeps-profiler"),
                                         if (!roomMemory.buyQueue) {
                                             roomMemory.buyQueue = {
                                                 resource: resource,
-                                                amount: 5 * Math.ceil((node.amount - resourceAmountInRoom) / 5),
+                                                amount: 5 * Math.ceil(node.amount / 5),
                                                 price: node.buyPrice,
                                                 start: Game.time
                                             };
@@ -406,23 +412,17 @@ var profiler = require("screeps-profiler"),
                                         break;
                                     case "create":
                                         // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
-                                        if (!hasLabQueue) {
+                                        if (!hasLabQueue && (foundUse || node.use)) {
                                             roomMemory.labQueue = {
                                                 resource: resource,
-                                                amount: 5 * Math.ceil(Math.min(node.amount - resourceAmountInRoom, LAB_MINERAL_CAPACITY) / 5),
+                                                amount: 5 * Math.ceil(Math.min(node.amount, LAB_MINERAL_CAPACITY) / 5),
                                                 children: _.map(node.children, (c) => c.resource),
                                                 start: Game.time
                                             };
-
-                                            // If we have enough of the requested resource, don't try further creations.    
-                                            hasLabQueue = true;
-                                            _.forEach(node.children, (child) => {
-                                                hasLabQueue = hasLabQueue && ((storageStore[child.resource] || 0) + (terminalStore[child.resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[child.resource] || 0) < node.amount);
-                                            });
                                         }
 
                                         _.forEach(node.children, (child) => {
-                                            innerFx(child, innerFx);
+                                            innerFx(child, innerFx, foundUse || node.use);
                                         });
 
                                         if (node.action === "create" && node.children.length > 0) {

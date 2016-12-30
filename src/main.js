@@ -347,10 +347,11 @@ var profiler = require("screeps-profiler"),
                     // Build the mineral data.
                     _.forEach(Cache.minerals[roomName], (mineral) => {
                         var fx = (node, innerFx) => {
-                            var buyPrice;
+                            var buyPrice,
+                                roomResources = (room.storage.store[node.resource] || 0) + (room.terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0);
 
                             node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
-                            node.amount = Math.max(node.amount - ((room.storage.store[node.resource] || 0) + (room.terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0)), 0);
+                            node.amount = Math.max(node.amount - roomResources, 0);
 
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);
@@ -363,9 +364,9 @@ var profiler = require("screeps-profiler"),
                                 if (node.buyPrice > buyPrice) {
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
-                                    if (node.amount < lowest) {
+                                    if (roomResources < lowest) {
                                         use = node;
-                                        lowest = node.amount;
+                                        lowest = roomResources;
                                     }
                                 } else {
                                     node.action = "buy";

@@ -413,15 +413,21 @@ var profiler = require("screeps-profiler"),
                                                 children: _.map(node.children, (c) => c.resource),
                                                 start: Game.time
                                             };
+
+                                            // If we have enough of the requested resource, don't try further creations.    
+                                            hasLabQueue = true;
+                                            _.forEach(node.children, (child) => {
+                                                hasLabQueue = hasLabQueue && ((storageStore[child.resource] || 0) + (terminalStore[child.resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[child.resource] || 0) < node.amount);
+                                            });
                                         }
 
                                         _.forEach(node.children, (child) => {
                                             innerFx(child, innerFx);
-
-                                            if (node.action === "create" && node.children.length > 0) {
-                                                Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
-                                            }
                                         });
+
+                                        if (node.action === "create" && node.children.length > 0) {
+                                            Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
+                                        }
 
                                         break;
                                 }

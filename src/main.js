@@ -336,7 +336,8 @@ var profiler = require("screeps-profiler"),
 
                 // Assign the market values and determine whether we should buy or create the minerals.
                 _.forEach(Game.rooms, (room, roomName) => {
-                    var lowest = Infinity;
+                    var lowest = Infinity,
+                        use;
                     
                     if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
                         return;
@@ -363,7 +364,8 @@ var profiler = require("screeps-profiler"),
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
                                     if (node.amount < lowest) {
-                                        node.use = true;
+                                        use = true;
+                                        lowest = node.amount;
                                     }
                                 } else {
                                     node.action = "buy";
@@ -373,6 +375,10 @@ var profiler = require("screeps-profiler"),
 
                         fx(mineral, fx);
                     });
+                    
+                    if (use) {
+                        use.use = true;
+                    }
                 });
 
                 // Set room lab queue.

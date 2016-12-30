@@ -364,7 +364,7 @@ var profiler = require("screeps-profiler"),
                                 if (node.buyPrice > buyPrice) {
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
-                                    if (roomResources < lowest) {
+                                    if (roomResources <= lowest) {
                                         use = node;
                                         lowest = roomResources;
                                     }
@@ -386,13 +386,9 @@ var profiler = require("screeps-profiler"),
                 _.forEach(Cache.minerals, (minerals, roomName) => {
                     var room = Game.rooms[roomName],
                         roomMemory = room.memory,
-                        storageStore = room.storage.store,
-                        terminalStore = room.terminal.store,
-                        allCreepsInRoom = Cache.creepsInRoom("all", room),
                         hasBuyQueue = !!roomMemory.buyQueue,
-                        hasLabQueue = !!roomMemory.labQueue,
-                        foundUse = false;
-                    
+                        hasLabQueue = !!roomMemory.labQueue;
+
                     if (!hasBuyQueue || !hasLabQueue) {
                         _.forEach(minerals, (mineral) => {
                             var fx = (node, innerFx, foundUse) => {
@@ -409,12 +405,15 @@ var profiler = require("screeps-profiler"),
                                         if (!roomMemory.buyQueue) {
                                             roomMemory.buyQueue = {
                                                 resource: resource,
-                                                amount: 5 * Math.ceil(node.amount / 5),
+                                                amount: node.amount,
                                                 price: node.buyPrice,
                                                 start: Game.time
                                             };
 
                                             Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
+                                            if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                                delete Memory.minimumSell[resource];
+                                            }
                                         }
                                         break;
                                     case "create":

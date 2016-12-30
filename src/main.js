@@ -337,26 +337,30 @@ var profiler = require("screeps-profiler"),
                 // Assign the market values and determine whether we should buy or create the minerals.
                 _.forEach(Game.rooms, (room, roomName) => {
                     var lowest = Infinity,
-                        use;
-                    
+                        roomMemory = room.memory,
+                        labQueue;
+
                     if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
                         return;
                     }
+
                     Cache.minerals[roomName] = _.cloneDeep(minerals);
+                    delete roomMemory.use;
                     
                     // Build the mineral data.
                     _.forEach(Cache.minerals[roomName], (mineral) => {
                         var fx = (node, innerFx) => {
                             var buyPrice,
-                                roomResources = (room.storage.store[node.resource] || 0) + (room.terminal.store[node.resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.resource] || 0);
+                                resource = node.resource,
+                                roomResources = (room.storage.store[resource] || 0) + (room.terminal.store[resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[resource] || 0);
 
-                            node.buyPrice = mineralOrders[node.resource] ? mineralOrders[node.resource].price : Infinity;
+                            node.buyPrice = mineralOrders[resource] ? mineralOrders[resource].price : Infinity;
                             node.amount = Math.max(node.amount - roomResources, 0);
 
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);
                             });
-
+                            
                             if (!node.children || node.children.length === 0) {
                                 node.action = "buy";
                             } else {
@@ -365,11 +369,26 @@ var profiler = require("screeps-profiler"),
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
                                     if (roomResources <= lowest) {
-                                        use = node;
+                                        labQueue = node;
                                         lowest = roomResources;
                                     }
                                 } else {
                                     node.action = "buy";
+                                }
+                            }
+                            
+                            // Set the buy queue if necessary.
+                            if (node.amount > 0 && node.action === "buy" && !roomMemory.buyQueue) {
+                                roomMemory.buyQueue = {
+                                    resource: resource,
+                                    amount: node.amount,
+                                    price: node.buyPrice,
+                                    start: Game.time
+                                };
+
+                                Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
+                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                    delete Memory.minimumSell[resource];
                                 }
                             }
                         };
@@ -377,75 +396,42 @@ var profiler = require("screeps-profiler"),
                         fx(mineral, fx);
                     });
                     
-                    if (use) {
-                        use.use = true;
+                    // Set the lab queue if necessary.
+                    if (labQueue && !roomMemory.labQueue) {
+                        var fx = (node, innerFx) => {
+                            var resource = node.resource;
+
+                            // If we have the requested mineral, we're done.
+                            if (node.amount <= 0) {
+                                return;
+                            }
+
+                            if (node.action === "create") {
+                                // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
+                                roomMemory.labQueue = {
+                                    resource: resource,
+                                    amount: 5 * Math.ceil(Math.min(node.amount, LAB_MINERAL_CAPACITY) / 5),
+                                    children: _.map(node.children, (c) => c.resource),
+                                    start: Game.time
+                                };
+
+                                _.forEach(node.children, (child) => {
+                                    innerFx(child, innerFx);
+                                });
+
+                                if (node.action === "create" && node.children.length > 0) {
+                                    Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
+                                    if (Memory.minimumSell[resource] === 0) {
+                                        delete Memory.minimumSell[resource];
+                                    }
+                                }
+                            }
+                        };
+
+                        fx(labQueue, fx);
                     }
                 });
 
-                // Set room lab queue.
-                _.forEach(Cache.minerals, (minerals, roomName) => {
-                    var room = Game.rooms[roomName],
-                        roomMemory = room.memory,
-                        hasBuyQueue = !!roomMemory.buyQueue,
-                        hasLabQueue = !!roomMemory.labQueue;
-
-                    if (!hasBuyQueue || !hasLabQueue) {
-                        _.forEach(minerals, (mineral) => {
-                            var fx = (node, innerFx, foundUse) => {
-                                var resource = node.resource;
-
-                                // If we have the requested mineral, we're done.
-                                if (node.amount <= 0) {
-                                    return;
-                                }
-
-                                switch (node.action) {
-                                    case "buy":
-                                        // We should buy the mineral from the market.
-                                        if (!roomMemory.buyQueue) {
-                                            roomMemory.buyQueue = {
-                                                resource: resource,
-                                                amount: node.amount,
-                                                price: node.buyPrice,
-                                                start: Game.time
-                                            };
-
-                                            Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
-                                            if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
-                                                delete Memory.minimumSell[resource];
-                                            }
-                                        }
-                                        break;
-                                    case "create":
-                                        // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
-                                        if (!hasLabQueue && (foundUse || node.use)) {
-                                            roomMemory.labQueue = {
-                                                resource: resource,
-                                                amount: 5 * Math.ceil(Math.min(node.amount, LAB_MINERAL_CAPACITY) / 5),
-                                                children: _.map(node.children, (c) => c.resource),
-                                                start: Game.time
-                                            };
-                                        }
-
-                                        _.forEach(node.children, (child) => {
-                                            innerFx(child, innerFx, foundUse || node.use);
-                                        });
-
-                                        if (node.action === "create" && node.children.length > 0) {
-                                            Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
-                                            if (Memory.minimumSell[resource] === 0) {
-                                                delete Memory.minimumSell[resource];
-                                            }
-                                        }
-
-                                        break;
-                                }
-                            };
-
-                            fx(mineral, fx);
-                        });
-                    }
-                });
             }
         },
         

@@ -119,10 +119,10 @@ var Cache = require("cache"),
                 labToBoostWith.creepToBoost = name;
                 labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_LEMERGIUM_ACID : ((storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE);
                 labToBoostWith.amount = 30 * workCount;
-                room.memory.labsInUse.push(labToBoostWith);
+                supportRoom.memory.labsInUse.push(labToBoostWith);
 
                 // If anything is coming to fill the lab, stop it.
-                _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
+                _.forEach(_.filter(Cache.creepsInRoom("all", supportRoom), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
                     delete creep.memory.currentTask;
                 });
             }
@@ -143,7 +143,7 @@ var Cache = require("cache"),
 
             // If not yet boosted, go get boosts.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-                var lab = _.filter(room.memory.labsInUse, (l) => l.id === creep.memory.labs[0])[0];
+                var lab = _.filter(Memory.rooms[creep.memory.supportRoom].labsInUse, (l) => l.id === creep.memory.labs[0])[0];
                 if (lab && Game.getObjectById(creep.memory.labs[0]).mineralType === lab.resource && Game.getObjectById(creep.memory.labs[0]).mineralAmount >= lab.amount) {
                     var task = new TaskRally(creep.memory.labs[0]);
                     task.canAssign(creep);

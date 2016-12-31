@@ -9,13 +9,16 @@ var Cache = require("cache"),
 
             var upgraders = Cache.creepsInRoom("upgrader", room),
                 storage = room.storage,
-                storageEnergy = storage.store[RESOURCE_ENERGY],
                 controller = room.controller,
-                count, max;
-            
+                storageEnergy, count, max;
+
             // If there are no spawns in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0) {
                 return;
+            }
+
+            if (storage) {
+                storageEnergy = storage.store[RESOURCE_ENERGY];
             }
 
             // If there is not enough energy in storage, ignore the room.

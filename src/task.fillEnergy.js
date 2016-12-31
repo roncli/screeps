@@ -163,13 +163,14 @@ FillEnergy.getStorageTasks = function(room) {
 FillEnergy.getLinkTasks = function(room) {
     "use strict";
 
-    var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
-    
-    if (links.length > 0) {
-        return [new FillEnergy(links[0].id)];
-    } else {
+    var links;
+
+    if (Cache.linksInRoom(room).length === 0) {
         return [];
     }
+
+    links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
+    return [new FillEnergy(links[0].id)];
 }
 
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");

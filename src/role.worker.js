@@ -33,9 +33,16 @@ var Cache = require("cache"),
                     max: max
                 });
             }
+
+            // Support smaller rooms in the region.
+            _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
+                if (_.filter(Cache.creepsInRoom("worker", otherRoom), (c) => c.memory.supportRoom === room.name).length === 0) {
+                    Worker.spawn(otherRoom, room);
+                }
+            });
         },
         
-        spawn: (room) => {
+        spawn: (room, supportRoom) => {
             "use strict";
 
             var body = [],
@@ -44,15 +51,20 @@ var Cache = require("cache"),
                 storage = room.storage,
                 canBoost = false,
                 roomName = room.name,
-                energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+                supportRoomName, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+
+            if (!supportRoom) {
+                supportRoom = room;
+            }
+            supportRoomName = supportRoom.name;
 
             // Fail if all the spawns are busy.
-            if (Cache.labsInRoom(room).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (Cache.labsInRoom(supportRoom).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
             // Get the total energy in the room, limited to 3300.
-            energy = Math.min(room.energyCapacityAvailable, 3300);
+            energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
             units = Math.floor(energy / 200);
             remainder = energy % 200;
 
@@ -83,20 +95,20 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            if (workCount > 0 && storage && Cache.labsInRoom(room).length > 0 && (Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0)) >= 30 * workCount) {
-                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
+            if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && (Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0)) >= 30 * workCount) {
+                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
             }
 
             // Create the creep from the first listed spawn that is available.
-            if (room.controller.level < 6) {
-                spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
+            if (Cache.labsInRoom(supportRoom).length < 3) {
+                spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             } else {
                 spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             }
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "worker-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "worker", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "worker-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "worker", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {

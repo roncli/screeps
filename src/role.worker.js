@@ -57,6 +57,9 @@ var Cache = require("cache"),
             }
             supportRoomName = supportRoom.name;
             spawns = Cache.spawnsInRoom(supportRoom);
+            if (spawns.length === 0) {
+                return;
+            }
 
             // Fail if all the spawns are busy.
             if (Cache.labsInRoom(supportRoom).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {

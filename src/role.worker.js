@@ -46,17 +46,17 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                spawns = Cache.spawnsInRoom(supportRoom),
                 workCount = 0,
                 storage = room.storage,
                 canBoost = false,
                 roomName = room.name,
-                supportRoomName, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+                supportRoomName, spawns, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             if (!supportRoom) {
                 supportRoom = room;
             }
             supportRoomName = supportRoom.name;
+            spawns = Cache.spawnsInRoom(supportRoom);
 
             // Fail if all the spawns are busy.
             if (Cache.labsInRoom(supportRoom).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {

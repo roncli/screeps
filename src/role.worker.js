@@ -47,16 +47,16 @@ var Cache = require("cache"),
 
             var body = [],
                 workCount = 0,
-                storage = room.storage,
                 canBoost = false,
                 roomName = room.name,
-                supportRoomName, spawns, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+                supportRoomName, spawns, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             if (!supportRoom) {
                 supportRoom = room;
             }
             supportRoomName = supportRoom.name;
             spawns = Cache.spawnsInRoom(supportRoom);
+            storage = supportRoom.storage,
             if (spawns.length === 0) {
                 return;
             }

@@ -46,7 +46,7 @@ var Cache = require("cache"),
             "use strict";
 
             var body = [],
-                spawns = Cache.spawnsInRoom(room),
+                spawns = Cache.spawnsInRoom(supportRoom),
                 workCount = 0,
                 storage = room.storage,
                 canBoost = false,

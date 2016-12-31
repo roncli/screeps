@@ -56,7 +56,7 @@ var Cache = require("cache"),
             }
             supportRoomName = supportRoom.name;
             spawns = Cache.spawnsInRoom(supportRoom);
-            storage = supportRoom.storage,
+            storage = supportRoom.storage;
             if (spawns.length === 0) {
                 return;
             }

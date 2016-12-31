@@ -47,7 +47,7 @@ var Cache = require("cache"),
                 energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
-            if (room.controller.level < 6 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (Cache.labsInRoom(room).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 

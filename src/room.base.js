@@ -162,10 +162,8 @@ Base.prototype.run = function(room) {
     var roomName = room.name,
         spawns = Cache.spawnsInRoom(room),
         terminal = room.terminal,
-        terminalStore = terminal.store,
         terminalId = terminal.id,
         storage = room.storage,
-        storageStore = storage.store,
         memory = room.memory,
         buyQueue = memory.buyQueue,
         labQueue = memory.labQueue,
@@ -176,7 +174,14 @@ Base.prototype.run = function(room) {
         labsInUse = memory.labsInUse,
         dismantle = Memory.dismantle,
         controller = room.controller,
-        tasks, links, firstLink, terminalMinerals, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
+        terminalStore, storageStore, tasks, links, firstLink, terminalMinerals, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
+
+    if (terminal) {
+        terminalStore = terminal.store
+    }
+    if (storage) {
+        storageStore = storage.store
+    }
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {

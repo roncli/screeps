@@ -173,7 +173,7 @@ Base.prototype.run = function(room) {
         labsInUse = memory.labsInUse,
         dismantle = Memory.dismantle,
         controller = room.controller,
-        terminalStore, storageStore, tasks, links, firstLink, terminalMinerals, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
+        terminalStore, terminalId, storageStore, tasks, links, firstLink, terminalMinerals, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
 
     if (terminal) {
         terminalStore = terminal.store;

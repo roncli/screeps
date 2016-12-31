@@ -162,7 +162,6 @@ Base.prototype.run = function(room) {
     var roomName = room.name,
         spawns = Cache.spawnsInRoom(room),
         terminal = room.terminal,
-        terminalId = terminal.id,
         storage = room.storage,
         memory = room.memory,
         buyQueue = memory.buyQueue,
@@ -177,10 +176,11 @@ Base.prototype.run = function(room) {
         terminalStore, storageStore, tasks, links, firstLink, terminalMinerals, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
 
     if (terminal) {
-        terminalStore = terminal.store
+        terminalStore = terminal.store;
+        terminalId = terminal.id;
     }
     if (storage) {
-        storageStore = storage.store
+        storageStore = storage.store;
     }
 
     // Something is supremely wrong.  Notify and bail.

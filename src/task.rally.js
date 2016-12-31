@@ -51,7 +51,7 @@ Rally.prototype.run = function(creep) {
             creep.move(BOTTOM);
         } else if (creep.pos.y === 49) {
             creep.move(TOP);
-        } else if (_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureRoad).length > 0) {
+        } else if (_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureRoad || s instanceof StructureContainer).length > 0) {
             creep.move(Math.floor(Math.random() * 8));
         }
     } else {

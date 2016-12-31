@@ -11,10 +11,6 @@ var Cache = require("cache"),
             var workers = Cache.creepsInRoom("worker", room),
                 storage = room.storage,
                 count, max;
-            
-            if (Cache.spawnsInRoom(room).length === 0) {
-                return;
-            }
 
             // If there are no energy sources, ignore the room.
             if (room.find(FIND_SOURCES).length === 0) {
@@ -51,7 +47,7 @@ var Cache = require("cache"),
                 energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             // Fail if all the spawns are busy.
-            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+            if (room.controller.level < 6 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
 
@@ -92,7 +88,11 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            if (room.controller.level < 6) {
+                spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
+            } else {
+                spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            }
             if (!spawnToUse) {
                 return false;
             }

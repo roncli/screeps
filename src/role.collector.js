@@ -41,7 +41,7 @@ var Cache = require("cache"),
                     return;
                 }
 
-                max += 3 * adjustment;
+                max += Math.ceil(3 * adjustment);
 
                 // If we have less than max collectors, spawn a collector.
                 count = _.filter(collectors, (c) => c.memory.homeSource === sourceId).length;

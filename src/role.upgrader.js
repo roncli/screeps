@@ -150,7 +150,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, supportRoom: supportRoomName, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
@@ -245,6 +245,24 @@ var Cache = require("cache"),
 
             if (creepsWithNoTask.length === 0) {
                 return;
+            }
+
+            // If there are no full containers in the room, attempt to assign harvest task to remaining creeps.
+            if (_.filter(Cache.containersInRoom(room), (c) => c.energy > 0).length === 0 && !room.storage) {
+                // Attempt to assign harvest task to remaining creeps.
+                _.forEach(creepsWithNoTask, (creep) => {
+                    var task = new TaskHarvest();
+                    if (task.canAssign(creep)) {
+                        creep.say("Harvesting");
+                        assigned.push(creep.name);
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             }
 
             // Rally remaining creeps.

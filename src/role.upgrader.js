@@ -46,7 +46,7 @@ var Cache = require("cache"),
             // Support smaller rooms in the region.
             _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
                 if (_.filter(Cache.creepsInRoom("upgrader", otherRoom), (c) => c.memory.supportRoom === room.name).length === 0) {
-                    Worker.spawn(otherRoom, room);
+                    Upgrader.spawn(otherRoom, room);
                 }
             });
         },

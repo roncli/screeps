@@ -42,8 +42,8 @@ Harvest.prototype.run = function(creep) {
         }
         creep.room.memory.harvested += (creep.getActiveBodyparts(WORK) * 2);
     } else {
-        failIn--;
-        if (failIn === 0) {
+        this.failIn--;
+        if (this.failIn === 0) {
             Task.prototype.assign.call(this, creep);
         }
     }

@@ -42,18 +42,30 @@ var Cache = require("cache"),
                     max: max
                 });
             }
+
+            // Support smaller rooms in the region.
+            _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
+                if (_.filter(Cache.creepsInRoom("upgrader", otherRoom), (c) => c.memory.supportRoom === room.name).length === 0) {
+                    Worker.spawn(otherRoom, room);
+                }
+            });
         },
         
-        spawn: (room) => {
+        spawn: (room, supportRoom) => {
             "use strict";
 
             var body = [],
                 controller = room.controller,
                 workCount = 0,
-                storage = room.storage,
                 canBoost = false,
                 roomName = room.name,
-                energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+                supportRoomName, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+
+            if (!supportRoom) {
+                supportRoom = room;
+            }
+            supportRoomName = supportRoom.name;
+            storage = supportRoom.storage;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -63,7 +75,7 @@ var Cache = require("cache"),
             // Check if we have a link in range of the controller and build the creep accordingly.
             if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), controller)[0].pos.getRangeTo(controller) <= 2) {
                 // Get the total energy in the room, limited to 4100, or 1950 at RCL 8.
-                energy = Math.min(room.energyCapacityAvailable, controller.level === 8 ? 1950 : 4100);
+                energy = Math.min(supportRoom.energyCapacityAvailable, controller.level === 8 ? 1950 : 4100);
                 units = Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250);
                 remainder = (energy - Math.ceil(energy / 3200) * 50) % 250;
     
@@ -92,7 +104,7 @@ var Cache = require("cache"),
                 }
             } else {
                 // Get the total energy in the room, limited to 3300, or 3000 at RCL 8.
-                energy = Math.min(room.energyCapacityAvailable, controller.level === 8 ? 3000 : 3300);
+                energy = Math.min(supportRoom.energyCapacityAvailable, controller.level === 8 ? 3000 : 3300);
                 units = Math.floor(energy / 200);
                 remainder = energy % 200;
     
@@ -124,16 +136,21 @@ var Cache = require("cache"),
                 }
             }
 
-            if (workCount > 0 && storage && Cache.labsInRoom(room).length > 0 && (Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {
-                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(room)[0]);
+            if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && (Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {
+                canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
             }
 
             // Create the creep from the first listed spawn that is available, spawning only in the current room if they are being boosted.
-            spawnToUse = _.filter(Cache.spawnsInRoom(room), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            if (Cache.labsInRoom(supportRoom).length < 3) {
+                spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
+            } else {
+                spawnToUse = _.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            }
+
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, supportRoom: supportRoomName, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
@@ -141,10 +158,10 @@ var Cache = require("cache"),
                 labToBoostWith.creepToBoost = name;
                 labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_GHODIUM_ACID : ((storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE);
                 labToBoostWith.amount = 30 * workCount;
-                room.memory.labsInUse.push(labToBoostWith);
+                supportRoom.memory.labsInUse.push(labToBoostWith);
 
                 // If anything is coming to fill the lab, stop it.
-                _.forEach(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
+                _.forEach(_.filter(Cache.creepsInRoom("all", supportRoom), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
                     delete creep.memory.currentTask;
                 });
             }

@@ -59,12 +59,13 @@ var Cache = require("cache"),
                 workCount = 0,
                 canBoost = false,
                 roomName = room.name,
-                supportRoomName, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+                supportRoomName, spawns, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
 
             if (!supportRoom) {
                 supportRoom = room;
             }
             supportRoomName = supportRoom.name;
+            spawns = Cache.spawnsInRoom(supportRoom);
             storage = supportRoom.storage;
 
             // Fail if all the spawns are busy.
@@ -144,7 +145,7 @@ var Cache = require("cache"),
             if (Cache.labsInRoom(supportRoom).length < 3) {
                 spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             } else {
-                spawnToUse = _.filter(Cache.spawnsInRoom(supportRoom), (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+                spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
             }
 
             if (!spawnToUse) {

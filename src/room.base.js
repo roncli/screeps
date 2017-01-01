@@ -137,7 +137,7 @@ Base.prototype.manage = function(room) {
 
     // At RCL3, build roads around our structures.
     if (rcl >= 3) {
-        _.forEach(_.filter(room.find(FIND_MY_STRUCTURES), (s) => s.room.name === roomName && (s.structureType instanceof StructureSpawn || s.structureType instanceof StructureExtension || s.structureType instanceof StructureTower || s.structureType instanceof StructureStorage || s.structureType instanceof StructureTerminal)), (structure) => {
+        _.forEach(_.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureSpawn || s instanceof StructureExtension || s instanceof StructureTower || s instanceof StructureStorage || s instanceof StructureTerminal), (structure) => {
             var structureX = structure.pos.x,
                 structureY = structure.pos.y;
                 

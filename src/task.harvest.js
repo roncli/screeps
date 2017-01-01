@@ -4,7 +4,7 @@ var Task = require("task"),
         Task.call(this);
         
         this.type = "harvest";
-        this.failIn = failIn || 50;
+        this.failIn = failIn || 10;
     };
     
 Harvest.prototype = Object.create(Task.prototype);

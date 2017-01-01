@@ -21,7 +21,7 @@ var Cache = require("cache"),
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
                 var count = 0,
-                    source = source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
+                    source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
                     id = container.id,
                     length;
 
@@ -40,7 +40,7 @@ var Cache = require("cache"),
                 length = Memory.lengthToContainer[id][supportRoom.name];
 
                 // Calculate number of storers needed.
-                count += Math.max(Math.ceil(length / [20, 20, 20, 20, 32, 48, 60, 64, 64][supportRoom.controller.level]), 0);
+                count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 46, 58, 62, 62][supportRoom.controller.level]), 0);
                 max += count;
 
                 // If we don't have enough remote storers for this container, spawn one.

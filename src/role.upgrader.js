@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    TaskHarvest = require("task.harvest"),
     TaskRally = require("task.rally"),
 
     Upgrader = {

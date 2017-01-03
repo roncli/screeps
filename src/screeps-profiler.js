@@ -109,9 +109,7 @@ function hookUpPrototypes() {
   });
 }
 
-function profileObjectFunctions(object, label) {
-  const objectToWrap = object.prototype ? object.prototype : object;
-
+function profileObject(objectToWrap, label) {
   Object.getOwnPropertyNames(objectToWrap).forEach(functionName => {
     const extendedLabel = `${label}.${functionName}`;
     try {
@@ -125,6 +123,13 @@ function profileObjectFunctions(object, label) {
   });
 
   return objectToWrap;
+}
+
+function profileObjectFunctions(object, label) {
+  if (object.prototype) {
+    profileObject(object.prototype, label);
+  }
+  profileObject(object, label);
 }
 
 function profileFunction(fn, functionName) {

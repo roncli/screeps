@@ -106,7 +106,7 @@ var Cache = require("cache"),
             // Check critical repairs.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== roomName), (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
-                    if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
+                    if (_.filter(Cache.creepsInRoom("all", task.structure.room), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
                             assigned.push(creep.name);
@@ -125,8 +125,9 @@ var Cache = require("cache"),
 
             // Check for construction sites.
             _.forEach(creepsWithNoTask, (creep) => {
-                if (creep.room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) {
-                    var task = new TaskBuild(creep.room.find(FIND_MY_CONSTRUCTION_SITES)[0].id);
+                var constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+                if (constructionSites.length > 0) {
+                    var task = new TaskBuild(constructionSites[0].id);
                     if (task.canAssign(creep)) {
                         creep.say("Build");
                         assigned.push(creep.name);

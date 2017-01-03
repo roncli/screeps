@@ -19,7 +19,7 @@ var Cache = require("cache"),
                 if ((room && room.memory.harvested >= 30000) || (room && Cache.hostilesInRoom(room).length > 0)) {
                     max = meleeAttack[supportRoomName][roomName].maxCreeps;
 
-                    if (_.filter(melee, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                    if (melee.length < max) {
                         Melee.spawn(room, supportRoom);
                     }
                 }

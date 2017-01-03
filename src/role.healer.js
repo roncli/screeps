@@ -19,7 +19,7 @@ var Cache = require("cache"),
                 if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
                     max = healer[supportRoomName][roomName].maxCreeps;
                     
-                    if (_.filter(healers, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                    if (healers.length < max) {
                         Healer.spawn(room, supportRoom);
                     }
                 }

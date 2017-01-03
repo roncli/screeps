@@ -19,7 +19,7 @@ var Cache = require("cache"),
                 if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
                     max = rangedAttack[supportRoomName][roomName].maxCreeps;
 
-                    if (_.filter(ranged, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                    if (ranged.length < max) {
                         Ranged.spawn(room, supportRoom);
                     }
                 }

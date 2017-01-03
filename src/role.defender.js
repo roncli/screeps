@@ -20,7 +20,7 @@ var Cache = require("cache"),
                 if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
                     max = defender[supportRoomName][roomName].maxCreeps;
 
-                    if (_.filter(defenders, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                    if (defenders.length < max) {
                         Defender.spawn(room, supportRoom);
                     }
                 }

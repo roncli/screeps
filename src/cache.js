@@ -99,7 +99,7 @@ var creepsInRoom = {},
         powerSpawnsInRoom: (room) => {
             "use strict";
 
-            return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : (powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCURES), (s) => s instanceof StructurePowerSpawn));
+            return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : (powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructurePowerSpawn));
         },
         
         // Returns all extentions in the current room.

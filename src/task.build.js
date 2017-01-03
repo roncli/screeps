@@ -3,15 +3,23 @@ var Task = require("task"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     Build = function(id) {
-        Task.call(this);
-
-        this.type = "build";
-        this.id = id;
-        this.constructionSite = Game.getObjectById(id);
-    };
+        "use strict";
     
+        this.init(id);
+    };
+
 Build.prototype = Object.create(Task.prototype);
 Build.prototype.constructor = Build;
+
+Build.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "build";
+    this.id = id;
+    this.constructionSite = Game.getObjectById(id);
+};
 
 Build.prototype.canAssign = function(creep) {
     "use strict";

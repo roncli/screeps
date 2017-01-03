@@ -15,6 +15,8 @@ var RoomObj = require("roomObj"),
     TaskHeal = require("task.heal"),
     TaskRepair = require("task.repair"),
     Mine = function(supportRoom, stage) {
+        "use strict";
+    
         this.init(supportRoom, stage);
     };
 
@@ -22,6 +24,8 @@ Mine.prototype = Object.create(RoomObj.prototype);
 Mine.prototype.constructor = Mine;
 
 Mine.prototype.init = function(supportRoom, stage) {
+    "use strict";
+    
     RoomObj.call(this);
 
     this.type = "mine";

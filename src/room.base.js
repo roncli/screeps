@@ -26,6 +26,8 @@ var RoomObj = require("roomObj"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController"),
     Base = function() {
+        "use strict";
+    
         this.init();
     };
 
@@ -33,6 +35,8 @@ Base.prototype = Object.create(RoomObj.prototype);
 Base.prototype.constructor = Base;
 
 Base.prototype.init = function() {
+    "use strict";
+    
     RoomObj.call(this);
 
     this.type = "base";
@@ -161,6 +165,8 @@ Base.prototype.manage = function(room) {
 };
 
 Base.prototype.transferEnergy = function(room) {
+    "use strict";
+    
     var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
         firstLink = links[0];
 
@@ -176,6 +182,8 @@ Base.prototype.transferEnergy = function(room) {
 };
 
 Base.prototype.terminal = function(room, terminal) {
+    "use strict";
+    
     var terminalStore = terminal.store,
         terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
         storage = room.storage,
@@ -311,6 +319,8 @@ Base.prototype.terminal = function(room, terminal) {
 };
 
 Base.prototype.tasks = function(room) {
+    "use strict";
+    
     var tasks = {
         build: {
             tasks: TaskBuild.getTasks(room)
@@ -412,6 +422,8 @@ Base.prototype.tasks = function(room) {
 };
 
 Base.prototype.spawn = function(room, canSpawnWorkers) {
+    "use strict";
+    
     var dismantle = Memory.dismantle,
         roomName = room.name,
         controller = room.controller;
@@ -435,6 +447,8 @@ Base.prototype.spawn = function(room, canSpawnWorkers) {
 };
 
 Base.prototype.assignTasks = function(room, tasks) {
+    "use strict";
+    
     RoleWorker.assignTasks(room, tasks);
     RoleMiner.assignTasks(room, tasks);
     RoleStorer.assignTasks(room, tasks);
@@ -452,6 +466,8 @@ Base.prototype.assignTasks = function(room, tasks) {
 };
 
 Base.prototype.labQueue = function(room, labQueue) {
+    "use strict";
+    
     var memory = room.memory,
         labs = Cache.labsInRoom(room),
         labsInUse = memory.labsInUse,
@@ -517,6 +533,8 @@ Base.prototype.labQueue = function(room, labQueue) {
 };
 
 Base.prototype.labsInUse = function(room, labsInUse) {
+    "use strict";
+    
     var boosted = [];
 
     _.forEach(labsInUse, (queue) => {

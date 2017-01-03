@@ -11,6 +11,8 @@ var RoomObj = require("roomObj"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     Cleanup = function(supportRoom) {
+        "use strict";
+    
         this.init(supportRoom);
     };
 
@@ -18,6 +20,8 @@ Cleanup.prototype = Object.create(RoomObj.prototype);
 Cleanup.prototype.constructor = Cleanup;
 
 Cleanup.prototype.init = function(supportRoom) {
+    "use strict";
+    
     RoomObj.call(this);
 
     this.type = "cleanup";

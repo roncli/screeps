@@ -1,14 +1,22 @@
 var Task = require("task"),
     Pathing = require("pathing"),
     Harvest = function(failIn) {
-        Task.call(this);
+        "use strict";
         
-        this.type = "harvest";
-        this.failIn = failIn || 10;
+        this.init(failIn);
     };
     
 Harvest.prototype = Object.create(Task.prototype);
 Harvest.prototype.constructor = Harvest;
+
+Harvest.prototype.init = function(failIn) {
+    "use strict";
+    
+    Task.call(this);
+    
+    this.type = "harvest";
+    this.failIn = failIn || 10;
+};
 
 Harvest.prototype.canAssign = function(creep) {
     "use strict";

@@ -3,17 +3,25 @@ var Task = require("task"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     CollectMinerals = function(id, resource, amount) {
-        Task.call(this);
-
-        this.type = "collectMinerals";
-        this.id = id;
-        this.resource = resource;
-        this.amount = amount;
-        this.object = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id, resource, amount);
     };
     
 CollectMinerals.prototype = Object.create(Task.prototype);
 CollectMinerals.prototype.constructor = CollectMinerals;
+
+CollectMinerals.prototype.init = function(id, resource, amount) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "collectMinerals";
+    this.id = id;
+    this.resource = resource;
+    this.amount = amount;
+    this.object = Game.getObjectById(id);
+};
 
 CollectMinerals.prototype.canAssign = function(creep) {
     "use strict";

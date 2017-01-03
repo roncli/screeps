@@ -2,13 +2,21 @@ var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
     Claim = function(id) {
-        Task.call(this);
-
-        this.type = "claim";
+        "use strict";
+        
+        this.init(id);
     };
     
 Claim.prototype = Object.create(Task.prototype);
 Claim.prototype.constructor = Claim;
+
+Claim.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "claim";
+};
 
 Claim.prototype.canAssign = function(creep) {
     "use strict";

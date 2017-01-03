@@ -1,15 +1,23 @@
 var Task = require("task"),
     Pathing = require("pathing"),
     Dismantle = function(id) {
-        Task.call(this);
-
-        this.type = "dismantle";
-        this.id = id;
-        this.structure = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id);
     };
     
 Dismantle.prototype = Object.create(Task.prototype);
 Dismantle.prototype.constructor = Dismantle;
+
+Dismantle.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "dismantle";
+    this.id = id;
+    this.structure = Game.getObjectById(id);
+};
 
 Dismantle.prototype.canAssign = function(creep) {
     "use strict";
@@ -20,7 +28,7 @@ Dismantle.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Dismantle.prototype.run = function(creep) {
     "use strict";

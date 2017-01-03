@@ -3,15 +3,23 @@ var Task = require("task"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     FillEnergy = function(id) {
-        Task.call(this);
-
-        this.type = "fillEnergy";
-        this.id = id;
-        this.object = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id);
     };
     
 FillEnergy.prototype = Object.create(Task.prototype);
 FillEnergy.prototype.constructor = FillEnergy;
+
+FillEnergy.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "fillEnergy";
+    this.id = id;
+    this.object = Game.getObjectById(id);
+};
 
 FillEnergy.prototype.canAssign = function(creep) {
     "use strict";

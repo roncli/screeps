@@ -1,15 +1,23 @@
 var Task = require("task"),
     Pathing = require("pathing"),
     Heal = function(id) {
-        Task.call(this);
+        "use strict";
         
-        this.type = "heal";
-        this.id = id;
-        this.ally = Game.getObjectById(id);
+        this.init(id);
     };
     
 Heal.prototype = Object.create(Task.prototype);
 Heal.prototype.constructor = Heal;
+
+Heal.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+    
+    this.type = "heal";
+    this.id = id;
+    this.ally = Game.getObjectById(id);
+};
 
 Heal.prototype.canAssign = function(creep, tasks) {
     "use strict";

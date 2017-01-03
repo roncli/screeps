@@ -18,10 +18,10 @@ var RoomObj = require("roomObj"),
     TaskBuild = require("task.build"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskCollectMinerals = require("task.collectMinerals"),
+    TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHeal = require("task.heal"),
-    TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController"),
@@ -156,71 +156,38 @@ Base.prototype.manage = function(room) {
     }
 };
 
-Base.prototype.run = function(room) {
-    "use strict";
+Base.prototype.transferEnergy = function(room) {
+    var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
+        firstLink = links[0];
 
-    var roomName = room.name,
-        spawns = Cache.spawnsInRoom(room),
-        terminal = room.terminal,
+    _.forEach(links, (link, index) => {
+        if (index === 0) {
+            return;
+        }
+
+        if (!firstLink.cooldown && firstLink.energy > 0 && link.energy <= 300) {
+            firstLink.transferEnergy(link);
+        }
+    });
+};
+
+Base.prototype.terminal = function(room, terminal) {
+    var terminalStore = terminal.store,
+        terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
         storage = room.storage,
+        roomName = room.name,
         memory = room.memory,
         buyQueue = memory.buyQueue,
-        labQueue = memory.labQueue,
         dealMade = false,
         flips = [],
-        completed = [],
-        labs = Cache.labsInRoom(room),
-        labsInUse = memory.labsInUse,
-        dismantle = Memory.dismantle,
-        controller = room.controller,
-        terminalStore, terminalId, storageStore, tasks, links, firstLink, terminalMinerals, bestOrder, transCost, terminalEnergy, terminalTask, amount, moved, boosted;
-
-    if (terminal) {
-        terminalStore = terminal.store;
-        terminalId = terminal.id;
-    }
+        storageStore = {},
+        terminalMinerals, bestOrder, transCost, amount;
+        
     if (storage) {
         storageStore = storage.store;
     }
-
-    // Something is supremely wrong.  Notify and bail.
-    if (room.unobservable) {
-        Game.notify("Base Room " + roomName + " is unobservable, something is wrong!");
-        return;
-    }
-
-    // Manage room.
-    if (Game.time % 100 === 0 && spawns.length > 0) {
-        this.manage(room);
-    }
-
-    if (spawns.length > 0) {
-        // Transfer energy from near link to far link.
-        links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), spawns[0]);
-        firstLink = links[0];
-        _.forEach(links, (link, index) => {
-            if (index === 0) {
-                return;
-            }
-
-            if (!firstLink.cooldown && firstLink.energy > 0 && link.energy <= 300) {
-                firstLink.transferEnergy(link);
-            }
-        });
-    }
-
-    // Check to see if we can do a deal in the terminal.
-    if (terminal) {
-        terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0;
-    } else {
-        terminalEnergy = 0;
-    }
-
-    if (terminal && terminalEnergy < 1000) {
-        terminalTask = new TaskFillEnergy(terminalId);
-    }
-
-    if (terminal && terminalEnergy >= 1000 && storageStore[RESOURCE_ENERGY] >= 25000) {
+    
+    if (terminal && terminalEnergy >= 1000 && storageStore[RESOURCE_ENERGY] >= Memory.dealEnergy) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
         }
@@ -337,9 +304,10 @@ Base.prototype.run = function(room) {
             }
         }
     }
+};
 
-    // Get the tasks needed for this room.
-    tasks = {
+Base.prototype.tasks = function(room) {
+    var tasks = {
         build: {
             tasks: TaskBuild.getTasks(room)
         },
@@ -362,8 +330,7 @@ Base.prototype.run = function(room) {
             containerTasks: TaskFillEnergy.getContainerTasks(room),
             labTasks: TaskFillEnergy.getLabTasks(room),
             linkTasks: TaskFillEnergy.getLinkTasks(room),
-            nukerTasks: TaskFillEnergy.getNukerTasks(room),
-            terminalTask: terminalTask
+            nukerTasks: TaskFillEnergy.getNukerTasks(room)
         },
         fillMinerals: {
             labTasks: TaskFillMinerals.getLabTasks(room),
@@ -390,13 +357,34 @@ Base.prototype.run = function(room) {
         dismantle: {
             tasks: []
         }
-    };
+    },
+        terminal = room.terminal,
+        dismantle = Memory.dismantle,
+        roomName = room.name,
+        terminalEnergy = 0,
+        storageEnergy = 0,
+        terminalId;
+    
+    if (terminal) {
+        terminalEnergy = terminal.store[RESOURCE_ENERGY] || 0;
+        terminalId = terminal.id;
+    }
+    
+    if (room.storage) {
+        storageEnergy = room.storage.store[RESOURCE_ENERGY] || 0;
+    }
 
-    if (terminal && terminalStore[RESOURCE_ENERGY] >= 5000 && (!buyQueue || storageStore[RESOURCE_ENERGY] < 25000)) {
+    if (terminal && terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy)) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
     }
 
+    if (terminal && terminalEnergy < 1000) {
+        tasks.fillEnergy.terminalTask = new TaskFillEnergy(terminalId);
+    }
+
     if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
+        let completed = [];
+        
         _.forEach(dismantle[roomName], (pos) => {
             var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
             
@@ -415,9 +403,14 @@ Base.prototype.run = function(room) {
             creep.memory.container = Cache.containersInRoom(room)[0].id;
         });
     }
-    
-    // Spawn new creeps.
-    RoleWorker.checkSpawn(room, !storage || storageStore[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks.length > 0 || _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0);
+};
+
+Base.prototype.spawn = function(room, canSpawnWorkers) {
+    var dismantle = Memory.dismantle,
+        roomName = room.name,
+        controller = room.controller;
+
+    RoleWorker.checkSpawn(room, canSpawnWorkers);
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
     RoleScientist.checkSpawn(room);
@@ -426,15 +419,16 @@ Base.prototype.run = function(room) {
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
     if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-        RoleDismantler.checkSpawn(room, supportRoom);
+        RoleDismantler.checkSpawn(room);
     }
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
     if (controller && controller.level < 8) {
         RoleUpgrader.checkSpawn(room);
     }
+};
 
-    // Assign tasks to creeps.                    
+Base.prototype.assignTasks = function(room, tasks) {
     RoleWorker.assignTasks(room, tasks);
     RoleMiner.assignTasks(room, tasks);
     RoleStorer.assignTasks(room, tasks);
@@ -448,115 +442,169 @@ Base.prototype.run = function(room) {
     RoleClaimer.assignTasks(room, tasks);
     RoleUpgrader.assignTasks(room, tasks);
 
-    // Assign tasks to towers.
     RoleTower.assignTasks(room, tasks);
+};
 
-    // Update lab queue if necessary.
-    if (storage && labs.length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
-        let sourceLabs = labQueue.sourceLabs || [],
-            children = labQueue.children || [],
-            sourceLab0 = Game.getObjectById(sourceLabs[0]),
-            sourceLab1 = Game.getObjectById(sourceLabs[1]),
-            resource = labQueue.resource;
-        
-        switch (labQueue.status) {
-            case "clearing":
-                if (labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
-                    labQueue.status = "moving";
-                }
-            case "moving":
-                if (!labQueue.start || labQueue.start + 500 < Game.time) {
-                    delete memory.labQueue;
-                    labQueue = undefined;
-                } else {
-                    moved = true;
-                    _.forEach(children, (resource) => {
-                        if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
-                            moved = false;
-                            return false;
-                        }
-                    });
-
-                    if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
-                        _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                            if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
-                                labQueue.amount -= 5;
-                            }
-                        });
-                    }
-
-                    if (moved) {
-                        labQueue.status = "creating";
-                    }
-                }
-                break;
-            case "creating":
-                _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                    if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
-                        labQueue.amount -= 5;
+Base.prototype.labQueue = function(room, labQueue) {
+    var memory = room.memory,
+        labs = Cache.labsInRoom(room),
+        labsInUse = memory.labsInUse,
+        sourceLabs = labQueue.sourceLabs || [],
+        children = labQueue.children || [],
+        sourceLab0 = Game.getObjectById(sourceLabs[0]),
+        sourceLab1 = Game.getObjectById(sourceLabs[1]),
+        resource = labQueue.resource;
+    
+    switch (labQueue.status) {
+        case "clearing":
+            if (labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
+                labQueue.status = "moving";
+            }
+        case "moving":
+            if (!labQueue.start || labQueue.start + 500 < Game.time) {
+                delete memory.labQueue;
+                labQueue = undefined;
+            } else {
+                let moved = true;
+                _.forEach(children, (resource) => {
+                    if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
+                        moved = false;
+                        return false;
                     }
                 });
 
-                if (_.sum(_.filter(labs, (l) => sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
-                    labQueue.status = "returning";
+                if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
+                    _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                        if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
+                            labQueue.amount -= 5;
+                        }
+                    });
                 }
-                break;
-            case "returning":
-                if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) === 0) {
-                    delete memory.labQueue;
-                    labQueue = undefined;
+
+                if (moved) {
+                    labQueue.status = "creating";
                 }
-                break;
-            default:
-                labQueue.status = "clearing";
-                labQueue.sourceLabs = Utilities.getSourceLabs(room);
-                break;
-        }
+            }
+            break;
+        case "creating":
+            _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
+                    labQueue.amount -= 5;
+                }
+            });
+
+            if (_.sum(_.filter(labs, (l) => sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
+                labQueue.status = "returning";
+            }
+            break;
+        case "returning":
+            if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) === 0) {
+                delete memory.labQueue;
+                labQueue = undefined;
+            }
+            break;
+        default:
+            labQueue.status = "clearing";
+            labQueue.sourceLabs = Utilities.getSourceLabs(room);
+            break;
     }
+};
 
-    if (labsInUse) {
-        boosted = [];
+Base.prototype.labsInUse = function(room, labsInUse) {
+    var boosted = [];
 
-        _.forEach(labsInUse, (queue) => {
-            var lab = Game.getObjectById(queue.id);
-            
-            switch (queue.status) {
-                case "emptying":
-                    if (lab.mineralAmount === 0) {
-                        queue.status = "filling";
-                    }
-                    break;
-                case "filling":
-                    if (lab.mineralAmount === queue.amount && lab.mineralType === queue.resource) {
-                        queue.status = "waiting";
-                    }
-                    break;
-                case "waiting":
-                default:
-                    let creep = Game.creeps[queue.creepToBoost];
-                    
-                    if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
-                        if (lab.boostCreep(creep) === OK) {
-                            _.remove(creep.memory.labs, (l) => l === queue.id);
-                            if (!queue.status || queue.oldAmount === 0) {
-                                boosted.push(queue);
-                            } else {
-                                queue.status = "refilling";
-                            }
+    _.forEach(labsInUse, (queue) => {
+        var lab = Game.getObjectById(queue.id);
+        
+        switch (queue.status) {
+            case "emptying":
+                if (lab.mineralAmount === 0) {
+                    queue.status = "filling";
+                }
+                break;
+            case "filling":
+                if (lab.mineralAmount === queue.amount && lab.mineralType === queue.resource) {
+                    queue.status = "waiting";
+                }
+                break;
+            case "waiting":
+            default:
+                let creep = Game.creeps[queue.creepToBoost];
+                
+                if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
+                    if (lab.boostCreep(creep) === OK) {
+                        _.remove(creep.memory.labs, (l) => l === queue.id);
+                        if (!queue.status || queue.oldAmount === 0) {
+                            boosted.push(queue);
+                        } else {
+                            queue.status = "refilling";
                         }
                     }
-                    break;
-                case "refilling":
-                    if (lab.mineralAmount === queue.oldAmount && lab.mineralType === queue.oldResource) {
-                        boosted.push(queue);
-                    }
-                    break;
-            }
-        });
+                }
+                break;
+            case "refilling":
+                if (lab.mineralAmount === queue.oldAmount && lab.mineralType === queue.oldResource) {
+                    boosted.push(queue);
+                }
+                break;
+        }
+    });
 
-        _.forEach(boosted, (queue) => {
-            _.remove(labsInUse, (l) => l.id === queue.id);
-        });
+    _.forEach(boosted, (queue) => {
+        _.remove(labsInUse, (l) => l.id === queue.id);
+    });
+};
+
+Base.prototype.run = function(room) {
+    "use strict";
+
+    var roomName = room.name,
+        spawns = Cache.spawnsInRoom(room),
+        terminal = room.terminal,
+        storage = room.storage,
+        memory = room.memory,
+        labQueue = memory.labQueue,
+        labsInUse = memory.labsInUse,
+        tasks;
+
+    // Something is supremely wrong.  Notify and bail.
+    if (room.unobservable) {
+        Game.notify("Base Room " + roomName + " is unobservable, something is wrong!");
+        return;
+    }
+
+    // Manage room.
+    if (Game.time % 100 === 0 && spawns.length > 0) {
+        this.manage(room);
+    }
+
+    // Transfer energy from near link to far link.
+    if (spawns.length > 0) {
+        this.transferEnergy(room);
+    }
+    
+    // Check to see if we can do a deal in the terminal.
+    if (terminal) {
+        this.terminal(room, terminal);
+    }
+
+    // Get the tasks needed for this room.
+    tasks = this.tasks(room);
+    
+    // Spawn new creeps.
+    this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks.length > 0 || _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0);
+
+    // Assign tasks to creeps and towers.
+    this.assignTasks(room, tasks);
+
+    // Update lab queue if necessary.
+    if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
+        this.labQueue(room, labQueue);
+    }
+
+    // Update labs in use.
+    if (labsInUse) {
+        this.labsInUse(room, labsInUse);
     }
 };
 
@@ -565,7 +613,7 @@ Base.prototype.toObj = function(room) {
 
     Memory.rooms[room.name].roomType = {
         type: this.type
-    }
+    };
 };
 
 Base.fromObj = function(room) {

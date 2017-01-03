@@ -72,7 +72,7 @@ Build.fromObj = function(creep) {
 Build.getTasks = function(room) {
     "use strict";
 
-    return Utilities.objectsClosestToObj(_.map(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => new Build(s.id)), Cache.spawnsInRoom(room)[0] || room.find(FIND_SOURCES)[0]);
+    return _.map(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => new Build(s.id));
 };
 
 require("screeps-profiler").registerObject(Build, "TaskBuild");

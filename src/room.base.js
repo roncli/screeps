@@ -318,10 +318,10 @@ Base.prototype.terminal = function(room, terminal) {
     }
 };
 
-Base.prototype.tasks = function(room) {
+Base.prototype.tasksInit = function(room) {
     "use strict";
     
-    var tasks = {
+    return {
         build: {
             tasks: TaskBuild.getTasks(room)
         },
@@ -371,7 +371,13 @@ Base.prototype.tasks = function(room) {
         dismantle: {
             tasks: []
         }
-    },
+    };
+};
+
+Base.prototype.tasks = function(room) {
+    "use strict";
+    
+    var tasks = tasksInit(room),
         terminal = room.terminal,
         dismantle = Memory.dismantle,
         roomName = room.name,

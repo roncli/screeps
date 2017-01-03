@@ -595,6 +595,7 @@ Base.prototype.run = function(room) {
         memory = room.memory,
         labQueue = memory.labQueue,
         labsInUse = memory.labsInUse,
+        creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("all", room)).length,
         tasks;
 
     // Something is supremely wrong.  Notify and bail.
@@ -619,13 +620,31 @@ Base.prototype.run = function(room) {
     }
 
     // Get the tasks needed for this room.
-    tasks = this.tasks(room);
+    if (creepsWithNoTask > 0) {
+        tasks = this.tasks(room);
+    } else {
+        tasks = {
+            heal: {
+                tasks: TaskHeal.getTasks(room)
+            },
+            rangedAttack: {
+                tasks: TaskRangedAttack.getTasks(room)
+            },
+            repair: {
+                towerTasks: TaskRepair.getTowerTasks(room)
+            }
+        }
+    }
     
     // Spawn new creeps.
     this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks.length > 0 || _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0);
 
     // Assign tasks to creeps and towers.
-    this.assignTasks(room, tasks);
+    if (creepsWithNoTask > 0) {
+        this.assignTasks(room, tasks);
+    } else {
+        RoleTower.assignTasks(room, tasks);
+    }
 
     // Update lab queue if necessary.
     if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {

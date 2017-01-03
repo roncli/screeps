@@ -186,7 +186,7 @@ FillMinerals.getNukerTasks = function(room) {
     return [new FillMinerals(nukers[0].id, RESOURCE_GHODIUM)];
 };
 
-FillEnergy.getPowerSpawnTasks = function(room) {
+FillMinerals.getPowerSpawnTasks = function(room) {
     "use strict";
 
     var spawns = Cache.powerSpawnsInRoom(room);

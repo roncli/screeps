@@ -235,14 +235,14 @@ CollectMinerals.getStorageTasks = function(room) {
     }
 
     // If we have a nuker, transfer ghodium.
-    _.forEach(Cache.getNukersInRoom(room), (nuker) => {
+    _.forEach(Cache.nukersInRoom(room), (nuker) => {
         if (nuker.ghodium < nuker.ghodiumCapacity) {
             tasks.push(new CollectMinerals(room.storage.id, RESOURCE_GHODIUM, nuker.ghodiumCapacity - nuker.ghodium));
         }
     });
 
     // If we have a power spawn, transfer power.
-    _.forEach(Cache.getPowerSpawnsInRoom(room), (spawn) => {
+    _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
         if (spawn.power < spawn.powerCapacity) {
             tasks.push(new CollectMinerals(room.storage.id, RESOURCE_POWER, spawn.powerCapacity - spawn.power));
         }

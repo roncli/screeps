@@ -568,7 +568,7 @@ var profiler = require("screeps-profiler"),
                 var roomName = room.name,
                     roomMemory = Memory.rooms[roomName],
                     type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",
-                    repairableStructures, constructionSites, towers, labs;
+                    repairableStructures, constructionSites, towers, labs, nukers, powerSpawns;
 
                 // Log room data.
                 if (room.unobservable) {
@@ -587,6 +587,8 @@ var profiler = require("screeps-profiler"),
                     constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES),
                     towers = Cache.towersInRoom(room),
                     labs = Cache.labsInRoom(room);
+                    nukers = Cache.nukersInRoom(room);
+                    powerSpawns = Cache.powerSpawnsInRoom(room);
 
                     Cache.log.rooms[roomName] = {
                         type: type,
@@ -642,6 +644,15 @@ var profiler = require("screeps-profiler"),
 
                     Cache.log.rooms[roomName].labEnergy = _.sum(_.map(labs, (l) => l.energy));
                     Cache.log.rooms[roomName].labEnergyCapacity = _.sum(_.map(labs, (l) => l.energyCapacity));
+
+                    Cache.log.rooms[roomName].nukerEnergy = _.sum(_.map(nukers, (n) => n.energy));
+                    Cache.log.rooms[roomName].nukerEnergyCapacity = _.sum(_.map(nukres, (l) => n.energyCapacity));
+
+                    Cache.log.rooms[roomName].nukerGhodium = _.sum(_.map(nukers, (n) => n.ghodium));
+                    Cache.log.rooms[roomName].nukerGhodiumCapacity = _.sum(_.map(nukres, (l) => n.ghodiumCapacity));
+
+                    Cache.log.rooms[roomName].powerSpawnPower = _.sum(_.map(powerSpawns, (s) => s.power));
+                    Cache.log.rooms[roomName].powerSpawnPowerCapacity = _.sum(_.map(powerSpawns, (s) => s.powerCapacity));
 
                     if (room.storage) {
                         Cache.log.rooms[roomName].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});

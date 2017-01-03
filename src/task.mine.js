@@ -2,10 +2,12 @@ var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
-    Mine = function() {
+    Mine = function(id) {
         Task.call(this);
         
         this.type = "mine";
+        this.id = id;
+        this.source = Game.getObjectById(id);
     };
     
 Mine.prototype = Object.create(Task.prototype);
@@ -41,12 +43,16 @@ Mine.prototype.run = function(creep) {
         Pathing.moveTo(creep, container, 0);
     }
 
-    // If we are at the container, get the source closest to the creep and attempt to harvest it.
+    // If we are at the container, get the source closest to the creep and attempt to harvest it.  Save it for future use.
     if (container.pos.x === creep.pos.x && container.pos.y === creep.pos.y && container.pos.roomName === creep.pos.roomName) {
-        if (Memory.containerSource[creep.memory.container]) {
+        if (this.source) {
+            source = this.source;
+        } else if (Memory.containerSource[creep.memory.container]) {
             source = Game.getObjectById(Memory.containerSource[creep.memory.container]);
+            this.id = source.id;
         } else {
             source = Utilities.objectsClosestToObj([].concat.apply([], [container.room.find(FIND_SOURCES), container.room.find(FIND_MINERALS)]), creep)[0];
+            this.id = source.id;
         }
 
         if (source instanceof Mineral && source.mineralAmount === 0) {
@@ -87,14 +93,15 @@ Mine.prototype.toObj = function(creep) {
     "use strict";
 
     creep.memory.currentTask = {
-        type: this.type
+        type: this.type,
+        id: this.id
     }
 };
 
 Mine.fromObj = function(creep) {
     "use strict";
 
-    return new Mine();
+    return new Mine(creep.memory.currentTask.id);
 };
 
 require("screeps-profiler").registerObject(Mine, "TaskMine");

@@ -403,6 +403,8 @@ Base.prototype.tasks = function(room) {
             creep.memory.container = Cache.containersInRoom(room)[0].id;
         });
     }
+
+    return tasks;
 };
 
 Base.prototype.spawn = function(room, canSpawnWorkers) {

@@ -163,15 +163,40 @@ FillEnergy.getStorageTasks = function(room) {
 FillEnergy.getLinkTasks = function(room) {
     "use strict";
 
-    var links;
+    var links = Cache.linksInRoom(room),
+        spawns = Cache.spawnsInRoom(room);
 
-    if (Cache.linksInRoom(room).length === 0) {
+    if (links.length === 0 || spawns.length === 0) {
         return [];
     }
 
-    links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]);
+    links = Utilities.objectsClosestToObj(links, spawns[0]);
     return [new FillEnergy(links[0].id)];
-}
+};
+
+FillEnergy.getNukerTasks = function(room) {
+    "use strict";
+
+    var nukers = Cache.nukersInRoom(room);
+
+    if (nukers.length === 0) {
+        return [];
+    }
+
+    return [new FillEnergy(nukers[0].id)];
+};
+
+FillEnergy.getPowerSpawnTasks = function(room) {
+    "use strict";
+
+    var spawns = Cache.powerSpawnsInRoom(room);
+
+    if (spawns.length === 0) {
+        return [];
+    }
+
+    return [new FillEnergy(spawns[0].id)];
+};
 
 require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
 module.exports = FillEnergy;

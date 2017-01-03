@@ -356,11 +356,13 @@ Base.prototype.run = function(room) {
         fillEnergy: {
             extensionTasks: TaskFillEnergy.getExtensionTasks(room),
             spawnTasks: TaskFillEnergy.getSpawnTasks(room),
+            powerSpawnTasks: TaskFillEnergy.getPowerSpawnTasks(room),
             towerTasks: TaskFillEnergy.getTowerTasks(room),
             storageTasks: TaskFillEnergy.getStorageTasks(room),
             containerTasks: TaskFillEnergy.getContainerTasks(room),
             labTasks: TaskFillEnergy.getLabTasks(room),
             linkTasks: TaskFillEnergy.getLinkTasks(room),
+            nukerTasks: TaskFillEnergy.getNukerTasks(room),
             terminalTask: terminalTask
         },
         fillMinerals: {

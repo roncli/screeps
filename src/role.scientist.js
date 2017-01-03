@@ -243,6 +243,52 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled nukers.
+            _.forEach(tasks.fillEnergy.nukerTasks, (task) => {
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("NukeEnergy");
+                            assigned.push(creep.name);
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+            
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled power spawns.
+            _.forEach(tasks.fillEnergy.powerSpawnTasks, (task) => {
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(Cache.creepsInRoom("all", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("PwrEnergy");
+                            assigned.push(creep.name);
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+            
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled extensions.
             _.forEach(_.sortBy(creepsWithNoTask, (c) => c.pos.getRangeTo(Cache.spawnsInRoom(room)[0])), (creep) => {
                 _.forEach(_.sortBy(tasks.fillEnergy.extensionTasks, (t) => t.object.pos.getRangeTo(creep)), (task) => {

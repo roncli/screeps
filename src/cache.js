@@ -1,9 +1,11 @@
 var creepsInRoom = {},
     creepsInArmy = {},
     spawnsInRoom = {},
+    powerSpawnsInRoom = {},
     extensionsInRoom = {},
     towersInRoom = {},
     labsInRoom = {},
+    nukersInRoom = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
@@ -26,9 +28,11 @@ var creepsInRoom = {},
             creepsInRoom = {};
             creepsInArmy = {};
             spawnsInRoom = {};
+            powerSpawnsInRoom = {};
             extensionsInRoom = {};
             towersInRoom = {};
             labsInRoom = {};
+            nukersInRoom = {};
             containersInRoom = {};
             linksInRoom = {};
             repairableStructuresInRoom = {};
@@ -90,6 +94,13 @@ var creepsInRoom = {},
     
             return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : (spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureSpawn));
         },
+
+        // Returns all power spawns in the current room.
+        powerSpawnsInRoom: (room) => {
+            "use strict";
+
+            return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : (powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCURES), (s) => s instanceof StructurePowerSpawn));
+        },
         
         // Returns all extentions in the current room.
         extensionsInRoom: (room) => {
@@ -110,6 +121,13 @@ var creepsInRoom = {},
             "use strict";
     
             return labsInRoom[room.name] ? labsInRoom[room.name] : (labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureLab));
+        },
+
+        // Returns all nukers in the current room.
+        nukersInRoom: (room) => {
+            "use strict";
+
+            return nukersInRoom[room.name] ? nukersInRoom[room.name] : (nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureNuker));
         },
     
         // Returns all containers in the current room.

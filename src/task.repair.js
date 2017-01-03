@@ -82,19 +82,19 @@ Repair.fromObj = function(creep) {
 Repair.getTowerTasks = function(room) {
     "use strict";
 
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.25), (s) => new Repair(s.id)), (s) => s.structure.hits);
+    return _.map(_.take(_.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.25), (s) => s.structure.hits), 5), (s) => new Repair(s.id));
 };
 
 Repair.getCriticalTasks = function(room) {
     "use strict";
 
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 100000 && s.hits / s.hitsMax < 0.5), (s) => new Repair(s.id)), (s) => s.structure.hits);
+    return _.map(_.take(_.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits < 100000 && s.hits / s.hitsMax < 0.5), (s) => s.structure.hits), 5), (s) => new Repair(s.id));
 };
 
 Repair.getTasks = function(room) {
     "use strict";
 
-    return _.sortBy(_.map(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), (s) => new Repair(s.id)), (s) => s.structure.hits);
+    return _.map(_.take(_.sortBy(_.filter(Cache.repairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), (s) => s.structure.hits), 5), (s) => new Repair(s.id));
 };
 
 require("screeps-profiler").registerObject(Repair, "TaskRepair");

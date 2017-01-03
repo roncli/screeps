@@ -152,14 +152,17 @@ FillMinerals.getLabTasks = function(room) {
 FillMinerals.getStorageTasks = function(room) {
     "use strict";
 
+    var storage = room.storage,
+        store;
+
     // If the room only has storage and no terminal, minerals go to storage.
-    if (room.storage && !room.terminal) {
-        return [new FillMinerals(room.storage.id)];
+    if (storage && !room.terminal) {
+        return [new FillMinerals(storage.id)];
     }
 
     // If the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
-    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity && Memory.reserveMinerals) {
-        return _.filter(_.map(_.keys(Memory.reserveMinerals), (r) => new FillMinerals(room.storage.id, r, Memory.reserveMinerals[r] - (room.storage.store[r] || 0))), (f) => f.amount > 0);
+    if (storage && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
+        return _.filter(_.map(_.keys(Memory.reserveMinerals), (r) => new FillMinerals(storage.id, r, Memory.reserveMinerals[r] - (store[r] || 0))), (f) => f.amount > 0);
     }
 };
 

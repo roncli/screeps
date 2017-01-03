@@ -3,15 +3,23 @@ var Task = require("task"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     Upgrade = function(room) {
-        Task.call(this);
-
-        this.type = "upgradeController";
-        this.room = room;
-        this.controller = Game.rooms[room].controller;
+        "use strict";
+        
+        this.init(room);
     };
     
 Upgrade.prototype = Object.create(Task.prototype);
 Upgrade.prototype.constructor = Upgrade;
+
+Upgrade.prototype.init = function(room) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "upgradeController";
+    this.room = room;
+    this.controller = Game.rooms[room].controller;
+};
 
 Upgrade.prototype.canAssign = function(creep) {
     "use strict";
@@ -22,7 +30,7 @@ Upgrade.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Upgrade.prototype.run = function(creep) {
     "use strict";
@@ -49,7 +57,7 @@ Upgrade.prototype.run = function(creep) {
     creep.transfer(this.controller, RESOURCE_ENERGY);
 
     if (Memory.signs && Memory.signs[creep.room.name] && (!this.controller.sign || this.controller.sign.username !== "roncli")) {
-        creep.signController(this.controller, Memory.signs[creep.room.name])
+        creep.signController(this.controller, Memory.signs[creep.room.name]);
     }
 };
 
@@ -69,7 +77,7 @@ Upgrade.prototype.toObj = function(creep) {
     creep.memory.currentTask = {
         type: this.type,
         room: this.room
-    }
+    };
 };
 
 Upgrade.fromObj = function(creep) {

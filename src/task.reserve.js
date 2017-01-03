@@ -1,14 +1,21 @@
 var Task = require("task"),
-    Cache = require("cache"),
     Pathing = require("pathing"),
     Reserve = function(id) {
-        Task.call(this);
-
-        this.type = "reserve";
+        "use strict";
+        
+        this.init(id);
     };
     
 Reserve.prototype = Object.create(Task.prototype);
 Reserve.prototype.constructor = Reserve;
+
+Reserve.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "reserve";
+};
 
 Reserve.prototype.canAssign = function(creep) {
     "use strict";
@@ -23,7 +30,7 @@ Reserve.prototype.canAssign = function(creep) {
 
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Reserve.prototype.run = function(creep) {
     "use strict";
@@ -40,7 +47,7 @@ Reserve.prototype.run = function(creep) {
     creep.reserveController(Game.rooms[creep.memory.home].controller);
 
     if (Memory.signs && Memory.signs[creep.room.name] && (!creep.room.controller.sign || creep.room.controller.sign.username !== "roncli")) {
-        creep.signController(creep.room.controller, Memory.signs[creep.room.name])
+        creep.signController(creep.room.controller, Memory.signs[creep.room.name]);
     }
 };
 
@@ -65,7 +72,7 @@ Reserve.prototype.toObj = function(creep) {
     if (creep.room.controller) {
         creep.memory.currentTask = {
             type: this.type
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }
@@ -83,7 +90,7 @@ Reserve.getTask = function(creep) {
     if (creep.room.controller) {
         return new Reserve();
     }
-}
+};
 
 Reserve.getRemoteTask = function(creep) {
     "use strict";
@@ -91,7 +98,7 @@ Reserve.getRemoteTask = function(creep) {
     if (Game.rooms[creep.memory.home].controller) {
         return new Reserve();
     }
-}
+};
 
 require("screeps-profiler").registerObject(Reserve, "TaskReserve");
 module.exports = Reserve;

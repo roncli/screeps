@@ -2,15 +2,23 @@ var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
     Ranged = function(id) {
-        Task.call(this);
-
-        this.type = "rangedAttack";
-        this.id = id;
-        this.enemy = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id);
     };
     
 Ranged.prototype = Object.create(Task.prototype);
 Ranged.prototype.constructor = Ranged;
+
+Ranged.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "rangedAttack";
+    this.id = id;
+    this.enemy = Game.getObjectById(id);
+};
 
 Ranged.prototype.canAssign = function(creep) {
     "use strict";
@@ -21,7 +29,7 @@ Ranged.prototype.canAssign = function(creep) {
 
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Ranged.prototype.run = function(creep) {
     "use strict";
@@ -84,7 +92,7 @@ Ranged.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }
@@ -106,7 +114,7 @@ Ranged.getDefenderTask = function(creep) {
     "use strict";
 
     return _.map(_.sortBy(Cache.hostilesInRoom(creep.room), (h) => h.hits), (h) => new Ranged(h.id))[0];
-}
+};
 
 require("screeps-profiler").registerObject(Ranged, "TaskRangedAttack");
 module.exports = Ranged;

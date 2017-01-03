@@ -3,15 +3,23 @@ var Task = require("task"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     Mine = function(id) {
-        Task.call(this);
+        "use strict";
         
-        this.type = "mine";
-        this.id = id;
-        this.source = Game.getObjectById(id);
+        this.init(id);
     };
     
 Mine.prototype = Object.create(Task.prototype);
 Mine.prototype.constructor = Mine;
+
+Mine.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+    
+    this.type = "mine";
+    this.id = id;
+    this.source = Game.getObjectById(id);
+};
 
 Mine.prototype.canAssign = function(creep) {
     "use strict";
@@ -24,7 +32,7 @@ Mine.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Mine.prototype.run = function(creep) {
     "use strict";

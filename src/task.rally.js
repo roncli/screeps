@@ -1,22 +1,29 @@
 var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
-    Utilities = require("utilities"),
     Rally = function(id, creep) {
-        Task.call(this);
-
-        this.type = "rally";
-        this.id = id;
-        this.creep = creep;
-        this.rallyPoint = Game.getObjectById(id);
-        if (!this.rallyPoint) {
-            this.rallyPoint = new RoomPosition(25, 25, id);
-            this.range = 5;
-        }
+        "use strict";
+        
+        this.init(id, creep);
     };
     
 Rally.prototype = Object.create(Task.prototype);
 Rally.prototype.constructor = Rally;
+
+Rally.prototype.init = function(id, creep) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "rally";
+    this.id = id;
+    this.creep = creep;
+    this.rallyPoint = Game.getObjectById(id);
+    if (!this.rallyPoint) {
+        this.rallyPoint = new RoomPosition(25, 25, id);
+        this.range = 5;
+    }
+};
 
 Rally.prototype.canAssign = function(creep) {
     "use strict";
@@ -27,7 +34,7 @@ Rally.prototype.canAssign = function(creep) {
 
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Rally.prototype.run = function(creep) {
     "use strict";
@@ -86,7 +93,7 @@ Rally.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }

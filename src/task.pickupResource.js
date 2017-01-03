@@ -2,15 +2,23 @@ var Task = require("task"),
     TaskCollectEnergy = require("task.collectEnergy"),
     Pathing = require("pathing"),
     Pickup = function(id) {
-        Task.call(this);
-
-        this.type = "pickupResource";
-        this.id = id;
-        this.resource = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id);
     };
     
 Pickup.prototype = Object.create(Task.prototype);
 Pickup.prototype.constructor = Pickup;
+
+Pickup.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "pickupResource";
+    this.id = id;
+    this.resource = Game.getObjectById(id);
+};
 
 Pickup.prototype.canAssign = function(creep) {
     "use strict";
@@ -21,7 +29,7 @@ Pickup.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Pickup.prototype.run = function(creep) {
     "use strict";
@@ -70,7 +78,7 @@ Pickup.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.resource.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }

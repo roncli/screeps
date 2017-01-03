@@ -2,15 +2,23 @@ var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
     Repair = function(id) {
-        Task.call(this);
-
-        this.type = "repair";
-        this.id = id;
-        this.structure = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id);
     };
     
 Repair.prototype = Object.create(Task.prototype);
 Repair.prototype.constructor = Repair;
+
+Repair.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "repair";
+    this.id = id;
+    this.structure = Game.getObjectById(id);
+};
 
 Repair.prototype.canAssign = function(creep) {
     "use strict";
@@ -26,7 +34,7 @@ Repair.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Repair.prototype.run = function(creep) {
     "use strict";
@@ -59,7 +67,7 @@ Repair.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.structure.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }

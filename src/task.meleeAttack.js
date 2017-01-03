@@ -2,15 +2,23 @@ var Task = require("task"),
     Cache = require("cache"),
     Pathing = require("pathing"),
     Melee = function(id) {
-        Task.call(this);
-
-        this.type = "meleeAttack";
-        this.id = id;
-        this.enemy = Game.getObjectById(id);
+        "use strict";
+        
+        this.init(id);
     };
     
 Melee.prototype = Object.create(Task.prototype);
 Melee.prototype.constructor = Melee;
+
+Melee.prototype.init = function(id) {
+    "use strict";
+    
+    Task.call(this);
+
+    this.type = "meleeAttack";
+    this.id = id;
+    this.enemy = Game.getObjectById(id);
+};
 
 Melee.prototype.canAssign = function(creep) {
     "use strict";
@@ -21,7 +29,7 @@ Melee.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Melee.prototype.run = function(creep) {
     "use strict";

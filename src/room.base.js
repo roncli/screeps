@@ -26,13 +26,17 @@ var RoomObj = require("roomObj"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController"),
     Base = function() {
-        RoomObj.call(this);
-
-        this.type = "base";
+        this.init();
     };
 
 Base.prototype = Object.create(RoomObj.prototype);
 Base.prototype.constructor = Base;
+
+Base.prototype.init = function() {
+    RoomObj.call(this);
+
+    this.type = "base";
+};
 
 Base.prototype.manage = function(room) {
     "use strict";

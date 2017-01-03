@@ -9,26 +9,25 @@ var RoomObj = require("roomObj"),
     RoleRemoteStorer = require("role.remoteStorer"),
     RoleRemoteWorker = require("role.remoteWorker"),
     TaskBuild = require("task.build"),
-    TaskCollectEnergy = require("task.collectEnergy"),
-    TaskCollectMinerals = require("task.collectMinerals"),
     TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHeal = require("task.heal"),
-    TaskRally = require("task.rally"),
-    TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
-    TaskUpgradeController = require("task.upgradeController"),
     Mine = function(supportRoom, stage) {
-        RoomObj.call(this);
-
-        this.type = "mine";
-        this.supportRoom = supportRoom;
-        this.stage = stage || 1;
+        this.init(supportRoom, stage);
     };
 
 Mine.prototype = Object.create(RoomObj.prototype);
 Mine.prototype.constructor = Mine;
+
+Mine.prototype.init = function(supportRoom, stage) {
+    RoomObj.call(this);
+
+    this.type = "mine";
+    this.supportRoom = supportRoom;
+    this.stage = stage || 1;
+};
 
 Mine.prototype.run = function(room) {
     "use strict";

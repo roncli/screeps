@@ -4,12 +4,8 @@ var RoomObj = require("roomObj"),
     Utilities = require("utilities"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
-    RoleDefender = require("role.defender"),
     RoleDismantler = require("role.dismantler"),
-    RoleHealer = require("role.healer"),
-    RoleMeleeAttack = require("role.meleeAttack"),
     RoleMiner = require("role.miner"),
-    RoleRangedAttack = require("role.rangedAttack"),
     RoleScientist = require("role.scientist"),
     RoleStorer = require("role.storer"),
     RoleTower = require("role.tower"),
@@ -438,10 +434,6 @@ Base.prototype.spawn = function(room, canSpawnWorkers) {
     RoleMiner.checkSpawn(room);
     RoleStorer.checkSpawn(room);
     RoleScientist.checkSpawn(room);
-    RoleMeleeAttack.checkSpawn(room);
-    RoleRangedAttack.checkSpawn(room);
-    RoleHealer.checkSpawn(room);
-    RoleDefender.checkSpawn(room);
     if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
         RoleDismantler.checkSpawn(room);
     }
@@ -459,10 +451,6 @@ Base.prototype.assignTasks = function(room, tasks) {
     RoleMiner.assignTasks(room, tasks);
     RoleStorer.assignTasks(room, tasks);
     RoleScientist.assignTasks(room, tasks);
-    RoleMeleeAttack.assignTasks(room, tasks);
-    RoleRangedAttack.assignTasks(room, tasks);
-    RoleHealer.assignTasks(room, tasks);
-    RoleDefender.assignTasks(room, tasks);
     RoleDismantler.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);

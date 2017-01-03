@@ -2,7 +2,6 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
-    TaskRangedAttack = require("task.rangedAttack"),
 
     Healer = {
         checkSpawn: (room) => {
@@ -11,31 +10,19 @@ var Cache = require("cache"),
             var healers = Cache.creepsInRoom("healer", room),
                 healer = Memory.maxCreeps.healer,
                 roomName = room.name,
-                num = 0,
+                supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
+                supportRoomName = supportRoom.name,
                 max = 0;
             
-            // If there are no spawns in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0) {
-                return;
-            }
-
             // Loop through the room healers to see if we need to spawn a creep.
-            if (healer) {
-                _.forEach(healer[roomName], (value, toRoomName) => {
-                    var count = _.filter(healers, (c) => c.memory.defending === toRoomName).length,
-                        toRoom = Game.rooms[toRoomName],
-                        maxCreeps = value.maxCreeps;
+            if (healer && healer[supportRoomName] && healer[supportRoomName][roomName]) {
+                if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
+                    max = healer[supportRoomName][roomName].maxCreeps;
                     
-                    num += count;
-
-                    if ((toRoom && toRoom.memory.harvested >= 30000) || Cache.hostilesInRoom(toRoom).length > 0) {
-                        max += maxCreeps;
-                        
-                        if (count < maxCreeps) {
-                            Healer.spawn(room, toRoomName);
-                        }
+                    if (_.filter(healers, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                        Healer.spawn(room, supportRoom);
                     }
-                });
+                }
             }
 
             // Output healer count in the report.
@@ -48,11 +35,12 @@ var Cache = require("cache"),
             }        
         },
         
-        spawn: (room, toRoomName) => {
+        spawn: (room, supportRoom) => {
             "use strict";
 
             var body = [],
                 roomName = room.name,
+                supportRoomName = supportRoom.name,
                 energy, units, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -61,7 +49,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 7500.
-            energy = Math.min(room.energyCapacityAvailable, 7500);
+            energy = Math.min(supportRoom.energyCapacityAvailable, 7500);
             units = Math.floor(energy / 300);
 
             for (count = 0; count < units; count++) {
@@ -73,12 +61,12 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "healer-" + toRoomName + "-" + Game.time.toFixed(0).substring(4), {role: "healer", home: roomName, defending: toRoomName});
-            if (spawnToUse.room.name === roomName) {
+            name = spawnToUse.createCreep(body, "healer-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "healer", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -96,7 +84,7 @@ var Cache = require("cache"),
             }
 
             // If the creeps are not in the room, rally them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.room), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
@@ -127,7 +115,7 @@ var Cache = require("cache"),
             }
 
             // Rally the troops!
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.room), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);

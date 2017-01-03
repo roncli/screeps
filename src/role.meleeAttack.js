@@ -1,6 +1,5 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
     TaskMeleeAttack = require("task.meleeAttack"),
 
@@ -11,31 +10,19 @@ var Cache = require("cache"),
             var melee = Cache.creepsInRoom("meleeAttack", room),
                 meleeAttack = Memory.maxCreeps.meleeAttack,
                 roomName = room.name,
-                num = 0,
+                supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
+                supportRoomName = supportRoom.name,
                 max = 0;
-            
-            // If there are no spawns in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0) {
-                return;
-            }
 
             // Loop through the room melee attackers to see if we need to spawn a creep.
-            if (meleeAttack) {
-                _.forEach(meleeAttack[roomName], (value, toRoomName) => {
-                    var count = _.filter(melee, (c) => c.memory.defending === toRoomName).length,
-                        toRoom = Game.rooms[toRoomName],
-                        maxCreeps = value.maxCreeps;
-                        
-                    num += count;
+            if (meleeAttack && meleeAttack[supportRoomName] && meleeAttack[supportRoomName][roomName]) {
+                if ((room && room.memory.harvested >= 30000) || (room && Cache.hostilesInRoom(room).length > 0)) {
+                    max = meleeAttack[supportRoomName][roomName].maxCreeps;
 
-                    if ((toRoom && toRoom.memory.harvested >= 30000) || (toRoom && Cache.hostilesInRoom(toRoom).length > 0)) {
-                        max += maxCreeps;
-
-                        if (count < maxCreeps) {
-                            Melee.spawn(room, toRoomName);
-                        }
+                    if (_.filter(melee, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                        Melee.spawn(room, supportRoom);
                     }
-                });
+                }
             }
 
             // Output melee attacker count in the report.
@@ -48,11 +35,12 @@ var Cache = require("cache"),
             }        
         },
         
-        spawn: (room, toRoomName) => {
+        spawn: (room, supportRoom) => {
             "use strict";
 
             var body = [],
                 roomName = room.name,
+                supportRoomName = supportRoom.name,
                 energy, units, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -61,7 +49,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 3250.
-            energy = Math.min(room.energyCapacityAvailable, 3250);
+            energy = Math.min(supportRoom.energyCapacityAvailable, 3250);
             units = Math.floor(energy / 130);
 
             // Create the body based on the energy.
@@ -74,12 +62,12 @@ var Cache = require("cache"),
             }
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "meleeAttack-" + toRoomName + "-" + Game.time.toFixed(0).substring(4), {role: "meleeAttack", home: roomName, defending: toRoomName});
-            if (spawnToUse.room.name === roomName) {
+            name = spawnToUse.createCreep(body, "meleeAttack-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "meleeAttack", home: roomName, defending: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -97,7 +85,7 @@ var Cache = require("cache"),
             }
 
             // If the creeps are not in the room, rally them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
@@ -128,7 +116,7 @@ var Cache = require("cache"),
             }
 
             // Rally the troops!
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);

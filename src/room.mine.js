@@ -2,7 +2,11 @@ var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
+    RoleDefender = require("role.defender"),
     RoleDismantler = require("role.dismantler"),
+    RoleHealer = require("role.healer"),
+    RoleMeleeAttack = require("role.meleeAttack"),
+    RoleRangedAttack = require("role.rangedAttack"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteReserver = require("role.remoteReserver"),
@@ -13,6 +17,7 @@ var RoomObj = require("roomObj"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHeal = require("task.heal"),
+    TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
     Mine = function(supportRoom, stage) {
         "use strict";
@@ -161,6 +166,10 @@ Mine.prototype.run = function(room) {
             }
 
             // Spawn new creeps.
+            RoleMeleeAttack.checkSpawn(room);
+            RoleRangedAttack.checkSpawn(room);
+            RoleHealer.checkSpawn(room);
+            RoleDefender.checkSpawn(room);
             RoleRemoteReserver.checkSpawn(room);
             RoleRemoteMiner.checkSpawn(room);
             RoleRemoteWorker.checkSpawn(room);
@@ -191,6 +200,9 @@ Mine.prototype.run = function(room) {
             tasks.heal = {
                 tasks: TaskHeal.getTasks(room)
             };
+            tasks.rangedAttack = {
+                tasks: TaskRangedAttack.getTasks(room)
+            };
             tasks.repair = {
                 criticalTasks: TaskRepair.getCriticalTasks(room),
                 tasks: TaskRepair.getTasks(room)
@@ -220,6 +232,10 @@ Mine.prototype.run = function(room) {
         }
 
         // Assign tasks to creeps.                    
+        RoleMeleeAttack.assignTasks(room, tasks);
+        RoleRangedAttack.assignTasks(room, tasks);
+        RoleHealer.assignTasks(room, tasks);
+        RoleDefender.assignTasks(room, tasks);
         RoleRemoteReserver.assignTasks(room, tasks);
         RoleRemoteMiner.assignTasks(room, tasks);
         RoleRemoteWorker.assignTasks(room, tasks);

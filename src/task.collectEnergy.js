@@ -44,7 +44,7 @@ CollectEnergy.prototype.canAssign = function(creep) {
 
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 CollectEnergy.prototype.run = function(creep) {
     "use strict";
@@ -103,7 +103,7 @@ CollectEnergy.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }

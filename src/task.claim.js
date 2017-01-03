@@ -1,5 +1,4 @@
 var Task = require("task"),
-    Cache = require("cache"),
     Pathing = require("pathing"),
     Claim = function(id) {
         "use strict";
@@ -29,7 +28,7 @@ Claim.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 Claim.prototype.run = function(creep) {
     "use strict";
@@ -61,7 +60,7 @@ Claim.prototype.toObj = function(creep) {
     if (creep.room.controller) {
         creep.memory.currentTask = {
             type: this.type
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }
@@ -79,7 +78,7 @@ Claim.getTask = function(creep) {
     if (creep.room.controller) {
         return new Claim();
     }
-}
+};
 
 require("screeps-profiler").registerObject(Claim, "TaskClaim");
 module.exports = Claim;

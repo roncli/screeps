@@ -8,50 +8,40 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var defender = Memory.maxCreeps.defender,
+            var defenders = Cache.creepsInRoom("defender", room),
+                defender = Memory.maxCreeps.defender,
                 roomName = room.name,
-                num = 0,
+                supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
+                supportRoomName = supportRoom.name,
                 max = 0;
             
-            // If there are no spawns in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0) {
-                return;
-            }
-
             // Loop through the room defenders to see if we need to spawn a creep.
-            if (defender) {
-                _.forEach(defender[roomName], (value, toRoomName) => {
-                    var count = _.filter(Cache.creepsInRoom("defender", room), (c) => c.memory.defending === toRoomName).length,
-                        toRoom = Game.rooms[toRoomName],
-                        maxCreeps = value.maxCreeps;
-                    
-                    num += count;
+            if (defender && defender[supportRoomName] && defender[supportRoomName][roomName]) {
+                if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
+                    max = defender[supportRoomName][roomName].maxCreeps;
 
-                    if ((toRoom && toRoom.memory.harvested >= 30000) || Cache.hostilesInRoom(toRoom).length > 0) {
-                        max += maxCreeps;
-
-                        if (count < maxCreeps) {
-                            Defender.spawn(room, toRoomName);
-                        }
+                    if (_.filter(defenders, (c) => c.memory.supportRoom === supportRoomName).length < max) {
+                        Defender.spawn(room, supportRoom);
                     }
-                });
+                }
             }
 
             // Output defender count in the report.
-            if (max > 0) {
+            if (defenders.length > 0 || max > 0) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "defender",
-                    count: num,
+                    count: defenders.length,
                     max: max
                 });
             }        
         },
         
-        spawn: (room, toRoom) => {
+        spawn: (room, supportRoom) => {
             "use strict";
 
             var body = [],
                 roomName = room.name,
+                supportRoomName = supportRoom.name,
                 energy, units, remainder, count, spawnToUse, name;
 
             // Fail if all the spawns are busy.
@@ -60,7 +50,7 @@ var Cache = require("cache"),
             }
 
             // Get the total energy in the room, limited to 6200.
-            energy = Math.min(room.energyCapacityAvailable, 6200);
+            energy = Math.min(supportRoom.energyCapacityAvailable, 6200);
             units = Math.floor(energy / 500);
             remainder = energy % 500;
 
@@ -91,12 +81,12 @@ var Cache = require("cache"),
             } 
 
             // Create the creep from the first listed spawn that is available.
-            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region), (s) => s.room.name === roomName ? 0 : 1)[0];
+            spawnToUse = _.sortBy(_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region), (s) => s.room.name === supportRoomName ? 0 : 1)[0];
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "defender-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "defender", home: roomName, defending: toRoom});
-            if (spawnToUse.room.name === roomName) {
+            name = spawnToUse.createCreep(body, "defender-" + room + "-" + Game.time.toFixed(0).substring(4), {role: "defender", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
 
@@ -114,7 +104,7 @@ var Cache = require("cache"),
             }
 
             // If the creeps are not in the room, rally them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
@@ -161,7 +151,7 @@ var Cache = require("cache"),
             }
 
             // Rally the troops!
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.defending), (creep) => {
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);

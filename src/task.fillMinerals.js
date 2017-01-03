@@ -25,6 +25,14 @@ FillMinerals.prototype.canAssign = function(creep) {
     if (this.resource && (!creep.carry[this.resource] || creep.carry[this.resource] === 0)) {
         return false;
     }
+
+    if (this.object instanceof StructureNuker && this.object.ghodium === this.object.ghodiumCapacity) {
+        return false;
+    }
+
+    if (this.object instanceof StructurePowerSpawn && this.object.power === this.object.powerCapacity) {
+        return false;
+    }
     
     Task.prototype.assign.call(this, creep);
     return true;
@@ -164,6 +172,30 @@ FillMinerals.getTerminalTasks = function(room) {
         return [new FillMinerals(room.terminal.id)];
     }
     return [];
+};
+
+FillMinerals.getNukerTasks = function(room) {
+    "use strict";
+
+    var nukers = Cache.nukersInRoom(room);
+
+    if (nukers.length === 0) {
+        return [];
+    }
+
+    return [new FillMinerals(nukers[0].id, RESOURCE_GHODIUM)];
+};
+
+FillEnergy.getPowerSpawnTasks = function(room) {
+    "use strict";
+
+    var spawns = Cache.powerSpawnsInRoom(room);
+
+    if (spawns.length === 0) {
+        return [];
+    }
+
+    return [new FillMinerals(spawns[0].id, RESOURCE_POWER)];
 };
 
 require("screeps-profiler").registerObject(FillMinerals, "TaskFillMinerals");

@@ -368,7 +368,9 @@ Base.prototype.run = function(room) {
         fillMinerals: {
             labTasks: TaskFillMinerals.getLabTasks(room),
             storageTasks: TaskFillMinerals.getStorageTasks(room),
-            terminalTasks: TaskFillMinerals.getTerminalTasks(room)
+            terminalTasks: TaskFillMinerals.getTerminalTasks(room),
+            nukerTasks: TaskFillMinerals.getNukerTasks(room),
+            powerSpawnTasks: TaskFillMinerals.getPowerSpawnTasks(room)
         },
         heal: {
             tasks: TaskHeal.getTasks(room)

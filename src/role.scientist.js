@@ -170,6 +170,40 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for unfilled nukers for minerals.
+            _.forEach(tasks.fillMinerals.nukerTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("NukeG");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Check for unfilled power spawns for minerals.
+            _.forEach(tasks.fillMinerals.powerSpawnTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("powerPower");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled storage for minerals.
             _.forEach(tasks.fillMinerals.storageTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {

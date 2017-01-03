@@ -377,7 +377,7 @@ Base.prototype.tasksInit = function(room) {
 Base.prototype.tasks = function(room) {
     "use strict";
     
-    var tasks = tasksInit(room),
+    var tasks = this.tasksInit(room),
         terminal = room.terminal,
         dismantle = Memory.dismantle,
         roomName = room.name,

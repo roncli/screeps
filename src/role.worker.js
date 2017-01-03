@@ -135,8 +135,8 @@ var Cache = require("cache"),
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 allCreeps = Cache.creepsInRoom("all", room),
-                controller = room.controller;
-                assigned = [],
+                controller = room.controller,
+                assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

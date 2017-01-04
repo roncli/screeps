@@ -51,11 +51,12 @@ var profiler = require("screeps-profiler"),
 
             profiler.wrap(() => {
                 main.init();
-                main.log();
                 main.minerals();
                 main.baseMatrixes();
                 main.deserializeCreeps();
+                main.deserializeRooms();
                 main.balanceEnergy();
+                main.log();
                 main.rooms();
                 main.army();
                 main.creeps();
@@ -206,50 +207,6 @@ var profiler = require("screeps-profiler"),
                     Memory.paths = {};
                     break;
             }
-        },
-
-        log: () => {
-            "use strict";
-
-            Cache.log.tick = Game.time;
-            Cache.log.date = new Date();
-            Cache.log.gcl = Game.gcl.level;
-            Cache.log.progress = Game.gcl.progress;
-            Cache.log.progressTotal = Game.gcl.progressTotal;
-            Cache.log.limit = Game.cpu.limit;
-            Cache.log.tickLimit = Game.cpu.tickLimit;
-            Cache.log.bucket = Game.cpu.bucket;
-            Cache.log.credits = Game.market.credits;
-
-            _.forEach(Game.creeps, (c) => {
-                Cache.log.creeps.push({
-                    creepId: c.id,
-                    name: c.name,
-                    creepType: c.memory.role,
-                    home: c.memory.home,
-                    army: c.memory.army,
-                    room: c.pos.roomName,
-                    x: c.pos.x,
-                    y: c.pos.y,
-                    spawning: c.spawning,
-                    ttl: c.ticksToLive,
-                    carryCapacity: c.carryCapacity,
-                    carry: c.carry,
-                    hits: c.hits,
-                    hitsMax: c.hitsMax
-                });
-            });
-
-            _.forEach(Game.spawns, (s) => {
-                Cache.log.spawns.push({
-                    spawnId: s.id,
-                    name: s.name,
-                    room: s.room.name,
-                    spawningName: s.spawning ? s.spawning.name : undefined,
-                    spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
-                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
-                });
-            });
         },
 
         minerals: () => {
@@ -523,6 +480,25 @@ var profiler = require("screeps-profiler"),
             });
         },
         
+        deserializeRooms: () => {
+            // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
+            unobservableRooms = [];
+            _.forEach(Memory.rooms, (roomMemory, name) => {
+                if (!roomMemory.roomType) {
+                    return;
+                }
+
+                roomDeserialization(roomMemory, name);
+
+                if (!Game.rooms[name]) {
+                    unobservableRooms.push({
+                        name: name,
+                        unobservable: true
+                    });
+                }
+            });
+        },
+
         balanceEnergy: () => {
             // See if there is some energy balancing we can do.
             var rooms, energyGoal;
@@ -550,28 +526,50 @@ var profiler = require("screeps-profiler"),
                 });
             }
         },
-
-        rooms: () => {
+        
+        log: () => {
             "use strict";
 
-            // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
-            unobservableRooms = [];
-            _.forEach(Memory.rooms, (roomMemory, name) => {
-                if (!roomMemory.roomType) {
-                    return;
-                }
+            Cache.log.tick = Game.time;
+            Cache.log.date = new Date();
+            Cache.log.gcl = Game.gcl.level;
+            Cache.log.progress = Game.gcl.progress;
+            Cache.log.progressTotal = Game.gcl.progressTotal;
+            Cache.log.limit = Game.cpu.limit;
+            Cache.log.tickLimit = Game.cpu.tickLimit;
+            Cache.log.bucket = Game.cpu.bucket;
+            Cache.log.credits = Game.market.credits;
 
-                roomDeserialization(roomMemory, name);
-
-                if (!Game.rooms[name]) {
-                    unobservableRooms.push({
-                        name: name,
-                        unobservable: true
-                    });
-                }
+            _.forEach(Game.creeps, (c) => {
+                Cache.log.creeps.push({
+                    creepId: c.id,
+                    name: c.name,
+                    creepType: c.memory.role,
+                    home: c.memory.home,
+                    army: c.memory.army,
+                    room: c.pos.roomName,
+                    x: c.pos.x,
+                    y: c.pos.y,
+                    spawning: c.spawning,
+                    ttl: c.ticksToLive,
+                    carryCapacity: c.carryCapacity,
+                    carry: c.carry,
+                    hits: c.hits,
+                    hitsMax: c.hitsMax
+                });
             });
 
-            // Loop through each room to determine the required tasks for the room, and then serialize the room.
+            _.forEach(Game.spawns, (s) => {
+                Cache.log.spawns.push({
+                    spawnId: s.id,
+                    name: s.name,
+                    room: s.room.name,
+                    spawningName: s.spawning ? s.spawning.name : undefined,
+                    spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
+                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
+                });
+            });
+
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
                 var roomName = room.name,
                     roomMemory = Memory.rooms[roomName],
@@ -589,7 +587,7 @@ var profiler = require("screeps-profiler"),
                         labs: [],
                         source: [],
                         creeps: []
-                    }
+                    };
                 } else {
                     repairableStructures = Cache.repairableStructuresInRoom(room),
                     constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES),
@@ -608,7 +606,7 @@ var profiler = require("screeps-profiler"),
                         labs: [],
                         source: [],
                         creeps: []
-                    }
+                    };
 
                     if (Cache.log.rooms[roomName].controller) {
                         Cache.log.rooms[roomName].rcl = room.controller.level;
@@ -617,7 +615,7 @@ var profiler = require("screeps-profiler"),
                         }
                         Cache.log.rooms[roomName].progress = room.controller.progress;
                         Cache.log.rooms[roomName].progressTotal = room.controller.progressTotal;
-                        Cache.log.rooms[roomName].ttd = room.controller.ticksToDowngrade
+                        Cache.log.rooms[roomName].ttd = room.controller.ticksToDowngrade;
                     }
 
                     if (room.controller && room.controller.reservation) {
@@ -710,7 +708,17 @@ var profiler = require("screeps-profiler"),
                         });
                     });
                 }
+            });
+        },
 
+        rooms: () => {
+            "use strict";
+
+            // Loop through each room to determine the required tasks for the room, and then serialize the room.
+            _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
+                var roomName = room.name,
+                    roomMemory = room.memory;
+                
                 if (Cache.roomTypes[roomName]) {
                     Cache.roomTypes[roomName].run(room);
                     if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {

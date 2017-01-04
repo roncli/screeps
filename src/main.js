@@ -570,7 +570,7 @@ var profiler = require("screeps-profiler"),
                 });
             });
 
-            _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {
+            _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
                 var roomName = room.name,
                     roomMemory = Memory.rooms[roomName],
                     type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",

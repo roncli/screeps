@@ -50,7 +50,7 @@ var Cache = require("cache"),
                     count: workers.length,
                     max: max
                 });
-            }        
+            }
         },
         
         spawn: (room, supportRoom, id) => {

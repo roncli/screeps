@@ -193,19 +193,6 @@ Mine.prototype.run = function(room) {
 
         // Get tasks.
         if (!room.unobservable) {
-            tasks.build = {
-                tasks: TaskBuild.getTasks(room)
-            };
-            tasks.heal = {
-                tasks: TaskHeal.getTasks(room)
-            };
-            tasks.rangedAttack = {
-                tasks: TaskRangedAttack.getTasks(room)
-            };
-            tasks.repair = {
-                criticalTasks: TaskRepair.getCriticalTasks(room),
-                tasks: TaskRepair.getTasks(room)
-            };
             tasks.dismantle = {
                 tasks: []
             };

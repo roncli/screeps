@@ -54,6 +54,7 @@ var profiler = require("screeps-profiler"),
                 main.log();
                 main.minerals();
                 main.baseMatrixes();
+                main.deserializeCreeps();
                 main.rooms();
                 main.army();
                 main.creeps();
@@ -503,11 +504,9 @@ var profiler = require("screeps-profiler"),
                 }
             });
         },
-
-        rooms: () => {
+        
+        deserializeCreeps: () => {
             "use strict";
-
-            var rooms, energyGoal;
 
             // Loop through each creep to deserialize their task and see if it is completed.
             _.forEach(Game.creeps, (creep) => {
@@ -521,6 +520,12 @@ var profiler = require("screeps-profiler"),
                     }
                 }
             });
+        },
+
+        rooms: () => {
+            "use strict";
+
+            var rooms, energyGoal;
 
             // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
             unobservableRooms = [];

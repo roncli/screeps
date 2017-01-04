@@ -52,7 +52,7 @@ var Cache = require("cache"),
             });
 
             // Output miner count in the report.
-            if (miners.length > 0 || max > 0) {
+            if (Memory.log && (miners.length > 0 || max > 0)) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "remoteMiner",
                     count: miners.length,

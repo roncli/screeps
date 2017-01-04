@@ -27,7 +27,7 @@ var Cache = require("cache"),
             }
 
             // Output defender count in the report.
-            if (defenders.length > 0 || max > 0) {
+            if (Memory.log && (defenders.length > 0 || max > 0)) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "defender",
                     count: defenders.length,

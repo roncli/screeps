@@ -532,16 +532,6 @@ var profiler = require("screeps-profiler"),
         log: () => {
             "use strict";
 
-            Cache.log.tick = Game.time;
-            Cache.log.date = new Date();
-            Cache.log.gcl = Game.gcl.level;
-            Cache.log.progress = Game.gcl.progress;
-            Cache.log.progressTotal = Game.gcl.progressTotal;
-            Cache.log.limit = Game.cpu.limit;
-            Cache.log.tickLimit = Game.cpu.tickLimit;
-            Cache.log.bucket = Game.cpu.bucket;
-            Cache.log.credits = Game.market.credits;
-
             _.forEach(Game.creeps, (c) => {
                 Cache.log.creeps.push({
                     creepId: c.id,
@@ -916,6 +906,15 @@ var profiler = require("screeps-profiler"),
         },
 
         finalize: () => {
+            Cache.log.tick = Game.time;
+            Cache.log.date = new Date();
+            Cache.log.gcl = Game.gcl.level;
+            Cache.log.progress = Game.gcl.progress;
+            Cache.log.progressTotal = Game.gcl.progressTotal;
+            Cache.log.limit = Game.cpu.limit;
+            Cache.log.tickLimit = Game.cpu.tickLimit;
+            Cache.log.bucket = Game.cpu.bucket;
+            Cache.log.credits = Game.market.credits;
             Cache.log.cpuUsed = Game.cpu.getUsed();
             Memory.console = Cache.log;
         }

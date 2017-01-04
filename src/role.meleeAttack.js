@@ -26,7 +26,7 @@ var Cache = require("cache"),
             }
 
             // Output melee attacker count in the report.
-            if (melee.length > 0 || max > 0) {
+            if (Memory.log && (melee.length > 0 || max > 0)) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "meleeAttack",
                     count: melee.length,

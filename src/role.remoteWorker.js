@@ -44,7 +44,7 @@ var Cache = require("cache"),
             });
 
             // Output remote worker count in the report.
-            if (workers.length > 0 || max > 0) {
+            if (Memory.log && (workers.length > 0 || max > 0)) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "remoteWorker",
                     count: workers.length,

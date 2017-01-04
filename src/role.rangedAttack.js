@@ -26,7 +26,7 @@ var Cache = require("cache"),
             }
 
             // Output ranged attacker count in the report.
-            if (ranged.length > 0 || max > 0) {
+            if (Memory.log && (ranged.length > 0 || max > 0)) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "rangedAttack",
                     count: ranged.length,

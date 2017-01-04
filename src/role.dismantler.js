@@ -27,7 +27,7 @@ var Cache = require("cache"),
             }
 
             // Output dismantler count in the report.
-            if (dismantlers.length > 0 || max > 0) {
+            if (Memory.log && (dismantlers.length > 0 || max > 0)) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "dismantler",
                     count: dismantlers.length,

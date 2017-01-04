@@ -26,7 +26,7 @@ var Cache = require("cache"),
             }
 
             // Output healer count in the report.
-            if (healers.length > 0 || max > 0) {
+            if (Memory.log && (healers.length > 0 || max > 0)) {
                 Cache.log.rooms[roomName].creeps.push({
                     role: "healer",
                     count: healers.length,

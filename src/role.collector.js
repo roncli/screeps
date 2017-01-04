@@ -51,7 +51,7 @@ var Cache = require("cache"),
             });
 
             // Output collector count in the report.
-            if (collectors.length > 0 || max > 0) {
+            if (Memory.log && (collectors.length > 0 || max > 0)) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "collector",
                     count: collectors.length,

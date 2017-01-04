@@ -15,7 +15,7 @@ var Cache = require("cache"),
             }
 
             // Output healer count in the report.
-            if (max > 0) {
+            if (Memory.log && max > 0) {
                 Cache.log.army[armyName].creeps.push({
                     role: "armyHealer",
                     count: count,

@@ -26,7 +26,7 @@ var Cache = require("cache"),
             }
 
             // Output worker count in the report.
-            if (workers.length > 0 || max > 0) {
+            if (Memory.log && (workers.length > 0 || max > 0)) {
                 Cache.log.rooms[room.name].creeps.push({
                     role: "worker",
                     count: workers.length,

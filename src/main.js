@@ -55,6 +55,7 @@ var profiler = require("screeps-profiler"),
                 main.minerals();
                 main.baseMatrixes();
                 main.deserializeCreeps();
+                main.balanceEnergy();
                 main.rooms();
                 main.army();
                 main.creeps();
@@ -521,30 +522,11 @@ var profiler = require("screeps-profiler"),
                 }
             });
         },
-
-        rooms: () => {
-            "use strict";
-
+        
+        balanceEnergy: () => {
+            // See if there is some energy balancing we can do.
             var rooms, energyGoal;
 
-            // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
-            unobservableRooms = [];
-            _.forEach(Memory.rooms, (roomMemory, name) => {
-                if (!roomMemory.roomType) {
-                    return;
-                }
-
-                roomDeserialization(roomMemory, name);
-
-                if (!Game.rooms[name]) {
-                    unobservableRooms.push({
-                        name: name,
-                        unobservable: true
-                    });
-                }
-            });
-
-            // See if there is some energy balancing we can do.
             rooms = _.sortBy(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY]);
             if (rooms.length > 1) {
                 energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
@@ -567,6 +549,27 @@ var profiler = require("screeps-profiler"),
                     }
                 });
             }
+        },
+
+        rooms: () => {
+            "use strict";
+
+            // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
+            unobservableRooms = [];
+            _.forEach(Memory.rooms, (roomMemory, name) => {
+                if (!roomMemory.roomType) {
+                    return;
+                }
+
+                roomDeserialization(roomMemory, name);
+
+                if (!Game.rooms[name]) {
+                    unobservableRooms.push({
+                        name: name,
+                        unobservable: true
+                    });
+                }
+            });
 
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach(_.sortBy([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (r) => Memory.rooms[r.name] && Memory.rooms[r.name].roomType ? ["base", "mine", "cleanup"].indexOf(Memory.rooms[r.name].roomType.type) : 9999), (room) => {

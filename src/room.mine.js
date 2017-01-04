@@ -186,7 +186,6 @@ Mine.prototype.run = function(room) {
                 containerTasks: TaskFillEnergy.getContainerTasks(supportRoom)
             },
             fillMinerals: {
-                labTasks: TaskFillMinerals.getLabTasks(supportRoom),
                 storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
                 terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
             }

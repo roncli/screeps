@@ -442,7 +442,7 @@ Base.prototype.spawn = function(room, canSpawnWorkers) {
     }
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
-    if (controller) {
+    if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length === 0)) {
         RoleUpgrader.checkSpawn(room);
     }
 };

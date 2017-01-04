@@ -9,6 +9,7 @@ var creepsInRoom = {},
     containersInRoom = {},
     linksInRoom = {},
     repairableStructuresInRoom = {},
+    sortedRepairableStructuresInRoom = {},
     extractorsInRoom = {},
     portalsInRoom = {},
     hostilesInRoom = {},
@@ -36,6 +37,7 @@ var creepsInRoom = {},
             containersInRoom = {};
             linksInRoom = {};
             repairableStructuresInRoom = {};
+            sortedRepairableStructuresInRoom = {};
             extractorsInRoom = {};
             portalsInRoom = {};
             hostilesInRoom = {};
@@ -148,7 +150,13 @@ var creepsInRoom = {},
         repairableStructuresInRoom: (room) => {
             "use strict";
     
-            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = _.sortBy(room.find(FIND_STRUCTURES, {filter: (s) => ((s.my || s instanceof StructureWall || s instanceof StructureRoad || s instanceof StructureContainer) && s.hits)}), (s) => s.hits));
+            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : (repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => ((s.my || s instanceof StructureWall || s instanceof StructureRoad || s instanceof StructureContainer) && s.hits)}));
+        },
+        
+        sortedRepairableStructuresInRoom: (room) => {
+            "use strict";
+            
+            return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : (sortedRepairableStructuresInRoom[room.name] = _.sortBy(repairableStructuresInRoom, (s) => s.hits));
         },
     
         // Returns all extractors in the current room.

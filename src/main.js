@@ -56,7 +56,9 @@ var profiler = require("screeps-profiler"),
                 main.deserializeCreeps();
                 main.deserializeRooms();
                 main.balanceEnergy();
-                main.log();
+                if (Memory.log) {
+                    main.log();
+                }
                 main.rooms();
                 main.army();
                 main.creeps();

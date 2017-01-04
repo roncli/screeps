@@ -371,7 +371,7 @@ var profiler = require("screeps-profiler"),
                                 // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
                                 roomMemory.labQueue = {
                                     resource: resource,
-                                    amount: 5 * Math.ceil(Math.min(node.amount, LAB_MINERAL_CAPACITY) / 5),
+                                    amount: Math.min(5 * Math.ceil(Math.min(node.amount, LAB_MINERAL_CAPACITY) / 5), 3000),
                                     children: _.map(node.children, (c) => c.resource),
                                     start: Game.time
                                 };

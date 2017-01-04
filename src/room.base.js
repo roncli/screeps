@@ -314,72 +314,73 @@ Base.prototype.terminal = function(room, terminal) {
     }
 };
 
-Base.prototype.tasksInit = function(room) {
-    "use strict";
-    
-    return {
-        build: {
-            tasks: TaskBuild.getTasks(room)
-        },
-        collectEnergy: {
-            tasks: TaskCollectEnergy.getTasks(room),
-            storerTasks: TaskCollectEnergy.getStorerTasks(room)
-        },
-        collectMinerals: {
-            storerTasks: TaskCollectMinerals.getStorerTasks(room),
-            labTasks: TaskCollectMinerals.getLabTasks(room),
-            storageTasks: TaskCollectMinerals.getStorageTasks(room),
-            terminalTasks: TaskCollectMinerals.getTerminalTasks(room)
-        },
-        fillEnergy: {
-            extensionTasks: TaskFillEnergy.getExtensionTasks(room),
-            spawnTasks: TaskFillEnergy.getSpawnTasks(room),
-            powerSpawnTasks: TaskFillEnergy.getPowerSpawnTasks(room),
-            towerTasks: TaskFillEnergy.getTowerTasks(room),
-            storageTasks: TaskFillEnergy.getStorageTasks(room),
-            containerTasks: TaskFillEnergy.getContainerTasks(room),
-            labTasks: TaskFillEnergy.getLabTasks(room),
-            linkTasks: TaskFillEnergy.getLinkTasks(room),
-            nukerTasks: TaskFillEnergy.getNukerTasks(room)
-        },
-        fillMinerals: {
-            labTasks: TaskFillMinerals.getLabTasks(room),
-            storageTasks: TaskFillMinerals.getStorageTasks(room),
-            terminalTasks: TaskFillMinerals.getTerminalTasks(room),
-            nukerTasks: TaskFillMinerals.getNukerTasks(room),
-            powerSpawnTasks: TaskFillMinerals.getPowerSpawnTasks(room)
-        },
-        heal: {
-            tasks: TaskHeal.getTasks(room)
-        },
-        rangedAttack: {
-            tasks: TaskRangedAttack.getTasks(room)
-        },
-        repair: {
-            tasks: TaskRepair.getTasks(room),
-            criticalTasks: TaskRepair.getCriticalTasks(room),
-            towerTasks: TaskRepair.getTowerTasks(room)
-        },
-        upgradeController: {
-            tasks: TaskUpgradeController.getTasks(room),
-            criticalTasks: TaskUpgradeController.getCriticalTasks(room)
-        },
-        dismantle: {
-            tasks: []
-        }
-    };
-};
-
 Base.prototype.tasks = function(room) {
     "use strict";
     
-    var tasks = this.tasksInit(room),
-        terminal = room.terminal,
+    var terminal = room.terminal,
         dismantle = Memory.dismantle,
         roomName = room.name,
         terminalEnergy = 0,
         storageEnergy = 0,
-        terminalId;
+        terminalId,
+        workers = Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)).length > 0,
+        storers = Utilities.creepsWithNoTask(Cache.creepsInRoom("storer", room)).length > 0,
+        scientists = Utilities.creepsWithNoTask(Cache.creepsInRoom("scientist", room)).length > 0,
+        dismantlers = Utilities.creepsWithNoTask(Cache.creepsInRoom("dismantler", room)).length > 0,
+        collectors = Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)).length > 0,
+        upgraders = Utilities.creepsWithNoTask(Cache.creepsInRoom("upgarder", room)).length > 0,
+        noWorkers = (Cache.creepsInRoom("worker").length + Cache.creepsInRoom("collector").length) === 0;
+        tasks = {
+            build: {
+                tasks: (workers || collectors) ? TaskBuild.getTasks(room) : []
+            },
+            collectEnergy: {
+                tasks: (workers || storers || scientists || collectors || upgraders) ? TaskCollectEnergy.getTasks(room) : [],
+                storerTasks: storers ? TaskCollectEnergy.getStorerTasks(room) : []
+            },
+            collectMinerals: {
+                storerTasks: storers ? TaskCollectMinerals.getStorerTasks(room) : [],
+                labTasks: scientists ? TaskCollectMinerals.getLabTasks(room) : [],
+                storageTasks: scientists ? TaskCollectMinerals.getStorageTasks(room) : [],
+                terminalTasks: scientists ? TaskCollectMinerals.getTerminalTasks(room) : []
+            },
+            fillEnergy: {
+                extensionTasks: (workers || storers || scientists || collectors) ? TaskFillEnergy.getExtensionTasks(room) : [],
+                spawnTasks: (workers || storers || scientists || collectors) ? TaskFillEnergy.getSpawnTasks(room) : [],
+                powerSpawnTasks: scientists ? TaskFillEnergy.getPowerSpawnTasks(room) : [],
+                towerTasks: (workers || scientists || collectors) ? TaskFillEnergy.getTowerTasks(room) : [],
+                storageTasks: (storers || scientists || dismantlers) ? TaskFillEnergy.getStorageTasks(room) : [],
+                containerTasks: dismantlers ? TaskFillEnergy.getContainerTasks(room) : [],
+                labTasks: scientists ? TaskFillEnergy.getLabTasks(room) : [],
+                linkTasks: storers ? TaskFillEnergy.getLinkTasks(room) : [],
+                nukerTasks: scientists ? TaskFillEnergy.getNukerTasks(room) : []
+            },
+            fillMinerals: {
+                labTasks: scientists ? TaskFillMinerals.getLabTasks(room) : [],
+                storageTasks: (workers || storers || scientists || dismantlers) ? TaskFillMinerals.getStorageTasks(room) : [],
+                terminalTasks: (workers || storers || scientists || dismantlers) ? TaskFillMinerals.getTerminalTasks(room) : [],
+                nukerTasks: scientists ? TaskFillMinerals.getNukerTasks(room) : [],
+                powerSpawnTasks: scientists ? TaskFillMinerals.getPowerSpawnTasks(room) : []
+            },
+            heal: {
+                tasks: TaskHeal.getTasks(room)
+            },
+            rangedAttack: {
+                tasks: TaskRangedAttack.getTasks(room)
+            },
+            repair: {
+                tasks: (noWorkers || workers || collectors) ? TaskRepair.getTasks(room) : [],
+                criticalTasks: (noWorkers || workers || collectors) ? TaskRepair.getCriticalTasks(room) : [],
+                towerTasks: TaskRepair.getTowerTasks(room)
+            },
+            upgradeController: {
+                tasks: (workers || collectors || upgraders) ? TaskUpgradeController.getTasks(room) : [],
+                criticalTasks: (workers || collectors) ? TaskUpgradeController.getCriticalTasks(room) : []
+            },
+            dismantle: {
+                tasks: []
+            }
+        };
     
     if (terminal) {
         terminalEnergy = terminal.store[RESOURCE_ENERGY] || 0;
@@ -390,11 +391,11 @@ Base.prototype.tasks = function(room) {
         storageEnergy = room.storage.store[RESOURCE_ENERGY] || 0;
     }
 
-    if (terminal && terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy)) {
+    if ((storers || scientists) && terminal && terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy)) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
     }
 
-    if (terminal && terminalEnergy < 1000) {
+    if ((workers || storers || scientists) && terminal && terminalEnergy < 1000) {
         tasks.fillEnergy.terminalTask = new TaskFillEnergy(terminalId);
     }
 
@@ -407,7 +408,9 @@ Base.prototype.tasks = function(room) {
             if (structures.length === 0) {
                 completed.push(pos);
             } else {
-                tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
+                if (dismantlers) {
+                    tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
+                }
             }
         });
         _.forEach(completed, (complete) => {
@@ -583,7 +586,6 @@ Base.prototype.run = function(room) {
         memory = room.memory,
         labQueue = memory.labQueue,
         labsInUse = memory.labsInUse,
-        creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("all", room)).length,
         tasks;
 
     // Something is supremely wrong.  Notify and bail.
@@ -608,31 +610,13 @@ Base.prototype.run = function(room) {
     }
 
     // Get the tasks needed for this room.
-    if (creepsWithNoTask > 0) {
-        tasks = this.tasks(room);
-    } else {
-        tasks = {
-            heal: {
-                tasks: TaskHeal.getTasks(room)
-            },
-            rangedAttack: {
-                tasks: TaskRangedAttack.getTasks(room)
-            },
-            repair: {
-                towerTasks: TaskRepair.getTowerTasks(room)
-            }
-        }
-    }
-    
+    tasks = this.tasks(room);
+
     // Spawn new creeps.
-    this.spawn(room, creepsWithNoTask > 0 && (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || tasks.upgradeController.criticalTasks.length > 0 || tasks.build.tasks.length > 0 || tasks.repair.criticalTasks.length > 0 || _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0));
+    this.spawn(room, (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 1000 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || (tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0) || (tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0)));
 
     // Assign tasks to creeps and towers.
-    if (creepsWithNoTask > 0) {
-        this.assignTasks(room, tasks);
-    } else {
-        RoleTower.assignTasks(room, tasks);
-    }
+    this.assignTasks(room, tasks);
 
     // Update lab queue if necessary.
     if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {

@@ -476,7 +476,7 @@ Base.prototype.labQueue = function(room, labQueue) {
     
     switch (labQueue.status) {
         case "clearing":
-            if (labsInUse && labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
+            if (!labsInUse || (labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0)) {
                 labQueue.status = "moving";
             }
         case "moving":

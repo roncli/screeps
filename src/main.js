@@ -709,7 +709,7 @@ var profiler = require("screeps-profiler"),
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
                 var roomName = room.name,
-                    roomMemory = room.memory;
+                    roomMemory = Memory.rooms[roomName];
                 
                 if (Cache.roomTypes[roomName]) {
                     Cache.roomTypes[roomName].run(room);

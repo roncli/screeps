@@ -328,7 +328,7 @@ Base.prototype.tasks = function(room) {
         scientists = Utilities.creepsWithNoTask(Cache.creepsInRoom("scientist", room)).length > 0,
         dismantlers = Utilities.creepsWithNoTask(Cache.creepsInRoom("dismantler", room)).length > 0,
         collectors = Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)).length > 0,
-        upgraders = Utilities.creepsWithNoTask(Cache.creepsInRoom("upgarder", room)).length > 0,
+        upgraders = Utilities.creepsWithNoTask(Cache.creepsInRoom("upgrader", room)).length > 0,
         noWorkers = (Cache.creepsInRoom("worker", room).length + Cache.creepsInRoom("collector", room).length) === 0,
         tasks = {
             build: {

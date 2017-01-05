@@ -177,6 +177,51 @@ var app = angular.module("screeps", []),
 
             return hours.toString() + ":" + (minutes < 10 ? "0" : "") + minutes.toString() + ":" + (seconds <= 9.999 ? "0" : "") + seconds.toFixed(2);
         };
+
+        $scope.getMineralDescription = function(resource) {
+            Minerals = {};
+            Minerals.H = {name: "Hydrogen", description: ""};
+            Minerals.O = {name: "Oxygen", description: ""};
+            Minerals.U = {name: "Utrium", description: ""};
+            Minerals.L = {name: "Lemergium", description: ""};
+            Minerals.K = {name: "Keanium", description: ""};
+            Minerals.Z = {name: "Zynthium", description: ""};
+            Minerals.X = {name: "Catalyst", description: ""};
+            Minerals.G = {name: "Ghodium", description: "Needed for nukes and creating safe mode charges."};
+            Minerals.OH = {name: "Hydroxide", description: ""};
+            Minerals.ZK = {name: "Zynthium Keanite", description: ""};
+            Minerals.UL = {name: "Utrium Lemergite", description: ""};
+            Minerals.UH = {name: "Utrium Hydride", description: ""};
+            Minerals.UO = {name: "Utrium Oxide", description: ""};
+            Minerals.KH = {name: "Keanium Hydride", description: ""};
+            Minerals.KO = {name: "Keanium Oxide", description: ""};
+            Minerals.LH = {name: "Lemergium Hydride", description: ""};
+            Minerals.LO = {name: "Lemergium Oxide", description: ""};
+            Minerals.ZH = {name: "Zynthium Hydride", description: ""};
+            Minerals.ZO = {name: "Zynthium Oxide", description: ""};
+            Minerals.GH = {name: "Ghodium Hydride", description: ""};
+            Minerals.GO = {name: "Ghodium Oxide", description: ""};
+            Minerals.UH2O = {name: "Utrium Acid", description: ""};
+            Minerals.UHO2 = {name: "Utrium Alkalide", description: ""};
+            Minerals.KH2O = {name: "Keanium Acid", description: ""};
+            Minerals.KHO2 = {name: "Keanium Alkalide", description: ""};
+            Minerals.LH2O = {name: "Lemergium Acid", description: ""};
+            Minerals.LHO2 = {name: "Lemergium Alkalide", description: ""};
+            Minerals.ZH2O = {name: "Zynthium Acid", description: ""};
+            Minerals.ZHO2 = {name: "Zynthium Alkalide", description: ""};
+            Minerals.GH2O = {name: "Ghodium Acid", description: ""};
+            Minerals.GHO2 = {name: "Ghodium Alkalide", description: ""};
+            Minerals.XUH2O = {name: "Catalyzed Utrium Acid", description: ""};
+            Minerals.XUHO2 = {name: "Catalyzed Utrium Alkalide", description: ""};
+            Minerals.XKH2O = {name: "Catalyzed Keanium Acid", description: ""};
+            Minerals.XKHO2 = {name: "Catalyzed Keanium Alkalide", description: ""};
+            Minerals.XLH2O = {name: "Catalyzed Lemergium Acid", description: ""};
+            Minerals.XLHO2 = {name: "Catalyzed Lemergium Alkalide", description: ""};
+            Minerals.XZH2O = {name: "Catalyzed Zynthium Acid", description: ""};
+            Minerals.XZHO2 = {name: "Catalyzed Zynthium Alkalide", description: ""};
+            Minerals.XGH2O = {name: "Catalyzed Ghodium Acid", description: ""};
+            Minerals.XGHO2 = {name: "Catalyzed Ghodium Alkalide", description: ""};
+        };
     }]);
 
     $(document).ready(function() {

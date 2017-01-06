@@ -45,7 +45,7 @@ Melee.prototype.run = function(creep) {
     Pathing.moveTo(creep, this.enemy);
     if (creep.attack(this.enemy) === ERR_NOT_IN_RANGE) {
         // Heal self if possible available.
-        if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.hitsMax) {
+        if (creep.hits < creep.hitsMax && creep.getActiveBodyparts(HEAL) > 0) {
             creep.heal(creep);
         }
     }

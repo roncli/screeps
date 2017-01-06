@@ -22,7 +22,7 @@ Dismantle.prototype.init = function(id) {
 Dismantle.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity) || creep.getActiveBodyparts(WORK) === 0 || creep.spawning) {
+    if (creep.spawning || (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity) || creep.spawning || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     

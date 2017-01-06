@@ -240,7 +240,7 @@ Base.prototype.terminal = function(room, terminal) {
             }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
             if (terminalMinerals.length > 0) {
-                _.forEach(_.sortBy(terminalMinerals, (s) => -s.amount), (topResource) => {
+                _.forEach(_terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                     bestOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0 && (!Memory.minimumSell[o.resourceType] || o.price >= Memory.minimumSell[o.resourceType])).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
                     if (bestOrder) {
                         transCost = Game.market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
@@ -274,15 +274,15 @@ Base.prototype.terminal = function(room, terminal) {
                     }
 
                     // Get all the orders that can be flipped.
-                    sellOrder = _.sortBy(_.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
-                    buyOrder = _.sortBy(_.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "buy" && o.amount > 0), (o) => -o.price)[0];
+                    sellOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0).sort((a, b) => a.price - b.price)[0];
+                    buyOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "buy" && o.amount > 0).sort((a, b) => b.price - a.price)[0];
 
                     if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < Game.market.credits) {
                         flips.push({resource: resource, buy: buyOrder, sell: sellOrder});
                     }
                 });
 
-                _.forEach(_.sortBy(flips, (f) => f.sell.price - f.buy.price), (flip, index) => {
+                _.forEach(flips.sort((a, b) => (a.sell.price - a.buy.price) - (b.sell.price - b.buy.price)), (flip, index) => {
                     var buy = flip.buy,
                         sell = flip.sell;
                     

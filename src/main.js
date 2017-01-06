@@ -288,7 +288,7 @@ var profiler = require("screeps-profiler"),
 
                 // Get market values for each mineral.
                 _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
-                    sellOrder = _.sortBy(_.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0), (o) => o.price)[0];
+                    sellOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0).sort((a, b) => a.price - b.price)[0];
 
                     if (sellOrder) {
                         mineralOrders[resource] = sellOrder;
@@ -505,7 +505,7 @@ var profiler = require("screeps-profiler"),
             // See if there is some energy balancing we can do.
             var rooms, energyGoal;
 
-            rooms = _.sortBy(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal), (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY]);
+            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal).sort((a, b) => (a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY]) - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
             if (rooms.length > 1) {
                 energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
@@ -581,7 +581,7 @@ var profiler = require("screeps-profiler"),
                         creeps: []
                     };
                 } else {
-                    repairableStructures = Cache.repairableStructuresInRoom(room),
+                    repairableStructures = Cache.sortedRepairableStructuresInRoom(room),
                     constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES),
                     towers = Cache.towersInRoom(room),
                     labs = Cache.labsInRoom(room);
@@ -627,7 +627,7 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
-                    Cache.log.rooms[roomName].lowestWall = _.sortBy(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits)[0];
+                    Cache.log.rooms[roomName].lowestWall = _.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart)[0];
 
                     if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
                         Cache.log.rooms[roomName].energyAvailable = room.energyAvailable;

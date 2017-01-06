@@ -101,8 +101,16 @@ Mine.prototype.run = function(room) {
         }
 
         // Assign tasks to creeps.                    
-        RoleRemoteReserver.assignTasks(room);
+        RoleMeleeAttack.assignTasks(room, tasks);
+        RoleRangedAttack.assignTasks(room, tasks);
+        RoleHealer.assignTasks(room, tasks);
+        RoleDefender.assignTasks(room, tasks);
+        RoleRemoteReserver.assignTasks(room, tasks);
         RoleRemoteBuilder.assignTasks(room);
+        RoleRemoteMiner.assignTasks(room, tasks);
+        RoleRemoteWorker.assignTasks(room, tasks);
+        RoleRemoteStorer.assignTasks(room, tasks);
+        RoleDismantler.assignTasks(room, tasks);
 
         if (!room.unobservable) {
             // Check to see if we have built containers.  If so, move to stage 2.

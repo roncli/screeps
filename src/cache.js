@@ -156,7 +156,7 @@ var creepsInRoom = {},
         sortedRepairableStructuresInRoom: (room) => {
             "use strict";
             
-            return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : (sortedRepairableStructuresInRoom[room.name] = _.sortBy(Cache.repairableStructuresInRoom(room), (s) => s.hits));
+            return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : (sortedRepairableStructuresInRoom[room.name] = Cache.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits));
         },
     
         // Returns all extractors in the current room.

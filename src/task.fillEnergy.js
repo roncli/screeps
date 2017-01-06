@@ -143,7 +143,7 @@ FillEnergy.getSpawnTasks = function(room) {
 FillEnergy.getTowerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8), (t) => t.energy), (t) => new FillEnergy(t.id));
+    return _.map(_.filter(Cache.towersInRoom(room), (t) => t.energy / t.energyCapacity < 0.8).sort((a, b) => a.energy - b.energy), (t) => new FillEnergy(t.id));
 };
 
 FillEnergy.getLabTasks = function(room) {
@@ -155,7 +155,7 @@ FillEnergy.getLabTasks = function(room) {
 FillEnergy.getContainerTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity)), (c) => c instanceof StructureStorage ? 1 : 2), (c) => new FillEnergy(c.id));
+    return _.map(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity)).sort((a, b) => (a instanceof StructureStorage ? 1 : 2) - (b instanceof StructureStorage ? 1 : 2)), (c) => new FillEnergy(c.id));
 };
 
 FillEnergy.getStorageTasks = function(room) {

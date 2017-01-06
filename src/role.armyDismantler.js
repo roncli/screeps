@@ -242,7 +242,7 @@ var Cache = require("cache"),
                     }
 
                     if (attackRoom) {
-                        structures = _.sortBy(_.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)), (s) => (s instanceof StructureTower ? 1 : (s instanceof StructureSpawn ? 2 : 3)));
+                        structures = _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart));
 
                         // Dismantle towers, spawns, and any remaining structures.
                         if (structures.length > 0) {

@@ -87,7 +87,7 @@ Pickup.prototype.toObj = function(creep) {
 Pickup.getTasks = function(room) {
     "use strict";
     
-    return _.map(_.sortBy(room.find(FIND_DROPPED_RESOURCES), (r) => -r.amount), (r) => new Pickup(r.id));
+    return _.map(room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount), (r) => new Pickup(r.id));
 };
 
 require("screeps-profiler").registerObject(Pickup, "TaskPickupResource");

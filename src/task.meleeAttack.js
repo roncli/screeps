@@ -95,13 +95,13 @@ Melee.fromObj = function(creep) {
 Melee.getTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(Cache.hostilesInRoom(room), (h) => h.hits), (h) => new Melee(h.id));
+    return _.map(Cache.hostilesInRoom(room).sort((a, b) => a.hits - b.hits), (h) => new Melee(h.id));
 };
 
 Melee.getDefenderTask = function(creep) {
     "use strict";
 
-    return _.map(_.sortBy(Cache.hostilesInRoom(creep.room), (h) => h.hits), (h) => new Melee(h.id))[0];
+    return _.map(Cache.hostilesInRoom(creep.room).sort((a, b) => a.hits - b.hits), (h) => new Melee(h.id))[0];
 }
 
 require("screeps-profiler").registerObject(Melee, "TaskMeleeAttack");

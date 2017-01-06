@@ -118,7 +118,7 @@ CollectEnergy.fromObj = function(creep) {
 CollectEnergy.getTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter([].concat.apply([], [_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500), room.storage ? [room.storage] : []]), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0), (c) => -(c instanceof StructureStorage ? 2000 : 0 + c.store[RESOURCE_ENERGY])), (c) => new CollectEnergy(c.id));
+    return _.map(_.filter([].concat.apply([], [_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500), room.storage ? [room.storage] : []]), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0).sort((a, b) => (b instanceof StructureStorage ? 2000 : 0 + b.store[RESOURCE_ENERGY]) - (a instanceof StructureStorage ? 2000 : 0 + a.store[RESOURCE_ENERGY])), (c) => new CollectEnergy(c.id));
 };
 
 CollectEnergy.getStorerTasks = function(room) {
@@ -130,7 +130,7 @@ CollectEnergy.getStorerTasks = function(room) {
 CollectEnergy.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(structures, (s) => s.energy || (s.store && s.store[RESOURCE_ENERGY])), (s) => s.energy || s.store[RESOURCE_ENERGY]), (s) => new CollectEnergy(s.id));
+    return _.map(_.filter(structures, (s) => s.energy || (s.store && s.store[RESOURCE_ENERGY])).sort((a, b) => (a.energy || a.store[RESOURCE_ENERGY]) - (b.energy || b.store[RESOURCE_ENERGY])), (s) => new CollectEnergy(s.id));
 };
 
 require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");

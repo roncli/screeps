@@ -88,13 +88,13 @@ Heal.fromObj = function(creep) {
 Heal.getTasks = function(room) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax), (c) => c.hits), (c) => new Heal(c.id));
+    return _.map(_.filter(room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id));
 };
 
 Heal.getDefenderTask = function(creep) {
     "use strict";
 
-    return _.map(_.sortBy(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax), (c) => c.hits), (c) => new Heal(c.id))[0];
+    return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
 };
 
 require("screeps-profiler").registerObject(Heal, "TaskHeal");

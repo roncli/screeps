@@ -99,7 +99,7 @@ var Cache = require("cache"),
                 melee: { tasks: [] },
                 ranged: { tasks: [] },
                 heal: {
-                    tasks: _.map(_.sortBy(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax), (c) => -(c.hitsMax - c.hits)), (c) => new TaskHeal(c.id))
+                    tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => (b.hitsMax - b.hits) - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
                 },
                 rally: { tasks: [] },
             };

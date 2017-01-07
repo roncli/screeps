@@ -240,7 +240,7 @@ Base.prototype.terminal = function(room, terminal) {
             }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
             if (terminalMinerals.length > 0) {
-                _.forEach(_terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
+                _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                     bestOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === topResource.resource && o.type === "buy" && o.amount > 0 && (!Memory.minimumSell[o.resourceType] || o.price >= Memory.minimumSell[o.resourceType])).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
                     if (bestOrder) {
                         transCost = Game.market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);

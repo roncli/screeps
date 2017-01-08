@@ -508,6 +508,9 @@ Base.prototype.labQueue = function(room, labQueue) {
             break;
         case "creating":
             _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                if (lab.mineralAmount === LAB_MINERAL_CAPACITY) {
+                    labQueue.status = "returning";
+                }
                 if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
                     labQueue.amount -= 5;
                 }

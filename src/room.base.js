@@ -609,7 +609,7 @@ Base.prototype.run = function(room) {
     }
     
     // Check to see if we can do a deal in the terminal.
-    if (terminal) {
+    if (terminal && Game.cpu.bucket >= Memory.marketBucket) {
         this.terminal(room, terminal);
     }
 

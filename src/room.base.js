@@ -479,6 +479,7 @@ Base.prototype.labQueue = function(room, labQueue) {
             if (!labsInUse || (labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0)) {
                 labQueue.status = "moving";
             }
+            break;
         case "moving":
             if (!labQueue.start || labQueue.start + 500 < Game.time) {
                 delete memory.labQueue;

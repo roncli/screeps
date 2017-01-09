@@ -37,11 +37,11 @@ var Cache = require("cache"),
                     Memory.lengthToContainer[containerId][supportRoomName] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
                 }
 
-                if (!Memory.containerSource[id]) {
-                    Memory.containerSource[id] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+                if (!Memory.containerSource[containerId]) {
+                    Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
                 }
 
-                source = Game.getObjectById(Memory.containerSource[id]);
+                source = Game.getObjectById(Memory.containerSource[containerId]);
 
                 // If this container is for a mineral, check to make sure it has resources.
                 if (source instanceof Mineral) {

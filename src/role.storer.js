@@ -9,14 +9,18 @@ var Cache = require("cache"),
             var containers = Cache.containersInRoom(room),
                 length = 0,
                 max = 0,
-                controller = room.controller,
-                army = Memory.army,
-                storers = Cache.creepsInRoom("storer", room);
+                controller, army, storers, sources, lengthToStorage;
             
             // If there are no spawns, containers, or storages in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage) {
                 return;
             }
+
+            controller = room.controller,
+            army = Memory.army;
+            storers = Cache.creepsInRoom("storer", room),
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
+            lengthToStorage = Memory.lengthToStorage;
 
             // Init road length cache.
             if (!Memory.lengthToStorage) {
@@ -25,18 +29,18 @@ var Cache = require("cache"),
 
             // Determine the number storers needed.
             _.forEach(containers, (container) => {
-                var closest = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0];
+                var closest = Utilities.objectsClosestToObj(sources, container)[0];
 
                 if (closest instanceof Mineral) {
                     if (closest.mineralAmount > 0) {
                         max += 1;
                     }
                 } else {
-                    if (!Memory.lengthToStorage[container.id]) {
-                        Memory.lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
+                    if (!lengthToStorage[container.id]) {
+                        lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
                     }
 
-                    length += Memory.lengthToStorage[container.id];
+                    length += lengthToStorage[container.id];
                 }
             });
 

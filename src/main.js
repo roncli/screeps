@@ -239,7 +239,6 @@ var profiler = require("screeps-profiler"),
                     {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
                     {resource: RESOURCE_GHODIUM, amount: 3000},
                     {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
-                    {resource: RESOURCE_UTRIUM_OXIDE, amount: 3000},
                     {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
                     {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
                     {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
@@ -247,7 +246,6 @@ var profiler = require("screeps-profiler"),
                     {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
                     {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
                     {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_UTRIUM_ALKALIDE, amount: 3000},
                     {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
                     {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
                     {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
@@ -255,7 +253,6 @@ var profiler = require("screeps-profiler"),
                     {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
                     {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
                     {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_UTRIUM_ALKALIDE, amount: 15000},
                     {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 15000},
                     {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000},
                     {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
@@ -273,7 +270,7 @@ var profiler = require("screeps-profiler"),
 
                             innerFx(child, innerFx);
                         });
-                    }
+                    };
 
                     fx(mineral, fx);
                 });
@@ -290,7 +287,7 @@ var profiler = require("screeps-profiler"),
                         _.forEach(node.children, (child) => {
                             innerFx(child, innerFx);
                         });
-                    }
+                    };
 
                     fx(mineral, fx);
                 });

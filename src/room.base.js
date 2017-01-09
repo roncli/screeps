@@ -371,7 +371,7 @@ Base.prototype.tasks = function(room) {
             repair: {
                 tasks: (noWorkers || workers || collectors) ? TaskRepair.getTasks(room) : [],
                 criticalTasks: (noWorkers || workers || collectors) ? TaskRepair.getCriticalTasks(room) : [],
-                towerTasks: TaskRepair.getTowerTasks(room)
+                towerTasks: (Memory.towerTasks[roomName] || Game.time % 10 === 0) ? TaskRepair.getTowerTasks(room) : []
             },
             upgradeController: {
                 tasks: (workers || collectors || upgraders) ? TaskUpgradeController.getTasks(room) : [],
@@ -381,6 +381,8 @@ Base.prototype.tasks = function(room) {
                 tasks: []
             }
         };
+    
+    Memory.towerTasks[roomName] = tasks.repair.towerTasks.length;
     
     if (terminal) {
         terminalEnergy = terminal.store[RESOURCE_ENERGY] || 0;

@@ -70,23 +70,22 @@ FillEnergy.prototype.run = function(creep) {
 FillEnergy.prototype.canComplete = function(creep) {
     "use strict";
 
-    var minEnergy;
+    var energy, minEnergy;
 
-    if (!this.object) {
+    if (!this.object || !creep.carry[RESOURCE_ENERGY]) {
         Task.prototype.complete.call(this, creep);
         return true;
     }
 
-    var energy = this.object.energy;
+    energy = this.object.energy;
     if (energy === undefined) {
         energy = _.sum(this.object.store);
     }
 
-    if (!creep.carry[RESOURCE_ENERGY] || energy === (this.object.energyCapacity || this.object.storeCapacity)) {
+    if (energy === (this.object.energyCapacity || this.object.storeCapacity)) {
         Task.prototype.complete.call(this, creep);
         return true;
     }
-
 
     if (this.object instanceof StructureExtension) {
         switch (this.object.room.controller.level) {

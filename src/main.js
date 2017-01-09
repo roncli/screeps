@@ -140,6 +140,9 @@ var profiler = require("screeps-profiler"),
             if (!Memory.lengthToStorage) {
                 Memory.lengthToStorage = {};
             }
+            if (!Memory.towerTasks) {
+                Memory.towerTasks = {};
+            }
 
             // Clear old memory.
             _.forEach(Memory.creeps, (creep, name) => {

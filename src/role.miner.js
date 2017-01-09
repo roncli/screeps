@@ -9,20 +9,25 @@ var Cache = require("cache"),
 
             var containers = Cache.containersInRoom(room),
                 max = 0,
-                sources, miners;
+                miners;
 
             // If there are no spawns or containers in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0) {
                 return;
             }
             
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
             miners = Cache.creepsInRoom("miner", room);
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
-                var source = Utilities.objectsClosestToObj(sources, container)[0],
-                    containerId = container.id;
+                var containerId = container.id;
+                    source;
+
+                if (!Memory.containerSource[containerId]) {
+                    Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+                }
+
+                source = Game.getObjectById(Memory.containerSource[containerId]);
                 
                 // If this container is for a mineral, check to make sure it has resources.
                 if (source instanceof Mineral && source.mineralAmount === 0) {

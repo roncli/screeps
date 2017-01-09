@@ -551,8 +551,8 @@ var profiler = require("screeps-profiler"),
         log: () => {
             "use strict";
 
-            _.forEach(Game.creeps, (c) => {
-                Cache.log.creeps.push({
+            Cache.log.creeps = _.map(Game.creeps, (c) => {
+                return {
                     creepId: c.id,
                     name: c.name,
                     creepType: c.memory.role,
@@ -567,18 +567,18 @@ var profiler = require("screeps-profiler"),
                     carry: c.carry,
                     hits: c.hits,
                     hitsMax: c.hitsMax
-                });
+                };
             });
 
-            _.forEach(Game.spawns, (s) => {
-                Cache.log.spawns.push({
+            Cache.log.spawns = _.map(Game.spawns, (s) => {
+                return {
                     spawnId: s.id,
                     name: s.name,
                     room: s.room.name,
                     spawningName: s.spawning ? s.spawning.name : undefined,
                     spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
                     spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
-                });
+                };
             });
 
             _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
@@ -633,9 +633,9 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[roomName].reservedUsername = room.controller.reservation.username;
                         Cache.log.rooms[roomName].tte = room.controller.reservation.ticksToEnd;
                     }
-
-                    _.forEach(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
-                        Cache.log.structures.push({
+                    
+                    [].concat.apply([], [Cache.log.structures, _.map(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
+                        return {
                             structureId: s.id,
                             room: roomName,
                             x: s.pos.x,
@@ -643,8 +643,8 @@ var profiler = require("screeps-profiler"),
                             structureType: s.structureType,
                             hits: s.hits,
                             hitsMax: s.hitsMax
-                        });
-                    });
+                        };
+                    })]);
 
                     Cache.log.rooms[roomName].lowestWall = _.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart)[0];
 
@@ -706,8 +706,8 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
-                    _.forEach(Cache.hostilesInRoom(room), (h) => {
-                        Cache.log.hostiles.push({
+                    [].concat.apply([], [Cache.log.hostiles, _.map(Cache.hostilesInRoom(room), (h) => {
+                        return {
                             creepId: h.id,
                             ownerUsername: h.owner.username,
                             room: roomName,
@@ -716,8 +716,8 @@ var profiler = require("screeps-profiler"),
                             ttl: h.ticksToLive,
                             hits: h.hits,
                             hitsMax: h.hitsMax
-                        });
-                    });
+                        };
+                    })]);
                 }
             });
         },

@@ -327,9 +327,15 @@ var profiler = require("screeps-profiler"),
                             } else {
                                 buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
                                 if (node.buyPrice > buyPrice) {
+                                    // Ensure we have the necessary minerals.
+                                    let roomResources1 = (room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.children[0].resource] || 0),
+                                        roomResources2 = (room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.children[0].resource] || 0);
+
+                                    node.amount = Math.min(Math.min(node.amount, roomResources1), roomResources2);
+
                                     node.action = "create";
                                     node.buyPrice = buyPrice;
-                                    if (roomResources <= lowest) {
+                                    if (roomResources <= lowest && node.amount > 0) {
                                         labQueue = node;
                                         lowest = roomResources;
                                     }
@@ -368,10 +374,14 @@ var profiler = require("screeps-profiler"),
                             }
 
                             if (node.action === "create") {
+                                // Ensure we have the necessary minerals.
+                                let roomResources1 = (room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.children[0].resource] || 0),
+                                    roomResources2 = (room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(Cache.creepsInRoom("all", room), (c) => c.carry[node.children[0].resource] || 0);
+
                                 // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
                                 roomMemory.labQueue = {
                                     resource: resource,
-                                    amount: Math.min(5 * Math.ceil(Math.min(node.amount, LAB_MINERAL_CAPACITY) / 5), 3000),
+                                    amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(node.amount, roomResources1), roomResources2), LAB_MINERAL_CAPACITY) / 5), 3000),
                                     children: _.map(node.children, (c) => c.resource),
                                     start: Game.time
                                 };

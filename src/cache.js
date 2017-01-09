@@ -72,7 +72,7 @@ var creepsInRoom = {},
                 creepsInRoom[roomName].all = _.filter(Game.creeps, (c) => c.memory.home === roomName);
             }
 
-            return creepsInRoom[roomName][type];
+            return creepsInRoom[roomName][type] ? creepsInRoom[roomName][type] : [];
         },
     
         // Returns all creeps of a certain in an army.

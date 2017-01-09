@@ -250,6 +250,8 @@ Mine.prototype.stage2Tasks = function(room, supportRoom) {
             });
         }
     }
+    
+    return tasks;
 };
 
 Mine.prototype.stage2AssignTasks = function(room, tasks) {

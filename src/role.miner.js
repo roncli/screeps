@@ -20,7 +20,7 @@ var Cache = require("cache"),
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
-                var containerId = container.id;
+                var containerId = container.id,
                     source;
 
                 if (!Memory.containerSource[containerId]) {

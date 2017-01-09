@@ -9,8 +9,12 @@ var Cache = require("cache"),
             "use strict";
 
             var workers = Cache.creepsInRoom("worker", room),
+                roomName = room.name,
                 storage = room.storage,
                 count, max;
+            
+            Memory.rooms[roomName] = Memory.rooms[roomName] || canSpawn;
+            canSpawn = Memory.rooms[roomName];
 
             // If there are no energy sources, ignore the room.
             if (room.find(FIND_SOURCES).length === 0) {
@@ -27,7 +31,7 @@ var Cache = require("cache"),
 
             // Output worker count in the report.
             if (Memory.log && (workers.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "worker",
                     count: workers.length,
                     max: max
@@ -35,7 +39,7 @@ var Cache = require("cache"),
             }
 
             // Support smaller rooms in the region.
-            _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
+            _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== roomName && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
                 if (_.filter(Cache.creepsInRoom("worker", otherRoom), (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
                     Worker.spawn(otherRoom, room);
                 }

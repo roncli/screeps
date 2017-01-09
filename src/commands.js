@@ -202,6 +202,11 @@ var Cache = require("cache"),
         // Resets a wartime cost matrix for a room.  It will be automatically recalculated.
         resetMatrix: (room) => {
             Memory.baseMatrixes[room] = {};
+        },
+
+        // Recover from an emergency.
+        recover: () => {
+            _.forEach(Game.spawns, (spawn) => {spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], "storer-emerg-" + spawn.room.name, {role: "storer", home: spawn.room.name})});            
         }
     };
 

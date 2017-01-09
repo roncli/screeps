@@ -11,10 +11,11 @@ var Cache = require("cache"),
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 supportRoomName = supportRoom.name,
                 miners = Cache.creepsInRoom("remoteMiner", room),
+                containers = Cache.containersInRoom(room),
                 max = 0;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
-            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || Cache.containersInRoom(room).length === 0) {
+            if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
                 return;
             }
 
@@ -24,7 +25,7 @@ var Cache = require("cache"),
             }
 
             // Loop through containers to see if we have anything we need to spawn.
-            _.forEach(Cache.containersInRoom(room), (container) => {
+            _.forEach(containers, (container) => {
                 var containerId = container.id,
                     source;
 
@@ -36,8 +37,14 @@ var Cache = require("cache"),
                     Memory.lengthToContainer[containerId][supportRoomName] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
                 }
 
+                if (!Memory.containerSource[id]) {
+                    Memory.containerSource[id] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+                }
+
+                source = Game.getObjectById(Memory.containerSource[id]);
+
                 // If this container is for a mineral, check to make sure it has resources.
-                if ((source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0]) instanceof Mineral) {
+                if (source instanceof Mineral) {
                     if (source.mineralAmount === 0) {
                         return;
                     }

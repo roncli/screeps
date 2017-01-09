@@ -21,10 +21,15 @@ var Cache = require("cache"),
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
                 var count = 0,
-                    source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
                     id = container.id,
-                    length;
+                    source, length;
 
+                if (!Memory.containerSource[id]) {
+                    Memory.containerSource[id] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+                }
+
+                source = Game.getObjectById(Memory.containerSource[id]);
+                
                 // If this container is for a mineral, bail if there are no minerals left.  If it's not a mineral, start counter at -1 since it has a worker on it already.
                 if (source instanceof Mineral) {
                     if (source.mineralAmount === 0) {

@@ -137,6 +137,9 @@ var profiler = require("screeps-profiler"),
             if (!Memory.paths) {
                 Memory.paths = {};
             }
+            if (!Memory.lengthToStorage) {
+                Memory.lengthToStorage = {};
+            }
 
             // Clear old memory.
             _.forEach(Memory.creeps, (creep, name) => {
@@ -192,20 +195,26 @@ var profiler = require("screeps-profiler"),
             switch (generationTick) {
                 case 0:
                     delete Memory.lengthToStorage;
+                    Memory.lengthToStorage = {};
                     break;
                 case 100:
                     delete Memory.lengthToContainer;
+                    Memory.lengthToContainer = {};
                     break;
                 case 200:
                     delete Memory.lengthToController;
+                    Memory.lengthToController = {};
                     break;
                 case 300:
                     delete Memory.distances;
+                    Memory.distances = {};
                     break;
                 case 400:
                     delete Memory.ranges;
+                    Memory.ranges = {};
                     break;
                 case 500:
+                    delete Memory.paths;
                     Memory.paths = {};
                     break;
             }

@@ -19,7 +19,6 @@ var Cache = require("cache"),
             controller = room.controller,
             army = Memory.army;
             storers = Cache.creepsInRoom("storer", room),
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
             lengthToStorage = Memory.lengthToStorage;
 
             // Init road length cache.
@@ -29,7 +28,14 @@ var Cache = require("cache"),
 
             // Determine the number storers needed.
             _.forEach(containers, (container) => {
-                var closest = Utilities.objectsClosestToObj(sources, container)[0];
+                var containerId = container.id,
+                    closest;
+
+                if (!Memory.containerSource[containerId]) {
+                    Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+                }
+
+                closest = Game.getObjectById(Memory.containerSource[containerId]);
 
                 if (closest instanceof Mineral) {
                     if (closest.mineralAmount > 0) {

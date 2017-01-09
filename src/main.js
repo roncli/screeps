@@ -354,7 +354,7 @@ var profiler = require("screeps-profiler"),
                             }
                             
                             // Set the buy queue if necessary.
-                            if (node.amount > 0 && node.action === "buy" && !roomMemory.buyQueue) {
+                            if (node.amount > 0 && node.action === "buy" && !roomMemory.buyQueue && Game.market.credits > Memory.minimumCredits) {
                                 roomMemory.buyQueue = {
                                     resource: resource,
                                     amount: node.amount,

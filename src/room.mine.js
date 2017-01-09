@@ -92,12 +92,20 @@ Mine.prototype.run = function(room) {
         RoleRemoteBuilder.checkSpawn(room);
 
         // Get tasks.
+        tasks = {
+            fillEnergy: {
+                storageTasks: TaskFillEnergy.getStorageTasks(supportRoom),
+                containerTasks: TaskFillEnergy.getContainerTasks(supportRoom)
+            },
+            fillMinerals: {
+                storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
+                terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
+            }
+        };
         if (!room.unobservable) {
-            tasks = {
-                build: {
-                    tasks: TaskBuild.getTasks(room)
-                }
-            };
+            tasks.build = {
+                tasks: TaskBuild.getTasks(room)
+            }
         }
 
         // Assign tasks to creeps.                    

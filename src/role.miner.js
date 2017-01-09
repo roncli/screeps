@@ -7,35 +7,33 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var max = 0,
-                containers = Cache.containersInRoom(room),
-                sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
-                miners;
+            var containers = Cache.containersInRoom(room),
+                max = 0,
+                sources, miners;
 
             // If there are no spawns or containers in the room, ignore the room.
             if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0) {
                 return;
             }
             
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
             miners = Cache.creepsInRoom("miner", room);
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
                 var source = Utilities.objectsClosestToObj(sources, container)[0],
-                    conatinerId = container.id;
+                    containerId = container.id;
                 
                 // If this container is for a mineral, check to make sure it has resources.
-                if (source instanceof Mineral) {
-                    if (source.mineralAmount === 0) {
-                        return;
-                    }
+                if (source instanceof Mineral && source.mineralAmount === 0) {
+                    return;
                 }
 
                 max += 1;
 
                 // If we don't have a miner for this container, spawn one.
-                if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === conatinerId).length === 0) {
-                    Miner.spawn(room, conatinerId);
+                if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === containerId).length === 0) {
+                    Miner.spawn(room, containerId);
                 }
             });
 

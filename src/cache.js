@@ -212,24 +212,28 @@ var creepsInRoom = {},
                 let matrix = new PathFinder.CostMatrix();
     
                 _.forEach(room.find(FIND_STRUCTURES), (structure) => {
+                    var pos = structure.pos;
                     if (structure instanceof StructureRoad) {
-                        matrix.set(structure.pos.x, structure.pos.y, 1);
-                    } else if (structure.structureType !== STRUCTURE_CONTAINER && (structure.structureType !== STRUCTURE_RAMPART || !structure.my)) {
-                        matrix.set(structure.pos.x, structure.pos.y, 255);
+                        matrix.set(pos.x, pos.y, 1);
+                    } else if (!(structure instanceof StructureContainer) && (!(structure instanceof StructureRampart) || !structure.my)) {
+                        matrix.set(pos.x, pos.y, 255);
                     }
                 });
     
                 _.forEach(room.find(FIND_MY_CONSTRUCTION_SITES), (structure) => {
-                    matrix.set(structure.pos.x, structure.pos.y, 5);
+                    var pos = structure.pos;
+                    matrix.set(pos.x, pos.y, 5);
                 });
                 
                 _.forEach(Cache.portalsInRoom(room), (structure) => {
-                    matrix.set(structure.pos.x, structure.pos.y, 5);
+                    var pos = structure.pos;
+                    matrix.set(pos.x, pos.y, 5);
                 });
                 
                 _.forEach(_.filter(room.find(FIND_HOSTILE_CREEPS), (c) => c.owner.username === "Source Keeper"), (creep) => {
-                    for (let x = creep.pos.x - 3; x < creep.pos.x + 3; x++) {
-                        for (let y = creep.pos.y - 3; y < creep.pos.y + 3; y++) {
+                    var pos = creep.pos;
+                    for (let x = pos.x - 3; x < pos.x + 3; x++) {
+                        for (let y = pos.y - 3; y < pos.y + 3; y++) {
                             matrix.set(x, y, 255);
                         }
                     }

@@ -329,13 +329,15 @@ Base.prototype.tasks = function(room) {
         terminalEnergy = 0,
         storageEnergy = 0,
         terminalId,
-        workers = Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)).length > 0,
+        workerList = Cache.creepsInRoom("worker", room),
+        collectorList = Cache.creepsInRoom("collector", room),
+        workers = Utilities.creepsWithNoTask(workerList).length > 0,
         storers = Utilities.creepsWithNoTask(Cache.creepsInRoom("storer", room)).length > 0,
         scientists = Utilities.creepsWithNoTask(Cache.creepsInRoom("scientist", room)).length > 0,
         dismantlers = Utilities.creepsWithNoTask(Cache.creepsInRoom("dismantler", room)).length > 0,
-        collectors = Utilities.creepsWithNoTask(Cache.creepsInRoom("collector", room)).length > 0,
+        collectors = Utilities.creepsWithNoTask(collectorList).length > 0,
         upgraders = Utilities.creepsWithNoTask(Cache.creepsInRoom("upgrader", room)).length > 0,
-        noWorkers = Game.time % 10 === 0 && (Cache.creepsInRoom("worker", room).length + Cache.creepsInRoom("collector", room).length) === 0,
+        noWorkers = Game.time % 10 === 0 && (workerList.length + collectorList.length) === 0,
         tasks = {
             build: {
                 tasks: (workers || collectors) ? TaskBuild.getTasks(room) : []

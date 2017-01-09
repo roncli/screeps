@@ -139,6 +139,7 @@ var Cache = require("cache"),
 
             var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 allCreeps = Cache.creepsInRoom("all", room),
+                storers = Cache.creepsInRoom("storer", room),
                 controller = room.controller,
                 assigned = [];
 
@@ -242,7 +243,7 @@ var Cache = require("cache"),
             }
 
             // Check for unfilled extensions if we don't have storage or storer creeps.
-            if (!room.storage || Cache.creepsInRoom("storer", room).length === 0) {
+            if (!room.storage || storers.length === 0) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
                         var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
@@ -264,7 +265,7 @@ var Cache = require("cache"),
             }
             
             // Check for unfilled spawns if we don't have storage or storer creeps.
-            if (!room.storage || Cache.creepsInRoom("storer", room).length === 0) {
+            if (!room.storage || storers.length === 0) {
                 _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
                     var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                     if (energyMissing > 0) {

@@ -36,9 +36,12 @@ var Screeps = require("screeps-api"),
 
     screeps.on("console", (msg) => {
         var [user, data] = msg;
-        
+
         if (data.messages && data.messages.results) {
             data.messages.results.forEach((l) => console.log(l));
+        }
+        if (data.messages && data.messages.log) {
+            data.messages.log.forEach((l) => console.log(l));
         }
         if (data.error) {
             console.log(data.error);

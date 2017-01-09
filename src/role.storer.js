@@ -16,15 +16,16 @@ var Cache = require("cache"),
                 return;
             }
 
-            controller = room.controller,
+            controller = room.controller;
             army = Memory.army;
-            storers = Cache.creepsInRoom("storer", room),
-            lengthToStorage = Memory.lengthToStorage;
+            storers = Cache.creepsInRoom("storer", room);
 
             // Init road length cache.
             if (!Memory.lengthToStorage) {
                 Memory.lengthToStorage = {};
             }
+
+            lengthToStorage = Memory.lengthToStorage;
 
             // Determine the number storers needed.
             _.forEach(containers, (container) => {

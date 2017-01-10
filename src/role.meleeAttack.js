@@ -78,7 +78,7 @@ var Cache = require("cache"),
             "use strict";
 
             var roomName = room.name,
-                zcreepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].meleeAttack || []), (c) => !c.spawning),
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].meleeAttack || []), (c) => !c.spawning),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

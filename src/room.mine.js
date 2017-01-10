@@ -114,12 +114,13 @@ Mine.prototype.stage1AssignTasks = function(room, tasks) {
 };
 
 Mine.prototype.stage1Manage = function(room, supportRoom) {
-    var sources = room.find(FIND_SOURCES),
-        containers = Cache.containersInRoom(room),
-        roomName = room.name,
-        sites;
+    var sources, containers, roomName, sites;
     
     if (!room.unobservable) {
+        sources = room.find(FIND_SOURCES);
+        containers = Cache.containersInRoom(room);
+        roomName = room.name;
+
         // Check to see if we have built containers.  If so, move to stage 2.
         if (containers.length === sources.length) {
             this.stage = 2;

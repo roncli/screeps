@@ -31,7 +31,8 @@ Cleanup.prototype.init = function(supportRoom) {
 Cleanup.prototype.run = function(room) {
     "use strict";
 
-    var ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [],
+    var roomName = room.name,
+        ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [],
         supportRoom, tasks;
 
     // Can't see the support room, we have bigger problems, so just bail.
@@ -75,10 +76,10 @@ Cleanup.prototype.run = function(room) {
                 }
             });
             _.forEach(completed, (complete) => {
-                _.remove(Memory.dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
+                _.remove(Memory.dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
             });
         } else {
-            _.forEach(Cache.creeps[room] && Cache.creeps[room].dismantler || [], (creep) => {
+            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
                 creep.memory.role = "worker";
                 creep.memory.home = supportRoom.name
             });
@@ -109,13 +110,13 @@ Cleanup.prototype.run = function(room) {
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
             
             // No longer need remote collectors.
-            _.forEach(Cache.creeps[room] && Cache.creeps[room].remoteCollector || [], (creep) => {
+            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [], (creep) => {
                 creep.memory.role = "storer";
                 creep.memory.home = supportRoom.name;
             });
 
             // No longer need dismantlers.
-            _.forEach(Cache.creeps[room] && Cache.creeps[room].remoteDismantler || [], (creep) => {
+            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [], (creep) => {
                 creep.memory.role = "upgrader";
                 creep.memory.home = supportRoom.name;
             });

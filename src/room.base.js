@@ -329,14 +329,14 @@ Base.prototype.tasks = function(room) {
         terminalEnergy = 0,
         storageEnergy = 0,
         terminalId,
-        workerList = Cache.creeps[room] && Cache.creeps[room].worker || [],
-        collectorList = Cache.creeps[room] && Cache.creeps[room].collector || [],
+        workerList = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
+        collectorList = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
         workers = Utilities.creepsWithNoTask(workerList).length > 0,
-        storers = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].storer || []).length > 0,
-        scientists = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].scientist || []).length > 0,
-        dismantlers = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].dismantler || []).length > 0,
+        storers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].storer || []).length > 0,
+        scientists = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].scientist || []).length > 0,
+        dismantlers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []).length > 0,
         collectors = Utilities.creepsWithNoTask(collectorList).length > 0,
-        upgraders = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].upgrader || []).length > 0,
+        upgraders = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []).length > 0,
         noWorkers = Game.time % 10 === 0 && (workerList.length + collectorList.length) === 0,
         tasks = {
             build: {
@@ -427,7 +427,7 @@ Base.prototype.tasks = function(room) {
             _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
         });
     } else {
-        _.forEach(Cache.creeps[room] && Cache.creeps[room].dismantler || [], (creep) => {
+        _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
             creep.memory.role = "remoteWorker";
             creep.memory.container = Cache.containersInRoom(room)[0].id;
         });

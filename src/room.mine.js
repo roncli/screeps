@@ -45,7 +45,7 @@ Mine.prototype.convert = function(room, supportRoom) {
     
     switch (oldRoomType) {
         case "mine":
-            _.forEach(Cache.creeps[room] && Cache.creeps[room].all || [], (creep) => {
+            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].all || [], (creep) => {
                 var creepMemory = creep.memory;
                 
                 switch (creepMemory.role) {
@@ -116,6 +116,7 @@ Mine.prototype.stage1AssignTasks = function(room, tasks) {
 Mine.prototype.stage1Manage = function(room, supportRoom) {
     var sources = room.find(FIND_SOURCES),
         containers = Cache.containersInRoom(room),
+        roomName = room.name,
         sites;
     
     if (!room.unobservable) {
@@ -133,7 +134,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
                 }
 
                 // Convert builders to workers.
-                _.forEach(Cache.creeps[room] && Cache.creeps[room].remoteBuilder || [], (creep) => {
+                _.forEach(Cache.creeps[roroomNameom] && Cache.creeps[roomName].remoteBuilder || [], (creep) => {
                     creep.memory.role = "remoteWorker";
                     creep.memory.container = Utilities.objectsClosestToObj(containers, source)[0].id;
                 });
@@ -176,13 +177,15 @@ Mine.prototype.stage1 = function(room, supportRoom) {
 };
 
 Mine.prototype.stage2Manage = function(room) {
+    var roomName = room.name;
+
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
         if (
-            (Cache.creeps[room] && Cache.creeps[room].remoteMiner || []).length === 0 &&
-            (Cache.creeps[room] && Cache.creeps[room].remoteWorker || []).length === 0 &&
-            (Cache.creeps[room] && Cache.creeps[room].remoteStorer || []).length === 0 &&
-            (Cache.creeps[room] && Cache.creeps[room].remoteReserver || []).length === 0
+            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []).length === 0 &&
+            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length === 0 &&
+            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length === 0 &&
+            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []).length === 0
         ) {
             this.stage = 1;
         }
@@ -220,7 +223,8 @@ Mine.prototype.stage2Tasks = function(room, supportRoom) {
             storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
             terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
         }
-    };
+    },
+        roomName = room.name;
 
     // Get tasks.
     if (!room.unobservable) {
@@ -229,10 +233,10 @@ Mine.prototype.stage2Tasks = function(room, supportRoom) {
             tasks: []
         };
 
-        if (dismantle && dismantle[room.name] && dismantle[room.name].length > 0) {
+        if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
             let completed = [];
             
-            _.forEach(dismantle[room.name], (pos) => {
+            _.forEach(dismantle[roomName], (pos) => {
                 var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
                 if (structures.length === 0) {
                     completed.push(pos);
@@ -241,10 +245,10 @@ Mine.prototype.stage2Tasks = function(room, supportRoom) {
                 }
             });
             _.forEach(completed, (complete) => {
-                _.remove(dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
+                _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
             });
         } else {
-            _.forEach(Cache.creeps[room] && Cache.creeps[room].dismantler || [], (creep) => {
+            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
                 creep.memory.role = "remoteWorker";
                 creep.memory.container = Cache.containersInRoom(room)[0].id;
             });

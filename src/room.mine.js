@@ -215,17 +215,18 @@ Mine.prototype.stage2Spawn = function(room, supportRoom) {
 };
 
 Mine.prototype.stage2Tasks = function(room, supportRoom) {
-    var tasks = {
-        fillEnergy: {
-            storageTasks: TaskFillEnergy.getStorageTasks(supportRoom),
-            containerTasks: TaskFillEnergy.getContainerTasks(supportRoom)
-        },
-        fillMinerals: {
-            storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
-            terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
-        }
-    },
-        roomName = room.name;
+    var roomName = room.name,
+        creeps = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []).length > 0
+        tasks = {
+            fillEnergy: {
+                storageTasks: creeps ? TaskFillEnergy.getStorageTasks(supportRoom) : [],
+                containerTasks: creeps ? TaskFillEnergy.getContainerTasks(supportRoom) : []
+            },
+            fillMinerals: {
+                storageTasks: creeps ? TaskFillMinerals.getStorageTasks(supportRoom) : [],
+                terminalTasks: creeps ? TaskFillMinerals.getTerminalTasks(supportRoom) : []
+            }
+        };
 
     // Get tasks.
     if (!room.unobservable) {

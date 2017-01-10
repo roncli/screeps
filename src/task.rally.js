@@ -116,12 +116,12 @@ Rally.getDefenderTask = function(creep) {
 
     if (creep.memory.role === "healer") {
         // Find a rally target.
-        var targets = Cache.creepsInRoom("rangedAttack", creep.room);
+        var targets = Cache.creeps[creep.room] && Cache.creeps[creep.room].rangedAttack || [];
         if (targets.length === 0) {
-            targets = Cache.creepsInRoom("meleeAttack", creep.room);
+            targets = Cache.creeps[creep.room] && Cache.creeps[creep.room].meleeAttack || [];
         }
         if (targets.length === 0) {
-            targets = Cache.creepsInRoom("defender", creep.room);
+            targets = Cache.creeps[creep.room] && Cache.creeps[creep.room].defender || [];
         }
 
         // Return the rally point.

@@ -80,9 +80,11 @@ var Cache = require("cache"),
                 labsInUse.push(labsToBoostWith[1]);
 
                 // If anything is coming to fill the labs, stop them.
-                _.forEach(_.filter(Cache.creepsInRoom("all", boostRoom), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
-                    delete creep.memory.currentTask;
-                });
+                if (Cache.creeps[boostRoom]) {
+                    _.forEach(_.filter(Cache.creeps[boostRoom].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
+                        delete creep.memory.currentTask;
+                    });
+                }
             }
 
             return typeof name !== "number";

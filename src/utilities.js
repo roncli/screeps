@@ -1,6 +1,20 @@
 var Cache = require("cache"),
 
     Utilities = {
+        nest: (seq, keys) => {
+            var first, rest;
+
+            if (!keys.length) {
+                return seq;
+            }
+
+            first = keys[0];
+            rest = keys.slice(1);
+            return _.mapValues(_.groupBy(seq, first), function (value) { 
+                return nest(value, rest)
+            });
+        },
+        
         creepsWithNoTask: (creeps) => {
             "use strict";
 

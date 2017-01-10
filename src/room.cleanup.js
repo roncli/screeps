@@ -78,7 +78,7 @@ Cleanup.prototype.run = function(room) {
                 _.remove(Memory.dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
             });
         } else {
-            _.forEach(Cache.creepsInRoom("dismantler", room), (creep) => {
+            _.forEach(Cache.creeps[room] && Cache.creeps[room].dismantler || [], (creep) => {
                 creep.memory.role = "worker";
                 creep.memory.home = supportRoom.name
             });
@@ -109,13 +109,13 @@ Cleanup.prototype.run = function(room) {
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
             
             // No longer need remote collectors.
-            _.forEach(Cache.creepsInRoom("remoteCollector", room), (creep) => {
+            _.forEach(Cache.creeps[room] && Cache.creeps[room].remoteCollector || [], (creep) => {
                 creep.memory.role = "storer";
                 creep.memory.home = supportRoom.name;
             });
 
             // No longer need dismantlers.
-            _.forEach(Cache.creepsInRoom("remoteDismantler", room), (creep) => {
+            _.forEach(Cache.creeps[room] && Cache.creeps[room].remoteDismantler || [], (creep) => {
                 creep.memory.role = "upgrader";
                 creep.memory.home = supportRoom.name;
             });

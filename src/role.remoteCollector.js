@@ -8,7 +8,7 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var collectors = Cache.creepsInRoom("remoteCollector", room),
+            var collectors = Cache.creeps[room] && Cache.creeps[room].remoteCollector || [],
                 max = 8;
 
             if (!supportRoom) {
@@ -77,7 +77,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteCollector", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteCollector || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [],
                 roomName = room.name;
 

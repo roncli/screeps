@@ -45,7 +45,7 @@ Mine.prototype.convert = function(room, supportRoom) {
     
     switch (oldRoomType) {
         case "mine":
-            _.forEach(Cache.creepsInRoom("all", room), (creep) => {
+            _.forEach(Cache.creeps[room] && Cache.creeps[room].all || [], (creep) => {
                 var creepMemory = creep.memory;
                 
                 switch (creepMemory.role) {
@@ -133,7 +133,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
                 }
 
                 // Convert builders to workers.
-                _.forEach(Cache.creepsInRoom("remoteBuilder", room), (creep) => {
+                _.forEach(Cache.creeps[room] && Cache.creeps[room].remoteBuilder || [], (creep) => {
                     creep.memory.role = "remoteWorker";
                     creep.memory.container = Utilities.objectsClosestToObj(containers, source)[0].id;
                 });
@@ -179,10 +179,10 @@ Mine.prototype.stage2Manage = function(room) {
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
         if (
-            Cache.creepsInRoom("remoteMiner", room).length === 0 &&
-            Cache.creepsInRoom("remoteWorker", room).length === 0 &&
-            Cache.creepsInRoom("remoteStorer", room).length === 0 &&
-            Cache.creepsInRoom("remoteReserver", room).length === 0
+            (Cache.creeps[room] && Cache.creeps[room].remoteMiner || []).length === 0 &&
+            (Cache.creeps[room] && Cache.creeps[room].remoteWorker || []).length === 0 &&
+            (Cache.creeps[room] && Cache.creeps[room].remoteStorer || []).length === 0 &&
+            (Cache.creeps[room] && Cache.creeps[room].remoteReserver || []).length === 0
         ) {
             this.stage = 1;
         }
@@ -244,7 +244,7 @@ Mine.prototype.stage2Tasks = function(room, supportRoom) {
                 _.remove(dismantle[room.name], (d) => d.x === complete.x && d.y === complete.y);
             });
         } else {
-            _.forEach(Cache.creepsInRoom("dismantler", room), (creep) => {
+            _.forEach(Cache.creeps[room] && Cache.creeps[room].dismantler || [], (creep) => {
                 creep.memory.role = "remoteWorker";
                 creep.memory.container = Cache.containersInRoom(room)[0].id;
             });

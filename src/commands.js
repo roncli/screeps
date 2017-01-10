@@ -105,8 +105,8 @@ var Cache = require("cache"),
 
         // Claim a room that's currently being reserved.  Only works if you already have a reserver on the controller.
         claimMine: (room) => {
-            if (Game.rooms[room]) {
-                _.forEach(Cache.creepsInRoom("remoteReserver", Game.rooms[room]), (creep) => {
+            if (Game.rooms[room] && Cache.creeps[room]) {
+                _.forEach(Cache.creeps[room].remoteReserver, (creep) => {
                     creep.claimController(Game.rooms[room].controller);
                 });
             }

@@ -10,7 +10,7 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var dismantlers = Cache.creepsInRoom("remoteDismantler", room),
+            var dismantlers = Cache.creeps[room] && Cache.creeps[room].remoteDismantler || [],
                 max = 1;
 
             if (!supportRoom) {
@@ -96,7 +96,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteDismantler", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteDismantler || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [],
                 roomName = room.name;
 

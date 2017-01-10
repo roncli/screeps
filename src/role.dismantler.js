@@ -10,7 +10,7 @@ var Cache = require("cache"),
             "use strict";
 
             var max = 1,
-                dismantlers = Cache.creepsInRoom("dismantler", room);
+                dismantlers = Cache.creeps[room] && Cache.creeps[room].dismantler || [];
 
             if (!supportRoom) {
                 supportRoom = room;
@@ -22,7 +22,7 @@ var Cache = require("cache"),
             }
 
             // If we don't have a dismantler for this room, spawn one.
-            if (_.filter(Cache.creepsInRoom("dismantler", room), (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
+            if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
                 Dismantler.spawn(room, supportRoom);
             }
 
@@ -95,7 +95,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("dismantler", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].defender || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [],
                 roomName = room.name;
 
@@ -106,7 +106,7 @@ var Cache = require("cache"),
             // Check critical repairs.
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== roomName), (creep) => {
                 _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
-                    if (_.filter(Cache.creepsInRoom("all", task.structure.room), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
+                    if (_.filter(Cache.creeps[task.structure.room] && Cache.creeps[task.structure.room].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
                             assigned.push(creep.name);

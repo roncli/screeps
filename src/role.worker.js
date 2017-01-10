@@ -8,7 +8,7 @@ var Cache = require("cache"),
         checkSpawn: (room, canSpawn) => {
             "use strict";
 
-            var workers = Cache.creepsInRoom("worker", room),
+            var workers = Cache.creeps[room] && Cache.creeps[room].worker || [],
                 roomName = room.name,
                 storage = room.storage,
                 count, max;
@@ -40,7 +40,7 @@ var Cache = require("cache"),
 
             // Support smaller rooms in the region.
             _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== roomName && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
-                if (_.filter(Cache.creepsInRoom("worker", otherRoom), (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
+                if (_.filter(Cache.creeps[otherRoom] && Cache.creeps[otherRoom].worker || [], (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
                     Worker.spawn(otherRoom, room);
                 }
             });
@@ -126,7 +126,7 @@ var Cache = require("cache"),
                 supportRoom.memory.labsInUse.push(labToBoostWith);
 
                 // If anything is coming to fill the lab, stop it.
-                _.forEach(_.filter(Cache.creepsInRoom("all", supportRoom), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
+                _.forEach(_.filter(Cache.creeps[supportRoom] && Cache.creeps[supportRoom].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
                     delete creep.memory.currentTask;
                 });
             }
@@ -137,9 +137,10 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("worker", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                allCreeps = Cache.creepsInRoom("all", room),
-                storers = Cache.creepsInRoom("storer", room),
+            var workers = Cache.creeps[room] && Cache.creeps[room].worker || [],
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(workers), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                allCreeps = Cache.creeps[room] && Cache.creeps[room].all || [],
+                storers = Cache.creeps[room] && Cache.creeps[room].storer || [],
                 controller = room.controller,
                 assigned = [];
 
@@ -225,7 +226,7 @@ var Cache = require("cache"),
 
             // Check for critical controllers to upgrade.
             _.forEach(tasks.upgradeController.criticalTasks, (task) => {
-                if (_.filter(Cache.creepsInRoom("worker", room), (c) => c.memory.currentTask && c.memory.currentTask.type === "upgradeController" && c.memory.currentTask.room === task.room).length === 0) {
+                if (_.filter(workers, (c) => c.memory.currentTask && c.memory.currentTask.type === "upgradeController" && c.memory.currentTask.room === task.room).length === 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, controller), (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("CritCntrlr");

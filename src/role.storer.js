@@ -18,7 +18,7 @@ var Cache = require("cache"),
 
             controller = room.controller;
             army = Memory.army;
-            storers = Cache.creepsInRoom("storer", room);
+            storers = Cache.creeps[room] && Cache.creeps[room].storer || [];
 
             // Init road length cache.
             if (!Memory.lengthToStorage) {
@@ -105,8 +105,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("storer", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                allCreeps = Cache.creepsInRoom("all", room),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].storer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                allCreeps = Cache.creeps[room] && Cache.creeps[room].all || [],
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

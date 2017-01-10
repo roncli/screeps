@@ -12,7 +12,7 @@ var Cache = require("cache"),
                 supportRoomName = supportRoom.name,
                 spawns = Cache.spawnsInRoom(supportRoom),
                 controller = room.controller,
-                reservers = Cache.creepsInRoom("remoteReserver", room),
+                reservers = Cache.creeps[room] && Cache.creeps[room].remoteReserver || [],
                 count = 0,
                 max = 0,
                 id, reservation;
@@ -100,7 +100,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("remoteReserver", room)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteReserver || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

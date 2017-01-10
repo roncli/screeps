@@ -7,7 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var ranged = Cache.creepsInRoom("rangedAttack", room),
+            var ranged = Cache.creeps[room] && Cache.creeps[room].rangedAttack || [],
                 rangedAttack = Memory.maxCreeps.rangedAttack,
                 roomName = room.name,
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
@@ -77,7 +77,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("rangedAttack", room)), (c) => !c.spawning),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].rangedAttack || []), (c) => !c.spawning),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

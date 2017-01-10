@@ -16,7 +16,7 @@ var Cache = require("cache"),
                 return;
             }
             
-            miners = Cache.creepsInRoom("miner", room);
+            miners = Cache.creeps[room] && Cache.creeps[room].miner || [];
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
@@ -117,7 +117,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creepsInRoom("miner", room)),
+            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].miner || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

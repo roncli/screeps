@@ -1,5 +1,4 @@
-var creepsInRoom = {},
-    creepsInArmy = {},
+var creepsInArmy = {},
     spawnsInRoom = {},
     powerSpawnsInRoom = {},
     extensionsInRoom = {},
@@ -26,7 +25,6 @@ var creepsInRoom = {},
         reset: () => {
             "use strict";
     
-            creepsInRoom = {};
             creepsInArmy = {};
             spawnsInRoom = {};
             powerSpawnsInRoom = {};
@@ -56,23 +54,6 @@ var creepsInRoom = {},
                 rooms: {},
                 army: {}
             };
-        },
-    
-        // Returns all creeps of a certain in the current room.
-        creepsInRoom: (type, room) => {
-            "use strict";
-            
-            var roomName = room.name;
-    
-            if (!creepsInRoom[roomName]) {
-                creepsInRoom[roomName] = _.groupBy(_.filter(Game.creeps, (c) => c.memory.home === roomName), (c) => c.memory.role);
-            }
-    
-            if (!creepsInRoom[roomName].all) {
-                creepsInRoom[roomName].all = _.filter(Game.creeps, (c) => c.memory.home === roomName);
-            }
-
-            return creepsInRoom[roomName][type] ? creepsInRoom[roomName][type] : [];
         },
     
         // Returns all creeps of a certain in an army.

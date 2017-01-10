@@ -8,7 +8,7 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var upgraders = Cache.creepsInRoom("upgrader", room),
+            var upgraders = Cache.creeps[room] && Cache.creeps[room].upgrader || [],
                 storage = room.storage,
                 controller = room.controller,
                 storageEnergy, count, max;
@@ -46,7 +46,7 @@ var Cache = require("cache"),
 
             // Support smaller rooms in the region.
             _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
-                if (_.filter(Cache.creepsInRoom("upgrader", otherRoom), (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
+                if (_.filter(Cache.creeps[otherRoom] && Cache.creeps[otherRoom].upgrader || [], (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
                     Upgrader.spawn(otherRoom, room);
                 }
             });
@@ -163,7 +163,7 @@ var Cache = require("cache"),
                 supportRoom.memory.labsInUse.push(labToBoostWith);
 
                 // If anything is coming to fill the lab, stop it.
-                _.forEach(_.filter(Cache.creepsInRoom("all", supportRoom), (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
+                _.forEach(_.filter(Cache.creeps[supportRoom] && Cache.creeps[supportRoom].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
                     delete creep.memory.currentTask;
                 });
             }
@@ -174,7 +174,7 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInRoom("upgrader", room)), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].upgrader || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [],
                 controller = room.controller;
 

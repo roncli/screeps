@@ -223,7 +223,7 @@ var profiler = require("screeps-profiler"),
             }
 
             // Setup cached creeps.
-            Cache.creeps = nest(Game.creeps, [(c) => c.room.name, (c) => c.memory.role]);
+            Cache.creeps = Utilities.nest(Game.creeps, [(c) => c.room.name, (c) => c.memory.role]);
             _.forEach(Cache.creeps, (creeps, room) => {
                 Cache.creeps[room].all = _.flatten(_.values(creeps));
             });

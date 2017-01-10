@@ -135,7 +135,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
                 }
 
                 // Convert builders to workers.
-                _.forEach(Cache.creeps[roroomNameom] && Cache.creeps[roomName].remoteBuilder || [], (creep) => {
+                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || [], (creep) => {
                     creep.memory.role = "remoteWorker";
                     creep.memory.container = Utilities.objectsClosestToObj(containers, source)[0].id;
                 });

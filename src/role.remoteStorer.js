@@ -9,7 +9,8 @@ var Cache = require("cache"),
 
             var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
                 containers = Cache.containersInRoom(room),
-                storers = Cache.creeps[room] && Cache.creeps[room].remoteStorer || [],
+                roomName = room.name,
+                storers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || [],
                 max = 0,
                 foundFirstSource = false;
 
@@ -55,7 +56,7 @@ var Cache = require("cache"),
             });
 
             if (Memory.log && (storers.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "remoteStorer",
                     count: storers.length,
                     max: max
@@ -110,7 +111,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteStorer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

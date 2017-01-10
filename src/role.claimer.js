@@ -10,7 +10,7 @@ var Cache = require("cache"),
 
             var claimer = Memory.maxCreeps.claimer,
                 roomName = room.name,
-                claimers = Cache.creeps[room] && Cache.creeps[room].claimer || [],
+                claimers = Cache.creeps[roomName] && Cache.creeps[roomName].claimer || [],
                 num = 0,
                 max = 0;
             
@@ -64,7 +64,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].claimer || []),
+            var roomName = room.name,
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].claimer || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

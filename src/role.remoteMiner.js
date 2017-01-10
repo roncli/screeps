@@ -10,7 +10,7 @@ var Cache = require("cache"),
             var roomName = room.name,
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 supportRoomName = supportRoom.name,
-                miners = Cache.creeps[room] && Cache.creeps[room].remoteMiner || [],
+                miners = Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || [],
                 containers = Cache.containersInRoom(room),
                 max = 0;
 
@@ -135,7 +135,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteMiner || []),
+            var roomName = room.name,
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

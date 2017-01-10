@@ -10,7 +10,8 @@ var Cache = require("cache"),
         checkSpawn: (room, supportRoom) => {
             "use strict";
 
-            var dismantlers = Cache.creeps[room] && Cache.creeps[room].remoteDismantler || [],
+            var roomName = room.name,
+                dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [],
                 max = 1;
 
             if (!supportRoom) {
@@ -29,7 +30,7 @@ var Cache = require("cache"),
 
             // Output remote dismantler count in the report.
             if (Memory.log && (dismantlers.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "remoteDismantler",
                     count: dismantlers.length,
                     max: max
@@ -96,9 +97,9 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteDismantler || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                assigned = [],
-                roomName = room.name;
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                assigned = [];
 
             if (creepsWithNoTask.length === 0) {
                 return;

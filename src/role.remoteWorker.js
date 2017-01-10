@@ -15,7 +15,7 @@ var Cache = require("cache"),
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 supportRoomName = supportRoom.name,
                 containers = Cache.containersInRoom(room),
-                workers = Cache.creeps[room] && Cache.creeps[room].remoteWorker || [],
+                workers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || [],
                 max = 0;
 
             // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
@@ -130,7 +130,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteWorker || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

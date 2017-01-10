@@ -7,9 +7,9 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var healers = Cache.creeps[room] && Cache.creeps[room].healer || [],
+            var roomName = room.name,
+                healers = Cache.creeps[roomName] && Cache.creeps[roomName].healer || [],
                 healer = Memory.maxCreeps.healer,
-                roomName = room.name,
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 supportRoomName = supportRoom.name,
                 max = 0;
@@ -76,7 +76,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].healer || []), (c) => !c.spawning),
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].healer || []), (c) => !c.spawning),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

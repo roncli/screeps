@@ -7,7 +7,8 @@ var Cache = require("cache"),
         checkSpawn: (room) => {
             "use strict";
 
-            var containers = Cache.containersInRoom(room),
+            var roomName = room.name,
+                containers = Cache.containersInRoom(room),
                 max = 0,
                 miners;
 
@@ -16,7 +17,7 @@ var Cache = require("cache"),
                 return;
             }
             
-            miners = Cache.creeps[room] && Cache.creeps[room].miner || [];
+            miners = Cache.creeps[roomName] && Cache.creeps[roomName].miner || [];
 
             // Loop through containers to see if we have anything we need to spawn.
             _.forEach(containers, (container) => {
@@ -44,7 +45,7 @@ var Cache = require("cache"),
 
             // Output miner count in the report.
             if (Memory.log && (miners.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "miner",
                     count: miners.length,
                     max: max
@@ -117,7 +118,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].miner || []),
+            var roomName = room.name,
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].miner || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

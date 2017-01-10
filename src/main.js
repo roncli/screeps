@@ -314,7 +314,7 @@ var profiler = require("screeps-profiler"),
                 _.forEach(Game.rooms, (room, roomName) => {
                     var lowest = Infinity,
                         roomMemory = room.memory,
-                        allCreepsInRoom = Cache.creeps[room] && Cache.creeps[room].all,
+                        allCreepsInRoom = Cache.creeps[roomName] && Cache.creeps[roomName].all,
                         labQueue;
 
                     if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {

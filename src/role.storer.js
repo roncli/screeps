@@ -7,6 +7,7 @@ var Cache = require("cache"),
             "use strict";
 
             var containers = Cache.containersInRoom(room),
+                roomName = room.name,
                 length = 0,
                 max = 0,
                 controller, army, storers, sources, lengthToStorage;
@@ -18,7 +19,7 @@ var Cache = require("cache"),
 
             controller = room.controller;
             army = Memory.army;
-            storers = Cache.creeps[room] && Cache.creeps[room].storer || [];
+            storers = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [];
 
             // Init road length cache.
             if (!Memory.lengthToStorage) {
@@ -59,7 +60,7 @@ var Cache = require("cache"),
 
             // Output storer count in the report.
             if (Memory.log && (storers.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "storer",
                     count: storers.length,
                     max: max
@@ -105,8 +106,9 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].storer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                allCreeps = Cache.creeps[room] && Cache.creeps[room].all || [],
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].storer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

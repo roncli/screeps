@@ -12,7 +12,8 @@ var Cache = require("cache"),
                 supportRoomName = supportRoom.name,
                 spawns = Cache.spawnsInRoom(supportRoom),
                 controller = room.controller,
-                reservers = Cache.creeps[room] && Cache.creeps[room].remoteReserver || [],
+                roomName = room.name,
+                reservers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || [],
                 count = 0,
                 max = 0,
                 id, reservation;
@@ -50,7 +51,7 @@ var Cache = require("cache"),
 
             // Output remote reserver count in the report.
             if (Memory.log && (reservers.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "remoteReserver",
                     count: reservers.length,
                     max: max
@@ -100,7 +101,8 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteReserver || []),
+            var roomName = room.name,
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

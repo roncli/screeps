@@ -21,7 +21,7 @@ var Cache = require("cache"),
             }
 
             // If we don't find a remote builder, spawn a new remote builder.
-            if ((num = (Cache.creeps[room] && Cache.creeps[room].remoteBuilder || []).length) < max) {
+            if ((num = (Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || []).length) < max) {
                 Builder.spawn(room, supportRoom);
             }
 
@@ -94,7 +94,8 @@ var Cache = require("cache"),
         assignTasks: (room) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].remoteBuilder || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

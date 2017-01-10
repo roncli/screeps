@@ -10,7 +10,8 @@ var Cache = require("cache"),
 
             var spawns = Cache.spawnsInRoom(room),
                 max = 0,
-                collectors = Cache.creeps[room] && Cache.creeps[room].collector || [],
+                roomName = room.name,
+                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
                 count, sources, capacity, adjustment;
             
             // If there is storage and containers in the room, ignore the room.
@@ -52,7 +53,7 @@ var Cache = require("cache"),
 
             // Output collector count in the report.
             if (Memory.log && (collectors.length > 0 || max > 0)) {
-                Cache.log.rooms[room.name].creeps.push({
+                Cache.log.rooms[roomName].creeps.push({
                     role: "collector",
                     count: collectors.length,
                     max: max
@@ -118,8 +119,9 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].collector || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                allCreeps = Cache.creeps[room] && Cache.creeps[room].all || [],
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].collector || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -214,7 +216,7 @@ var Cache = require("cache"),
             // Check for critical repairs.
             _.forEach(tasks.repair.criticalTasks, (task) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
-                    if (_.filter(Cache.creeps[task.structure.room] && Cache.creeps[task.structure.room].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
+                    if (_.filter(Cache.creeps[task.structure.room.name] && Cache.creeps[task.structure.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
                         if (task.canAssign(creep)) {
                             creep.say("CritRepair");
                             assigned.push(creep.name);
@@ -232,7 +234,7 @@ var Cache = require("cache"),
 
             // Check for construction sites.
             _.forEach(tasks.build.tasks, (task) => {
-                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(Cache.creeps[task.constructionSite.room] && Cache.creeps[task.constructionSite.room].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(Cache.creeps[task.constructionSite.room.name] && Cache.creeps[task.constructionSite.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
                         if (task.canAssign(creep)) {
@@ -255,7 +257,7 @@ var Cache = require("cache"),
 
             // Check for repairs.
             _.forEach(tasks.repair.tasks, (task) => {
-                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(_.filter(Cache.creeps[task.structure.room] && Cache.creeps[task.structure.room].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,
+                var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(_.filter(Cache.creeps[task.structure.room.name] && Cache.creeps[task.structure.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,
                     taskAssigned = false;
 
                 if (hitsMissing > 0) {
@@ -301,7 +303,7 @@ var Cache = require("cache"),
             if (Cache.hostilesInRoom(room).length === 0) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                        if (_.filter(Cache.creeps[task.resource.room] && Cache.creeps[task.resource.room].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                        if (_.filter(Cache.creeps[task.resource.room.name] && Cache.creeps[task.resource.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
                             return;
                         }
                         if (task.canAssign(creep)) {

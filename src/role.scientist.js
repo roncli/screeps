@@ -8,7 +8,8 @@ var Cache = require("cache"),
             "use strict";
 
             var controller = room.controller,
-                scientists = Cache.creeps[room] && Cache.creeps[room].scientist || [],
+                roomName = room.name,
+                scientists = Cache.creeps[roomName] && Cache.creeps[roomName].scientist || [],
                 max = 1,
                 count;
             
@@ -84,8 +85,9 @@ var Cache = require("cache"),
         assignTasks: (room, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[room] && Cache.creeps[room].scientist || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
-                allCreeps = Cache.creeps[room] && Cache.creeps[room].all || [],
+            var roomName = room.name,
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].scientist || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

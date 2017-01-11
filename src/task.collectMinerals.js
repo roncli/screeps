@@ -237,7 +237,7 @@ CollectMinerals.getStorageTasks = function(room) {
             if (!Memory.reserveMinerals[resource]) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, amount));
             } else if ((resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) < amount) {
-                tasks.push(new CollectMinerals(room.storage.id, resource, amount - Memory.reserveMinerals[resource]));
+                tasks.push(new CollectMinerals(room.storage.id, resource, amount - (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource])));
             }
         });
     }

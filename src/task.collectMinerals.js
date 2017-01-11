@@ -28,7 +28,7 @@ CollectMinerals.prototype.canAssign = function(creep) {
 
     var obj = this.object;
 
-    if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || creep.carry[RESOURCE_ENERGY] > 0) {
+    if (this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || creep.carry[RESOURCE_ENERGY] > 0) {
         return false;
     }
     
@@ -101,7 +101,7 @@ CollectMinerals.prototype.canComplete = function(creep) {
     "use strict";
 
     // If the creep is about to die or if the object doesn't exist, complete.
-    if (creep.ticksToLive < 150 || !this.object) {
+    if (this.amount < 0 || creep.ticksToLive < 150 || !this.object) {
         Task.prototype.complete.call(this, creep);
         return true;
     }

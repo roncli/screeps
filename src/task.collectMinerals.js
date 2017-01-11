@@ -236,7 +236,7 @@ CollectMinerals.getStorageTasks = function(room) {
             }
             if (!Memory.reserveMinerals[resource]) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, amount));
-            } else if (Memory.reserveMinerals[resource] < amount) {
+            } else if ((resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) < amount) {
                 tasks.push(new CollectMinerals(room.storage.id, resource, amount - Memory.reserveMinerals[resource]));
             }
         });
@@ -274,9 +274,9 @@ CollectMinerals.getTerminalTasks = function(room) {
                 return;
             }
             if (!room.storage.store[resource]) {
-                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, Memory.reserveMinerals[resource])));
+                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]))));
             } else if (room.storage.store[resource] < Memory.reserveMinerals[resource]) {
-                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, Memory.reserveMinerals[resource] - room.storage.store[resource])));
+                tasks.push(new CollectMinerals(room.terminal.id, resource, Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - room.storage.store[resource])));
             }
         });
     }

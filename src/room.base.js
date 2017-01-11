@@ -242,7 +242,7 @@ Base.prototype.terminal = function(room, terminal) {
         } else {
             // Sell what we have in excess.
             terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
-                return {resource: k, amount: Math.min(s, s - (Memory.reserveMinerals ? (Memory.reserveMinerals[k] || 0) : 0) + (storageStore[k] || 0))};
+                return {resource: k, amount: Math.min(s, s - (Memory.reserveMinerals ? ((k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0) : 0) + (storageStore[k] || 0))};
             }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
             if (terminalMinerals.length > 0) {

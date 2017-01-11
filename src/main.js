@@ -369,9 +369,11 @@ var profiler = require("screeps-profiler"),
                                     start: Game.time
                                 };
 
-                                Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
-                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
-                                    delete Memory.minimumSell[resource];
+                                if (node.buyPrice) {
+                                    Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
+                                    if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                        delete Memory.minimumSell[resource];
+                                    }
                                 }
                             }
                         };
@@ -382,7 +384,8 @@ var profiler = require("screeps-profiler"),
                     // Set the lab queue if necessary.
                     if (labQueue && !roomMemory.labQueue) {
                         var fx = (node, innerFx) => {
-                            var resource = node.resource;
+                            var resource = node.resource,
+                                price;
 
                             // If we have the requested mineral, we're done.
                             if (node.amount <= 0) {
@@ -406,8 +409,9 @@ var profiler = require("screeps-profiler"),
                                     innerFx(child, innerFx);
                                 });
 
-                                if (node.action === "create" && node.children.length > 0) {
-                                    Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, _.sum(node.children, (c) => c.price));
+                                price = _.sum(node.children, (c) => c.price);
+                                if (node.children.length > 0 && price > 0) {
+                                    Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, price);
                                     if (Memory.minimumSell[resource] === 0) {
                                         delete Memory.minimumSell[resource];
                                     }

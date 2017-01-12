@@ -18,10 +18,10 @@ var Cache = require("cache"),
             if (!Market.filteredOrders) {
                 Market.filteredOrders = Utilities.nest(Market.getAllOrders(), [(d) => d.type, (d) => d.resourceType]);
                 _.forEach(Market.filteredOrders.sell, (orders, resource) => {
-                    Market.filteredOrders.sell[resource].sort((a, b) => a.price - b.price);
+                    Market.filteredOrders.sell[resource].sort((a, b) => b.price - a.price);
                 });
                 _.forEach(Market.filteredOrders.buy, (orders, resource) => {
-                    Market.filteredOrders.sell[resource].sort((a, b) => b.price - a.price);
+                    Market.filteredOrders.sell[resource].sort((a, b) => a.price - b.price);
                 });
             }
             

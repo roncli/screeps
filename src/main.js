@@ -303,7 +303,7 @@ var profiler = require("screeps-profiler"),
 
                 // Get market values for each mineral.
                 _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
-                    sellOrder = _.filter(Market.getAllOrders(), (o) => o.resourceType === resource && o.type === "sell" && o.amount > 0).sort((a, b) => a.price - b.price)[0];
+                    sellOrder = (Market.getFilteredOrders().sell[resource] || []).sort((a, b) => a.price - b.price)[0];
 
                     if (sellOrder) {
                         mineralOrders[resource] = sellOrder;

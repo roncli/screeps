@@ -11,6 +11,12 @@ var Cache = require("cache"),
             return Market.orders;
         },
         
+        getFilteredOrders: () => {
+            "use strict";
+            
+            return Market.filteredOrders ? Market.filteredOrders : (Market.filteredOrders = Utilities.nest(Market.getAllOrders(), [(d) => d.type, (d) => d.resourceType]));
+        },
+        
         deal: (orderId, amount, yourRoomName) => {
             "use strict";
             

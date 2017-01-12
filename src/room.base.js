@@ -283,7 +283,7 @@ Base.prototype.terminal = function(room, terminal) {
                     }
 
                     // Get all the orders that can be flipped.
-                    sellOrder = (Market.getFilteredOrders().sell[resource] || []).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
+                    sellOrder = (Market.getFilteredOrders().sell[resource] || []).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
                     buyOrder = (Market.getFilteredOrders().buy[resource] || []).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
 
                     if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < market.credits) {

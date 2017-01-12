@@ -97,7 +97,7 @@ var Cache = require("cache"),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].defender || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

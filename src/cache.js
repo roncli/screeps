@@ -54,6 +54,8 @@ var creepsInArmy = {},
                 rooms: {},
                 army: {}
             };
+            
+            Cache.credits = Game.market.credits;
         },
     
         // Returns all creeps of a certain in an army.

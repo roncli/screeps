@@ -36,13 +36,8 @@ var Cache = require("cache"),
             
             if (ret === OK) {
                 if (order) {
-                    switch (order.type) {
-                        case "sell":
-                            Cache.credits -= order.amount * order.price;
-                            break;
-                        case "buy":
-                            Cache.credits += order.amount * order.price;
-                            break;
+                    if (order.type === "sell") {
+                        Cache.credits -= order.amount * order.price;
                     }
                     if (order.amount <= amount) {
                         Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id);

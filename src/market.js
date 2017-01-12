@@ -31,12 +31,11 @@ var Cache = require("cache"),
         deal: (orderId, amount, yourRoomName) => {
             "use strict";
             
-            var ret = Game.market.deal(orderId, amount, yourRoomName);
+            var ret = Game.market.deal(orderId, amount, yourRoomName),
+                order = _.filter(Market.orders, (m) => m.id === orderId);
             
             if (ret === OK) {
-                let index = _.findIndex(Market.orders, (m) => m.id === orderId);
-                if (index !== -1) {
-                    let order = Market.orders[index];
+                if (order) {
                     if (order.amount <= amount) {
                         Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id);
                         _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
@@ -47,7 +46,11 @@ var Cache = require("cache"),
                     }
                 }
             } else {
-                Cache.log.events.push(yourRoomName + " failed to process order ID " + orderId + ": " + ret);
+                if (order) {
+                    Cache.log.events.push(yourRoomName + " failed to process order ID " + orderId + ": " + ret);
+                    _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
+                    _.remove(Market.orders, (m) => m.id === orderId);
+                }
             }
             
             return ret;

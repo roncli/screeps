@@ -21,7 +21,7 @@ var Cache = require("cache"),
                     Market.filteredOrders.sell[resource].sort((a, b) => b.price - a.price);
                 });
                 _.forEach(Market.filteredOrders.buy, (orders, resource) => {
-                    Market.filteredOrders.sell[resource].sort((a, b) => a.price - b.price);
+                    Market.filteredOrders.buy[resource].sort((a, b) => a.price - b.price);
                 });
             }
             

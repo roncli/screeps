@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    Utilities = require("utilities"),
 
     Market = {
         getAllOrders: () => {

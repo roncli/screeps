@@ -1,6 +1,7 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Market = require("market"),
+    Minerals = require("minerals"),
     Utilities = require("utilities"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),

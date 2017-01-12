@@ -46,6 +46,8 @@ var Cache = require("cache"),
                         Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " " + order.amount + " remaining on " + order.id);
                     }
                 }
+            } else {
+                Cache.log.events.push(yourRoomName + " failed to process order ID " + orderId + ": " + ret);
             }
             
             return ret;

@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    resourcesAvailable,
 
     Market = {
         getAllOrders: () => {
@@ -31,6 +32,10 @@ var Cache = require("cache"),
             }
             
             return ret;
+        },
+        
+        resourcesAvailable: () => {
+            return resourcesAvailable ? resourcesAvailable : (resourcesAvailable = _.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)));
         }
     };
 

@@ -271,7 +271,7 @@ Base.prototype.terminal = function(room, terminal) {
             
             // Find an order to flip if we haven't made a deal and we have enough energy.
             if (!dealMade && storage && storageStore[RESOURCE_ENERGY] > Memory.marketEnergy) {
-                _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
+                _.forEach(Market.resourcesAvailable, (resource) => {
                     var sellOrder, buyOrder;
 
                     // Energy and tokens are not to be traded.

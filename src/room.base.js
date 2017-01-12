@@ -209,7 +209,7 @@ Base.prototype.terminal = function(room, terminal) {
 
         if (buyQueue) {
             // Buy what we need to for the lab queue.
-            bestOrder = (Market.getFilteredOrders().sell[buyQueue.resource] || []).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
+            bestOrder = (Market.getFilteredOrders().sell[buyQueue.resource] || [])[0];
             if (bestOrder) {
                 if (bestOrder.price > buyQueue.price) {
                     delete memory.buyQueue;
@@ -250,7 +250,7 @@ Base.prototype.terminal = function(room, terminal) {
                 _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                     var resource = topResource.resource;
                     
-                    bestOrder = _.filter((Market.getFilteredOrders().buy[resource] || []), (o) => !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource]).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
+                    bestOrder = _.filter((Market.getFilteredOrders().buy[resource] || []), (o) => !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
                     if (bestOrder) {
                         transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
                         if (terminalEnergy > transCost) {
@@ -283,8 +283,8 @@ Base.prototype.terminal = function(room, terminal) {
                     }
 
                     // Get all the orders that can be flipped.
-                    sellOrder = (Market.getFilteredOrders().sell[resource] || []).sort((a, b) => (a.price - b.price !== 0 ? a.price - b.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
-                    buyOrder = (Market.getFilteredOrders().buy[resource] || []).sort((a, b) => (b.price - a.price !== 0 ? b.price - a.price : Game.map.getRoomLinearDistance(roomName, a.roomName, true) - Game.map.getRoomLinearDistance(roomName, b.roomName, true)))[0];
+                    sellOrder = (Market.getFilteredOrders().sell[resource] || [])[0];
+                    buyOrder = (Market.getFilteredOrders().buy[resource] || [])[0];
 
                     if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < market.credits) {
                         flips.push({resource: resource, buy: buyOrder, sell: sellOrder});

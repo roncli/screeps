@@ -14,8 +14,18 @@ var Cache = require("cache"),
         
         getFilteredOrders: () => {
             "use strict";
+
+            if (!Market.filteredOrders) {
+                Market.filteredOrders = Utilities.nest(Market.getAllOrders(), [(d) => d.type, (d) => d.resourceType]);
+                _.forEach(Market.filteredOrders.sell, (orders, resource) => {
+                    Market.filteredOrders.sell[resource].orders.sort((a, b) => a.price - b.price);
+                });
+                _.forEach(Market.filteredOrders.buy, (orders, resource) => {
+                    Market.filteredOrders.sell[resource].orders.sort((a, b) => b.price - a.price);
+                });
+            }
             
-            return Market.filteredOrders ? Market.filteredOrders : (Market.filteredOrders = Utilities.nest(Market.getAllOrders(), [(d) => d.type, (d) => d.resourceType]));
+            return Market.filteredOrders;
         },
         
         deal: (orderId, amount, yourRoomName) => {
@@ -28,7 +38,7 @@ var Cache = require("cache"),
                 if (index !== -1) {
                     let order = Market.orders[index];
                     if (order.amount <= amount) {
-                        Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id)
+                        Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id);
                         _.remove(Market.orders, (m) => m.id === orderId);
                     } else {
                         order.amount -= amount;

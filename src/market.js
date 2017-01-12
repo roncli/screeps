@@ -32,7 +32,7 @@ var Cache = require("cache"),
             "use strict";
             
             var ret = Game.market.deal(orderId, amount, yourRoomName),
-                order = _.filter(Market.orders, (m) => m.id === orderId);
+                order = _.find(Market.orders, (m) => m.id === orderId);
             
             if (ret === OK) {
                 if (order) {

@@ -294,22 +294,27 @@ Base.prototype.terminal = function(room, terminal) {
                 _.forEach(flips.sort((a, b) => (a.sell.price - a.buy.price) - (b.sell.price - b.buy.price)), (flip, index) => {
                     var buy = flip.buy,
                         sell = flip.sell;
-                    
+
+                    amount = Math.min(buy.amount, sell.amount);
+                    if (amount * sell.price > market.credits) {
+                        amount = Math.floor(market.credits / sell.price);
+                    }
+
                     if (index === 0) {
-                        Cache.log.events.push("Biggest flip: " + flip.resource + " x" + Math.min(buy.amount, sell.amount) + " " + sell.price.toFixed(2) + " to " + buy.price.toFixed(2));
+                        Cache.log.events.push("Biggest flip: " + flip.resource + " x" + amount + " " + sell.price.toFixed(2) + " to " + buy.price.toFixed(2));
                     }
 
                     // Determine how much energy we need for the deal.
-                    transCost = market.calcTransactionCost(sell.amount, roomName, sell.roomName);
+                    transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
                     if (terminalEnergy > transCost) {
-                        Market.deal(sell.id, sell.amount, roomName);
+                        Market.deal(sell.id, amount, roomName);
                         Memory.minimumSell[flip.resource] = sell.price;
                         dealMade = true;
                         return false;
                     }
 
                     if (terminalEnergy > 0) {
-                        amount = Math.floor(sell.amount * terminalEnergy / transCost);
+                        amount = Math.floor(amount * terminalEnergy / transCost);
                         if (amount > 0) {
                             Market.deal(sell.id, amount, roomName);
                             Memory.minimumSell[flip.resource] = sell.price;

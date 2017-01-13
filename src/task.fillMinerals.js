@@ -205,7 +205,7 @@ FillMinerals.getStorageTasks = function(room) {
                 resources[resource] = amount;
             }
         });
-        return new [FillMinerals(storage.id, resources)];
+        return [new FillMinerals(storage.id, resources)];
     }
 };
 

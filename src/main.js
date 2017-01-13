@@ -645,7 +645,7 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[roomName].tte = room.controller.reservation.ticksToEnd;
                     }
                     
-                    [].concat.apply([], [Cache.log.structures, _.map(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
+                    Cache.log.structures = [].concat.apply([], [Cache.log.structures, _.map(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
                         return {
                             structureId: s.id,
                             room: roomName,

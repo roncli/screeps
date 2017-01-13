@@ -717,7 +717,7 @@ var profiler = require("screeps-profiler"),
                         });
                     });
 
-                    [].concat.apply([], [Cache.log.hostiles, _.map(Cache.hostilesInRoom(room), (h) => {
+                    Cache.log.hostiles = [].concat.apply([], [Cache.log.hostiles, _.map(Cache.hostilesInRoom(room), (h) => {
                         return {
                             creepId: h.id,
                             ownerUsername: h.owner.username,

@@ -30,6 +30,11 @@ FillMinerals.prototype.canAssign = function(creep) {
         return false;
     }
 
+    // Can't assign if the creep isn't carrying minerals at all.
+    if (_.sum(creep.carry) === creep.carry[RESOURCE_ENERGY]) {
+        return false;
+    }
+
     // Can't assign if the creep isn't carrying any of the requested resources.
     if (this.resources && _.intersection(_.keys(this.resources), _.filter(_.keys(creep.carry), (c) => c !== RESOURCE_ENERGY && creep.carry[c])).length === 0) {
         return false;

@@ -108,7 +108,7 @@ FillMinerals.prototype.run = function(creep) {
 
         // Move to the object and fill it.
         Pathing.moveTo(creep, this.object, 1);
-        if (creep.transfer(this.object, minerals[0], this.resources[minerals[0]] || undefined) === OK) {
+        if (creep.transfer(this.object, minerals[0], this.resources[minerals[0]] !== null ? Math.min(this.resources[minerals[0]], creep.carry[minerals[0]]) : undefined) === OK) {
             // If we have no minerals left for this container, we're done.
             if (minerals.length === 1) {
                 Task.prototype.complete.call(this, creep);
@@ -204,7 +204,7 @@ FillMinerals.getStorageTasks = function(room) {
     // If the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
     if (storage && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
         resources = {};
-        _(Memory.reserveMinerals).keys().forEach((resource) => {
+        _.keys(Memory.reserveMinerals).forEach((resource) => {
             var amount = (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - (store[resource] || 0);
             if (amount > 0) {
                 resources[resource] = amount;

@@ -28,7 +28,7 @@
                 <b>Complete structures to dismantle:</b> {{army.structures}}
             </div>
             <div ng-if="army.constructionSites">
-                <b>Initial structures to dismantle:</b> {{army.constructionSites}}
+                <b>Enemy construction sites:</b> {{army.constructionSites}}
             </div>
             <div ng-repeat="creeps in army.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
                 <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}

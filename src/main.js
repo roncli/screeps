@@ -611,7 +611,7 @@ var profiler = require("screeps-profiler"),
                         creeps: []
                     };
                 } else {
-                    repairableStructures = Cache.sortedRepairableStructuresInRoom(room),
+                    repairableStructures = Cache.repairableStructuresInRoom(room),
                     constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES),
                     towers = Cache.towersInRoom(room),
                     labs = Cache.labsInRoom(room);
@@ -657,7 +657,7 @@ var profiler = require("screeps-profiler"),
                         };
                     })]);
 
-                    Cache.log.rooms[roomName].lowestWall = _.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart)[0];
+                    Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits));
 
                     if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
                         Cache.log.rooms[roomName].energyAvailable = room.energyAvailable;

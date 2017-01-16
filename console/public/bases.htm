@@ -104,7 +104,7 @@
                 </div>
             </div>
             <div ng-if="room.lowestWall">
-                <b>Lowest Wall</b> {{room.lowestWall.hits.toFixed(0)}}
+                <b>Lowest Wall</b> {{room.lowestWall.toFixed(0)}}
             </div>
             <div ng-repeat="source in room.source">
                 <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{source.resource}}.png" /> {{source.amount}}<span ng-if="source.capacity">/{{source.capacity}}</span>

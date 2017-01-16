@@ -10,21 +10,24 @@ var Screeps = require("screeps-api"),
 (() => {
     "use strict";
 
-    var screeps = new Screeps(config);
+    var screeps = new Screeps(config),
+        socketOpen = () => {
+            screeps.ws.on("close", () => {
+                console.log("Screeps socket closed.  Reconnecting...");
+                screeps.socket(socketOpen);
+            });
 
-    screeps.socket(() => {
-        screeps.ws.on("close", () => {
-            throw "Screeps socket closed.  Reconnecting...";
-        });
+            screeps.ws.on("error", (err) => {
+                if (err.code === "ECONNREFUSED") {
+                    console.log("Connection refused.  Reconnecting...");
+                    screeps.socket(socketOpen);
+                } else {
+                    console.log(err);
+                }
+            });
+        };
 
-        screeps.ws.on("error", (err) => {
-            if (err.code === "ECONNREFUSED") {
-                throw "Connection refused.  Reconnecting...";
-            } else {
-                console.log(err);
-            }
-        });
-    });
+    screeps.socket(socketOpen);
 
     screeps.on("message", (msg) => {
         if (msg.startsWith("auth ok")) {

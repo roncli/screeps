@@ -554,6 +554,7 @@ var profiler = require("screeps-profiler"),
                         transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoom.name, room.name);
 
                         otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), room.name);
+                        Cache.log.events.push("Sending " + Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))) + " energy from " + otherRoom.name + " to " + room.name);
                     }
                 });
             }

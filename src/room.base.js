@@ -392,7 +392,7 @@ Base.prototype.tasks = function(room) {
             },
             upgradeController: {
                 tasks: (workers || collectors || upgraders) ? TaskUpgradeController.getTasks(room) : [],
-                criticalTasks: (workers || collectors) ? TaskUpgradeController.getCriticalTasks(room) : []
+                criticalTasks: (noWorkers || workers || collectors) ? TaskUpgradeController.getCriticalTasks(room) : []
             },
             dismantle: {
                 tasks: []

@@ -636,7 +636,7 @@ Base.prototype.run = function(room) {
     tasks = this.tasks(room);
 
     // Spawn new creeps.
-    this.spawn(room, (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 1000 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || (tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0) || (tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0)));
+    this.spawn(room, (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || (tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0) || (tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0)));
 
     // Assign tasks to creeps and towers.
     this.assignTasks(room, tasks);

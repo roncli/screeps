@@ -191,13 +191,14 @@ Base.prototype.terminal = function(room, terminal) {
         flips = [],
         storageStore = {},
         market = Game.market,
+        maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base"), (r) => r.storage ? r.storage.store[RESOURCE_ENERGY] : 0)),
         terminalMinerals, bestOrder, transCost, amount;
         
     if (storage) {
         storageStore = storage.store;
     }
     
-    if (terminal && terminalEnergy >= 1000 && storageStore[RESOURCE_ENERGY] >= Memory.dealEnergy) {
+    if (terminal && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
         if (!Memory.minimumSell) {
             Memory.minimumSell = {};
         }
@@ -273,7 +274,7 @@ Base.prototype.terminal = function(room, terminal) {
             }
             
             // Find an order to flip if we haven't made a deal and we have enough energy.
-            if (!dealMade && storage && storageStore[RESOURCE_ENERGY] > Memory.marketEnergy) {
+            if (!dealMade && storage && maxEnergy > Memory.marketEnergy) {
                 _.forEach(Minerals, (children, resource) => {
                     var sellOrder, buyOrder;
 

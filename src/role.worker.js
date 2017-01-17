@@ -13,9 +13,6 @@ var Cache = require("cache"),
                 storage = room.storage,
                 count, max;
             
-            Memory.rooms[roomName] = Memory.rooms[roomName] || canSpawn;
-            canSpawn = Memory.rooms[roomName];
-
             // If there are no energy sources, ignore the room.
             if (room.find(FIND_SOURCES).length === 0) {
                 return;

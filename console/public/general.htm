@@ -55,6 +55,7 @@
                         <span ng-if="room.progress > data.start[name].progress">ETA {{moment(data.memory.date).add((room.progressTotal - room.progress) / ((room.progress - data.start[name].progress) / moment(data.memory.date).diff(data.start[name].date)), "ms").format("M/D/YYYY h:mm:ss a")}}</span>
                     </div>
                 </div>
+                <div ng-if="!room.progressTotal" style="width: 100%;"></div>
                 <div ng-if="room.ttd" style="width: max-content; white-space: nowrap;">
                     <b>TTD</b> {{room.ttd}}
                 </div>

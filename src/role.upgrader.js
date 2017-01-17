@@ -23,9 +23,11 @@ var Cache = require("cache"),
                 storageEnergy = storage.store[RESOURCE_ENERGY];
             }
 
-            // If there is not enough energy in storage, ignore the room.
             count = _.filter(upgraders, (c) => c.spawning || c.ticksToLive >= 150).length;
-            if (!storage || storageEnergy < Memory.upgradeEnergy) {
+            if (roomName === Memory.rushRoom) {
+                max = 1;
+            } else if (!storage || storageEnergy < Memory.upgradeEnergy) {
+                // If there is not enough energy in storage, ignore the room.Array
                 max = 0;
             } else {
                 // If we have less than max upgraders, spawn an upgrader.

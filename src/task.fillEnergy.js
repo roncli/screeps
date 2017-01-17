@@ -153,8 +153,14 @@ FillEnergy.getLabTasks = function(room) {
 
 FillEnergy.getContainerTasks = function(room) {
     "use strict";
+    
+    var containers = _.filter(Cache.containersInRoom(room), (c) => _.sum(c.store) < c.storeCapacity);
+    
+    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
+        containers.unshift(room.storage);
+    }
 
-    return _.map(_.filter([].concat.apply([], [Cache.containersInRoom(room), room.storage ? [room.storage] : []]), (c) => (_.sum(c.store) < c.storeCapacity)).sort((a, b) => (a instanceof StructureStorage ? 1 : 2) - (b instanceof StructureStorage ? 1 : 2)), (c) => new FillEnergy(c.id));
+    return _.map(containers, (c) => new FillEnergy(c.id));
 };
 
 FillEnergy.getStorageTasks = function(room) {

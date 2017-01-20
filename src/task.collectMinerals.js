@@ -211,50 +211,54 @@ CollectMinerals.getStorageTasks = function(room) {
     var tasks = [],
         amount;
 
-    if (room.storage && room.memory.labsInUse) {
-        _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Game.getObjectById(l.id).mineralType || Game.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource))), (l) => {
-            if ((l.status === "refilling" ? (l.oldAmount - Game.getObjectById(l.id).mineralAmount) : (l.amount - Game.getObjectById(l.id).mineralAmount)) > 0) {
-                tasks.push(new CollectMinerals(room.storage.id, l.status === "refilling" ? l.oldResource : l.resource, l.status === "refilling" ? (l.oldAmount - Game.getObjectById(l.id).mineralAmount) : (l.amount - Game.getObjectById(l.id).mineralAmount)));
-            }
-        });
-    }
-
-    // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-    if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3 && !Utilities.roomLabsArePaused(room)) {
-        _.forEach(room.memory.labQueue.children, (resource) => {
-            if ((amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount)) < room.memory.labQueue.amount) {
-                tasks.push(new CollectMinerals(room.storage.id, resource, room.memory.labQueue.amount - amount));
-            }
-        });
-    }
-
-    // We only need to transfer from storage to terminal when we have both storage and terminal.
-    if (room.storage && room.terminal && Memory.reserveMinerals) {
-        _.forEach(room.storage.store, (amount, resource) => {
-            if (resource === RESOURCE_ENERGY) {
-                return;
-            }
-            if (!Memory.reserveMinerals[resource]) {
-                tasks.push(new CollectMinerals(room.storage.id, resource, amount));
-            } else if ((resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) < amount) {
-                tasks.push(new CollectMinerals(room.storage.id, resource, amount - (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource])));
-            }
-        });
-    }
-
-    // If we have a nuker, transfer ghodium.
-    _.forEach(Cache.nukersInRoom(room), (nuker) => {
-        if (nuker.ghodium < nuker.ghodiumCapacity) {
-            tasks.push(new CollectMinerals(room.storage.id, RESOURCE_GHODIUM, nuker.ghodiumCapacity - nuker.ghodium));
+    if (room.controller && room.controller.level >= 6) {
+        if (room.storage && room.memory.labsInUse) {
+            _.forEach(_.filter(room.memory.labsInUse, (l) => (!l.status || ["filling", "refilling"].indexOf(l.status) !== -1) && (!Game.getObjectById(l.id).mineralType || Game.getObjectById(l.id).mineralType === (l.status === "refilling" ? l.oldResource : l.resource))), (l) => {
+                if ((l.status === "refilling" ? (l.oldAmount - Game.getObjectById(l.id).mineralAmount) : (l.amount - Game.getObjectById(l.id).mineralAmount)) > 0) {
+                    tasks.push(new CollectMinerals(room.storage.id, l.status === "refilling" ? l.oldResource : l.resource, l.status === "refilling" ? (l.oldAmount - Game.getObjectById(l.id).mineralAmount) : (l.amount - Game.getObjectById(l.id).mineralAmount)));
+                }
+            });
         }
-    });
 
-    // If we have a power spawn, transfer power.
-    _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
-        if (spawn.power < spawn.powerCapacity) {
-            tasks.push(new CollectMinerals(room.storage.id, RESOURCE_POWER, spawn.powerCapacity - spawn.power));
+        // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
+        if (room.storage && room.memory.labQueue && room.memory.labQueue.status === "moving" && Cache.labsInRoom(room).length >= 3 && !Utilities.roomLabsArePaused(room)) {
+            _.forEach(room.memory.labQueue.children, (resource) => {
+                if ((amount = _.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === resource), (l) => l.mineralAmount)) < room.memory.labQueue.amount) {
+                    tasks.push(new CollectMinerals(room.storage.id, resource, room.memory.labQueue.amount - amount));
+                }
+            });
         }
-    });
+
+        // We only need to transfer from storage to terminal when we have both storage and terminal.
+        if (room.storage && room.terminal && Memory.reserveMinerals) {
+            _.forEach(room.storage.store, (amount, resource) => {
+                if (resource === RESOURCE_ENERGY) {
+                    return;
+                }
+                if (!Memory.reserveMinerals[resource]) {
+                    tasks.push(new CollectMinerals(room.storage.id, resource, amount));
+                } else if ((resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) < amount) {
+                    tasks.push(new CollectMinerals(room.storage.id, resource, amount - (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource])));
+                }
+            });
+        }
+
+        if (room.controller.level >= 8) {
+            // If we have a nuker, transfer ghodium.
+            _.forEach(Cache.nukersInRoom(room), (nuker) => {
+                if (nuker.ghodium < nuker.ghodiumCapacity) {
+                    tasks.push(new CollectMinerals(room.storage.id, RESOURCE_GHODIUM, nuker.ghodiumCapacity - nuker.ghodium));
+                }
+            });
+
+            // If we have a power spawn, transfer power.
+            _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
+                if (spawn.power < spawn.powerCapacity) {
+                    tasks.push(new CollectMinerals(room.storage.id, RESOURCE_POWER, spawn.powerCapacity - spawn.power));
+                }
+            });
+        }
+    }
 
     return tasks;
 };

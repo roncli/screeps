@@ -254,19 +254,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Attempt to get energy from terminals.
-            if (tasks.collectEnergy.terminalTask) {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (tasks.collectEnergy.terminalTask.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                        creep.memory.lastCollectEnergyWasStorage = false;
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-
             // Attempt to get energy from containers.
             _.forEach([].concat.apply([], [tasks.collectEnergy.storerTasks, tasks.collectMinerals.storerTasks]).sort((a, b) => (b.object.energy || _.sum(b.object.store) || 0) - (a.object.energy || _.sum(a.object.store) || 0)), (task) => {
                 if (!task.object.energy && !_.sum(task.object.store)) {
@@ -289,6 +276,27 @@ var Cache = require("cache"),
                     assigned = [];
                 }
             });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
+            // Attempt to get energy from terminals.
+            if (tasks.collectEnergy.terminalTask) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (tasks.collectEnergy.terminalTask.canAssign(creep)) {
+                        creep.say("Collecting");
+                        assigned.push(creep.name);
+                        creep.memory.lastCollectEnergyWasStorage = false;
+                    }
+                });
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
 
             // As a last resort, get energy from containers.
             _.forEach(tasks.collectEnergy.tasks, (task) => {

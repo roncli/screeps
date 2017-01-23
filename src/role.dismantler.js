@@ -202,20 +202,18 @@ var Cache = require("cache"),
             }
 
             // Check for structures needing dismantling.
-            if (tasks.dismantle) {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-                    _.forEach(tasks.dismantle.tasks, (task) => {
-                        if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
-                            return;
-                        }
-                        if (task.canAssign(creep)) {
-                            creep.say("Dismantle");
-                            assigned.push(creep.name);
-                            return false;
-                        }
-                    });
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
+                _.forEach(tasks.dismantle.tasks, (task) => {
+                    if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
+                        return;
+                    }
+                    if (task.canAssign(creep)) {
+                        creep.say("Dismantle");
+                        assigned.push(creep.name);
+                        return false;
+                    }
                 });
-            }
+            });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
             assigned = [];

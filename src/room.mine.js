@@ -83,6 +83,9 @@ Mine.prototype.stage1Tasks = function(room, supportRoom) {
         fillMinerals: {
             storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
             terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
+        },
+        dismantle: {
+            tasks: []
         }
     };
     

@@ -278,6 +278,11 @@ Base.prototype.terminal = function(room, terminal) {
                 _.forEach(Minerals, (children, resource) => {
                     var sellOrder, buyOrder;
 
+                    // Only flip what we are full on.
+                    if (!storageStore || storageStore[resource] < Memory.reserveMinerals[resource]) {
+                        return;
+                    }
+
                     // Energy and tokens are not to be traded.
                     if ([RESOURCE_ENERGY, SUBSCRIPTION_TOKEN].indexOf(resource) !== -1) {
                         return;

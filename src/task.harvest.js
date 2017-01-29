@@ -1,21 +1,22 @@
 var Task = require("task"),
     Pathing = require("pathing"),
-    Harvest = function(failIn) {
+    Harvest = function(failIn, source) {
         "use strict";
         
-        this.init(failIn);
+        this.init(failIn, source);
     };
     
 Harvest.prototype = Object.create(Task.prototype);
 Harvest.prototype.constructor = Harvest;
 
-Harvest.prototype.init = function(failIn) {
+Harvest.prototype.init = function(failIn, source) {
     "use strict";
     
     Task.call(this);
     
     this.type = "harvest";
     this.failIn = failIn || 10;
+    this.source = source;
 };
 
 Harvest.prototype.canAssign = function(creep) {
@@ -83,14 +84,15 @@ Harvest.prototype.toObj = function(creep) {
 
     creep.memory.currentTask = {
         type: this.type,
-        failIn: this.failIn
+        failIn: this.failIn,
+        source: this.source
     };
 };
 
 Harvest.fromObj = function(creep) {
     "use strict";
 
-    return new Harvest(creep.memory.currentTask.failIn);
+    return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
 };
 
 require("screeps-profiler").registerObject(Harvest, "TaskHarvest");

@@ -16,7 +16,7 @@ var Cache = require("cache"),
             
             // Loop through the room ranged attackers to see if we need to spawn a creep.
             if (rangedAttack && rangedAttack[supportRoomName] && rangedAttack[supportRoomName][roomName]) {
-                if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
+                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0) {
                     max = rangedAttack[supportRoomName][roomName].maxCreeps;
 
                     if (ranged.length < max) {

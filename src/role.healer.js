@@ -16,7 +16,7 @@ var Cache = require("cache"),
             
             // Loop through the room healers to see if we need to spawn a creep.
             if (healer && healer[supportRoomName] && healer[supportRoomName][roomName]) {
-                if ((room && room.memory.harvested >= 30000) || Cache.hostilesInRoom(room).length > 0) {
+                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0) {
                     max = healer[supportRoomName][roomName].maxCreeps;
                     
                     if (healers.length < max) {

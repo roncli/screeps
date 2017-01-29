@@ -28,7 +28,7 @@ Harvest.prototype.canAssign = function(creep) {
     }
 
     if (source.energy === 0) {
-        source = room.find(FIND_SOURCES_ACTIVE)[0]
+        source = creep.room.find(FIND_SOURCES_ACTIVE)[0]
         if (!source) {
             return false;
         }

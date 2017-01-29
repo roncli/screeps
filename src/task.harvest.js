@@ -28,7 +28,7 @@ Harvest.prototype.canAssign = function(creep) {
     }
 
     if (source.energy === 0) {
-        source = creep.room.find(FIND_SOURCES_ACTIVE)[0]
+        source = creep.room.find(FIND_SOURCES_ACTIVE)[0];
         if (!source) {
             return false;
         }
@@ -69,7 +69,7 @@ Harvest.prototype.run = function(creep) {
 Harvest.prototype.canComplete = function(creep) {
     "use strict";
 
-    var source = Game.getObjectById(creep.memory.homeSource);
+    var source = Game.getObjectById(this.source || creep.memory.homeSource);
 
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);

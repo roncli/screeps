@@ -62,7 +62,7 @@ Harvest.prototype.run = function(creep) {
     } else {
         this.failIn--;
         if (this.failIn === 0) {
-            Task.prototype.assign.call(this, creep);
+            Task.prototype.complete.call(this, creep);
         }
     }
 };

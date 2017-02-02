@@ -133,6 +133,18 @@ Rally.getDefenderTask = function(creep) {
     return new Rally(creep.memory.home, creep);
 };
 
+Rally.getSourceDefenderTask = function(creep) {
+    "use strict";
+
+    var source = Cache.sourceKeepersInRoom(creep.room).sort((a, b) => a.ticksToSpawn - b.ticksToSpawn)[0];
+
+    if (source) {
+        return new Rally(source.id, creep);
+    } else {
+        return new Rally(creep.memory.home, creep);
+    }
+}
+
 Rally.getClaimerTask = function(creep) {
     "use strict";
 

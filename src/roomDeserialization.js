@@ -16,6 +16,9 @@ var Cache = require("cache"),
             case "mine":
                 Cache.roomTypes[name] = RoomMine.fromObj(roomMemory);
                 break;
+            case "source":
+                Cache.roomTypes[name] = RoomSource.fromObj(roomMemory);
+                break;
         }
     };
 

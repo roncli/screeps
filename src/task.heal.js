@@ -28,7 +28,7 @@ Heal.prototype.canAssign = function(creep, tasks) {
 
     Task.prototype.assign.call(this, creep, tasks);
     return true;
-}
+};
 
 Heal.prototype.run = function(creep) {
     "use strict";
@@ -50,7 +50,7 @@ Heal.prototype.run = function(creep) {
         if (creep.pos.getRangeTo(this.ally) <= 1) {
             creep.heal(this.ally);
         } else if (creep.pos.getRangeTo(this.ally) <= 3) {
-            creep.rangedHeal(this.ally)
+            creep.rangedHeal(this.ally);
         }
     }
 
@@ -73,7 +73,7 @@ Heal.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.ally.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }
@@ -95,6 +95,12 @@ Heal.getDefenderTask = function(creep) {
     "use strict";
 
     return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
+};
+
+Heal.getSourceDefenderTask = function(creep) {
+    "use strict";
+
+    return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax && c.id !== creep.id).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
 };
 
 require("screeps-profiler").registerObject(Heal, "TaskHeal");

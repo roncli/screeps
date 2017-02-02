@@ -1,6 +1,6 @@
 <b>Mine Rooms</b>
 <div style="white-space: nowrap; overflow-x: scroll;">
-    <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'mine'" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+    <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'mine' || room.type === 'source'" ng-class="{panel: true, 'panel-primary': !room.unobservable, 'panel-danger': room.unobservable}" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
         <div class="panel-heading">{{name}} ({{room.region}}, Supporting {{room.supportRoom}})</div>
         <div class="panel-body">
             <div style="display: flex;">

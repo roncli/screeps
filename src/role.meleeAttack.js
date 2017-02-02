@@ -16,7 +16,7 @@ var Cache = require("cache"),
 
             // Loop through the room melee attackers to see if we need to spawn a creep.
             if (meleeAttack && meleeAttack[supportRoomName] && meleeAttack[supportRoomName][roomName]) {
-                if ((room && room.memory.harvested >= 100000) || (room && Cache.hostilesInRoom(room).length > 0)) {
+                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0 || (room && room.memory && room.memory.roomType && room.memory.roomType.type === "source")) {
                     max = meleeAttack[supportRoomName][roomName].maxCreeps;
 
                     if (melee.length < max) {

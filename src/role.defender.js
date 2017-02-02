@@ -17,7 +17,7 @@ var Cache = require("cache"),
             
             // Loop through the room defenders to see if we need to spawn a creep.
             if (defender && defender[supportRoomName] && defender[supportRoomName][roomName]) {
-                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0) {
+                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0 || (room && room.memory && room.memory.roomType && room.memory.roomType.type === "source")) {
                     max = defender[supportRoomName][roomName].maxCreeps;
 
                     if (defenders.length < max) {

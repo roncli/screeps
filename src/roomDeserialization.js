@@ -2,6 +2,7 @@ var Cache = require("cache"),
     RoomBase = require("room.base"),
     RoomCleanup = require("room.cleanup"),
     RoomMine = require("room.mine"),
+    RoomSource = require("room.source"),
     
     deserialization = (roomMemory, name) => {
         "use strict";

@@ -65,7 +65,7 @@ Source.prototype.stage1Spawn = function(room) {
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
 
-    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].sourceDefender || _.filter(Cache.creeps[roomName].sourceDefender, (c) => !c.spawning) === 0) {
+    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].sourceDefender || _.filter(Cache.creeps[roomName].sourceDefender, (c) => !c.spawning).length === 0) {
         return;
     }
 
@@ -177,7 +177,7 @@ Source.prototype.stage2Spawn = function(room, supportRoom) {
     RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
     
-    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].sourceDefender || _.filter(Cache.creeps[roomName].sourceDefender, (c) => !c.spawning) === 0) {
+    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].sourceDefender || _.filter(Cache.creeps[roomName].sourceDefender, (c) => !c.spawning).length === 0) {
         return;
     }
 

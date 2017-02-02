@@ -144,7 +144,7 @@ var Cache = require("cache"),
                 _.forEach(creepsWithNoTask, (creep) => {
                     var constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
                     if (constructionSites.length > 0) {
-                        var task = new TaskBuild(constructionSites[0].id);
+                        var task = new TaskBuild(Utilities.objectsClosestToObj(constructionSites, creep)[0].id);
                         if (task.canAssign(creep)) {
                             creep.say("Build");
                             assigned.push(creep.name);

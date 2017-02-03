@@ -88,7 +88,7 @@ Source.prototype.stage1Manage = function(room, supportRoom) {
     var sources, containers, roomName, sites;
     
     if (!room.unobservable) {
-        sources = room.find(FIND_SOURCES);
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
         containers = Cache.containersInRoom(room);
         roomName = room.name;
 
@@ -162,7 +162,8 @@ Source.prototype.stage2Manage = function(room) {
         }
     } else {
         // Check to see if we lost built containers.  If so, move to stage 1.
-        if (Cache.containersInRoom(room).length !== room.find(FIND_SOURCES).length) {
+        let sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
+        if (Cache.containersInRoom(room).length !== sources.length) {
             this.stage = 1;
         }
     }

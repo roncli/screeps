@@ -46,7 +46,7 @@ Heal.prototype.run = function(creep) {
 
     if (creep.id !== this.ally.id) {
         // Move and heal, or ranged heal if not in range.
-        Pathing.moveTo(creep, this.ally, 1);
+        Pathing.moveTo(creep, this.ally);
         if (creep.pos.getRangeTo(this.ally) <= 1) {
             creep.heal(this.ally);
         } else if (creep.pos.getRangeTo(this.ally) <= 3) {

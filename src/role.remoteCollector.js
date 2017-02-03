@@ -10,7 +10,7 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [],
-                max = 8;
+                max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? 8 : 1;
 
             if (!supportRoom) {
                 supportRoom = room;

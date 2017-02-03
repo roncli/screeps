@@ -1,12 +1,12 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
-    Commands = require("commands"),
     Utilities = require("utilities"),
     RoleDefender = require("role.defender"),
     RoleHealer = require("role.healer"),
     RoleMeleeAttack = require("role.meleeAttack"),
     RoleRangedAttack = require("role.rangedAttack"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
+    RoleRemoteCollector = require("role.remoteCollector"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteStorer = require("role.remoteStorer"),
     RoleRemoteWorker = require("role.remoteWorker"),
@@ -82,6 +82,7 @@ Source.prototype.stage1AssignTasks = function(room, tasks) {
     RoleRemoteMiner.assignTasks(room, tasks);
     RoleRemoteWorker.assignTasks(room, tasks);
     RoleRemoteStorer.assignTasks(room, tasks);
+    RoleRemoteCollector.assignTasks(room, tasks);
 };
 
 Source.prototype.stage1Manage = function(room, supportRoom) {
@@ -185,6 +186,7 @@ Source.prototype.stage2Spawn = function(room, supportRoom) {
     RoleRemoteMiner.checkSpawn(room);
     RoleRemoteWorker.checkSpawn(room);
     RoleRemoteStorer.checkSpawn(room);
+    RoleRemoteCollector.assignTasks(room);
 };
 
 Source.prototype.stage2Tasks = function(room, supportRoom) {
@@ -213,6 +215,7 @@ Source.prototype.stage2AssignTasks = function(room, tasks) {
     RoleRemoteMiner.assignTasks(room, tasks);
     RoleRemoteWorker.assignTasks(room, tasks);
     RoleRemoteStorer.assignTasks(room, tasks);
+    RoleRemoteCollector.assignTasks(room, tasks);
 };
 
 Source.prototype.stage2 = function(room, supportRoom) {

@@ -202,7 +202,7 @@ var Cache = require("cache"),
             // Attempt to get energy from containers.
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    var contanier = Game.getObjectById(creep.memory.container),
+                    var container = Game.getObjectById(creep.memory.container),
                         task;
                     
                     if (!container) {

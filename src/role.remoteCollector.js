@@ -108,38 +108,42 @@ var Cache = require("cache"),
             }
 
             // Attempt to get minerals from containers.
-            _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
+            if (tasks.collectMinerals && tasks.collectMinerals.cleanupTasks) {
+                _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Collecting");
+                            assigned.push(creep.name);
+                        }
+                    });
+    
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+    
+                    if (creepsWithNoTask.length === 0) {
+                        return;
                     }
                 });
+            }
 
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-            });
-
-            // Attempt to get energy from containers.
-            _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
+            if (tasks.collectEnergy && tasks.collectEnergy.cleanupTasks) {
+                // Attempt to get energy from containers.
+                _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Collecting");
+                            assigned.push(creep.name);
+                        }
+                    });
+    
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+    
+                    if (creepsWithNoTask.length === 0) {
+                        return;
                     }
                 });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-            });
+            }
 
             // Check for unfilled storage.
             _.forEach(tasks.fillEnergy.storageTasks, (task) => {

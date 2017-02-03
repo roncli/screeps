@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    TaskCollectMinerals = require("task.collectMinerals"),
     TaskRally = require("task.rally"),
 
     Storer = {

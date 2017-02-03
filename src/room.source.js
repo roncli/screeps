@@ -186,7 +186,7 @@ Source.prototype.stage2Spawn = function(room, supportRoom) {
     RoleRemoteMiner.checkSpawn(room);
     RoleRemoteWorker.checkSpawn(room);
     RoleRemoteStorer.checkSpawn(room);
-    RoleRemoteCollector.assignTasks(room);
+    RoleRemoteCollector.checkSpawn(room);
 };
 
 Source.prototype.stage2Tasks = function(room, supportRoom) {

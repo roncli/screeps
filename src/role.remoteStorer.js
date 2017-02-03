@@ -202,7 +202,18 @@ var Cache = require("cache"),
             // Attempt to get energy from containers.
             if (!room.unobservable) {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    var task = new TaskCollectEnergy(creep.memory.container);
+                    var contanier = Game.getObjectById(creep.memory.container),
+                        task;
+                    
+                    if (!container) {
+                        return;
+                    }
+                    
+                    if (container.store[RESOURCE_ENERGY]) {
+                        task = new TaskCollectEnergy(creep.memory.container);
+                    } else if (_.sum(container.store) > 0) {
+                        task = new TaskCollectMinerals(creep.memory.container);
+                    }
 
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");

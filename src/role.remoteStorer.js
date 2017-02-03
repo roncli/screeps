@@ -216,6 +216,10 @@ var Cache = require("cache"),
                         task = new TaskCollectMinerals(creep.memory.container);
                     }
 
+                    if (!task) {
+                        return;
+                    }
+
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);

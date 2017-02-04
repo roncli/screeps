@@ -162,11 +162,14 @@ var creepsInArmy = {},
         hostilesInRoom: (room) => {
             "use strict";
 
+            var roomName = room.name,
+                hostiles;
+
             if (!room) {
                 return [];
             }
     
-            var hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
+            hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
     
             if (!Memory[roomName].hostiles) {
                 Memory[roomName].hostiles = [];

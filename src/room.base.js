@@ -261,10 +261,10 @@ Base.prototype.terminal = function(room, terminal) {
                     })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed), (resource) => {
                         var amount = resource.needed - resource.otherRoomAmount;
 
-                        transCost = market.calcTransactionCost(amount, roomName, bestOrder.roomName);
+                        transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
                         if (terminalEnergy > transCost) {
                             room.terminal.send(resource.resource, amount, otherRoomName);
-                            Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + room.name + " to " + otherRoom.name);
+                            Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
                             dealMade = true;
                             return false;
                         } else {
@@ -272,7 +272,7 @@ Base.prototype.terminal = function(room, terminal) {
                                 amount = Math.floor(amount * terminalEnergy / transCost);
                                 if (amount > 0) {
                                     room.terminal.send(resource.resource, amount, otherRoomName);
-                                    Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + room.name + " to " + otherRoom.name);
+                                    Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
                                     dealMade = true;
                                     return false;
                                 }

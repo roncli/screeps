@@ -58,6 +58,7 @@ var Cache = require("cache"),
                     ) {
                         army.directive = "building";
                     }
+                    break;
                 case "building":
                     if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === army.buildRoom).length >= armyDismantlers.maxCreeps + armyHealers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps) {
                         army.directive = "staging";
@@ -79,7 +80,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (armyAttackRoom) {
-                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length === 0 && hostileConstructionSites.length === 0) {
+                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart) && !(s instanceof StructureKeeperLair)).length === 0 && hostileConstructionSites.length === 0) {
                             army.success = true;
                         }
                     }

@@ -244,45 +244,43 @@ Base.prototype.terminal = function(room, terminal) {
         } else {
             // Transfer what we have in excess to rooms in need.
             bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal);
-            if (bases.map((b) => b.name).indexOf(roomName) === Game.time % bases.length) {
-                _.forEach(bases, (otherRoom) => {
-                    var otherRoomName = otherRoom.name;
+            _.forEach(bases, (otherRoom) => {
+                var otherRoomName = otherRoom.name;
 
-                    dealMade = false;
-                    if (roomName === otherRoom.name) {
-                        return;
-                    }
+                dealMade = false;
+                if (roomName === otherRoom.name) {
+                    return;
+                }
 
-                    _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
-                        resource: k,
-                        amount: s,
-                        otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
-                        needed: (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0)
-                    })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed), (resource) => {
-                        var amount = resource.needed - resource.otherRoomAmount;
+                _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
+                    resource: k,
+                    amount: s,
+                    otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
+                    needed: (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0)
+                })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed), (resource) => {
+                    var amount = resource.needed - resource.otherRoomAmount;
 
-                        transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
-                        if (terminalEnergy > transCost) {
-                            room.terminal.send(resource.resource, amount, otherRoomName);
-                            Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
-                            dealMade = true;
-                            return false;
-                        } else {
-                            if (terminalEnergy > 0) {
-                                amount = Math.floor(amount * terminalEnergy / transCost);
-                                if (amount > 0) {
-                                    room.terminal.send(resource.resource, amount, otherRoomName);
-                                    Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
-                                    dealMade = true;
-                                    return false;
-                                }
+                    transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
+                    if (terminalEnergy > transCost) {
+                        room.terminal.send(resource.resource, amount, otherRoomName);
+                        Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                        dealMade = true;
+                        return false;
+                    } else {
+                        if (terminalEnergy > 0) {
+                            amount = Math.floor(amount * terminalEnergy / transCost);
+                            if (amount > 0) {
+                                room.terminal.send(resource.resource, amount, otherRoomName);
+                                Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                                dealMade = true;
+                                return false;
                             }
                         }
-                    });
-
-                    return !dealMade;
+                    }
                 });
-            }
+
+                return !dealMade;
+            });
 
             // Sell what we have in excess.
             if (!dealMade) {

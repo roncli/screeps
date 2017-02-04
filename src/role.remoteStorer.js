@@ -52,7 +52,7 @@ var Cache = require("cache"),
                 max += count;
 
                 // If we don't have enough remote storers for this container, spawn one.
-                if (_.filter(storers, (c) => (c.spawning || c.ticksToLive >= 150 + (length * 2)) && c.memory.container === id).length < count) {
+                if (_.filter(storers, (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === id).length < count) {
                     Storer.spawn(room, supportRoom, id);
                 }
             });
@@ -114,7 +114,7 @@ var Cache = require("cache"),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -258,10 +258,11 @@ var Cache = require("cache"),
 
             // Rally remaining creeps.
             _.forEach(creepsWithNoTask, (creep) => {
+                var task;
                 if (_.sum(creep.carry) > 0) {
-                    var task = new TaskRally(creep.memory.supportRoom);
+                    task = new TaskRally(creep.memory.supportRoom);
                 } else {
-                    var task = new TaskRally(creep.memory.home);
+                    task = new TaskRally(creep.memory.home);
                 }
                 task.canAssign(creep);
             });

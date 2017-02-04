@@ -20,7 +20,7 @@ var Cache = require("cache"),
 
             // If we have less than max workers, spawn a worker.
             count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage ? 150 : 300)).length;
-            max = canSpawn ? (storage ? 1 : 2) : 0;
+            max = canSpawn ? storage ? 1 : 2 : 0;
 
             if (count < max) {
                 Worker.spawn(room);
@@ -99,7 +99,7 @@ var Cache = require("cache"),
                 body.push(MOVE);
             }
 
-            if ((roomName === supportRoomName || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) && workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && (Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0)) >= 30 * workCount) {
+            if ((roomName === supportRoomName || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) && workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0) >= 30 * workCount) {
                 canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
             }
 
@@ -118,7 +118,7 @@ var Cache = require("cache"),
             if (typeof name !== "number" && canBoost) {
                 // Set the lab to be in use.
                 labToBoostWith.creepToBoost = name;
-                labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_LEMERGIUM_ACID : ((storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount) ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE);
+                labToBoostWith.resource = storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount ? RESOURCE_CATALYZED_LEMERGIUM_ACID : storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE;
                 labToBoostWith.amount = 30 * workCount;
                 supportRoom.memory.labsInUse.push(labToBoostWith);
 
@@ -136,7 +136,7 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 workers = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(workers), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(workers), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
                 allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
                 storers = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [],
                 controller = room.controller,
@@ -245,7 +245,7 @@ var Cache = require("cache"),
             if (!room.storage || storers.length === 0) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
-                        var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                        var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                         if (energyMissing > 0) {
                             if (task.canAssign(creep)) {
                                 creep.say("Extension");
@@ -266,7 +266,7 @@ var Cache = require("cache"),
             // Check for unfilled spawns if we don't have storage or storer creeps.
             if (!room.storage || storers.length === 0) {
                 _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
-                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                     if (energyMissing > 0) {
                         _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                             if (task.canAssign(creep)) {
@@ -290,7 +290,7 @@ var Cache = require("cache"),
 
             // Check for unfilled towers.
             _.forEach(tasks.fillEnergy.towerTasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
@@ -313,7 +313,7 @@ var Cache = require("cache"),
 
             // Check for 1-progress construction sites.
             _.forEach(_.filter(tasks.build.tasks, (t) => t.constructionSite.progressTotal === 1), (task) => {
-                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(task.constructionSite.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(task.constructionSite.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
                         if (task.canAssign(creep)) {
@@ -355,7 +355,7 @@ var Cache = require("cache"),
 
             // Check for construction sites.
             _.forEach(tasks.build.tasks, (task) => {
-                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(task.constructionSite.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(task.constructionSite.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
                         if (task.canAssign(creep)) {

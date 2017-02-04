@@ -53,7 +53,7 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            max += Math.ceil((2 * length) / ((controller && controller.level >= 6) ? 35 : 30)) + ((controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0) ? 1 : 0);
+            max += Math.ceil(2 * length / (controller && controller.level >= 6 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
             if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 Storer.spawn(room);
             }
@@ -107,7 +107,7 @@ var Cache = require("cache"),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].storer || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].storer || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
                 allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
                 assigned = [];
 
@@ -117,7 +117,7 @@ var Cache = require("cache"),
 
             // Check for unfilled links.
             _.forEach(tasks.fillEnergy.linkTasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
@@ -141,7 +141,7 @@ var Cache = require("cache"),
             // Check for unfilled extensions.
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
-                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                    var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                     if (energyMissing > 0) {
                         if (task.canAssign(creep)) {
                             creep.say("Extension");
@@ -160,7 +160,7 @@ var Cache = require("cache"),
 
             // Check for unfilled spawns.
             _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (energyMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                         if (task.canAssign(creep)) {
@@ -266,7 +266,7 @@ var Cache = require("cache"),
                         if (task.canAssign(creep)) {
                             creep.say("Collecting");
                             assigned.push(creep.name);
-                            energy -= (creep.carryCapacity - _.sum(creep.carry));
+                            energy -= creep.carryCapacity - _.sum(creep.carry);
                             if (energy < 500) {
                                 return false;
                             }

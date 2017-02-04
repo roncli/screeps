@@ -16,7 +16,7 @@ var Cache = require("cache"),
             
             // Loop through the room ranged attackers to see if we need to spawn a creep.
             if (rangedAttack && rangedAttack[supportRoomName] && rangedAttack[supportRoomName][roomName]) {
-                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0 || (room && room.memory && room.memory.roomType && room.memory.roomType.type === "source")) {
+                if (room && room.memory.harvested >= 100000 || Cache.hostilesInRoom(room).length > 0 || room && room.memory && room.memory.roomType && room.memory.roomType.type === "source") {
                     max = rangedAttack[supportRoomName][roomName].maxCreeps;
 
                     if (ranged.length < max) {
@@ -90,7 +90,7 @@ var Cache = require("cache"),
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
-                };
+                }
             });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -121,7 +121,7 @@ var Cache = require("cache"),
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
-                };
+                }
             });
         }
     };

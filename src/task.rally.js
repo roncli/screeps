@@ -48,7 +48,7 @@ Rally.prototype.run = function(creep) {
     }
 
     // Rally to the rally point.
-    range = creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || (this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName) ? (this.range || 0) : 20;
+    range = creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName ? this.range || 0 : 20;
     if (creep.pos.getRangeTo(this.rallyPoint) <= range) {
         if (creep.pos.x === 0) {
             creep.move(RIGHT);
@@ -143,7 +143,7 @@ Rally.getSourceDefenderTask = function(creep) {
     } else {
         return new Rally(creep.memory.home, creep);
     }
-}
+};
 
 Rally.getClaimerTask = function(creep) {
     "use strict";

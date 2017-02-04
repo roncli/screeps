@@ -192,7 +192,7 @@ Base.prototype.terminal = function(room, terminal) {
         storageStore = {},
         market = Game.market,
         maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal), (r) => r.storage ? r.storage.store[RESOURCE_ENERGY] : 0)),
-        terminalMinerals, bestOrder, transCost, amount;
+        bases, terminalMinerals, bestOrder, transCost, amount;
         
     if (storage) {
         storageStore = storage.store;
@@ -242,35 +242,82 @@ Base.prototype.terminal = function(room, terminal) {
                 buyQueue = undefined;
             }
         } else {
-            // Sell what we have in excess.
-            terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
-                return {resource: k, amount: Math.min(s, s - (Memory.reserveMinerals ? ((k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0) : 0) + (storageStore[k] || 0))};
-            }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
+            // Transfer what we have in excess to rooms in need.
+            bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal);
+            if (bases.map((b) => b.name).indexOf(roomName) === Game.time % bases.length) {
+                _.forEach(bases, (otherRoom) => {
+                    var otherRoomName = otherRoom.name;
 
-            if (terminalMinerals.length > 0) {
-                _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
-                    var resource = topResource.resource;
-                    
-                    bestOrder = _.filter((Market.getFilteredOrders().buy[resource] || []), (o) => !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
-                    if (bestOrder) {
-                        transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
+                    dealMade = false;
+                    if (roomName === otherRoom.name) {
+                        return;
+                    }
+
+                    _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
+                        resource: k,
+                        amount: s,
+                        otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
+                        needed: (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0)
+                    })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed), (resource) => {
+                        var amount = resource.needed - resource.otherRoomAmount;
+
+                        transCost = market.calcTransactionCost(amount, roomName, bestOrder.roomName);
                         if (terminalEnergy > transCost) {
-                            Market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), roomName);
+                            room.terminal.send(resource.resource, amount, otherRoomName);
+                            Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + room.name + " to " + otherRoom.name);
                             dealMade = true;
-                            delete Memory.minimumSell[bestOrder.resourceType];
                             return false;
                         } else {
                             if (terminalEnergy > 0) {
-                                amount = Math.floor(Math.min(topResource.amount, bestOrder.amount) * terminalEnergy / transCost);
+                                amount = Math.floor(amount * terminalEnergy / transCost);
                                 if (amount > 0) {
-                                    Market.deal(bestOrder.id, amount, roomName);
+                                    room.terminal.send(resource.resource, amount, otherRoomName);
+                                    Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + room.name + " to " + otherRoom.name);
                                     dealMade = true;
                                     return false;
                                 }
                             }
                         }
+                    });
+
+                    if (!dealMade) {
+                        Cache.log.events.push(room.name + ": Could not balance resources.");
                     }
+                    return !dealMade;
                 });
+            }
+
+            // Sell what we have in excess.
+            if (!dealMade) {
+                terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
+                    return {resource: k, amount: Math.min(s, s - (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))};
+                }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
+
+                if (terminalMinerals.length > 0) {
+                    _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
+                        var resource = topResource.resource;
+                        
+                        bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
+                        if (bestOrder) {
+                            transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
+                            if (terminalEnergy > transCost) {
+                                Market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), roomName);
+                                dealMade = true;
+                                delete Memory.minimumSell[bestOrder.resourceType];
+                                return false;
+                            } else {
+                                if (terminalEnergy > 0) {
+                                    amount = Math.floor(Math.min(topResource.amount, bestOrder.amount) * terminalEnergy / transCost);
+                                    if (amount > 0) {
+                                        Market.deal(bestOrder.id, amount, roomName);
+                                        dealMade = true;
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
             }
             
             // Find an order to flip if we haven't made a deal and we have enough energy.
@@ -297,7 +344,7 @@ Base.prototype.terminal = function(room, terminal) {
                     }
                 });
 
-                _.forEach(flips.sort((a, b) => (a.sell.price - a.buy.price) - (b.sell.price - b.buy.price)), (flip, index) => {
+                _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
                     var buy = flip.buy,
                         sell = flip.sell;
 
@@ -351,13 +398,13 @@ Base.prototype.tasks = function(room) {
         dismantlers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []).length > 0,
         collectors = Utilities.creepsWithNoTask(collectorList).length > 0,
         upgraders = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []).length > 0,
-        noWorkers = Game.time % 10 === 0 && (workerList.length + collectorList.length) === 0,
+        noWorkers = Game.time % 10 === 0 && workerList.length + collectorList.length === 0,
         tasks = {
             build: {
-                tasks: (workers || collectors) ? TaskBuild.getTasks(room) : []
+                tasks: workers || collectors ? TaskBuild.getTasks(room) : []
             },
             collectEnergy: {
-                tasks: (workers || storers || scientists || collectors || upgraders) ? TaskCollectEnergy.getTasks(room) : [],
+                tasks: workers || storers || scientists || collectors || upgraders ? TaskCollectEnergy.getTasks(room) : [],
                 storerTasks: storers ? TaskCollectEnergy.getStorerTasks(room) : []
             },
             collectMinerals: {
@@ -367,11 +414,11 @@ Base.prototype.tasks = function(room) {
                 terminalTasks: scientists ? TaskCollectMinerals.getTerminalTasks(room) : []
             },
             fillEnergy: {
-                extensionTasks: (workers || storers || scientists || collectors) ? TaskFillEnergy.getExtensionTasks(room) : [],
-                spawnTasks: (workers || storers || scientists || collectors) ? TaskFillEnergy.getSpawnTasks(room) : [],
+                extensionTasks: workers || storers || scientists || collectors ? TaskFillEnergy.getExtensionTasks(room) : [],
+                spawnTasks: workers || storers || scientists || collectors ? TaskFillEnergy.getSpawnTasks(room) : [],
                 powerSpawnTasks: scientists ? TaskFillEnergy.getPowerSpawnTasks(room) : [],
-                towerTasks: (workers || scientists || collectors) ? TaskFillEnergy.getTowerTasks(room) : [],
-                storageTasks: (storers || scientists || dismantlers) ? TaskFillEnergy.getStorageTasks(room) : [],
+                towerTasks: workers || scientists || collectors ? TaskFillEnergy.getTowerTasks(room) : [],
+                storageTasks: storers || scientists || dismantlers ? TaskFillEnergy.getStorageTasks(room) : [],
                 containerTasks: dismantlers ? TaskFillEnergy.getContainerTasks(room) : [],
                 labTasks: scientists ? TaskFillEnergy.getLabTasks(room) : [],
                 linkTasks: storers ? TaskFillEnergy.getLinkTasks(room) : [],
@@ -379,8 +426,8 @@ Base.prototype.tasks = function(room) {
             },
             fillMinerals: {
                 labTasks: scientists ? TaskFillMinerals.getLabTasks(room) : [],
-                storageTasks: (workers || storers || scientists || dismantlers) ? TaskFillMinerals.getStorageTasks(room) : [],
-                terminalTasks: (workers || storers || scientists || dismantlers) ? TaskFillMinerals.getTerminalTasks(room) : [],
+                storageTasks: workers || storers || scientists || dismantlers ? TaskFillMinerals.getStorageTasks(room) : [],
+                terminalTasks: workers || storers || scientists || dismantlers ? TaskFillMinerals.getTerminalTasks(room) : [],
                 nukerTasks: scientists ? TaskFillMinerals.getNukerTasks(room) : [],
                 powerSpawnTasks: scientists ? TaskFillMinerals.getPowerSpawnTasks(room) : []
             },
@@ -391,13 +438,13 @@ Base.prototype.tasks = function(room) {
                 tasks: TaskRangedAttack.getTasks(room)
             },
             repair: {
-                tasks: (noWorkers || workers || collectors) ? TaskRepair.getTasks(room) : [],
-                criticalTasks: (noWorkers || workers || collectors) ? TaskRepair.getCriticalTasks(room) : [],
-                towerTasks: (Memory.towerTasks[roomName] || Game.time % 10 === 0) ? TaskRepair.getTowerTasks(room) : []
+                tasks: noWorkers || workers || collectors ? TaskRepair.getTasks(room) : [],
+                criticalTasks: noWorkers || workers || collectors ? TaskRepair.getCriticalTasks(room) : [],
+                towerTasks: Memory.towerTasks[roomName] || Game.time % 10 === 0 ? TaskRepair.getTowerTasks(room) : []
             },
             upgradeController: {
-                tasks: (workers || collectors || upgraders) ? TaskUpgradeController.getTasks(room) : [],
-                criticalTasks: (noWorkers || workers || collectors) ? TaskUpgradeController.getCriticalTasks(room) : []
+                tasks: workers || collectors || upgraders ? TaskUpgradeController.getTasks(room) : [],
+                criticalTasks: noWorkers || workers || collectors ? TaskUpgradeController.getCriticalTasks(room) : []
             },
             dismantle: {
                 tasks: []
@@ -500,7 +547,7 @@ Base.prototype.labQueue = function(room, labQueue) {
     
     switch (labQueue.status) {
         case "clearing":
-            if (!labsInUse || (labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0)) {
+            if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
                 labQueue.status = "moving";
             }
             break;
@@ -641,7 +688,7 @@ Base.prototype.run = function(room) {
     tasks = this.tasks(room);
 
     // Spawn new creeps.
-    this.spawn(room, (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || (tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0) || (tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0)));
+    this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0);
 
     // Assign tasks to creeps and towers.
     this.assignTasks(room, tasks);

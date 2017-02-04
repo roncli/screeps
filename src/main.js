@@ -537,7 +537,7 @@ var profiler = require("screeps-profiler"),
             // See if there is some energy balancing we can do.
             var rooms, energyGoal;
 
-            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal).sort((a, b) => (a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY]) - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
+            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
             if (rooms.length > 1) {
                 energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
@@ -771,7 +771,7 @@ var profiler = require("screeps-profiler"),
                     attackRoom: value.attackRoom,
                     dismantle: value.dismantle.length,
                     creeps: []
-                }
+                };
 
                 if (Game.rooms[value.attackRoom]) {
                     Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart)).length;
@@ -792,7 +792,7 @@ var profiler = require("screeps-profiler"),
                 }
 
                 // Countdown to death!
-                if (creep.ticksToLive <= 150 || (creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1) || creep.ticksToLive % 100 === 1) {
+                if (creep.ticksToLive <= 150 || creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1 || creep.ticksToLive % 100 === 1) {
                     switch (creep.ticksToLive - 1) {
                         case 3:
                             creep.say("R.I.P. and", true);

@@ -16,7 +16,7 @@ var Cache = require("cache"),
             
             // Loop through the room healers to see if we need to spawn a creep.
             if (healer && healer[supportRoomName] && healer[supportRoomName][roomName]) {
-                if ((room && room.memory.harvested >= 100000) || Cache.hostilesInRoom(room).length > 0 || (room && room.memory && room.memory.roomType && room.memory.roomType.type === "source")) {
+                if (room && room.memory.harvested >= 100000 || Cache.hostilesInRoom(room).length > 0 || room && room.memory && room.memory.roomType && room.memory.roomType.type === "source") {
                     max = healer[supportRoomName][roomName].maxCreeps;
                     
                     if (healers.length < max) {
@@ -89,7 +89,7 @@ var Cache = require("cache"),
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
-                };
+                }
             });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -120,7 +120,7 @@ var Cache = require("cache"),
                 var task = TaskRally.getDefenderTask(creep);
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
-                };
+                }
             });
         }
     };

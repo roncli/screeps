@@ -284,10 +284,6 @@ Base.prototype.terminal = function(room, terminal) {
                 });
             }
 
-            if (!dealMade) {
-                Cache.log.events.push(room.name + ": Could not balance resources.");
-            }
-
             // Sell what we have in excess.
             if (!dealMade) {
                 terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {

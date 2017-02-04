@@ -165,7 +165,7 @@ var creepsInArmy = {},
             var roomName = room.name,
                 hostiles;
 
-            if (!room) {
+            if (!room || room.unobservable) {
                 return [];
             }
     

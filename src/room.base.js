@@ -254,9 +254,9 @@ Base.prototype.terminal = function(room, terminal) {
 
                 _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
                     resource: k,
-                    amount: s,
+                    amount: k.startsWith("X") && k.length === 5 ? s - 5000 : s,
                     otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
-                    needed: (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0)
+                    needed: Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0
                 })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed), (resource) => {
                     var amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount);
 

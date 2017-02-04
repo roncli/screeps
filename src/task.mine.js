@@ -74,10 +74,10 @@ Mine.prototype.run = function(creep) {
         }
 
         if (creep.harvest(source) === OK) {
-            if (Memory[creep.room.name].harvested === undefined) {
-                Memory[creep.room.name].harvested = 30000;
+            if (Memory.rooms[creep.room.name].harvested === undefined) {
+                Memory.rooms[creep.room.name].harvested = 30000;
             }
-            Memory[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
+            Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
         }
 
         // Suicide creep if there's another one right here with a higher TTL.

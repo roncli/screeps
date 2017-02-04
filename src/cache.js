@@ -171,13 +171,13 @@ var creepsInArmy = {},
     
             hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
     
-            if (!Memory[roomName].hostiles) {
-                Memory[roomName].hostiles = [];
+            if (!Memory.rooms[roomName].hostiles) {
+                Memory.rooms[roomName].hostiles = [];
             }
     
             _.forEach(hostiles, (hostile) => {
-                if (Memory[roomName].hostiles.indexOf(hostile.id) !== -1) {
-                    Memory[roomName].harvested = 0;
+                if (Memory.rooms[roomName].hostiles.indexOf(hostile.id) !== -1) {
+                    Memory.rooms[roomName].harvested = 0;
                 }
             });
     

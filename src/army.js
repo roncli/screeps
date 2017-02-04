@@ -102,7 +102,7 @@ var Cache = require("cache"),
                 heal: {
                     tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => (b.hitsMax - b.hits) - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
                 },
-                rally: { tasks: [] },
+                rally: { tasks: [] }
             };
 
             if (armyAttackRoom) {

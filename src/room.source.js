@@ -1,5 +1,6 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
+    Commands = require("commands"),
     Utilities = require("utilities"),
     RoleDefender = require("role.defender"),
     RoleHealer = require("role.healer"),
@@ -149,8 +150,9 @@ Source.prototype.stage1 = function(room, supportRoom) {
     this.stage1Manage(room, supportRoom);
 };
 
-Source.prototype.stage2Manage = function(room) {
-    var roomName = room.name;
+Source.prototype.stage2Manage = function(room, supportRoom) {
+    var roomName = room.name,
+        supportRoomName = supportRoom.name;
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
@@ -167,6 +169,17 @@ Source.prototype.stage2Manage = function(room) {
         if (Cache.containersInRoom(room).length !== sources.length) {
             this.stage = 1;
         }
+    }
+
+    if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+        // If there are invaders in the room, spawn an army if we don't have one.
+        if (!Memory.army[roomName + "-defense"]) {
+            Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 2, units: 20}});
+        }
+    } else if (Memory.army[roomName + "-defense"]) {
+        // Cancel army if invaders are gone.
+        Memory.army[roomName + "-defense"].directive = "attack";
+        Memory.army[roomName + "-defense"].success = true;
     }
 };
 
@@ -222,7 +235,7 @@ Source.prototype.stage2 = function(room, supportRoom) {
     var tasks;
 
     // Manage room and bail if it got reset to stage 1.    
-    this.stage2Manage(room);
+    this.stage2Manage(room, supportRoom);
     if (this.stage === 1) {
         return;
     }

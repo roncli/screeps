@@ -370,12 +370,12 @@ var profiler = require("screeps-profiler"),
                                     price: node.buyPrice,
                                     start: Game.time
                                 };
+                            }
 
-                                if (node.buyPrice) {
-                                    Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
-                                    if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
-                                        delete Memory.minimumSell[resource];
-                                    }
+                            if (node.buyPrice) {
+                                Memory.minimumSell[resource] = Math.min(Memory.minimumSell[resource] || Infinity, node.buyPrice);
+                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                    delete Memory.minimumSell[resource];
                                 }
                             }
                         };

@@ -78,7 +78,8 @@ Source.prototype.stage1AssignTasks = function(room, tasks) {
 };
 
 Source.prototype.stage1Manage = function(room, supportRoom) {
-    var sources, containers, roomName, sites;
+    var supportRoomName = supportRoom.name,
+        sources, containers, roomName, sites;
     
     if (!room.unobservable) {
         sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);

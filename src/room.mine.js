@@ -109,7 +109,8 @@ Mine.prototype.stage1AssignTasks = function(room, tasks) {
 };
 
 Mine.prototype.stage1Manage = function(room, supportRoom) {
-    var sources, containers, roomName, sites;
+    var supportRoomName = supportRoom.name,
+        sources, containers, roomName, sites;
     
     if (!room.unobservable) {
         sources = room.find(FIND_SOURCES);
@@ -184,8 +185,9 @@ Mine.prototype.stage1 = function(room, supportRoom) {
     this.stage1Manage(room, supportRoom);
 };
 
-Mine.prototype.stage2Manage = function(room) {
-    var roomName = room.name;
+Mine.prototype.stage2Manage = function(room, supportRoom) {
+    var roomName = room.name,
+        supportRoomName = supportRoom.name;
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
@@ -288,7 +290,7 @@ Mine.prototype.stage2 = function(room, supportRoom) {
     var tasks;
 
     // Manage room and bail if it got reset to stage 1.    
-    this.stage2Manage(room);
+    this.stage2Manage(room, supportRoom);
     if (this.stage === 1) {
         return;
     }

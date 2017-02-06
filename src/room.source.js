@@ -4,14 +4,11 @@ var RoomObj = require("roomObj"),
     Utilities = require("utilities"),
     RoleDefender = require("role.defender"),
     RoleHealer = require("role.healer"),
-    RoleMeleeAttack = require("role.meleeAttack"),
-    RoleRangedAttack = require("role.rangedAttack"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
     RoleRemoteCollector = require("role.remoteCollector"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteStorer = require("role.remoteStorer"),
     RoleRemoteWorker = require("role.remoteWorker"),
-    RoleSourceDefender = require("role.sourceDefender"),
     TaskBuild = require("task.build"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
@@ -60,13 +57,10 @@ Source.prototype.stage1Tasks = function(room, supportRoom) {
 Source.prototype.stage1Spawn = function(room) {
     var roomName = room.name;
 
-    RoleSourceDefender.checkSpawn(room);
-    RoleMeleeAttack.checkSpawn(room);
-    RoleRangedAttack.checkSpawn(room);
-    RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
+    RoleHealer.checkSpawn(room);
 
-    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].sourceDefender || _.filter(Cache.creeps[roomName].sourceDefender, (c) => !c.spawning).length === 0) {
+    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].defender || _.filter(Cache.creeps[roomName].defender, (c) => !c.spawning).length === 0) {
         return;
     }
 
@@ -74,11 +68,8 @@ Source.prototype.stage1Spawn = function(room) {
 };
 
 Source.prototype.stage1AssignTasks = function(room, tasks) {
-    RoleSourceDefender.assignTasks(room, tasks);
-    RoleMeleeAttack.assignTasks(room, tasks);
-    RoleRangedAttack.assignTasks(room, tasks);
-    RoleHealer.assignTasks(room, tasks);
     RoleDefender.assignTasks(room, tasks);
+    RoleHealer.assignTasks(room, tasks);
     RoleRemoteBuilder.assignTasks(room);
     RoleRemoteMiner.assignTasks(room, tasks);
     RoleRemoteWorker.assignTasks(room, tasks);
@@ -115,6 +106,7 @@ Source.prototype.stage1Manage = function(room, supportRoom) {
                 return false;
             });
 
+            return;
         }
 
         // Check to see if we have construction sites for the containers.  If not, create them.
@@ -131,7 +123,18 @@ Source.prototype.stage1Manage = function(room, supportRoom) {
                     room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
                 }
             });
-        } 
+        }
+
+        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+            // If there are invaders in the room, spawn an army if we don't have one.
+            if (!Memory.army[roomName + "-defense"]) {
+                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 50) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 50) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
+            }
+        } else if (Memory.army[roomName + "-defense"]) {
+            // Cancel army if invaders are gone.
+            Memory.army[roomName + "-defense"].directive = "attack";
+            Memory.army[roomName + "-defense"].success = true;
+        }
     }
 };
 
@@ -173,7 +176,7 @@ Source.prototype.stage2Manage = function(room, supportRoom) {
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
             if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 2, units: 20}});
+                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             }
         } else if (Memory.army[roomName + "-defense"]) {
             // Cancel army if invaders are gone.
@@ -186,13 +189,10 @@ Source.prototype.stage2Manage = function(room, supportRoom) {
 Source.prototype.stage2Spawn = function(room, supportRoom) {
     var roomName = room.name;
 
-    RoleSourceDefender.checkSpawn(room);
-    RoleMeleeAttack.checkSpawn(room);
-    RoleRangedAttack.checkSpawn(room);
-    RoleHealer.checkSpawn(room);
     RoleDefender.checkSpawn(room);
-    
-    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].sourceDefender || _.filter(Cache.creeps[roomName].sourceDefender, (c) => !c.spawning).length === 0) {
+    RoleHealer.checkSpawn(room);
+
+    if (!Cache.creeps[roomName] || !Cache.creeps[roomName].defender || _.filter(Cache.creeps[roomName].defender, (c) => !c.spawning).length === 0) {
         return;
     }
 
@@ -220,11 +220,8 @@ Source.prototype.stage2Tasks = function(room, supportRoom) {
 };
 
 Source.prototype.stage2AssignTasks = function(room, tasks) {
-    RoleSourceDefender.assignTasks(room, tasks);
-    RoleMeleeAttack.assignTasks(room, tasks);
-    RoleRangedAttack.assignTasks(room, tasks);
-    RoleHealer.assignTasks(room, tasks);
     RoleDefender.assignTasks(room, tasks);
+    RoleHealer.assignTasks(room, tasks);
     RoleRemoteMiner.assignTasks(room, tasks);
     RoleRemoteWorker.assignTasks(room, tasks);
     RoleRemoteStorer.assignTasks(room, tasks);

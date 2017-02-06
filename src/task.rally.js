@@ -114,28 +114,6 @@ Rally.getHarvesterTasks = function(creeps) {
 Rally.getDefenderTask = function(creep) {
     "use strict";
 
-    if (creep.memory.role === "healer") {
-        // Find a rally target.
-        var targets = Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].rangedAttack || [];
-        if (targets.length === 0) {
-            targets = Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].meleeAttack || [];
-        }
-        if (targets.length === 0) {
-            targets = Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].defender || [];
-        }
-
-        // Return the rally point.
-        if (targets.length === 0) {
-            return new Rally(creep.memory.home, creep);
-        }
-    }
-
-    return new Rally(creep.memory.home, creep);
-};
-
-Rally.getSourceDefenderTask = function(creep) {
-    "use strict";
-
     var source = Cache.sourceKeepersInRoom(creep.room).sort((a, b) => a.ticksToSpawn - b.ticksToSpawn)[0];
 
     if (source) {

@@ -9,20 +9,13 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 healers = Cache.creeps[roomName] && Cache.creeps[roomName].healer || [],
-                healer = Memory.maxCreeps.healer,
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 supportRoomName = supportRoom.name,
-                max = 0;
+                max = 1;
             
-            // Loop through the room healers to see if we need to spawn a creep.
-            if (healer && healer[supportRoomName] && healer[supportRoomName][roomName]) {
-                if (room && Memory.rooms[roomName].harvested >= 100000 || Cache.hostilesInRoom(room).length > 0 || room && room.memory && room.memory.roomType && room.memory.roomType.type === "source") {
-                    max = healer[supportRoomName][roomName].maxCreeps;
-                    
-                    if (healers.length < max) {
-                        Healer.spawn(room, supportRoom);
-                    }
-                }
+            // See if we need to spawn a creep.
+            if (_.filter(healers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
+                Healer.spawn(room, supportRoom);
             }
 
             // Output healer count in the report.

@@ -94,12 +94,6 @@ Heal.getTasks = function(room) {
 Heal.getDefenderTask = function(creep) {
     "use strict";
 
-    return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
-};
-
-Heal.getSourceDefenderTask = function(creep) {
-    "use strict";
-
     return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax && c.id !== creep.id).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
 };
 

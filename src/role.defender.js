@@ -2,7 +2,7 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
-    TaskRangedAttack = require("task.rangedAttack"),
+    TaskMeleeAttack = require("task.meleeAttack"),
 
     Defender = {
         checkSpawn: (room) => {
@@ -10,20 +10,13 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 defenders = Cache.creeps[roomName] && Cache.creeps[roomName].defender || [],
-                defender = Memory.maxCreeps.defender,
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
                 supportRoomName = supportRoom.name,
-                max = 0;
-            
-            // Loop through the room defenders to see if we need to spawn a creep.
-            if (defender && defender[supportRoomName] && defender[supportRoomName][roomName]) {
-                if (room && Memory.rooms[roomName].harvested >= 100000 || Cache.hostilesInRoom(room).length > 0 || room && room.memory && room.memory.roomType && room.memory.roomType.type === "source") {
-                    max = defender[supportRoomName][roomName].maxCreeps;
+                max = 1;
 
-                    if (defenders.length < max) {
-                        Defender.spawn(room, supportRoom);
-                    }
-                }
+            // See if we need to spawn a creep.
+            if (_.filter(defenders, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
+                Defender.spawn(room, supportRoom);
             }
 
             // Output defender count in the report.
@@ -39,46 +32,15 @@ var Cache = require("cache"),
         spawn: (room, supportRoom) => {
             "use strict";
 
-            var body = [],
+            var body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, HEAL, HEAL, HEAL, HEAL],
                 roomName = room.name,
                 supportRoomName = supportRoom.name,
-                energy, units, remainder, count, spawnToUse, name;
+                spawnToUse, name;
 
             // Fail if all the spawns are busy.
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
-
-            // Get the total energy in the room, limited to 6200.
-            energy = Math.min(supportRoom.energyCapacityAvailable, 6200);
-            units = Math.floor(energy / 500);
-            remainder = energy % 500;
-
-            // Create the body based on the energy.
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 250) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(HEAL);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(RANGED_ATTACK);
-            }
-
-            if (remainder >= 200) {
-                body.push(RANGED_ATTACK);
-            } 
 
             // Create the creep from the first listed spawn that is available.
             spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
@@ -121,7 +83,7 @@ var Cache = require("cache"),
             
             // Find hostiles to attack.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskRangedAttack.getDefenderTask(creep);
+                var task = TaskMeleeAttack.getDefenderTask(creep);
                 if (task && task.canAssign(creep)) {
                     creep.say("Die!", true);
                     assigned.push(creep.name);
@@ -154,6 +116,7 @@ var Cache = require("cache"),
             // Rally the troops!
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
+                task.range = 1;
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
                 }

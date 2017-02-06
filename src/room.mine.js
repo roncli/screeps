@@ -2,11 +2,7 @@ var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
-    RoleDefender = require("role.defender"),
     RoleDismantler = require("role.dismantler"),
-    RoleHealer = require("role.healer"),
-    RoleMeleeAttack = require("role.meleeAttack"),
-    RoleRangedAttack = require("role.rangedAttack"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteReserver = require("role.remoteReserver"),
@@ -104,10 +100,6 @@ Mine.prototype.stage1Spawn = function(room) {
 };
 
 Mine.prototype.stage1AssignTasks = function(room, tasks) {
-    RoleMeleeAttack.assignTasks(room, tasks);
-    RoleRangedAttack.assignTasks(room, tasks);
-    RoleHealer.assignTasks(room, tasks);
-    RoleDefender.assignTasks(room, tasks);
     RoleRemoteReserver.assignTasks(room, tasks);
     RoleRemoteBuilder.assignTasks(room);
     RoleRemoteMiner.assignTasks(room, tasks);
@@ -204,10 +196,6 @@ Mine.prototype.stage2Manage = function(room) {
 Mine.prototype.stage2Spawn = function(room, supportRoom) {
     var dismantle = Memory.dismantle;
     
-    RoleMeleeAttack.checkSpawn(room);
-    RoleRangedAttack.checkSpawn(room);
-    RoleHealer.checkSpawn(room);
-    RoleDefender.checkSpawn(room);
     RoleRemoteReserver.checkSpawn(room);
     RoleRemoteMiner.checkSpawn(room);
     RoleRemoteWorker.checkSpawn(room);
@@ -264,10 +252,6 @@ Mine.prototype.stage2Tasks = function(room, supportRoom) {
 };
 
 Mine.prototype.stage2AssignTasks = function(room, tasks) {
-    RoleMeleeAttack.assignTasks(room, tasks);
-    RoleRangedAttack.assignTasks(room, tasks);
-    RoleHealer.assignTasks(room, tasks);
-    RoleDefender.assignTasks(room, tasks);
     RoleRemoteReserver.assignTasks(room, tasks);
     RoleRemoteMiner.assignTasks(room, tasks);
     RoleRemoteWorker.assignTasks(room, tasks);

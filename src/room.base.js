@@ -257,7 +257,7 @@ Base.prototype.terminal = function(room, terminal) {
                     amount: k.startsWith("X") && k.length === 5 ? s - 5000 : s,
                     otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
                     needed: Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0
-                })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed), (resource) => {
+                })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed && r.amount > 0 && r.needed - r.otherRoomAmount > 0), (resource) => {
                     var amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount);
 
                     transCost = market.calcTransactionCost(amount, roomName, otherRoomName);

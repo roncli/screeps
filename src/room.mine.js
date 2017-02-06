@@ -137,6 +137,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
                 return false;
             });
 
+            return;
         }
 
         // Check to see if we have construction sites for the containers.  If not, create them.
@@ -154,6 +155,17 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
                 }
             });
         } 
+
+        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+            // If there are invaders in the room, spawn an army if we don't have one.
+            if (!Memory.army[roomName + "-defense"]) {
+                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 50) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 50) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
+            }
+        } else if (Memory.army[roomName + "-defense"]) {
+            // Cancel army if invaders are gone.
+            Memory.army[roomName + "-defense"].directive = "attack";
+            Memory.army[roomName + "-defense"].success = true;
+        }
     }
 };
 
@@ -184,11 +196,24 @@ Mine.prototype.stage2Manage = function(room) {
             (Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []).length === 0
         ) {
             this.stage = 1;
+            return;
         }
     } else {
         // Check to see if we lost built containers.  If so, move to stage 1.
         if (Cache.containersInRoom(room).length !== room.find(FIND_SOURCES).length) {
             this.stage = 1;
+            return;
+        }
+
+        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+            // If there are invaders in the room, spawn an army if we don't have one.
+            if (!Memory.army[roomName + "-defense"]) {
+                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 50) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 50) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
+            }
+        } else if (Memory.army[roomName + "-defense"]) {
+            // Cancel army if invaders are gone.
+            Memory.army[roomName + "-defense"].directive = "attack";
+            Memory.army[roomName + "-defense"].success = true;
         }
     }
 };

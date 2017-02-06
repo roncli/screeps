@@ -262,18 +262,20 @@ Base.prototype.terminal = function(room, terminal) {
 
                     transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
                     if (terminalEnergy > transCost) {
-                        room.terminal.send(resource.resource, amount, otherRoomName);
-                        Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
-                        dealMade = true;
-                        return false;
+                        if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
+                            Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                            dealMade = true;
+                            return false;
+                        }
                     } else {
                         if (terminalEnergy > 0) {
                             amount = Math.floor(amount * terminalEnergy / transCost);
                             if (amount > 0) {
-                                room.terminal.send(resource.resource, amount, otherRoomName);
-                                Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
-                                dealMade = true;
-                                return false;
+                                if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
+                                    Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                                    dealMade = true;
+                                    return false;
+                                }
                             }
                         }
                     }

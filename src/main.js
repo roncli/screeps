@@ -756,7 +756,7 @@ var profiler = require("screeps-profiler"),
             });
         },
 
-        drawRoom: () => {
+        drawRoom: (room) => {
             room.visual.text("GCL " + Game.gcl.level, -0.5, 0.1, {align: "left"});
             Drawing.progressBar(room, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
             // CPU is in the finalize() function.

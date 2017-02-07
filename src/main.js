@@ -751,8 +751,8 @@ var profiler = require("screeps-profiler"),
                 }
                 
                 if (!room.unobservable) {
-                    room.visual.text("GCL " + Game.gcl.level, -0.5, 0, {align: "left"});
-                    Drawing.progressBar(room, 2, -0.5, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
+                    room.visual.text("GCL " + Game.gcl.level, -0.4, 0, {align: "left"});
+                    Drawing.progressBar(room, 2, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
                 }
             });
         },

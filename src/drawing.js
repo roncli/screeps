@@ -6,7 +6,7 @@ var Drawing = {
         room.visual
             .rect(x, y, w, h, {fill: options.background})
             .rect(x, y, w * value / max, h, {fill: options.bar})
-            .text((options.label ? options.label + " " : "") + value.toFixed(0) + (options.showMax ? "/" + max.toFixed(0) : "") + (options.showDetails ? " (" + (100 * value / max).toFixed(3) + "%) " + (max - value).toFixed(0) + " to go" : ""), x + w / 2, y + h / 2 - 0.25, {align: "center", color: options.color});
+            .text((options.label ? options.label + " " : "") + value.toFixed(0) + (options.showMax ? "/" + max.toFixed(0) : "") + (options.showDetails ? " (" + (100 * value / max).toFixed(3) + "%) " + (max - value).toFixed(0) + " to go" : ""), x + w / 2, y + h / 2 + 0.25, {align: "center", color: options.color});
     }
 };
 

@@ -754,7 +754,7 @@ var profiler = require("screeps-profiler"),
                     room.visual.text("GCL " + Game.gcl.level, -0.5, 0.1, {align: "left"});
                     Drawing.progressBar(room, 2, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
                     // CPU is in the finalize() function.
-                    Drawing.progressBar(room, 34, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#ffff00" : "#ff0000", color: "#ffffff"});
+                    Drawing.progressBar(room, 34, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff"});
                     room.visual.text("Tick " + Game.time, 49.5, 0.1, {align: "right"});
                 }
             });

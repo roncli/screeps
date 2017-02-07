@@ -957,7 +957,7 @@ var profiler = require("screeps-profiler"),
             Memory.console = Cache.log;
 
             _.forEach(Game.rooms, (room) => {
-                Drawing.progressBar(room, 23, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {background: "#808080", bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", showDetails: true, color: "#ffffff"});
+                Drawing.progressBar(room, 23, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, showMax: false, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff"});
             });
         }
     };

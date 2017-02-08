@@ -770,8 +770,10 @@ var profiler = require("screeps-profiler"),
             }
 
             if (room.controller) {
-                room.visual.text("RCL " + room.controller.level, 2.5, 49.4, {align: "left"});
-                //Drawing.progressBar(room, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
+                if (room.controller.level) {
+                    room.visual.text("RCL " + room.controller.level, 2.5, 49.4, {align: "left"});
+                    Drawing.progressBar(room, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
+                }
             }
         },
 

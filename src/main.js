@@ -147,10 +147,10 @@ var profiler = require("screeps-profiler"),
             if (!Memory.stats.cpu) {
                 Memory.stats.cpu = [];
             }
-            if (!Memory.stats.cpu) {
+            if (!Memory.stats.bucket) {
                 Memory.stats.bucket = [];
             }
-            if (!Memory.stats.cpu) {
+            if (!Memory.stats.gclProgress) {
                 Memory.stats.gclProgress = [];
             }
 

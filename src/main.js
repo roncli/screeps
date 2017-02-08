@@ -770,6 +770,10 @@ var profiler = require("screeps-profiler"),
         },
 
         drawRoom: (room) => {
+            if (!Memory.visualizations) {
+                return;
+            }
+
             room.visual.text("GCL " + Game.gcl.level, -0.5, 0.1, {align: "left"});
             Drawing.progressBar(room, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
             // CPU is in the finalize() function.
@@ -999,17 +1003,21 @@ var profiler = require("screeps-profiler"),
                 Memory.stats.gclProgress.shift();
             }
 
-            _.forEach(Game.rooms, (room) => {
-                Drawing.sparkline(room, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Cache.log.limit})), [{key: "limit", min: Cache.log.limit * 0.5, max: Cache.log.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Cache.log.limit * 0.5, max: Cache.log.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5}]);
-            });
+            if (Memory.visualizations) {
+                _.forEach(Game.rooms, (room) => {
+                    Drawing.sparkline(room, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Cache.log.limit})), [{key: "limit", min: Cache.log.limit * 0.5, max: Cache.log.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Cache.log.limit * 0.5, max: Cache.log.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5}]);
+                });
+            }
 
             Cache.log.cpuUsed = Game.cpu.getUsed();
             Memory.stats.cpu[Memory.stats.cpu.length - 1] = Cache.log.cpuUsed;
             Memory.console = Cache.log;
 
-            _.forEach(Game.rooms, (room) => {
-                Drawing.progressBar(room, 23.5, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff"});
-            });
+            if (Memory.visualizations) {
+                _.forEach(Game.rooms, (room) => {
+                    Drawing.progressBar(room, 23.5, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff"});
+                });
+            }
         }
     };
 

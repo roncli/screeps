@@ -9,6 +9,7 @@ var profiler = require("screeps-profiler"),
     Drawing = require("drawing"),
     Market = require("market"),
     Minerals = require("minerals"),
+    Proxy = require("proxy"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -763,10 +764,10 @@ var profiler = require("screeps-profiler"),
             Drawing.progressBar(room, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff"});
             room.visual.text("Tick " + Game.time, 49.5, 0.1, {align: "right"});
             room.visual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.8, {align: "left"});
-            room.visual.text(new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", ""), 49.5, 0.8, {align: "right"});
+            room.visual.text(Cache.time, 49.5, 0.8, {align: "right"});
 
             if (room.memory && room.memory.roomType) {
-                room.visual.text(room.memory.roomType.type, -0.5, 48.9, {align: "left"});
+                room.visual.text(_.capitalize(room.memory.roomType.type), -0.5, 49.4, {align: "left"});
             }
 
             if (room.controller) {

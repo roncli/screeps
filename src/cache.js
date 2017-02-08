@@ -58,6 +58,7 @@ var creepsInArmy = {},
             };
             
             Cache.credits = Game.market.credits;
+            Cache.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
         },
     
         // Returns all creeps of a certain in an army.

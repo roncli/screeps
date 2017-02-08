@@ -997,8 +997,8 @@ var profiler = require("screeps-profiler"),
                 Memory.stats.bucket.shift();
             }
             Memory.stats.gclProgress.push(Cache.log.progress);
-            while (Memory.stats.progress.length > 100) {
-                Memory.stats.progress.shift();
+            while (Memory.stats.gclProgress.length > 100) {
+                Memory.stats.gclProgress.shift();
             }
 
             _.forEach(Game.rooms, (room) => {

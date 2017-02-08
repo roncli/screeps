@@ -14,7 +14,7 @@ var Drawing = {
 
     sparkline: (room, x, y, w, h, values, options) => {
         _.forEach(options, (option) => {
-            room.visual.poly(_.map(values, (v, i) => [x + w * (i / (values.length - 1)), y + h * (v[option.key] / (option.max - option.min))]), option);
+            room.visual.poly(_.map(values, (v, i) => [x + w * (i / (values.length - 1)), y + h * ((v[option.key] - option.min) / (option.max - option.min))]), option);
         });
     }
 };

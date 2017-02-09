@@ -118,7 +118,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
         roomName = room.name;
 
         // Check to see if we have built containers.  If so, move to stage 2.
-        if (containers.length === sources.length) {
+        if (containers.length >= sources.length) {
             this.stage = 2;
 
             // Loop through containers to get first container by source.

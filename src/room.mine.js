@@ -113,12 +113,12 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
         sources, containers, roomName, sites;
     
     if (!room.unobservable) {
-        sources = room.find(FIND_SOURCES);
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9*]5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
         containers = Cache.containersInRoom(room);
         roomName = room.name;
 
         // Check to see if we have built containers.  If so, move to stage 2.
-        if (containers.length >= sources.length) {
+        if (containers.length === sources.length) {
             this.stage = 2;
 
             // Loop through containers to get first container by source.
@@ -187,6 +187,7 @@ Mine.prototype.stage1 = function(room, supportRoom) {
 
 Mine.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9*]5$/.test(room.name) ? room.find(FIND_MINERALS) : []]),
         supportRoomName = supportRoom.name;
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
@@ -202,7 +203,7 @@ Mine.prototype.stage2Manage = function(room, supportRoom) {
         }
     } else {
         // Check to see if we lost built containers.  If so, move to stage 1.
-        if (Cache.containersInRoom(room).length !== room.find(FIND_SOURCES).length) {
+        if (Cache.containersInRoom(room).length !== sources.length) {
             this.stage = 1;
             return;
         }

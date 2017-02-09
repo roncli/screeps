@@ -113,7 +113,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
         sources, containers, roomName, sites;
     
     if (!room.unobservable) {
-        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9*]5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
         containers = Cache.containersInRoom(room);
         roomName = room.name;
 
@@ -187,7 +187,7 @@ Mine.prototype.stage1 = function(room, supportRoom) {
 
 Mine.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
-        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9*]5$/.test(room.name) ? room.find(FIND_MINERALS) : []]),
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]),
         supportRoomName = supportRoom.name;
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.

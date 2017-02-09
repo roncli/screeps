@@ -71,7 +71,7 @@ var Cache = require("cache"),
         spawn: (room, supportRoom, id) => {
             "use strict";
 
-            var body = (room.memory && room.memory.roomType && room.memory.roomType.type === "source") || /^[EW][1-9][0-9]*5[NS][1-9][0-9*]5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
+            var body = (room.memory && room.memory.roomType && room.memory.roomType.type === "source") || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
                 roomName = room.name,
                 supportRoomName = supportRoom.name,
                 energy, units, remainder, count, spawnToUse, name;

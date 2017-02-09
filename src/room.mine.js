@@ -226,6 +226,11 @@ Mine.prototype.stage2Manage = function(room, supportRoom) {
 Mine.prototype.stage2Spawn = function(room, supportRoom) {
     var dismantle = Memory.dismantle;
     
+    // Bail if there are hostiles.
+    if (Cache.hostilesInRoom(room).length > 0) {
+        return;
+    }
+    
     RoleRemoteReserver.checkSpawn(room);
     RoleRemoteMiner.checkSpawn(room);
     RoleRemoteWorker.checkSpawn(room);

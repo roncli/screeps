@@ -187,8 +187,8 @@ Mine.prototype.stage1 = function(room, supportRoom) {
 
 Mine.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
-        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]),
-        supportRoomName = supportRoom.name;
+        supportRoomName = supportRoom.name,
+        sources;
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
@@ -202,6 +202,8 @@ Mine.prototype.stage2Manage = function(room, supportRoom) {
             return;
         }
     } else {
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []])
+
         // Check to see if we lost built containers.  If so, move to stage 1.
         if (Cache.containersInRoom(room).length !== sources.length) {
             this.stage = 1;

@@ -204,7 +204,7 @@ FillMinerals.getStorageTasks = function(room) {
     // If the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
     if (storage && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
         resources = {};
-        _.keys(Memory.reserveMinerals).forEach((resource) => {
+        _.forEach(_.keys(Memory.reserveMinerals), (resource) => {
             var amount = (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - (store[resource] || 0);
             if (amount > 0) {
                 resources[resource] = amount;

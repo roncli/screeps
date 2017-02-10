@@ -12,7 +12,7 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-                max = 1,
+                max = 2,
                 num;
 
             // If there are no spawns in the support room, ignore the room.

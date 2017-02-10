@@ -3,6 +3,7 @@ var RoomObj = require("roomObj"),
     Commands = require("commands"),
     Utilities = require("utilities"),
     RoleDefender = require("role.defender"),
+    RoleDismantler = require("role.dismantler"),
     RoleHealer = require("role.healer"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
     RoleRemoteCollector = require("role.remoteCollector"),
@@ -10,6 +11,7 @@ var RoomObj = require("roomObj"),
     RoleRemoteStorer = require("role.remoteStorer"),
     RoleRemoteWorker = require("role.remoteWorker"),
     TaskBuild = require("task.build"),
+    TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     Source = function(supportRoom, stage) {
@@ -42,6 +44,9 @@ Source.prototype.stage1Tasks = function(room, supportRoom) {
         fillMinerals: {
             storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
             terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
+        },
+        dismantle: {
+            tasks: []
         }
     };
     
@@ -75,6 +80,7 @@ Source.prototype.stage1AssignTasks = function(room, tasks) {
     RoleRemoteWorker.assignTasks(room, tasks);
     RoleRemoteStorer.assignTasks(room, tasks);
     RoleRemoteCollector.assignTasks(room, tasks);
+    RoleDismantler.assignTasks(room, tasks);
 };
 
 Source.prototype.stage1Manage = function(room, supportRoom) {
@@ -188,7 +194,8 @@ Source.prototype.stage2Manage = function(room, supportRoom) {
 };
 
 Source.prototype.stage2Spawn = function(room, supportRoom) {
-    var roomName = room.name;
+    var roomName = room.name,
+        dismantle = Memory.dismantle;
 
     RoleDefender.checkSpawn(room);
     RoleHealer.checkSpawn(room);
@@ -201,11 +208,14 @@ Source.prototype.stage2Spawn = function(room, supportRoom) {
     RoleRemoteWorker.checkSpawn(room);
     RoleRemoteStorer.checkSpawn(room);
     RoleRemoteCollector.checkSpawn(room, supportRoom);
+    if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
+        RoleDismantler.checkSpawn(room, supportRoom);
+    }
 };
 
 Source.prototype.stage2Tasks = function(room, supportRoom) {
     var roomName = room.name,
-        creeps = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length > 0;
+        creeps = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []).length > 0;
         tasks = {
             fillEnergy: {
                 storageTasks: creeps ? TaskFillEnergy.getStorageTasks(supportRoom) : [],
@@ -217,6 +227,34 @@ Source.prototype.stage2Tasks = function(room, supportRoom) {
             }
         };
 
+    // Get tasks.
+    if (!room.unobservable) {
+        let dismantle = Memory.dismantle;
+        tasks.dismantle = {
+            tasks: []
+        };
+
+        if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
+            let completed = [];
+            
+            _.forEach(dismantle[roomName], (pos) => {
+                var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
+                if (structures.length === 0) {
+                    completed.push(pos);
+                } else {
+                    tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
+                }
+            });
+            _.forEach(completed, (complete) => {
+                _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
+            });
+        } else {
+            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
+                creep.memory.role = "remoteWorker";
+                creep.memory.container = Cache.containersInRoom(room)[0].id;
+            });
+        }
+    }
     return tasks;
 };
 
@@ -227,6 +265,7 @@ Source.prototype.stage2AssignTasks = function(room, tasks) {
     RoleRemoteWorker.assignTasks(room, tasks);
     RoleRemoteStorer.assignTasks(room, tasks);
     RoleRemoteCollector.assignTasks(room, tasks);
+    RoleDismantler.assignTasks(room, tasks);
 };
 
 Source.prototype.stage2 = function(room, supportRoom) {

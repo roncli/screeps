@@ -162,7 +162,7 @@ var Cache = require("cache"),
             
             // Check for dropped resources in current room.
             _.forEach(creepsWithNoTask, (creep) => {
-                if (creep.room === creep.memory.home) {
+                if (creep.room.name === creep.memory.home) {
                     _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
                         if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
                             return;

@@ -246,21 +246,24 @@ var Cache = require("cache"),
                     });
 
                     // Heal hurt creeps in the room.
-                    _.forEach(TaskHeal.getDefenderTasks(room), (task) => {
-                        _.forEach(creepsWithNoTask, (creep) => {
-                            if (task.canAssign(creep)) {
-                                creep.say("Heal");
-                                assigned.push(creep.name);
+                    
+                    if (Game.rooms[attackRoomName] && !Game.rooms[attackRoomName].unobservable) {
+                        _.forEach(TaskHeal.getDefenderTasks(Game.rooms[attackRoomName]), (task) => {
+                            _.forEach(creepsWithNoTask, (creep) => {
+                                if (task.canAssign(creep)) {
+                                    creep.say("Heal");
+                                    assigned.push(creep.name);
+                                }
+                            });
+    
+                            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                            assigned = [];
+    
+                            if (creepsWithNoTask.length === 0) {
+                                return;
                             }
                         });
-
-                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                        assigned = [];
-
-                        if (creepsWithNoTask.length === 0) {
-                            return;
-                        }
-                    });
+                    }
 
                     // Rally to any hostile construction sites.
                     _.forEach(tasks.rally.tasks, (task) => {

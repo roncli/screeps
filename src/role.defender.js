@@ -97,22 +97,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Find allies to heal.
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskHeal.getDefenderTask(creep);
-                if (task && task.canAssign(creep)) {
-                    creep.say("Heal");
-                    assigned.push(creep.name);
-                }
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             // Rally the troops!
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);

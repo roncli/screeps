@@ -64,53 +64,6 @@ var Cache = require("cache"),
             return _.map(objList, (o) => o.object);
         },
 
-        objectsClosestToObjByPath: (objects, obj, range) => {
-            "use strict";
-
-            var objId = obj.id;
-
-            if (objects.length === 0) {
-                return [];
-            }
-
-            if (!obj) {
-                return objects;
-            }
-
-            if (!range) {
-                range = 1;
-            }
-            
-            var objList = _.map(objects, (o) => {
-                var oId = o.id,
-                    distance;
-                
-                if (Memory.distances && Memory.distances[objId] && Memory.distances[objId][oId]) {
-                    distance = Memory.distances[objId][oId];
-                } else {
-                    distance = PathFinder.search(obj.pos, {pos: o.pos, range: range}, {swampCost: 1, maxOps: obj.pos.roomName === o.pos.roomName ? 2000 : 100000}).path.length;
-                    if (!(o instanceof Creep) && !(obj instanceof Creep)) {
-                        if (!Memory.distances) {
-                            Memory.distances = {};
-                        }
-                        if (!Memory.distances[objId]) {
-                            Memory.distances[objId] = {};
-                        }
-                        Memory.distances[objId][oId] = distance;
-                    }
-                }
-
-                return {
-                    object: o,
-                    distance: distance
-                };
-            });
-            
-            objList.sort((a, b) => a.distance - b.distance);
-            
-            return _.map(objList, (o) => o.object);
-        },
-
         getEmptyPosAroundPos: (pos) => {
             "use strict";
 

@@ -219,14 +219,10 @@ var profiler = require("screeps-profiler"),
                     Memory.lengthToController = {};
                     break;
                 case 300:
-                    delete Memory.distances;
-                    Memory.distances = {};
-                    break;
-                case 400:
                     delete Memory.ranges;
                     Memory.ranges = {};
                     break;
-                case 500:
+                case 400:
                     delete Memory.paths;
                     Memory.paths = {};
                     break;

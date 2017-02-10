@@ -246,7 +246,7 @@ var Cache = require("cache"),
                     });
 
                     // Heal hurt creeps in the room.
-                    _.forEach(TaskHeal.getTasks(creep.room), (task) => {
+                    _.forEach(TaskHeal.getDefenderTasks(room), (task) => {
                         _.forEach(creepsWithNoTask, (creep) => {
                             if (task.canAssign(creep)) {
                                 creep.say("Heal");

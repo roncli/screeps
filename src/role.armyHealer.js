@@ -248,7 +248,7 @@ var Cache = require("cache"),
                     // Heal hurt creeps in the room.
                     
                     if (Game.rooms[attackRoomName] && !Game.rooms[attackRoomName].unobservable) {
-                        _.forEach(TaskHeal.getDefenderTasks(Game.rooms[attackRoomName]), (task) => {
+                        _.forEach(TaskHeal.getTasks(Game.rooms[attackRoomName]), (task) => {
                             _.forEach(creepsWithNoTask, (creep) => {
                                 if (task.canAssign(creep)) {
                                     creep.say("Heal");

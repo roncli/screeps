@@ -109,7 +109,7 @@ Rally.getDefenderTask = function(creep) {
 
     var source = Cache.sourceKeepersInRoom(creep.room).sort((a, b) => a.ticksToSpawn - b.ticksToSpawn)[0];
 
-    if (source) {
+    if (source && creep.room.name === creep.memory.home) {
         return new Rally(source.id, creep);
     } else {
         return new Rally(creep.memory.home, creep);

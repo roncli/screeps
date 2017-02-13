@@ -10,7 +10,6 @@ var profiler = require("screeps-profiler"),
     Drawing = require("drawing"),
     Market = require("market"),
     Minerals = require("minerals"),
-    Proxy = require("proxy"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -619,9 +618,11 @@ var profiler = require("screeps-profiler"),
                         creeps: []
                     };
                 } else {
-                    repairableStructures = Cache.repairableStructuresInRoom(room),
-                    constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES),
-                    towers = Cache.towersInRoom(room),
+                    if (Game.time % 10 === 0) {
+                        repairableStructures = Cache.repairableStructuresInRoom(room);
+                    }
+                    constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
+                    towers = Cache.towersInRoom(room);
                     labs = Cache.labsInRoom(room);
                     nukers = Cache.nukersInRoom(room);
                     powerSpawns = Cache.powerSpawnsInRoom(room);
@@ -653,19 +654,23 @@ var profiler = require("screeps-profiler"),
                         Cache.log.rooms[roomName].tte = room.controller.reservation.ticksToEnd;
                     }
                     
-                    Cache.log.structures = [].concat.apply([], [Cache.log.structures, _.map(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
-                        return {
-                            structureId: s.id,
-                            room: roomName,
-                            x: s.pos.x,
-                            y: s.pos.y,
-                            structureType: s.structureType,
-                            hits: s.hits,
-                            hitsMax: s.hitsMax
-                        };
-                    })]);
+                    if (Game.time % 10 === 0) {
+                        Cache.log.structures = [].concat.apply([], [Cache.log.structures, _.map(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
+                            return {
+                                structureId: s.id,
+                                room: roomName,
+                                x: s.pos.x,
+                                y: s.pos.y,
+                                structureType: s.structureType,
+                                hits: s.hits,
+                                hitsMax: s.hitsMax
+                            };
+                        })]);
 
-                    Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits));
+                        Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits));
+                    } else {
+                        Cache.log.rooms[roomName].lowestWall = Memory.console && Memory.console.rooms && Memory.console.rooms[roomName] && Memory.console.rooms[roomName].lowestWall || null;
+                    }
 
                     if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
                         Cache.log.rooms[roomName].energyAvailable = room.energyAvailable;

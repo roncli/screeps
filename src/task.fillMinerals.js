@@ -57,12 +57,19 @@ FillMinerals.prototype.canAssign = function(creep) {
 FillMinerals.prototype.run = function(creep) {
     "use strict";
 
-    var minerals;
+    var obj = this.object,
+        minerals;
 
     // Object not found, complete task.
-    if (!this.object) {
+    if (!obj) {
         Task.prototype.complete.call(this, creep);
         return;
+    }
+
+    // The container is full, complete.
+    if (obj.storeCapacity && _.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0 || (_.sum(obj.store) || 0) === obj.storeCapacity) {
+        Task.prototype.complete.call(this, creep);
+        return true;
     }
 
     if (!this.resources) {
@@ -76,8 +83,8 @@ FillMinerals.prototype.run = function(creep) {
         }
 
         // Move to the object and fill it.
-        Pathing.moveTo(creep, this.object, 1);
-        if (creep.transfer(this.object, minerals[0]) === OK) {
+        Pathing.moveTo(creep, obj, 1);
+        if (creep.transfer(obj, minerals[0]) === OK) {
             // If we are out of minerals, complete task.
             if (_.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
                 Task.prototype.complete.call(this, creep);
@@ -107,38 +114,14 @@ FillMinerals.prototype.run = function(creep) {
         }
 
         // Move to the object and fill it.
-        Pathing.moveTo(creep, this.object, 1);
-        if (creep.transfer(this.object, minerals[0], this.resources[minerals[0]] !== null ? Math.min(this.resources[minerals[0]], creep.carry[minerals[0]]) : undefined) === OK) {
+        Pathing.moveTo(creep, obj, 1);
+        if (creep.transfer(obj, minerals[0], this.resources[minerals[0]] !== null ? Math.min(this.resources[minerals[0]], creep.carry[minerals[0]]) : undefined) === OK) {
             // If we have no minerals left for this container, we're done.
             if (minerals.length === 1) {
                 Task.prototype.complete.call(this, creep);
             }
         }
     }
-};
-
-FillMinerals.prototype.canComplete = function(creep) {
-    "use strict";
-
-    // Complete if object doesn't exist.
-    if (!this.object) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    // Complete if the creep isn't carrying any of the requested resources.
-    if (this.resources && _.intersection(_.keys(this.resources), _.filter(_.keys(creep.carry), (c) => creep.carry[c])).length === 0) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    // Complete if container is full.
-    if (this.object.storeCapacity && _.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0 || (_.sum(this.object.store) || 0) === this.object.storeCapacity) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    return false;
 };
 
 FillMinerals.prototype.toObj = function(creep) {

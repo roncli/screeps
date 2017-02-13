@@ -55,16 +55,6 @@ Pickup.prototype.run = function(creep) {
     }
 };
 
-Pickup.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (!this.resource || this.resource.amount < creep.pos.getRangeTo(this.resource)) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
-};
-
 Pickup.fromObj = function(creep) {
     "use strict";
 

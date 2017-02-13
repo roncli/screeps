@@ -57,8 +57,14 @@ CollectMinerals.prototype.run = function(creep) {
         amount = this.amount,
         minerals;
 
-    // Object not found, complete task.
-    if (!obj) {
+    // If the amount is less than 0, or the creep is about to die, or if the object doesn't exist, complete.
+    if (amount < 0 || creep.ticksToLive < 150 || !obj) {
+        Task.prototype.complete.call(this, creep);
+        return;
+    }
+
+    // If we're full, complete task.
+    if (_.sum(creep.carry) === creep.carryCapacity) {
         Task.prototype.complete.call(this, creep);
         return;
     }
@@ -95,23 +101,6 @@ CollectMinerals.prototype.run = function(creep) {
             Task.prototype.complete.call(this, creep);
         }
     }
-};
-
-CollectMinerals.prototype.canComplete = function(creep) {
-    "use strict";
-
-    // If the creep is about to die or if the object doesn't exist, complete.
-    if (this.amount < 0 || creep.ticksToLive < 150 || !this.object) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    // If we're full or there are no more minerals, complete task.
-    if (_.sum(creep.carry) === creep.carryCapacity || (this.object.store && _.filter(_.keys(this.object.store), (m) => m !== RESOURCE_ENERGY && this.object.store[m] > 0).length === 0) || (this.object instanceof StructureLab && this.object.mineralAmount === 0)) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
 };
 
 CollectMinerals.prototype.toObj = function(creep) {

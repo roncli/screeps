@@ -33,7 +33,7 @@ Claim.prototype.canAssign = function(creep) {
 Claim.prototype.run = function(creep) {
     "use strict";
 
-    if (!creep.room.controller) {
+    if (!creep.room.controller || creep.room.controller.my || !creep.getActiveBodyparts(CLAIM) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
@@ -41,17 +41,6 @@ Claim.prototype.run = function(creep) {
     // Move towards the controller and claim it.    
     Pathing.moveTo(creep, creep.room.controller, 1);
     creep.claimController(creep.room.controller);
-};
-
-Claim.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (!creep.room.controller || creep.room.controller.my || !creep.getActiveBodyparts(CLAIM) === 0) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    return false;
 };
 
 Claim.prototype.toObj = function(creep) {

@@ -59,13 +59,6 @@ Heal.prototype.run = function(creep) {
     return true;
 };
 
-Heal.prototype.canComplete = function(creep) {
-    "use strict";
-
-    Task.prototype.complete.call(this, creep);
-    return true;
-};
-
 Heal.prototype.toObj = function(creep) {
     "use strict";
 

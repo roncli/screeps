@@ -46,8 +46,8 @@ Harvest.prototype.run = function(creep) {
 
     var source = Game.getObjectById(this.source || creep.memory.homeSource);
     
-    // No sources found or the source is drained, complete task.
-    if (!source || source.energy === 0) {
+    // No sources found or the source is drained, or creep is about to die or out of WORK parts, complete task.
+    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
@@ -65,18 +65,6 @@ Harvest.prototype.run = function(creep) {
             Task.prototype.complete.call(this, creep);
         }
     }
-};
-
-Harvest.prototype.canComplete = function(creep) {
-    "use strict";
-
-    var source = Game.getObjectById(this.source || creep.memory.homeSource);
-
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
 };
 
 Harvest.prototype.toObj = function(creep) {

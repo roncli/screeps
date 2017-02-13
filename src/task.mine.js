@@ -88,15 +88,6 @@ Mine.prototype.run = function(creep) {
     }
 };
 
-Mine.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (!Game.getObjectById(creep.memory.container) || creep.getActiveBodyparts(WORK) === 0) {
-        return true;
-    }
-    return false;
-};
-
 Mine.prototype.toObj = function(creep) {
     "use strict";
 

@@ -79,13 +79,6 @@ Rally.prototype.run = function(creep) {
     Task.prototype.complete.call(this, creep);
 };
 
-Rally.prototype.canComplete = function(creep) {
-    "use strict";
-
-    Task.prototype.complete.call(this, creep);
-    return true;
-};
-
 Rally.prototype.toObj = function(creep) {
     "use strict";
 

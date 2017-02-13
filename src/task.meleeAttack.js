@@ -40,6 +40,14 @@ Melee.prototype.run = function(creep) {
         Task.prototype.complete.call(this, creep);
         return;
     }
+
+    // If we're out of attack parts, we're done.    
+    if (creep.getActiveBodyparts(ATTACK) === 0) {
+        creep.say("Help!");
+        Task.prototype.complete.call(this, creep);
+        return;
+    }
+
     
     // Move and attack.
     Pathing.moveTo(creep, this.enemy);
@@ -54,23 +62,6 @@ Melee.prototype.run = function(creep) {
     if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
         creep.rangedAttack(this.enemy);
     }
-};
-
-Melee.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (creep.getActiveBodyparts(ATTACK) === 0) {
-        creep.say("Help!");
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    if (!this.enemy) {
-        creep.say("Get Rekt!", true);
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
 };
 
 Melee.prototype.toObj = function(creep) {

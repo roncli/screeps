@@ -35,25 +35,21 @@ Build.prototype.run = function(creep) {
 
     var site = this.constructionSite;
 
-    // Check for complete construction.
-    if (!site) {
+    // Complete task if we're out of energy, the site is gone, or we can't do the work.
+    if (!creep.carry[RESOURCE_ENERGY] || !site || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
-    
+
     // Move to the construction site and build it.
     Pathing.moveTo(creep, site, Math.max(Math.min(creep.pos.getRangeTo(site) - 1, 3), 1));
     creep.build(site, RESOURCE_ENERGY);
-};
-
-Build.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (!creep.carry[RESOURCE_ENERGY] || !this.constructionSite || creep.getActiveBodyparts(WORK) === 0) {
+    
+    // If we have the means to complete the construction site, complete the task.
+    if (Math.min(creep.getActiveBodyparts(WORK) * 5, creep.carry[RESOURCE_ENERGY]) >= site.progressTotal - site.progress) {
         Task.prototype.complete.call(this, creep);
-        return true;
+        return;
     }
-    return false;
 };
 
 Build.prototype.toObj = function(creep) {

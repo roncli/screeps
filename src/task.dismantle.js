@@ -32,26 +32,24 @@ Dismantle.prototype.canAssign = function(creep) {
 
 Dismantle.prototype.run = function(creep) {
     "use strict";
+    
+    var structure = this.structure;
 
-    // Check for destroyed structure.
-    if (!this.structure) {
+    // If we're at capacity, the structure is destroyed, or we have no WORK parts, we're done.
+    if (_.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
     
     // Move to the structure and dismantle it.
-    Pathing.moveTo(creep, this.structure, 1);
-    creep.dismantle(this.structure);
-};
-
-Dismantle.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (_.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
+    Pathing.moveTo(creep, structure, 1);
+    creep.dismantle(structure);
+    
+    // If the unit can destroy the structure, complete the task.
+    if (Math.min(creep.getActiveBodyparts(WORK), creep.carry[RESOURCE_ENERGY]) * 50 >= structure.hits) {
         Task.prototype.complete.call(this, creep);
-        return true;
+        return;
     }
-    return false;
 };
 
 Dismantle.prototype.toObj = function(creep) {

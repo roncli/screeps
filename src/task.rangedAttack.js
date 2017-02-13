@@ -41,6 +41,13 @@ Ranged.prototype.run = function(creep) {
         return;
     }
 
+    // If we're out of ranged parts, we're done.
+    if (creep.getActiveBodyparts(RANGED_ATTACK) === 0) {
+        creep.say("Help!");
+        Task.prototype.complete.call(this, creep);
+        return;
+    }
+
     // If this has attack body parts, use different logic.
     if (creep.getActiveBodyparts(ATTACK) > 0) {
         // Move and attack.
@@ -66,23 +73,6 @@ Ranged.prototype.run = function(creep) {
             creep.heal(creep);
         }
     } 
-};
-
-Ranged.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (creep.getActiveBodyparts(RANGED_ATTACK) === 0) {
-        creep.say("Help!");
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    if (!this.enemy) {
-        creep.say("Get Rekt!", true);
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-    return false;
 };
 
 Ranged.prototype.toObj = function(creep) {

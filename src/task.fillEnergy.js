@@ -49,63 +49,30 @@ FillEnergy.prototype.canAssign = function(creep) {
     
     Task.prototype.assign.call(this, creep);
     return true;
-}
+};
 
 FillEnergy.prototype.run = function(creep) {
     "use strict";
+    
+    var obj = this.object;
 
-    // Object not found, complete task.
-    if (!this.object) {
+    // If the object is at capacity, we're done.
+    if ((obj.energy || _.sum(obj.store)) === (obj.energyCapacity || obj.storeCapacity)) {
+        Task.prototype.complete.call(this, creep);
+        return;
+    }
+
+    // Object not found or we have no energy, complete task.
+    if (!obj || !creep.carry[RESOURCE_ENERGY]) {
         Task.prototype.complete.call(this, creep);
         return;
     }
 
     // Move to the object and fill it.
-    Pathing.moveTo(creep, this.object, 1);
-    if (creep.transfer(this.object, RESOURCE_ENERGY) === OK) {
+    Pathing.moveTo(creep, obj, 1);
+    if (creep.transfer(obj, RESOURCE_ENERGY) === OK) {
         Task.prototype.complete.call(this, creep);
     }
-};
-
-FillEnergy.prototype.canComplete = function(creep) {
-    "use strict";
-
-    var energy, minEnergy;
-
-    if (!this.object || !creep.carry[RESOURCE_ENERGY]) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    energy = this.object.energy;
-    if (energy === undefined) {
-        energy = _.sum(this.object.store);
-    }
-
-    if (energy === (this.object.energyCapacity || this.object.storeCapacity)) {
-        Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    if (this.object instanceof StructureExtension) {
-        switch (this.object.room.controller.level) {
-            case 7:
-                minEnergy = 100;
-                break;
-            case 8:
-                minEnergy = 200;
-                break;
-            default:
-                minEnergy = 50;
-                break;
-        }
-        if (creep.carry[RESOURCE_ENERGY] < minEnergy) {
-            Task.prototype.complete.call(this, creep);
-            return true;
-        }
-    }
-
-    return false;
 };
 
 FillEnergy.prototype.toObj = function(creep) {

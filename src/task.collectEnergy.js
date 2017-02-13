@@ -49,51 +49,36 @@ CollectEnergy.prototype.canAssign = function(creep) {
 CollectEnergy.prototype.run = function(creep) {
     "use strict";
 
-    var resources;
-
-    // Object not found, complete task.
-    if (!this.object) {
-        Task.prototype.complete.call(this, creep);
-        return;
-    }
-
-    // Move to the object and collect from it.
-    Pathing.moveTo(creep, this.object, 1);
-
-    // If we are 1 square from the goal, check to see if there's a resource on it and pick it up.
-    if (creep.pos.getRangeTo(this.object) === 1) {
-        if ((resources = _.filter(this.object.pos.lookFor(LOOK_RESOURCES), (r) => r.amount > 50)).length > 0) {
-            creep.pickup(resources[0]);
-            return;
-        }
-    }
-
-    if (creep.withdraw(this.object, RESOURCE_ENERGY) === OK) {
-        Task.prototype.complete.call(this, creep);
-    }
-};
-
-CollectEnergy.prototype.canComplete = function(creep) {
-    "use strict";
+    var obj = this.object,
+        energy = obj.energy || obj.store[RESOURCE_ENERGY] || 0,
+        resources;
 
     // If the creep is about to die or if the object doesn't exist, complete.
-    if (creep.ticksToLive < 150 || !this.object) {
+    if (creep.ticksToLive < 150 || !obj) {
         Task.prototype.complete.call(this, creep);
-        return true;
-    }
-
-    // Check the object's energy.
-    var energy = this.object.energy;
-    if (energy === undefined) {
-        energy = this.object.store[RESOURCE_ENERGY] || 0;
+        return;
     }
 
     // If the creep is full on capacity or the energy is empty, complete.
     if (_.sum(creep.carry) === creep.carryCapacity || energy === 0) {
         Task.prototype.complete.call(this, creep);
-        return true;
+        return;
     }
-    return false;
+
+    // Move to the object and collect from it.
+    Pathing.moveTo(creep, obj, 1);
+
+    // If we are 1 square from the goal, check to see if there's a resource on it and pick it up.
+    if (creep.pos.getRangeTo(obj) === 1) {
+        if ((resources = _.filter(obj.pos.lookFor(LOOK_RESOURCES), (r) => r.amount > 50)).length > 0) {
+            creep.pickup(resources[0]);
+            return;
+        }
+    }
+
+    if (creep.withdraw(obj, RESOURCE_ENERGY) === OK) {
+        Task.prototype.complete.call(this, creep);
+    }
 };
 
 CollectEnergy.prototype.toObj = function(creep) {

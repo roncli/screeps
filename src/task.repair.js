@@ -38,26 +38,24 @@ Repair.prototype.canAssign = function(creep) {
 
 Repair.prototype.run = function(creep) {
     "use strict";
+    
+    var structure = this.structure;
 
-    // Check for destroyed structure.
-    if (!this.structure) {
+    // Check for destroyed structure, out of energy, or no WORK parts.
+    if (!creep.carry[RESOURCE_ENERGY] || !structure || structure.hits === structure.hitsMax || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
     
     // Move to the structure and repair it.
-    Pathing.moveTo(creep, this.structure, Math.max(Math.min(creep.pos.getRangeTo(this.structure) - 1, 3), 1));
-    creep.repair(this.structure);
-};
-
-Repair.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (!creep.carry[RESOURCE_ENERGY] || !this.structure || this.structure.hits === this.structure.hitsMax || creep.getActiveBodyparts(WORK) === 0) {
+    Pathing.moveTo(creep, structure, Math.max(Math.min(creep.pos.getRangeTo(structure) - 1, 3), 1));
+    creep.repair(structure);
+    
+    // If we can repair the structure completely, then complete the task.
+    if (Math.min(creep.getActiveBodyparts(WORK), creep.carry[RESOURCE_ENERGY]) * 100 >= structure.hitsMax - structure.hits) {
         Task.prototype.complete.call(this, creep);
-        return true;
+        return;
     }
-    return false;
 };
 
 Repair.prototype.toObj = function(creep) {

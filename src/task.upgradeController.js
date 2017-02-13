@@ -37,8 +37,8 @@ Upgrade.prototype.run = function(creep) {
 
     creep.say(["I've", "got to", "celebrate", "you baby", "I've got", "to praise", "GCL like", "I should!", ""][Game.time % 9], true);
 
-    // Controller not found, complete task.
-    if (!this.controller) {
+    // Controller not found, or no energy, or no WORK parts, then complete task.
+    if (!this.controller || !creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
@@ -59,16 +59,12 @@ Upgrade.prototype.run = function(creep) {
     if (Memory.signs && Memory.signs[creep.room.name] && (!this.controller.sign || this.controller.sign.username !== "roncli")) {
         creep.signController(this.controller, Memory.signs[creep.room.name]);
     }
-};
-
-Upgrade.prototype.canComplete = function(creep) {
-    "use strict";
-
-    if (!creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
+    
+    // If we run out of energy, complete task.
+    if (creep.carry[RESOURCE_ENERGY] <= creep.getActiveBodyparts(WORK)) {
         Task.prototype.complete.call(this, creep);
-        return true;
+        return;
     }
-    return false;
 };
 
 Upgrade.prototype.toObj = function(creep) {

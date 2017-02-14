@@ -102,10 +102,9 @@ CollectMinerals.prototype.run = function(creep) {
     }
 
     if (creep.withdraw(obj, minerals[0]) === OK) {
-        // If we're full or there are no more minerals, complete task.
-        if (resource || _.sum(creepCarry) === creepCarryCapacity || (objStore && _.filter(_.keys(objStore), (m) => m !== RESOURCE_ENERGY && objStore[m] > 0).length === 0) || (obj instanceof StructureLab && obj.mineralAmount === 0)) {
-            Task.prototype.complete.call(this, creep);
-        }
+        // Complete task.
+        Task.prototype.complete.call(this, creep);
+        return;
     }
 };
 

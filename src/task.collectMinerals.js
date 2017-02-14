@@ -50,18 +50,19 @@ CollectMinerals.prototype.run = function(creep) {
     "use strict";
 
     var obj = this.object,
-        objStore = obj.store,
         resource = this.resource,
         creepCarry = creep.carry,
         creepCarryCapacity = creep.carryCapacity,
         amount = this.amount,
-        minerals;
+        objStore, minerals;
 
     // If the amount is less than 0, or the creep is about to die, or if the object doesn't exist, complete.
     if (amount < 0 || creep.ticksToLive < 150 || !obj) {
         Task.prototype.complete.call(this, creep);
         return;
     }
+
+    objStore = obj.store;
 
     // If we're full, complete task.
     if (_.sum(creep.carry) === creep.carryCapacity) {

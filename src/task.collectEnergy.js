@@ -50,14 +50,15 @@ CollectEnergy.prototype.run = function(creep) {
     "use strict";
 
     var obj = this.object,
-        energy = obj.energy || obj.store[RESOURCE_ENERGY] || 0,
-        resources;
+        energy, resources;
 
     // If the creep is about to die or if the object doesn't exist, complete.
     if (creep.ticksToLive < 150 || !obj) {
         Task.prototype.complete.call(this, creep);
         return;
     }
+
+    energy = obj.energy || obj.store[RESOURCE_ENERGY] || 0;
 
     // If the creep is full on capacity or the energy is empty, complete.
     if (_.sum(creep.carry) === creep.carryCapacity || energy === 0) {

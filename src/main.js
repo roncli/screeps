@@ -649,18 +649,6 @@ var profiler = require("screeps-profiler"),
                     }
                     
                     if (Game.time % 10 === 0) {
-                        Cache.log.structures = [].concat.apply([], [Cache.log.structures, _.map(_.filter(repairableStructures, (s) => !(s instanceof StructureWall) && !(s instanceof StructureRampart) === -1), (s) => {
-                            return {
-                                structureId: s.id,
-                                room: roomName,
-                                x: s.pos.x,
-                                y: s.pos.y,
-                                structureType: s.structureType,
-                                hits: s.hits,
-                                hitsMax: s.hitsMax
-                            };
-                        })]);
-
                         Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits));
                     } else {
                         Cache.log.rooms[roomName].lowestWall = Memory.console && Memory.console.rooms && Memory.console.rooms[roomName] && Memory.console.rooms[roomName].lowestWall || null;

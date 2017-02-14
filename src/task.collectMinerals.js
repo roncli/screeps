@@ -72,6 +72,11 @@ CollectMinerals.prototype.run = function(creep) {
 
     // Get the resource we're going to use.
     if (obj instanceof StructureLab) {
+        // Lab is empty, complete task.
+        if (obj.mineralType === null) {
+            Task.prototype.complete.call(this, creep);
+            return;
+        }
         minerals = [obj.mineralType];
     } else if (resource) {
         minerals = [resource];

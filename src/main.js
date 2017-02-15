@@ -133,7 +133,7 @@ var profiler = require("screeps-profiler"),
                 Memory.avoidRooms = [];
             }
             if (!Memory.avoidSquares) {
-                Memory.avoidSquares = [];
+                Memory.avoidSquares = {};
             }
             if (!Memory.paths) {
                 Memory.paths = {};

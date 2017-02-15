@@ -34,8 +34,8 @@ Pickup.prototype.canAssign = function(creep) {
 Pickup.prototype.run = function(creep) {
     "use strict";
 
-    // Resource is gone.
-    if (!this.resource) {
+    // Resource is gone or we are full or it's not close enough.
+    if (!this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource)) {
         Task.prototype.complete.call(this, creep);
         return;
     }

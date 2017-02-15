@@ -122,7 +122,7 @@ var Cache = require("cache"),
         avoidSquare: (x, y, room, avoid) => {
             if (avoid) {
                 if (!Memory.avoidSquares[room]) {
-                    Memory.avoidSquares[room] === [];
+                    Memory.avoidSquares[room] = [];
                 }
                 Memory.avoidSquares[room].push({x: x, y: y});
             }

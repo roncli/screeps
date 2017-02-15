@@ -211,7 +211,9 @@ var creepsInArmy = {},
                     var pos = structure.pos;
                     if (structure instanceof StructureRoad) {
                         matrix.set(pos.x, pos.y, 1);
-                    } else if (!(structure instanceof StructureContainer) && (!(structure instanceof StructureRampart) || !structure.my)) {
+                    } else if (structure instanceof StructureContainer) {
+                        matrix.set(pos.x, pos.y, 10);
+                    } else if (!(structure instanceof StructureRampart) || !structure.my) {
                         matrix.set(pos.x, pos.y, 255);
                     }
                 });

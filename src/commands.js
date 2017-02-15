@@ -118,6 +118,21 @@ var Cache = require("cache"),
             }
         },
 
+        // Avoids a square or not.
+        avoidSquare: (x, y, room, avoid) => {
+            if (avoid) {
+                if (!Memory.avoidSquares[room]) {
+                    Memory.avoidSquares[room] === [];
+                }
+                Memory.avoidSquares.push({x: x, y: y});
+            }
+            if (!avoid) {
+                if (Memory.avoidSquares[room]) {
+                    _.remove(Memory.avoidSquares[room], (s) => s.x === x && s.y === y);
+                }
+            }
+        },
+
         // Adds a sign to a room.  When a reserver or upgrader is near the controller, it will apply the sign.
         addSign: (room, text) => {
             if (!Memory.signs) {

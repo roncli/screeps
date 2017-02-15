@@ -225,6 +225,12 @@ var creepsInArmy = {},
                     var pos = structure.pos;
                     matrix.set(pos.x, pos.y, 5);
                 });
+
+                if (Memory.avoidSquares[roomName]) {
+                    _.forEach(Memory.avoidSquares[roomName], (square) => {
+                        matrix.set(square.x, square.y, 255);
+                    });
+                }
                 
                 if (!Memory.rooms[roomName] || !Memory.rooms[roomName].roomType || Memory.rooms[roomName].roomType.type !== "source") {
                     _.forEach(_.filter(room.find(FIND_HOSTILE_CREEPS), (c) => c.owner.username === "Source Keeper"), (creep) => {

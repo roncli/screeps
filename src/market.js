@@ -7,6 +7,7 @@ var Cache = require("cache"),
 
             if (!Market.orders || Game.cpu.bucket >= Memory.marketBucket) {
                 Market.orders = Game.market.getAllOrders();
+                delete Market.filteredOrders;
             }
             
             return Market.orders;

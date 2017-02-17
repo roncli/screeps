@@ -42,6 +42,12 @@
                 <div ng-if="room.rcl" style="width: max-content; white-space: nowrap;">
                     <b>{{name}} RCL</b> {{room.rcl}}
                 </div>
+                <div ng-if="room.store && room.store.storage && room.store.storage[0]" style="margin: 0 5px; white-space: nowrap;">
+                    <b>S</b> {{room.store.storage[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{room.store.storage[0].resource}}.png" />
+                </div>
+                <div ng-if="room.store && room.store.terminal && room.store.terminal[0]" style="white-space: nowrap;">
+                    <b>T</b> {{room.store.terminal[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{room.store.terminal[0].resource}}.png" />
+                </div>
                 <div ng-if="room.reservedUsername">
                     <b>Reserved</b> {{room.reservedUsername}}
                     <b>TTE</b> {{room.tte}}

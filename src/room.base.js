@@ -296,7 +296,7 @@ Base.prototype.terminal = function(room, terminal) {
                     _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                         var resource = topResource.resource;
 
-                        if (topResource.amount > 5000) {
+                        if (topResource.amount > 5000 && Cache.credits < Memory.minimumCredits) {
                             delete Memory.minimumSell[topResource.resource];
                         }
                         

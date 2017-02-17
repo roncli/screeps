@@ -295,6 +295,10 @@ Base.prototype.terminal = function(room, terminal) {
                 if (terminalMinerals.length > 0) {
                     _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                         var resource = topResource.resource;
+
+                        if (topResource.amount > 5000) {
+                            delete Memory.minimumSell[topResource.resource];
+                        }
                         
                         bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
                         if (bestOrder) {

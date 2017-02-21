@@ -15,6 +15,7 @@ Reserve.prototype.init = function(id) {
     Task.call(this);
 
     this.type = "reserve";
+    this.force = true;
 };
 
 Reserve.prototype.canAssign = function(creep) {

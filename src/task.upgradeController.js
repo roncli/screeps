@@ -19,6 +19,7 @@ Upgrade.prototype.init = function(room) {
     this.type = "upgradeController";
     this.room = room;
     this.controller = Game.rooms[room].controller;
+    this.force = true;
 };
 
 Upgrade.prototype.canAssign = function(creep) {

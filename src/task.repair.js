@@ -18,6 +18,7 @@ Repair.prototype.init = function(id) {
     this.type = "repair";
     this.id = id;
     this.structure = Game.getObjectById(id);
+    this.force = true;
 };
 
 Repair.prototype.canAssign = function(creep) {

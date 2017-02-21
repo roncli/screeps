@@ -18,6 +18,7 @@ Pickup.prototype.init = function(id) {
     this.type = "pickupResource";
     this.id = id;
     this.resource = Game.getObjectById(id);
+    this.force = true;
 };
 
 Pickup.prototype.canAssign = function(creep) {

@@ -17,6 +17,7 @@ Build.prototype.init = function(id) {
     this.type = "build";
     this.id = id;
     this.constructionSite = Game.getObjectById(id);
+    this.force = true;
 };
 
 Build.prototype.canAssign = function(creep) {

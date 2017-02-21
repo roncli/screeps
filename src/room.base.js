@@ -243,7 +243,7 @@ Base.prototype.terminal = function(room, terminal) {
             }
         } else {
             // Transfer what we have in excess to rooms in need if we have the minimum credits.
-            if (Cache.credits >= Memory.minimumCredits) {
+            if (Cache.credits >= Memory.minimumCredits && Memory.buy) {
                 bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal);
                 _.forEach(bases, (otherRoom) => {
                     var otherRoomName = otherRoom.name;

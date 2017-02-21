@@ -128,14 +128,16 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Reserve the controller if we are in the room.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
-                var task = TaskReserve.getRemoteTask(creep);
-                if (task.canAssign(creep)) {
-                    creep.say("Reserving");
-                    assigned.push(creep.name);
-                };
-            });
+            // Reserve the controller.
+            if (room && !room.unobservable && room.controller) {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    var task = TaskReserve.getRemoteTask(creep);
+                    if (task.canAssign(creep)) {
+                        creep.say("Reserving");
+                        assigned.push(creep.name);
+                    };
+                });
+            }
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
             assigned = [];

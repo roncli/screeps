@@ -56,13 +56,9 @@ Reserve.prototype.run = function(creep) {
 Reserve.prototype.toObj = function(creep) {
     "use strict";
 
-    if (creep.room.controller) {
-        creep.memory.currentTask = {
-            type: this.type
-        };
-    } else {
-        delete creep.memory.currentTask;
-    }
+    creep.memory.currentTask = {
+        type: this.type
+    };
 };
 
 Reserve.fromObj = function(creep) {

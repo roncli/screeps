@@ -245,7 +245,7 @@ var Cache = require("cache"),
             if (!room.storage || storers.length === 0) {
                 _.forEach(creepsWithNoTask, (creep) => {
                     // Don't bother if the creep doesn't have enough energy.
-                    if (creep.carry[RESOURCE_ENERGY] < room.controller.level === 8 ? 200 : room.controller.level === 7 ? 100 : 50) {
+                    if (creep.carry[RESOURCE_ENERGY] < (room.controller.level === 8 ? 200 : room.controller.level === 7 ? 100 : 50)) {
                         return;
                     }
                     

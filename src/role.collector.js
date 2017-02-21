@@ -149,6 +149,11 @@ var Cache = require("cache"),
 
             // Check for unfilled extensions.
             _.forEach(creepsWithNoTask, (creep) => {
+                // Don't bother if the creep doesn't have enough energy.
+                if (creep.energy < room.controller.level === 8 ? 200 : room.controller.level === 7 ? 100 : 50) {
+                    return;
+                }
+                
                 _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
                     var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
                     if (energyMissing > 0) {

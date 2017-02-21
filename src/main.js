@@ -157,54 +157,57 @@ var profiler = require("screeps-profiler"),
                 Memory.stats.gclProgress = [];
             }
 
-            // Clear old memory.
-            _.forEach(Memory.creeps, (creep, name) => {
-                if (!Game.creeps[name]) {
-                    delete Memory.creeps[name];
-                }
-            });
-            _.forEach(Memory.lengthToContainer, (value, id) => {
-                if (!Game.getObjectById(id)) {
-                    delete Memory.lengthToContainer[id];
-                }
-            });
-            _.forEach(Memory.lengthToController, (value, id) => {
-                if (!Game.getObjectById(id)) {
-                    delete Memory.lengthToController[id];
-                }
-            });
-            _.forEach(Memory.lengthToStorage, (value, id) => {
-                if (!Game.getObjectById(id)) {
-                    delete Memory.lengthToStorage[id];
-                }
-            });
-            _.forEach(Memory.containerSource, (value, id) => {
-                if (!Game.getObjectById(id)) {
-                    delete Memory.containerSource[id];
-                }
-            });
-            _.forEach(Memory.dismantle, (value, room) => {
-                if (value.length === 0) {
-                    delete Memory.dismantle[room];
-                }
-            });
-            _.forEach(Memory.rooms, (value, room) => {
-                if (!value || !value.roomType) {
-                    delete Memory.rooms[room];
-                }
-            });
-            _.forEach(Memory.maxCreeps, (max, type) => {
-                _.forEach(Memory.maxCreeps[type], (value, room) => {
-                     if (Object.keys(value).length === 0) {
-                         delete max[room];
-                     }
+            // Clear old memory every 10 ticks.
+            if (Game.time % 10 === 0) {
+                _.forEach(Memory.creeps, (creep, name) => {
+                    if (!Game.creeps[name]) {
+                        delete Memory.creeps[name];
+                    }
                 });
-            });
-            _.forEach(Memory.paths, (value, id) => {
-                if (value.lastUsed <= Game.time - 500) {
-                    delete Memory.paths[id];
-                }
-            });
+                _.forEach(Memory.lengthToContainer, (value, id) => {
+                    if (!Game.getObjectById(id)) {
+                        delete Memory.lengthToContainer[id];
+                    }
+                });
+                _.forEach(Memory.lengthToController, (value, id) => {
+                    if (!Game.getObjectById(id)) {
+                        delete Memory.lengthToController[id];
+                    }
+                });
+                _.forEach(Memory.lengthToStorage, (value, id) => {
+                    if (!Game.getObjectById(id)) {
+                        delete Memory.lengthToStorage[id];
+                    }
+                });
+                _.forEach(Memory.containerSource, (value, id) => {
+                    if (!Game.getObjectById(id)) {
+                        delete Memory.containerSource[id];
+                    }
+                });
+                _.forEach(Memory.dismantle, (value, room) => {
+                    if (value.length === 0) {
+                        delete Memory.dismantle[room];
+                    }
+                });
+                _.forEach(Memory.rooms, (value, room) => {
+                    if (!value || !value.roomType) {
+                        delete Memory.rooms[room];
+                    }
+                });
+                _.forEach(Memory.maxCreeps, (max, type) => {
+                    _.forEach(Memory.maxCreeps[type], (value, room) => {
+                        if (Object.keys(value).length === 0) {
+                            delete max[room];
+                        }
+                    });
+                });
+                _.forEach(Memory.paths, (value, id) => {
+                    if (value.lastUsed <= Game.time - 500) {
+                        delete Memory.paths[id];
+                    }
+                });
+            }
+            
             delete Memory.flags;
 
             // Every generation, clear cache.

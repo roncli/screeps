@@ -393,46 +393,63 @@ Base.prototype.tasks = function(room) {
         terminalEnergy = 0,
         storageEnergy = 0,
         terminalId,
+
         workerList = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
+        workersWithEnergy = _.filter(workerList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] > 0),
+        workersWithMinerals = _.filter(workerList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)),
+        workersWithNothing = _.filter(workerList, (c) => !c.memory.currentTask && _.sum(c.carry) === 0),
+
         collectorList = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
-        workers = Utilities.creepsWithNoTask(workerList).length > 0,
-        storers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].storer || []).length > 0,
-        scientists = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].scientist || []).length > 0,
+        collectorsWithEnergy = _.filter(collectorList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] > 0),
+        collectorsWithNothing = _.filter(collectorList, (c) => !c.memory.currentTask && _.sum(c.carry) === 0),
+        
+        storerList = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [],
+        storersWithEnergy = _.filter(storerList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] > 0),
+        storersWithMinerals = _.filter(storerList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)),
+        storersWithNothing = _.filter(storerList, (c) => !c.memory.currentTask && _.sum(c.carry) === 0),
+
+        scientistList = Cache.creeps[roomName] && Cache.creeps[roomName].scientist || [],
+        scientistsWithEnergy = _.filter(scientistList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] > 0),
+        scientistsWithMinerals = _.filter(scientistList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)),
+        scientistsWithNothing = _.filter(scientistList, (c) => !c.memory.currentTask && _.sum(c.carry) === 0),
+
+        upgraderList = Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || [],
+        upgradersWithEnergy = _.filter(upgraderList, (c) => !c.memory.currentTask && c.carry[RESOURCE_ENERGY] > 0),
+        upgradersWithNothing = _.filter(upgraderList, (c) => !c.memory.currentTask && _.sum(c.carry) === 0),
+
         dismantlers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []).length > 0,
-        collectors = Utilities.creepsWithNoTask(collectorList).length > 0,
-        upgraders = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []).length > 0,
         noWorkers = Game.time % 10 === 0 && workerList.length + collectorList.length === 0,
         tasks = {
             build: {
-                tasks: workers || collectors ? TaskBuild.getTasks(room) : []
+                tasks: workersWithEnergy || collectorsWithEnergy ? TaskBuild.getTasks(room) : []
             },
             collectEnergy: {
-                tasks: workers || storers || scientists || collectors || upgraders ? TaskCollectEnergy.getTasks(room) : [],
-                storerTasks: storers ? TaskCollectEnergy.getStorerTasks(room) : []
+                tasks: workersWithNothing || storersWithNothing || scientistsWithNothing || collectorsWithNothing || upgradersWithNothing ? TaskCollectEnergy.getTasks(room) : [],
+                storerTasks: storersWithNothing ? TaskCollectEnergy.getStorerTasks(room) : []
             },
             collectMinerals: {
-                storerTasks: storers ? TaskCollectMinerals.getStorerTasks(room) : [],
-                labTasks: scientists ? TaskCollectMinerals.getLabTasks(room) : [],
-                storageTasks: scientists ? TaskCollectMinerals.getStorageTasks(room) : [],
-                terminalTasks: scientists ? TaskCollectMinerals.getTerminalTasks(room) : []
+                storerTasks: storersWithNothing ? TaskCollectMinerals.getStorerTasks(room) : [],
+                labTasks: scientistsWithNothing ? TaskCollectMinerals.getLabTasks(room) : [],
+                storageTasks: scientistsWithNothing ? TaskCollectMinerals.getStorageTasks(room) : [],
+                terminalTasks: scientistsWithNothing ? TaskCollectMinerals.getTerminalTasks(room) : []
             },
             fillEnergy: {
-                extensionTasks: workers || storers || scientists || collectors ? TaskFillEnergy.getExtensionTasks(room) : [],
-                spawnTasks: workers || storers || scientists || collectors ? TaskFillEnergy.getSpawnTasks(room) : [],
-                powerSpawnTasks: scientists ? TaskFillEnergy.getPowerSpawnTasks(room) : [],
-                towerTasks: workers || scientists || collectors ? TaskFillEnergy.getTowerTasks(room) : [],
-                storageTasks: storers || scientists || dismantlers ? TaskFillEnergy.getStorageTasks(room) : [],
+                extensionTasks: workersWithEnergy || storersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getExtensionTasks(room) : [],
+                spawnTasks: workersWithEnergy || storersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getSpawnTasks(room) : [],
+                powerSpawnTasks: scientistsWithEnergy ? TaskFillEnergy.getPowerSpawnTasks(room) : [],
+                towerTasks: workersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getTowerTasks(room) : [],
+                storageTasks: storersWithEnergy || scientistsWithEnergy || dismantlers ? TaskFillEnergy.getStorageTasks(room) : [],
                 containerTasks: dismantlers ? TaskFillEnergy.getContainerTasks(room) : [],
-                labTasks: scientists ? TaskFillEnergy.getLabTasks(room) : [],
-                linkTasks: storers ? TaskFillEnergy.getLinkTasks(room) : [],
-                nukerTasks: scientists ? TaskFillEnergy.getNukerTasks(room) : []
+                labTasks: scientistsWithEnergy ? TaskFillEnergy.getLabTasks(room) : [],
+                linkTasks: storersWithEnergy ? TaskFillEnergy.getLinkTasks(room) : [],
+                nukerTasks: scientistsWithEnergy ? TaskFillEnergy.getNukerTasks(room) : []
             },
             fillMinerals: {
-                labTasks: scientists ? TaskFillMinerals.getLabTasks(room) : [],
-                storageTasks: workers || storers || scientists || dismantlers ? TaskFillMinerals.getStorageTasks(room) : [],
-                terminalTasks: workers || storers || scientists || dismantlers ? TaskFillMinerals.getTerminalTasks(room) : [],
-                nukerTasks: scientists ? TaskFillMinerals.getNukerTasks(room) : [],
-                powerSpawnTasks: scientists ? TaskFillMinerals.getPowerSpawnTasks(room) : []
+                labTasks: scientistsWithMinerals ? TaskFillMinerals.getLabTasks(room) : [],
+                storageTasks: workersWithMinerals || storersWithMinerals || scientistsWithMinerals || dismantlers ? TaskFillMinerals.getStorageTasks(room) : [],
+                terminalTasks: workersWithMinerals || storersWithMinerals || scientistsWithMinerals || dismantlers ? TaskFillMinerals.getTerminalTasks(room) : [],
+                nukerTasks: scientistsWithMinerals ? TaskFillMinerals.getNukerTasks(room) : [],
+                powerSpawnTasks: scientistsWithMinerals ? TaskFillMinerals.getPowerSpawnTasks(room) : []
             },
             heal: {
                 tasks: TaskHeal.getTasks(room)
@@ -441,13 +458,13 @@ Base.prototype.tasks = function(room) {
                 tasks: TaskRangedAttack.getTasks(room)
             },
             repair: {
-                tasks: noWorkers || workers || collectors ? TaskRepair.getTasks(room) : [],
-                criticalTasks: noWorkers || workers || collectors ? TaskRepair.getCriticalTasks(room) : [],
+                tasks: noWorkers || workersWithEnergy || collectorsWithEnergy ? TaskRepair.getTasks(room) : [],
+                criticalTasks: noWorkers || workersWithEnergy || collectorsWithEnergy ? TaskRepair.getCriticalTasks(room) : [],
                 towerTasks: Memory.towerTasks[roomName] || Game.time % 10 === 0 ? TaskRepair.getTowerTasks(room) : []
             },
             upgradeController: {
-                tasks: workers || collectors || upgraders ? TaskUpgradeController.getTasks(room) : [],
-                criticalTasks: noWorkers || workers || collectors ? TaskUpgradeController.getCriticalTasks(room) : []
+                tasks: workersWithEnergy || collectorsWithEnergy || upgradersWithEnergy ? TaskUpgradeController.getTasks(room) : [],
+                criticalTasks: noWorkers || workersWithEnergy || collectorsWithEnergy ? TaskUpgradeController.getCriticalTasks(room) : []
             },
             dismantle: {
                 tasks: []
@@ -465,11 +482,11 @@ Base.prototype.tasks = function(room) {
         storageEnergy = room.storage.store[RESOURCE_ENERGY] || 0;
     }
 
-    if ((storers || scientists) && terminal && terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy || Cache.credits < Memory.minimumCredits)) {
+    if ((storersWithNothing || scientistsWithNothing) && terminal && terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy || Cache.credits < Memory.minimumCredits)) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
     }
 
-    if ((workers || storers || scientists) && terminal && terminalEnergy < 1000) {
+    if ((workersWithEnergy || storersWithEnergy || scientistsWithEnergy) && terminal && terminalEnergy < 1000) {
         tasks.fillEnergy.terminalTask = new TaskFillEnergy(terminalId);
     }
 

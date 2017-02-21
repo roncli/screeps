@@ -135,7 +135,7 @@ var Cache = require("cache"),
                     if (task.canAssign(creep)) {
                         creep.say("Reserving");
                         assigned.push(creep.name);
-                    };
+                    }
                 });
             }
 

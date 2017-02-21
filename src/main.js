@@ -835,7 +835,7 @@ var profiler = require("screeps-profiler"),
 
                 // Army creeps know who their friends are.
                 if (creep.memory.army && Memory.army[creep.memory.army] && creep.room.name === Memory.army[creep.memory.army].attackRoom) {
-                    creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][Game.time % 35], true)
+                    creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][Game.time % 35], true);
                 }
 
                 // Happy new million!

@@ -23,7 +23,7 @@ Dismantle.prototype.init = function(id) {
 Dismantle.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity) || creep.spawning || creep.getActiveBodyparts(WORK) === 0) {
+    if (creep.spawning || creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity || creep.spawning || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     
@@ -60,7 +60,7 @@ Dismantle.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.structure.id
-        }
+        };
     } else {
         delete creep.memory.currentTask;
     }

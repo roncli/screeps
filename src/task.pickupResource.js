@@ -24,7 +24,7 @@ Pickup.prototype.init = function(id) {
 Pickup.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || (this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50)) {
+    if (creep.spawning || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50) {
         return false;
     }
     

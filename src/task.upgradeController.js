@@ -25,7 +25,7 @@ Upgrade.prototype.init = function(room) {
 Upgrade.prototype.canAssign = function(creep) {
     "use strict";
 
-    if (creep.spawning || !creep.carry[RESOURCE_ENERGY] || (creep.memory.role !== "upgrader" && _.sum(creep.carry) != creep.carryCapacity && creep.ticksToLive >= 150 && this.controller.ticksToDowngrade >= 1000) || creep.getActiveBodyparts(WORK) === 0) {
+    if (creep.spawning || !creep.carry[RESOURCE_ENERGY] || creep.memory.role !== "upgrader" && _.sum(creep.carry) !== creep.carryCapacity && creep.ticksToLive >= 150 && this.controller.ticksToDowngrade >= 1000 || creep.getActiveBodyparts(WORK) === 0) {
         return false;
     }
     

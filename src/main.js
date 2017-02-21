@@ -79,6 +79,14 @@ var profiler = require("screeps-profiler"),
                 reset = true;
                 Cache.log.events.push("System reset.");
             }
+
+            if (Cache.credits < Memory.minimumCredits) {
+                delete Memory.buy;
+            }
+
+            if (Cache.credits >= Memory.minimumCredits * 1.5) {
+                Memory.buy = true;
+            }
             
             // Export global objects to Game.cmd for use from console.
             Game.cmd = {

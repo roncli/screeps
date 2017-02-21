@@ -11,7 +11,7 @@ var Cache = require("cache"),
             first = keys[0];
             rest = keys.slice(1);
             return _.mapValues(_.groupBy(seq, first), function (value) { 
-                return Utilities.nest(value, rest)
+                return Utilities.nest(value, rest);
             });
         },
         

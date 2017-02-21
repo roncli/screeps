@@ -207,7 +207,7 @@ var profiler = require("screeps-profiler"),
                     }
                 });
             }
-            
+
             delete Memory.flags;
 
             // Every generation, clear cache.
@@ -747,7 +747,9 @@ var profiler = require("screeps-profiler"),
                     roomMemory = Memory.rooms[roomName];
                 
                 if (Cache.roomTypes[roomName]) {
-                    Cache.roomTypes[roomName].run(room);
+                    if (Game.cpu.bucket >= 5000 || Game.time % 2 === 0) {
+                        Cache.roomTypes[roomName].run(room);
+                    }
                     if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
                         Cache.roomTypes[roomName].toObj(room);
                     }
@@ -995,7 +997,7 @@ var profiler = require("screeps-profiler"),
 
             if (Memory.visualizations) {
                 _.forEach(Game.rooms, (room) => {
-                    Drawing.sparkline(room, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Cache.log.limit})), [{key: "limit", min: Cache.log.limit * 0.5, max: Cache.log.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Cache.log.limit * 0.5, max: Cache.log.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5}]);
+                    Drawing.sparkline(room, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5}]);
                 });
             }
 

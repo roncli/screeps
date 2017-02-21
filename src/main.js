@@ -938,10 +938,6 @@ var profiler = require("screeps-profiler"),
 
                     Cache.creepTasks[creep.name].run(creep);
 
-                    // Purge current task if the creep is in a new room.
-                    if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name) {
-                        delete creep.memory.currentTask;
-                    }
                     creep.memory.lastRoom = creep.room.name;
 
                     // Only serialize if the task wasn't completed.

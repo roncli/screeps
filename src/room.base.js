@@ -428,10 +428,10 @@ Base.prototype.tasks = function(room) {
                 storerTasks: storersWithNothing ? TaskCollectEnergy.getStorerTasks(room) : []
             },
             collectMinerals: {
-                storerTasks: storersWithNothing ? TaskCollectMinerals.getStorerTasks(room) : [],
-                labTasks: scientistsWithNothing ? TaskCollectMinerals.getLabTasks(room) : [],
-                storageTasks: scientistsWithNothing ? TaskCollectMinerals.getStorageTasks(room) : [],
-                terminalTasks: scientistsWithNothing ? TaskCollectMinerals.getTerminalTasks(room) : []
+                storerTasks: storersWithNothing || storersWithMinerals ? TaskCollectMinerals.getStorerTasks(room) : [],
+                labTasks: scientistsWithNothing || scientistsWithMinerals ? TaskCollectMinerals.getLabTasks(room) : [],
+                storageTasks: scientistsWithNothing || scientistsWithMinerals ? TaskCollectMinerals.getStorageTasks(room) : [],
+                terminalTasks: scientistsWithNothing || scientistsWithMinerals ? TaskCollectMinerals.getTerminalTasks(room) : []
             },
             fillEnergy: {
                 extensionTasks: workersWithEnergy || storersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getExtensionTasks(room) : [],

@@ -1,0 +1,1 @@
+var Profiler=require("screeps-profiler"),Proxy={run:function(a,b){Profiler.registerFN(b,"Proxy."+a)()}};Profiler.registerObject(Proxy,"Proxy");module.exports=Proxy;

@@ -1,0 +1,9 @@
+{
+    "name": "screeps-closure",
+    "description": "Screeps Closure",
+    "author": "roncli",
+    "version": "1.0.0",
+    "dependencies": {
+        "google-closure-compiler-js": "20170124.0.0"
+    }
+}

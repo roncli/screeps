@@ -1,0 +1,1 @@
+var Cache=require("cache"),Task=function(){};Task.prototype.assign=function(a){Cache.creepTasks[a.name]=this;this.toObj(a)};Task.prototype.complete=function(a){delete a.memory.currentTask};require("screeps-profiler").registerObject(Task,"Task");module.exports=Task;

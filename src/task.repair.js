@@ -50,12 +50,12 @@ Repair.prototype.run = function(creep) {
     
     // Move to the structure and repair it.
     Pathing.moveTo(creep, structure, Math.max(Math.min(creep.pos.getRangeTo(structure) - 1, 3), 1));
-    creep.repair(structure);
-    
-    // If we can repair the structure completely, then complete the task.
-    if (Math.min(creep.getActiveBodyparts(WORK), creep.carry[RESOURCE_ENERGY]) * 100 >= structure.hitsMax - structure.hits) {
-        Task.prototype.complete.call(this, creep);
-        return;
+    if (creep.repair(structure) === OK) {
+        // If we can repair the structure completely, then complete the task.
+        if (Math.min(creep.getActiveBodyparts(WORK), creep.carry[RESOURCE_ENERGY]) * 100 >= structure.hitsMax - structure.hits) {
+            Task.prototype.complete.call(this, creep);
+            return;
+        }
     }
 };
 

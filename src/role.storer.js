@@ -309,7 +309,7 @@ var Cache = require("cache"),
                     if (task.canAssign(creep)) {
                         creep.say("Collecting");
                         assigned.push(creep.name);
-                        if (task.object instanceof StructureStorage) {
+                        if (task.object.structureType === STRUCTURE_STORAGE) {
                             creep.memory.lastCollectEnergyWasStorage = true;
                         }
                     }

@@ -30,7 +30,7 @@ FillEnergy.prototype.canAssign = function(creep) {
         return false;
     }
 
-    if (this.object instanceof StructureExtension) {
+    if (this.object.structureType === STRUCTURE_EXTENSION) {
         switch (this.object.room.controller.level) {
             case 7:
                 minEnergy = 100;

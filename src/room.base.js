@@ -77,8 +77,8 @@ Base.prototype.manage = function(room) {
                 y = location.y;
 
             if (
-                _.filter(structures, (s) => s instanceof StructureContainer).length === 0 &&
-                _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s instanceof StructureContainer).length === 0
+                _.filter(structures, (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
+                _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_CONTAINER).length === 0
             ) {
                 // Destroy roads and walls at this location.
                 _.forEach(_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
@@ -109,8 +109,8 @@ Base.prototype.manage = function(room) {
                 mineralY = mineralPos.y;
             
             if (
-                _.filter(mineralPos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureExtractor).length === 0 &&
-                _.filter(sites, (s) => s.pos.x === mineralX && s.pos.y === mineralY && s instanceof StructureExtractor).length === 0
+                _.filter(mineralPos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTRACTOR).length === 0 &&
+                _.filter(sites, (s) => s.pos.x === mineralX && s.pos.y === mineralY && s.structureType === STRUCTURE_EXTRACTOR).length === 0
             ) {
                 room.createConstructionSite(mineralX, mineralY, STRUCTURE_EXTRACTOR);
             }
@@ -126,8 +126,8 @@ Base.prototype.manage = function(room) {
                 y = location.y;
 
             if (
-                _.filter(structures, (s) => s instanceof StructureContainer).length === 0 &&
-                _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s instanceof StructureContainer).length === 0
+                _.filter(structures, (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
+                _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_CONTAINER).length === 0
             ) {
                 // Destroy roads and walls at this location.
                 _.forEach(_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
@@ -142,7 +142,7 @@ Base.prototype.manage = function(room) {
 
     // At RCL3, build roads around our structures.
     if (rcl >= 3) {
-        _.forEach(_.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureSpawn || s instanceof StructureExtension || s instanceof StructureTower || s instanceof StructureStorage || s instanceof StructureTerminal), (structure) => {
+        _.forEach(_.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_TOWER || s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_TERMINAL), (structure) => {
             var structureX = structure.pos.x,
                 structureY = structure.pos.y;
                 
@@ -151,8 +151,8 @@ Base.prototype.manage = function(room) {
                     y = pos.y;
                 
                 if (
-                    _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureRoad).length === 0 &&
-                    _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s instanceof StructureRoad).length === 0
+                    _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD).length === 0 &&
+                    _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_ROAD).length === 0
                 ) {
                     room.createConstructionSite(x, y, STRUCTURE_ROAD);
                 }
@@ -708,7 +708,7 @@ Base.prototype.run = function(room) {
     tasks = this.tasks(room);
 
     // Spawn new creeps.
-    this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure instanceof StructureWall || t.structure instanceof StructureRampart) && t.structure.hits < 1000000).length > 0);
+    this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
 
     // Assign tasks to creeps and towers.
     this.assignTasks(room, tasks);

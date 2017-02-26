@@ -41,12 +41,12 @@ FillMinerals.prototype.canAssign = function(creep) {
     }
 
     // Can't assign if the target structure is a nuker and it is full of ghodium.
-    if (this.object instanceof StructureNuker && this.object.ghodium === this.object.ghodiumCapacity) {
+    if (this.object.structureType === STRUCTURE_NUKER && this.object.ghodium === this.object.ghodiumCapacity) {
         return false;
     }
 
     // Can't assign if the target structure is a power spawn and it is full of power.
-    if (this.object instanceof StructurePowerSpawn && this.object.power === this.object.powerCapacity) {
+    if (this.object.structureType === STRUCTURE_POWER_SPAWN && this.object.power === this.object.powerCapacity) {
         return false;
     }
     

@@ -80,7 +80,7 @@ var Cache = require("cache"),
                     break;
                 case "attack":
                     if (armyAttackRoom) {
-                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart) && !(s instanceof StructureKeeperLair)).length === 0 && hostileConstructionSites.length === 0) {
+                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
                             army.success = true;
                         }
                     }

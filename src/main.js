@@ -465,7 +465,7 @@ var profiler = require("screeps-profiler"),
                 repairableStructuresInRoom = Cache.repairableStructuresInRoom(room);
                 if (!matrix.status) {
                     costMatrix = new PathFinder.CostMatrix();
-                    _.forEach(_.filter(repairableStructuresInRoom, (s) => !(s instanceof StructureRoad)), (structure) => {
+                    _.forEach(_.filter(repairableStructuresInRoom, (s) => !(s.structureType === STRUCTURE_ROAD)), (structure) => {
                         costMatrix.set(structure.pos.x, structure.pos.y, 255);
                     });
                     matrix.tempMatrix = costMatrix.serialize();
@@ -502,7 +502,7 @@ var profiler = require("screeps-profiler"),
                     }
                     
                     // Set ramparts back to 0.
-                    _.forEach(_.filter(repairableStructuresInRoom, (s) => s instanceof StructureRampart), (structure) => {
+                    _.forEach(_.filter(repairableStructuresInRoom, (s) => s.structureType === STRUCTURE_RAMPART), (structure) => {
                         costMatrix.set(structure.pos.x, structure.pos.y, 0);
                     });
                     
@@ -663,7 +663,7 @@ var profiler = require("screeps-profiler"),
                     }
                     
                     if (Game.time % 10 === 0) {
-                        Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s instanceof StructureWall || s instanceof StructureRampart), (s) => s.hits));
+                        Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits));
                     } else {
                         Cache.log.rooms[roomName].lowestWall = Memory.console && Memory.console.rooms && Memory.console.rooms[roomName] && Memory.console.rooms[roomName].lowestWall || null;
                     }
@@ -811,7 +811,7 @@ var profiler = require("screeps-profiler"),
                 };
 
                 if (Game.rooms[value.attackRoom]) {
-                    Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart) && !(s instanceof StructureKeeperLair)).length;
+                    Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
                     Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
                 }
 
@@ -964,7 +964,7 @@ var profiler = require("screeps-profiler"),
 
                     // If the creep has a work part, try to repair any road that may be under it.
                     if (creep.carry[RESOURCE_ENERGY] > 0 && creep.getActiveBodyparts(WORK) > 0) {
-                        _.forEach(_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s instanceof StructureRoad && s.hits < s.hitsMax), (structure) => {
+                        _.forEach(_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax), (structure) => {
                             creep.repair(structure);
                         });
                     }

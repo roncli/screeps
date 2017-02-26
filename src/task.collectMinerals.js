@@ -33,11 +33,11 @@ CollectMinerals.prototype.canAssign = function(creep) {
     }
     
     if (this.resource && this.amount) {
-        if (obj instanceof StructureLab && obj.mineralType !== this.resource && obj.mineralAmount < this.amount) {
+        if (obj.structureType === STRUCTURE_LAB && obj.mineralType !== this.resource && obj.mineralAmount < this.amount) {
             return false;
         }
 
-        if (!(obj instanceof StructureLab) && (obj.store[this.resource] || 0) < this.amount) {
+        if (!(obj.structureType === STRUCTURE_LAB) && (obj.store[this.resource] || 0) < this.amount) {
             return false;
         }
     }
@@ -71,7 +71,7 @@ CollectMinerals.prototype.run = function(creep) {
     }
 
     // Get the resource we're going to use.
-    if (obj instanceof StructureLab) {
+    if (obj.structureType === STRUCTURE_LAB) {
         // Lab is empty, complete task.
         if (obj.mineralType === null) {
             Task.prototype.complete.call(this, creep);
@@ -138,7 +138,7 @@ CollectMinerals.getStorerTasks = function(room) {
 CollectMinerals.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(_.filter(structures, (s) => (s.store || s instanceof StructureLab) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0)).sort((a, b) => (a instanceof StructureLab ? a.mineralAmount : _.sum(a.store) - a.store[RESOURCE_ENERGY]) - (b instanceof StructureLab ? b.mineralAmount : _.sum(b.store) - b.store[RESOURCE_ENERGY])), (s) => new CollectMinerals(s.id));
+    return _.map(_.filter(structures, (s) => (s.store || s.structureType === STRUCTURE_LAB) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0)).sort((a, b) => (a.structureType === STRUCTURE_LAB ? a.mineralAmount : _.sum(a.store) - a.store[RESOURCE_ENERGY]) - (b.structureType === STRUCTURE_LAB ? b.mineralAmount : _.sum(b.store) - b.store[RESOURCE_ENERGY])), (s) => new CollectMinerals(s.id));
 };
 
 CollectMinerals.getLabTasks = function(room) {

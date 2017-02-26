@@ -244,7 +244,7 @@ var Cache = require("cache"),
                     }
 
                     if (attackRoom) {
-                        structures = _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s instanceof StructureController) && !(s instanceof StructureRampart) && !(s instanceof StructureKeeperLair));
+                        structures = _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR));
 
                         // Dismantle towers, spawns, and any remaining structures.
                         if (structures.length > 0) {

@@ -82,63 +82,63 @@ var creepsInArmy = {},
         spawnsInRoom: (room) => {
             "use strict";
     
-            return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureSpawn);
+            return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
         },
 
         // Returns all power spawns in the current room.
         powerSpawnsInRoom: (room) => {
             "use strict";
 
-            return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructurePowerSpawn);
+            return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
         },
         
         // Returns all extentions in the current room.
         extensionsInRoom: (room) => {
             "use strict";
     
-            return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureExtension);
+            return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
         },
     
         // Returns all towers in the current room.
         towersInRoom: (room) => {
             "use strict";
     
-            return towersInRoom[room.name] ? towersInRoom[room.name] : towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureTower);
+            return towersInRoom[room.name] ? towersInRoom[room.name] : towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
         },
     
         // Returns all labs in the current room.
         labsInRoom: (room) => {
             "use strict";
     
-            return labsInRoom[room.name] ? labsInRoom[room.name] : labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureLab);
+            return labsInRoom[room.name] ? labsInRoom[room.name] : labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
         },
 
         // Returns all nukers in the current room.
         nukersInRoom: (room) => {
             "use strict";
 
-            return nukersInRoom[room.name] ? nukersInRoom[room.name] : nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s instanceof StructureNuker);
+            return nukersInRoom[room.name] ? nukersInRoom[room.name] : nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
         },
     
         // Returns all containers in the current room.
         containersInRoom: (room) => {
             "use strict";
     
-            return containersInRoom[room.name] ? containersInRoom[room.name] : containersInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s instanceof StructureContainer);
+            return containersInRoom[room.name] ? containersInRoom[room.name] : containersInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
         },
     
         // Returns all links in the current room.
         linksInRoom: (room) => {
             "use strict";
     
-            return linksInRoom[room.name] ? linksInRoom[room.name] : linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s instanceof StructureLink});
+            return linksInRoom[room.name] ? linksInRoom[room.name] : linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
         },
     
         // Returns all repairable structures in the current room.
         repairableStructuresInRoom: (room) => {
             "use strict";
     
-            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s instanceof StructureWall || s instanceof StructureRoad || s instanceof StructureContainer) && s.hits});
+            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
         },
         
         sortedRepairableStructuresInRoom: (room) => {
@@ -151,14 +151,14 @@ var creepsInArmy = {},
         extractorsInRoom: (room) => {
             "use strict";
     
-            return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s instanceof StructureExtractor});
+            return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
         },
         
         // Returns all portals in the current room.
         portalsInRoom: (room) => {
             "use strict";
             
-            return portalsInRoom[room.name] ? portalsInRoom[room.name] : portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s instanceof StructurePortal});
+            return portalsInRoom[room.name] ? portalsInRoom[room.name] : portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
         },
     
         // Return all hostile creeps in the current room.
@@ -193,7 +193,7 @@ var creepsInArmy = {},
         sourceKeepersInRoom: (room) => {
             "use strict";
 
-            return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s instanceof StructureKeeperLair});
+            return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
         },
     
         // Get the cost matrix for a room.
@@ -211,11 +211,11 @@ var creepsInArmy = {},
     
                 _.forEach(room.find(FIND_STRUCTURES), (structure) => {
                     var pos = structure.pos;
-                    if (structure instanceof StructureRoad) {
+                    if (structure.structureType === STRUCTURE_ROAD) {
                         matrix.set(pos.x, pos.y, 1);
-                    } else if (structure instanceof StructureContainer) {
+                    } else if (structure.structureType === STRUCTURE_CONTAINER) {
                         matrix.set(pos.x, pos.y, 10);
-                    } else if (!(structure instanceof StructureRampart) || !structure.my) {
+                    } else if (!(structure.structureType === STRUCTURE_RAMPART) || !structure.my) {
                         matrix.set(pos.x, pos.y, 255);
                     }
                 });

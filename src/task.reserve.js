@@ -25,7 +25,7 @@ Reserve.prototype.canAssign = function(creep) {
         return false;
     }
 
-    if (!Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
+    if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
         return false;
     }
 
@@ -40,7 +40,7 @@ Reserve.prototype.run = function(creep) {
     creep.say(["You", "spin", "me", "right", "round", "baby", "right", "round", "like a", "record", "baby", "right", "round", "round", "round", ""][Game.time % 16], true);
 
     // If no controller, or controller is mine, or no CLAIM parts, bail.
-    if (!Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
+    if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
         Task.prototype.complete.call(this, creep);
         return;
     }
@@ -78,7 +78,7 @@ Reserve.getTask = function(creep) {
 Reserve.getRemoteTask = function(creep) {
     "use strict";
 
-    if (Game.rooms[creep.memory.home].controller) {
+    if (Game.rooms[creep.memory.home] && Game.rooms[creep.memory.home].controller) {
         return new Reserve();
     }
 };

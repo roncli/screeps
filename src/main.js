@@ -786,14 +786,6 @@ var profiler = require("screeps-profiler"),
                 return;
             }
 
-            visual.text("GCL " + Game.gcl.level, -0.5, 0.1, {align: "left"});
-            Drawing.progressBar(visual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
-            // CPU is in the finalize() function.
-            Drawing.progressBar(visual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff"});
-            visual.text("Tick " + Game.time, 49.5, 0.1, {align: "right"});
-            visual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.8, {align: "left"});
-            visual.text(Cache.time, 49.5, 0.8, {align: "right"});
-
             if (room.memory && room.memory.roomType) {
                 visual.text(_.capitalize(room.memory.roomType.type), -0.5, 49.4, {align: "left"});
             }
@@ -992,7 +984,7 @@ var profiler = require("screeps-profiler"),
         },
 
         finalize: () => {
-            var globalVisual = new RoomVisual();
+            var visual = new RoomVisual();
 
             Cache.log.tick = Game.time;
             Cache.log.date = new Date();
@@ -1003,6 +995,13 @@ var profiler = require("screeps-profiler"),
             Cache.log.tickLimit = Game.cpu.tickLimit;
             Cache.log.bucket = Game.cpu.bucket;
             Cache.log.credits = Game.market.credits;
+
+            visual.text("GCL " + Game.gcl.level, -0.5, 0.1, {align: "left"});
+            Drawing.progressBar(visual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff"});
+            Drawing.progressBar(visual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff"});
+            visual.text("Tick " + Game.time, 49.5, 0.1, {align: "right"});
+            visual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.8, {align: "left"});
+            visual.text(Cache.time, 49.5, 0.8, {align: "right"});
 
             Memory.stats.cpu.push(Game.cpu.getUsed());
             while (Memory.stats.cpu.length > 100) {
@@ -1018,7 +1017,7 @@ var profiler = require("screeps-profiler"),
             }
 
             if (Memory.visualizations) {
-                Drawing.sparkline(globalVisual, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5}]);
+                Drawing.sparkline(visual, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5}]);
             }
 
             Cache.log.cpuUsed = Game.cpu.getUsed();
@@ -1026,7 +1025,7 @@ var profiler = require("screeps-profiler"),
             Memory.console = Cache.log;
 
             if (Memory.visualizations) {
-                Drawing.progressBar(globalVisual, 23.5, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff"});
+                Drawing.progressBar(visual, 23.5, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff"});
             }
         }
     };

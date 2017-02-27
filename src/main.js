@@ -787,11 +787,11 @@ var profiler = require("screeps-profiler"),
             }
 
             if (room.memory && room.memory.roomType) {
-                visual.text(_.capitalize(room.memory.roomType.type), -0.5, 49.4, {align: "left", font: "0.5 Arial"});
+                visual.text(_.capitalize(room.memory.roomType.type), -0.5, 49.325, {align: "left", font: "0.5 Arial"});
             }
 
             if (room.controller && room.controller.level) {
-                visual.text("RCL " + room.controller.level, 2.5, 49.4, {align: "left", font: "0.5 Arial"});
+                visual.text("RCL " + room.controller.level, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
                 if (room.controller.progress && room.controller.progressTotal) {
                     Drawing.progressBar(visual, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 }
@@ -999,12 +999,12 @@ var profiler = require("screeps-profiler"),
             if (Memory.visualizations) {
                 visual = new RoomVisual();
 
-                visual.text("GCL " + Game.gcl.level, -0.5, 0.1, {align: "left", font: "0.5 Arial"});
+                visual.text("GCL " + Game.gcl.level, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
                 Drawing.progressBar(visual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 Drawing.progressBar(visual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
-                visual.text("Tick " + Game.time, 49.5, 0.1, {align: "right", font: "0.5 Arial"});
-                visual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.8, {align: "left", font: "0.5 Arial"});
-                visual.text(Cache.time, 49.5, 0.8, {align: "right", font: "0.5 Arial"});
+                visual.text("Tick " + Game.time, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
+                visual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
+                visual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
             }
             
             Memory.stats.cpu.push(Game.cpu.getUsed());

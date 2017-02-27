@@ -9,7 +9,7 @@ var Drawing = {
         visual
             .rect(x, y, w, h, {fill: options.background})
             .rect(x, y, w * Math.min(value / max, 1), h, {fill: options.bar})
-            .text((options.label ? options.label + " " : "") + value.toFixed(options.valueDecimals) + (options.showMax ? "/" + max.toFixed(0) : "") + (options.showDetails ? " (" + (100 * value / max).toFixed(3) + "%) " + (max - value).toFixed(0) + " to go" : ""), x + w / 2, y + h / 2 + 0.25, {align: "center", color: options.color, font: options.font});
+            .text((options.label ? options.label + " " : "") + value.toFixed(options.valueDecimals) + (options.showMax ? "/" + max.toFixed(0) : "") + (options.showDetails ? " (" + (100 * value / max).toFixed(3) + "%) " + (max - value).toFixed(0) + " to go" : ""), x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
     },
 
     sparkline: (visual, x, y, w, h, values, options) => {
@@ -27,43 +27,51 @@ var Drawing = {
                 visual.circle(x, y, {radius: 0.625 * size / 2, fill: "#FF1930", opacity: style.opacity});
                 break;
             case RESOURCE_HYDROGEN:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#B4B4B4", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#4C4C4C", opacity: style.opacity});
-                visual.text("H", x, y + 0.225 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#B4B4B4", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#4C4C4C", opacity: style.opacity})
+                    .text("H", x, y + 0.175 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_OXYGEN:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#B4B4B4", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#4C4C4C", opacity: style.opacity});
-                visual.text("O", x, y + 0.225 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#B4B4B4", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#4C4C4C", opacity: style.opacity})
+                    .text("O", x, y + 0.175 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#50D7F9", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#006181", opacity: style.opacity});
-                visual.text("U", x, y + 0.225 * size, {color: "#50D7F9", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#50D7F9", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#006181", opacity: style.opacity})
+                    .text("U", x, y + 0.175 * size, {color: "#50D7F9", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#A071FF", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#371383", opacity: style.opacity});
-                visual.text("K", x, y + 0.225 * size, {color: "#A071FF", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#A071FF", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#371383", opacity: style.opacity})
+                    .text("K", x, y + 0.175 * size, {color: "#A071FF", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#00F4A2", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#236144", opacity: style.opacity});
-                visual.text("L", x, y + 0.225 * size, {color: "#00F4A2", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#00F4A2", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#236144", opacity: style.opacity})
+                    .text("L", x, y + 0.175 * size, {color: "#00F4A2", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#FDD388", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#5D4C2E", opacity: style.opacity});
-                visual.text("Z", x, y + 0.225 * size, {color: "#FDD388", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#FDD388", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#5D4C2E", opacity: style.opacity})
+                    .text("Z", x, y + 0.175 * size, {color: "#FDD388", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYST:
-                visual.circle(x, y, {radius: 0.4375 * size, fill: "#FF7B7B", opacity: style.opacity});
-                visual.circle(x, y, {radius: 0.375 * size, fill: "#592121", opacity: style.opacity});
-                visual.text("X", x, y + 0.225 * size, {color: "#FF7B7B", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .circle(x, y, {radius: 0.4375 * size, fill: "#FF7B7B", opacity: style.opacity})
+                    .circle(x, y, {radius: 0.375 * size, fill: "#592121", opacity: style.opacity})
+                    .text("X", x, y + 0.175 * size, {color: "#FF7B7B", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_HYDROXIDE:
-                visual.rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity});
-                visual.text("OH", x + 0.1875 * size, y + 0.225 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity})
+                    .text("OH", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_KEANITE:
                 break;

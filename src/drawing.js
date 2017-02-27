@@ -1,5 +1,5 @@
 var Drawing = {
-    progressBar: (room, x, y, w, h, value, max, options) => {
+    progressBar: (visual, x, y, w, h, value, max, options) => {
         if (options.showMax === undefined) {
             options.showMax = true;
         }
@@ -18,7 +18,7 @@ var Drawing = {
         });
     },
 
-    resource: (room, x, y, size, resource, style) => {
+    resource: (visual, x, y, size, resource, style) => {
         switch (resource) {
             case RESOURCE_ENERGY:
                 visual.circle(x, y, {radius: 0.625 * size / 2, fill: "#FFE664", opacity: style.opacity});

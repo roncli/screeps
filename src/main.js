@@ -772,10 +772,6 @@ var profiler = require("screeps-profiler"),
         drawRoom: (room) => {
             var visual;
 
-            if (!room.visual) {
-                visual = 
-            }
-
             if (!Memory.visualizations) {
                 return;
             }

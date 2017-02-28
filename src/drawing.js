@@ -87,7 +87,7 @@ var Drawing = {
             case RESOURCE_GHODIUM:
                 visual
                     .rect(x - size / 2, y - size / 2, size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text(resource, x + 0.175 * size, y + 0.2 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.2 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_HYDRIDE:
                 visual

@@ -868,8 +868,8 @@ var profiler = require("screeps-profiler"),
                     }
 
                     y += 0.7;
-                    visual.text(amount, 2.5, y, {align: "right", font: "0.5 Arial"});
-                    Drawing.resource(visual, 2.8, y - 0.175, 0.5, resource, {opacity: 1});
+                    visual.text(amount, 1, y, {align: "right", font: "0.5 Arial"});
+                    Drawing.resource(visual, 1.3, y - 0.175, 0.5, resource, {opacity: 1});
                 });
             }
 
@@ -882,8 +882,8 @@ var profiler = require("screeps-profiler"),
                     }
 
                     y += 0.7;
-                    visual.text(amount, 2.5, y, {align: "right", font: "0.5 Arial"});
-                    Drawing.resource(visual, 2.8, y - 0.175, 0.5, resource, {opacity: 1});
+                    visual.text(amount, 1, y, {align: "right", font: "0.5 Arial"});
+                    Drawing.resource(visual, 1.3, y - 0.175, 0.5, resource, {opacity: 1});
                 });
             }
         },

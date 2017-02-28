@@ -845,6 +845,7 @@ var profiler = require("screeps-profiler"),
             }
 
             if (labs.length > 0) {
+                y += 0.7;
                 visual.text("Labs", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
                 x = 0.5;
                 _.forEach(labs, (lab) => {

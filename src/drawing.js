@@ -75,30 +75,69 @@ var Drawing = {
                     .text("OH", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_KEANITE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity})
+                    .text("ZK", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_LEMERGITE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity})
+                    .text("UL", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM:
+                visual
+                    .rect(x - size / 2, y - size / 2, size, size, {fill: "#FFFFFF", opacity: style.opacity})
+                    .text("G", x + 0.175 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_HYDRIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#50D7F9", opacity: style.opacity})
+                    .text("UH", x + 0.1875 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_OXIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#50D7F9", opacity: style.opacity})
+                    .text("UO", x + 0.1875 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM_HYDRIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#A071FF", opacity: style.opacity})
+                    .text("KH", x + 0.1875 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM_OXIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#A071FF", opacity: style.opacity})
+                    .text("KO", x + 0.1875 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM_HYDRIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#00F4A2", opacity: style.opacity})
+                    .text("LH", x + 0.1875 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM_OXIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#00F4A2", opacity: style.opacity})
+                    .text("LO", x + 0.1875 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_HYDRIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FDD388", opacity: style.opacity})
+                    .text("ZH", x + 0.1875 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_OXIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FDD388", opacity: style.opacity})
+                    .text("ZO", x + 0.1875 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM_HYDRIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
+                    .text("GH", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM_OXIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
+                    .text("GO", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_ACID:
                 break;

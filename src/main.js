@@ -849,7 +849,7 @@ var profiler = require("screeps-profiler"),
                 visual.text("Labs", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
                 x = 0.5;
                 _.forEach(labs, (lab) => {
-                    x += 2;
+                    x += 2.5;
                     if (lab.mineralAmount === 0) {
                         visual.text("Empty", x, y, {align: "right", font: "0.5 Arial"});
                     } else {

@@ -772,7 +772,7 @@ var profiler = require("screeps-profiler"),
 
         drawRoom: (room) => {
             var visual = room.visual,
-                y, towers, labs, nukers, powerSpawns;
+                x, y, towers, labs, nukers, powerSpawns;
 
             if (!visual) {
                 visual = new RoomVisual(room.name);
@@ -828,6 +828,34 @@ var profiler = require("screeps-profiler"),
                 visual.text("Power Spawn", -0.5, y, {align: "left", font: "0.5 Arial"});
                 Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.energy)), _.sum(_.map(powerSpawns, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
                 Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.power)), _.sum(_.map(powerSpawns, (t) => t.powerCapacity)), {background: "#808080", bar: "#ff0000", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+            }
+
+            if (room.memory && room.memory.buyQueue) {
+                y += 0.7;
+                visual.text("Buy", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+                visual.text(room.memory.buyQueue.amount, 2.5, y, {align: "right", font: "bold 0.5 Arial"});
+                Drawing.resource(visual, 2.5, y - 0.175, 0.5, room.memory.buyQueue.resource, {opacity: 1});
+            }
+
+            if (room.memory && room.memory.labQueue) {
+                y += 0.7;
+                visual.text("Create", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+                visual.text(room.memory.labQueue.amount, 2.5, y, {align: "right", font: "bold 0.5 Arial"});
+                Drawing.resource(visual, 2.5, y - 0.175, 0.5, room.memory.labQueue.resource, {opacity: 1});
+            }
+
+            if (labs.length > 0) {
+                visual.text("Labs", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+                x = 0.5;
+                _.forEach(labs, (lab) => {
+                    x += 2;
+                    if (lab.mineralAmount === 0) {
+                        visual.text("Empty", x, y, {align: "right", font: "bold 0.5 Arial"});
+                    } else {
+                        visual.text(lab.mineralAmount, x, y, {align: "right", font: "bold 0.5 Arial"});
+                        Drawing.resource(visual, x, y - 0.175, 0.5, lab.mineralType, {opacity: 1});
+                    }
+                });
             }
         },
 

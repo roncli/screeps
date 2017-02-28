@@ -59,6 +59,9 @@ var creepsInArmy = {},
             
             Cache.credits = Game.market.credits;
             if (Memory.visualizations) {
+                Cache.globalVisual = new RoomVisual();
+            }
+            if (Memory.visualizations) {
                 Cache.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
             }
         },

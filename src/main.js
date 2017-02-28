@@ -63,6 +63,7 @@ var profiler = require("screeps-profiler"),
                 main.army();
                 main.creeps();
                 main.finalize();
+                main.drawGlobal();
             });
         },
 
@@ -984,8 +985,6 @@ var profiler = require("screeps-profiler"),
         },
 
         finalize: () => {
-            var visual;
-
             Cache.log.tick = Game.time;
             Cache.log.date = new Date();
             Cache.log.gcl = Game.gcl.level;
@@ -995,18 +994,12 @@ var profiler = require("screeps-profiler"),
             Cache.log.tickLimit = Game.cpu.tickLimit;
             Cache.log.bucket = Game.cpu.bucket;
             Cache.log.credits = Game.market.credits;
+        },
 
-            if (Memory.visualizations) {
-                visual = new RoomVisual();
+        drawGlobal: () => {
+            var y;
 
-                visual.text("GCL " + Game.gcl.level, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
-                visual.text("Tick " + Game.time, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
-                visual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
-                visual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
-            }
-            
+            // Stat logging for graphs
             Memory.stats.cpu.push(Game.cpu.getUsed());
             while (Memory.stats.cpu.length > 100) {
                 Memory.stats.cpu.shift();
@@ -1020,17 +1013,53 @@ var profiler = require("screeps-profiler"),
                 Memory.stats.gclProgress.shift();
             }
 
+
             if (Memory.visualizations) {
-                Drawing.sparkline(visual, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
+                // GCL & Progress
+                Cache.globalVisual.text("GCL " + Game.gcl.level, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
+                Drawing.progressBar(Cache.globalVisual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
+                
+                // Bucket
+                Drawing.progressBar(Cache.globalVisual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
+
+                // Time
+                Cache.globalVisual.text("Tick " + Game.time, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
+                Cache.globalVisual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
+
+                // Credits
+                Cache.globalVisual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
+            
+                // Graphs
+                Drawing.sparkline(Cache.globalVisual, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
+
+                // Energy
+                y = 0.725;
+                _.forEach(_.filter(Game.rooms, (r) => !r.unobservable && r.memory.roomType && r.memory.roomType.type === "base"), (room) => {
+                    y += 0.7;
+
+                    Cache.globalVisual.text(room.name, 43.5, y, {align: "right", font: "bold 0.5 Arial"});
+                    if (room.storage) {
+                        Cache.globalVisual.text(room.storage.store[RESOURCE_ENERGY], 45.8, y, {align: "right", font: "0.5 Arial"});
+                        Drawing.resource(Cache.globalVisual, 45.8, y, 1, RESOURCE_ENERGY, {opacity: 1});
+                    }
+                    if (room.terminal) {
+                        Cache.globalVisual.text(room.terminal.store[RESOURCE_ENERGY], 48.8, y, {align: "right", font: "0.5 Arial"});
+                        Drawing.resource(Cache.globalVisual, 48.8, y, 1, RESOURCE_ENERGY, {opacity: 1});
+                    }
+                });
             }
 
+            // Update CPU
             Cache.log.cpuUsed = Game.cpu.getUsed();
             Memory.stats.cpu[Memory.stats.cpu.length - 1] = Cache.log.cpuUsed;
             Memory.console = Cache.log;
 
-            if (Memory.visualizations) {
-                Drawing.progressBar(visual, 23.5, -0.4, 10, 0.5, Cache.log.cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
+            // CPU
+            if (Memory.Cache.globalVisualizations) {
+                Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
             }
+
+
         }
     };
 

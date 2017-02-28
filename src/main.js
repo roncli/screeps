@@ -847,7 +847,7 @@ var profiler = require("screeps-profiler"),
             if (labs.length > 0) {
                 y += 0.7;
                 visual.text("Labs", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                x = 0.5;
+                x = 0;
                 _.forEach(labs, (lab) => {
                     x += 2.5;
                     if (lab.mineralAmount === 0) {
@@ -856,6 +856,34 @@ var profiler = require("screeps-profiler"),
                         visual.text(lab.mineralAmount, x, y, {align: "right", font: "0.5 Arial"});
                         Drawing.resource(visual, x + 0.3, y - 0.175, 0.5, lab.mineralType, {opacity: 1});
                     }
+                });
+            }
+
+            if (room.storage) {
+                y += 1.4;
+                visual.text("Storage", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+                _.forEach(room.storage.store, (amount, resource) => {
+                    if (resource === RESOURCE_ENERGY) {
+                        return;
+                    }
+
+                    y += 0.7;
+                    visual.text(amount, 2.5, y, {align: "right", font: "0.5 Arial"});
+                    Drawing.resource(visual, 2.8, y - 0.175, 0.5, resource, {opacity: 1});
+                });
+            }
+
+            if (room.storage) {
+                y += 1.4;
+                visual.text("Terminal", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+                _.forEach(room.terminal.store, (amount, resource) => {
+                    if (resource === RESOURCE_ENERGY) {
+                        return;
+                    }
+
+                    y += 0.7;
+                    visual.text(amount, 2.5, y, {align: "right", font: "0.5 Arial"});
+                    Drawing.resource(visual, 2.8, y - 0.175, 0.5, resource, {opacity: 1});
                 });
             }
         },

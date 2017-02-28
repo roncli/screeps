@@ -7,7 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (armyName, portals) => {
             "use strict";
 
-            var count = _.filter(Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
                 max = Memory.army[armyName].dismantler.maxCreeps;
 
             if (count < max) {

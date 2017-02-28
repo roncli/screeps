@@ -13,6 +13,7 @@ var Drawing = {
     },
 
     sparkline: (visual, x, y, w, h, values, options) => {
+        visual.rect(x, y, w, h, {fill: "#404040", opacity: 0.5});
         _.forEach(options, (option) => {
             visual.poly(_.map(values, (v, i) => [x + w * (i / (values.length - 1)), y + h * (1 - (v[option.key] - option.min) / (option.max - option.min))]), option);
         });

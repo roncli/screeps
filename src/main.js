@@ -1004,15 +1004,14 @@ var profiler = require("screeps-profiler"),
             while (Memory.stats.cpu.length > 100) {
                 Memory.stats.cpu.shift();
             }
-            Memory.stats.bucket.push(Cache.log.bucket);
+            Memory.stats.bucket.push(Game.cpu.bucket);
             while (Memory.stats.bucket.length > 100) {
                 Memory.stats.bucket.shift();
             }
-            Memory.stats.gclProgress.push(Cache.log.progress);
+            Memory.stats.gclProgress.push(Game.gcl.progress);
             while (Memory.stats.gclProgress.length > 100) {
                 Memory.stats.gclProgress.shift();
             }
-
 
             if (Memory.visualizations) {
                 // GCL & Progress
@@ -1030,7 +1029,7 @@ var profiler = require("screeps-profiler"),
                 Cache.globalVisual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
             
                 // Graphs
-                Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
+                Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
 
                 // Energy
                 y = 0.725;
@@ -1051,7 +1050,7 @@ var profiler = require("screeps-profiler"),
 
             // Update CPU
             Cache.log.cpuUsed = Game.cpu.getUsed();
-            Memory.stats.cpu[Memory.stats.cpu.length - 1] = Cache.log.cpuUsed;
+            Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
             Memory.console = Cache.log;
 
             // CPU

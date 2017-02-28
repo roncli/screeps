@@ -31,183 +31,213 @@ var Drawing = {
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#B4B4B4", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#4C4C4C", opacity: style.opacity})
-                    .text("H", x, y + 0.175 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_OXYGEN:
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#B4B4B4", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#4C4C4C", opacity: style.opacity})
-                    .text("O", x, y + 0.175 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#B4B4B4", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM:
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#50D7F9", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#006181", opacity: style.opacity})
-                    .text("U", x, y + 0.175 * size, {color: "#50D7F9", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#50D7F9", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM:
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#A071FF", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#371383", opacity: style.opacity})
-                    .text("K", x, y + 0.175 * size, {color: "#A071FF", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#A071FF", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM:
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#00F4A2", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#236144", opacity: style.opacity})
-                    .text("L", x, y + 0.175 * size, {color: "#00F4A2", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#00F4A2", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM:
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#FDD388", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#5D4C2E", opacity: style.opacity})
-                    .text("Z", x, y + 0.175 * size, {color: "#FDD388", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#FDD388", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYST:
                 visual
                     .circle(x, y, {radius: 0.4375 * size, fill: "#FF7B7B", opacity: style.opacity})
                     .circle(x, y, {radius: 0.375 * size, fill: "#592121", opacity: style.opacity})
-                    .text("X", x, y + 0.175 * size, {color: "#FF7B7B", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x, y + 0.175 * size, {color: "#FF7B7B", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_HYDROXIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity})
-                    .text("OH", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_KEANITE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity})
-                    .text("ZK", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_LEMERGITE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#B4B4B4", opacity: style.opacity})
-                    .text("UL", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM:
                 visual
                     .rect(x - size / 2, y - size / 2, size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text("G", x + 0.175 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.175 * size, y + 0.175 * size, {color: "#666666", size: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_HYDRIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#50D7F9", opacity: style.opacity})
-                    .text("UH", x + 0.1875 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_OXIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#50D7F9", opacity: style.opacity})
-                    .text("UO", x + 0.1875 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM_HYDRIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#A071FF", opacity: style.opacity})
-                    .text("KH", x + 0.1875 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM_OXIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#A071FF", opacity: style.opacity})
-                    .text("KO", x + 0.1875 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM_HYDRIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#00F4A2", opacity: style.opacity})
-                    .text("LH", x + 0.1875 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM_OXIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#00F4A2", opacity: style.opacity})
-                    .text("LO", x + 0.1875 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_HYDRIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FDD388", opacity: style.opacity})
-                    .text("ZH", x + 0.1875 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_OXIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FDD388", opacity: style.opacity})
-                    .text("ZO", x + 0.1875 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM_HYDRIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text("GH", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM_OXIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 1.375 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text("GO", x + 0.1875 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.1875 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#50D7F9", opacity: style.opacity})
-                    .text("UH2O", x + 0.5 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_UTRIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#50D7F9", opacity: style.opacity})
-                    .text("UHO2", x + 0.5 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#A071FF", opacity: style.opacity})
-                    .text("KH2O", x + 0.5 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_KEANIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#A071FF", opacity: style.opacity})
-                    .text("KHO2", x + 0.5 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#00F4A2", opacity: style.opacity})
-                    .text("LH2O", x + 0.5 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_LEMERGIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#00F4A2", opacity: style.opacity})
-                    .text("LHO2", x + 0.5 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#FDD388", opacity: style.opacity})
-                    .text("ZH2O", x + 0.5 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_ZYNTHIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#FDD388", opacity: style.opacity})
-                    .text("ZHO2", x + 0.5 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text("GH2O", x + 0.5 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_GHODIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.125 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text("GHO2", x + 0.5 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.5 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_UTRIUM_ACID:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#50D7F9", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_UTRIUM_ALKALIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#50D7F9", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_KEANIUM_ACID:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#A071FF", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_KEANIUM_ALKALIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#A071FF", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_LEMERGIUM_ACID:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#00F4A2", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#00F4A2", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_ZYNTHIUM_ACID:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FDD388", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FDD388", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_GHODIUM_ACID:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_GHODIUM_ALKALIDE:
+                visual
+                    .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
+                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
         }
     }

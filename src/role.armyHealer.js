@@ -7,7 +7,7 @@ var Cache = require("cache"),
         checkSpawn: (armyName, portals) => {
             "use strict";
 
-            var count = _.filter(Cache.creepsInArmy("armyHealer", armyName), (c) => c.spawning || c.ticksToLive > 300).length,
+            var count = _.filter(Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
                 max = Memory.army[armyName].healer.maxCreeps;
 
             if (count < max) {
@@ -95,7 +95,7 @@ var Cache = require("cache"),
         assignTasks: (armyName, directive, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creepsInArmy("armyHealer", armyName)), (c) => !c.spawning),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning),
                 assigned = [],
                 army = Memory.army[armyName],
                 stageRoomName = army.stageRoom,

@@ -10,6 +10,8 @@ var RoomObj = require("roomObj"),
     TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
+    TaskPickupResource = require("task.pickupResource");
+
     Cleanup = function(supportRoom) {
         "use strict";
     
@@ -62,6 +64,9 @@ Cleanup.prototype.run = function(room) {
         },
         dismantle: {
             tasks: []
+        },
+        pickupResource: {
+            tasks: []
         }
     };
 
@@ -81,7 +86,7 @@ Cleanup.prototype.run = function(room) {
         } else {
             _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
                 creep.memory.role = "worker";
-                creep.memory.home = supportRoom.name
+                creep.memory.home = supportRoom.name;
             });
         }
 
@@ -91,11 +96,12 @@ Cleanup.prototype.run = function(room) {
         // Find all structures that aren't under ramparts, divided by whether they have energy or not.
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
         noEnergyStructures = _.filter(structures, (s) => (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
-        energyStructures = _.filter(structures, (s) => (s.energy && s.energy > 0) || (s.store && _.sum(s.store) > 0) || (s.mineralAmount && s.mineralAmount > 0));
+        energyStructures = _.filter(structures, (s) => s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0);
 
         // Collect energy and minerals from structures that aren't under ramparts.
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
+        tasks.pickupResource.tasks = TaskPickupResource.getTasks(room);
 
         if (noEnergyStructures.length > 0) {
             // Dismantle structures with no energy or minerals that aren't under ramparts.
@@ -105,7 +111,7 @@ Cleanup.prototype.run = function(room) {
             tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);
         }
 
-        if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0) {
+        if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0 && Cache.powerBanksInRoom(room).length === 0) {
             // Notify that the room is cleaned up.
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
             
@@ -149,7 +155,7 @@ Cleanup.prototype.toObj = function(room) {
     Memory.rooms[room.name].roomType = {
         type: this.type,
         supportRoom: this.supportRoom
-    }
+    };
 };
 
 Cleanup.fromObj = function(roomMemory) {

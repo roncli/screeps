@@ -1,5 +1,4 @@
-var creepsInArmy = {},
-    spawnsInRoom = {},
+var spawnsInRoom = {},
     powerSpawnsInRoom = {},
     extensionsInRoom = {},
     towersInRoom = {},
@@ -13,6 +12,7 @@ var creepsInArmy = {},
     portalsInRoom = {},
     hostilesInRoom = {},
     sourceKeepersInRoom = {},
+    powerBanksInRoom = {},
     costMatricies = {},
 
     Cache = {
@@ -26,7 +26,6 @@ var creepsInArmy = {},
         reset: () => {
             "use strict";
     
-            creepsInArmy = {};
             spawnsInRoom = {};
             powerSpawnsInRoom = {};
             extensionsInRoom = {};
@@ -41,6 +40,7 @@ var creepsInArmy = {},
             portalsInRoom = {};
             hostilesInRoom = {};
             sourceKeepersInRoom = {};
+            powerBanksInRoom = {};
             costMatricies = {};
             Cache.creepTasks = {};
             Cache.roomTypes = {};
@@ -64,21 +64,6 @@ var creepsInArmy = {},
             if (Memory.visualizations) {
                 Cache.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
             }
-        },
-    
-        // Returns all creeps of a certain in an army.
-        creepsInArmy: (type, army) => {
-            "use strict";
-    
-            if (!creepsInArmy[army]) {
-                creepsInArmy[army] = {};
-            }
-    
-            if (!creepsInArmy[army].all) {
-                creepsInArmy[army].all = _.filter(Game.creeps, (c) => c.memory.army === army);
-            }
-    
-            return creepsInArmy[army][type] ? creepsInArmy[army][type] : creepsInArmy[army][type] = _.filter(creepsInArmy[army].all, (c) => c.memory.role === type);
         },
     
         // Returns all spawns in the current room.    
@@ -197,6 +182,13 @@ var creepsInArmy = {},
             "use strict";
 
             return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
+        },
+    
+        // Return all power banks in the current room.
+        powerBanksInRoom: (room) => {
+            "use strict";
+
+            return powerBanksInRoom[room.name] ? powerBanksInRoom[room.name] : powerBanksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
         },
     
         // Get the cost matrix for a room.

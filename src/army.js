@@ -12,7 +12,7 @@ var Cache = require("cache"),
     Army = {
         run: (name) => {
             var army = Memory.army[name],
-                allCreepsInArmy = Cache.creepsInArmy("all", name),
+                allCreepsInArmy = Cache.creeps[name].all || [],
                 armyAttackRoom = Game.rooms[army.attackRoom],
                 armyDismantlers = army.dismantler,
                 armyHealers = army.healer,
@@ -93,6 +93,11 @@ var Cache = require("cache"),
                 RoleArmyHealer.checkSpawn(name, army.portals);
                 RoleArmyMelee.checkSpawn(name, army.portals);
                 RoleArmyRanged.checkSpawn(name, army.portals);
+            }
+
+            // Assign escorts.
+            if (armyDismantlers.escort) {
+
             }
 
             // Create tasks.

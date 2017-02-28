@@ -797,7 +797,7 @@ var profiler = require("screeps-profiler"),
             if (room.energyCapacityAvailable) {
                 y += 0.7;
                 visual.text("Energy", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y, 5, 0.5, room.energyAvailable, room.energyCapacityAvailable, {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, room.energyAvailable, room.energyCapacityAvailable, {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
             }
 
             towers = Cache.towersInRoom(room);
@@ -805,7 +805,7 @@ var profiler = require("screeps-profiler"),
             if (towers.length > 0) {
                 y += 0.7;
                 visual.text("Towers", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y, 5, 0.5, _.sum(_.map(towers, (t) => t.energy)), _.sum(_.map(towers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(towers, (t) => t.energy)), _.sum(_.map(towers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
             }
         },
 

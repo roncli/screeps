@@ -772,7 +772,7 @@ var profiler = require("screeps-profiler"),
 
         drawRoom: (room) => {
             var visual = room.visual,
-                y, towers;
+                y, towers, labs, nukers, powerSpawns;
 
             if (!visual) {
                 visual = new RoomVisual(room.name);
@@ -793,7 +793,7 @@ var profiler = require("screeps-profiler"),
                 }
             }
 
-            y = 1.425;
+            y = 2.125;
             if (room.energyCapacityAvailable) {
                 y += 0.7;
                 visual.text("Energy", -0.5, y, {align: "left", font: "0.5 Arial"});
@@ -801,11 +801,33 @@ var profiler = require("screeps-profiler"),
             }
 
             towers = Cache.towersInRoom(room);
-
             if (towers.length > 0) {
                 y += 0.7;
                 visual.text("Towers", -0.5, y, {align: "left", font: "0.5 Arial"});
                 Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(towers, (t) => t.energy)), _.sum(_.map(towers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+            }
+
+            labs = Cache.labsInRoom(room);
+            if (labs.length > 0) {
+                y += 0.7;
+                visual.text("Labs", -0.5, y, {align: "left", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(labs, (t) => t.energy)), _.sum(_.map(labs, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+            }
+
+            nukers = Cache.nukersInRoom(room);
+            if (nukers.length > 0) {
+                y += 0.7;
+                visual.text("Nuker", -0.5, y, {align: "left", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(nukers, (t) => t.energy)), _.sum(_.map(nukers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(nukers, (t) => t.ghodium)), _.sum(_.map(nukers, (t) => t.ghodiumCapacity)), {background: "#808080", bar: "#ffff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+            }
+
+            powerSpawns = Cache.powerSpawnsInRoom(room);
+            if (powerSpawns.length > 0) {
+                y += 0.7;
+                visual.text("Power Spawn", -0.5, y, {align: "left", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.energy)), _.sum(_.map(powerSpawns, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+                Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.power)), _.sum(_.map(powerSpawans, (t) => t.powerCapacity)), {background: "#808080", bar: "#ff0000", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
             }
         },
 

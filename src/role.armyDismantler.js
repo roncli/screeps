@@ -93,7 +93,7 @@ var Cache = require("cache"),
         assignTasks: (armyName, directive, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
+            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
                 assigned = [],
                 army = Memory.army[armyName],
                 stageRoomName = army.stageRoom,

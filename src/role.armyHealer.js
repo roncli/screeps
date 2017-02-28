@@ -103,7 +103,7 @@ var Cache = require("cache"),
                 creepsWithNoTask, task;
 
             // Assign tasks for escorts.
-            _.forEach(_.filter(Cache.creeps[armyName].armyHealer || [], (c) => !c.spawning && c.memory.escorting), (creep) => {
+            _.forEach(_.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => !c.spawning && c.memory.escorting), (creep) => {
                 // If the escortee is dead, this creep is no longer escorting anyone.
                 if (!Game.getObjectById(creep.memory.escorting)) {
                     delete creep.memory.escorting;
@@ -116,7 +116,7 @@ var Cache = require("cache"),
                 }
             });
 
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
 
             if (creepsWithNoTask.length === 0) {
                 return;

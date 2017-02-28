@@ -764,20 +764,15 @@ var profiler = require("screeps-profiler"),
                     }
                 }
                 
-                if (!room.unobservable) {
+                if (Memory.visualizations && !room.unobservable) {
                     main.drawRoom(room);
                 }
             });
         },
 
         drawRoom: (room) => {
-            var visual;
-
-            if (!Memory.visualizations) {
-                return;
-            }
-
-            visual = room.visual;
+            var visual = room.visual,
+                y;
 
             if (!visual) {
                 visual = new RoomVisual(room.name);
@@ -796,6 +791,12 @@ var profiler = require("screeps-profiler"),
                 if (room.controller.progress && room.controller.progressTotal) {
                     Drawing.progressBar(visual, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 }
+            }
+
+            y = 1.425;
+            if (room.energyCapacityAvailable) {
+                y += 0.7;
+                Drawing.progressBar(visual, 0.5, y, 5, 0.5, room.energyAvailable, room.energyCapacityAvailable, {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
             }
         },
 

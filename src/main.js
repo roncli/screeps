@@ -1055,7 +1055,7 @@ var profiler = require("screeps-profiler"),
             Memory.console = Cache.log;
 
             // CPU
-            if (Memory.Cache.globalVisualizations) {
+            if (Memory.visualizations) {
                 Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
             }
 

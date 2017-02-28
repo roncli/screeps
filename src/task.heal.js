@@ -33,20 +33,22 @@ Heal.prototype.canAssign = function(creep, tasks) {
 Heal.prototype.run = function(creep) {
     "use strict";
 
-    // If ally is gone or at full health, we're done.
-    if (!this.ally || this.ally.hits === this.ally.hitsMax) {
-        Task.prototype.complete.call(this, creep);
-        return;
-    }
-
     // Attempt to heal self if needed.  This is overridden by any future heal.
     if (creep.hits < creep.hitsMax) {
         creep.heal(creep);
     }
 
-    if (creep.id !== this.ally.id) {
-        // Move and heal, or ranged heal if not in range.
-        Pathing.moveTo(creep, this.ally);
+    // Ally is gone, complete task.
+    if (!this.ally) {
+        Task.prototype.complete.call(this, creep);
+        return true;
+    }
+
+    // Move to ally.
+    Pathing.moveTo(creep, this.ally);
+
+    if (this.ally.hits !== this.ally.hitsMax && creep.id !== this.ally.id) {
+        // Heal, or ranged heal if not in range.
         if (creep.pos.getRangeTo(this.ally) <= 1) {
             creep.heal(this.ally);
         } else if (creep.pos.getRangeTo(this.ally) <= 3) {

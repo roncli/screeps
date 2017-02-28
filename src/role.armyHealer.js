@@ -95,13 +95,28 @@ var Cache = require("cache"),
         assignTasks: (armyName, directive, tasks) => {
             "use strict";
 
-            var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning),
-                assigned = [],
+            var assigned = [],
                 army = Memory.army[armyName],
                 stageRoomName = army.stageRoom,
                 attackRoomName = army.attackRoom,
                 dismantle = army.dismantle,
-                task;
+                creepsWithNoTask, task;
+
+            // Assign tasks for escorts.
+            _.forEach(_.filter(Cache.creeps[armyName].armyHealer || [], (c) => !c.spawning && c.memory.escorting), (creep) => {
+                // If the escortee is dead, this creep is no longer escorting anyone.
+                if (!Game.getObjectById(creep.memory.escorting)) {
+                    delete creep.memory.escorting;
+                    return;
+                }
+
+                // Heal the escortee if possible, rally to it otherwise.
+                if (!new TaskHeal(creep.memory.escorting).canAssign(creep)) {
+                    new TaskRally(creep.memory.escorting).canAssign(creep);
+                }
+            });
+
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
 
             if (creepsWithNoTask.length === 0) {
                 return;

@@ -12,7 +12,7 @@ var Cache = require("cache"),
     Army = {
         run: (name) => {
             var army = Memory.army[name],
-                allCreepsInArmy = Cache.creeps[name].all || [],
+                allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
                 armyAttackRoom = Game.rooms[army.attackRoom],
                 armyDismantlers = army.dismantler,
                 armyHealers = army.healer,
@@ -96,8 +96,21 @@ var Cache = require("cache"),
             }
 
             // Assign escorts.
-            if (armyDismantlers.escort) {
+            if (armyDismantlers.escort || armyMelees.escort || armyRangeds.escort) {
+                _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
+                    var escort = [].concat.apply([], [
+                        armyDismantlers.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                        armyMelees.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                        armyRangeds.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
+                    ])[0];
 
+                    if (escort) {
+                        healer.memory.escorting = escort.id;
+                        escort.memory.escortedBy = healer.id;
+                    } else {
+                        return false;
+                    }
+                });
             }
 
             // Create tasks.

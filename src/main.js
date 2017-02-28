@@ -1040,11 +1040,11 @@ var profiler = require("screeps-profiler"),
                     Cache.globalVisual.text(room.name, 43.5, y, {align: "right", font: "bold 0.5 Arial"});
                     if (room.storage) {
                         Cache.globalVisual.text(room.storage.store[RESOURCE_ENERGY], 45.8, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(Cache.globalVisual, 46.15, y - 0.35, 0.5, RESOURCE_ENERGY, {opacity: 1});
+                        Drawing.resource(Cache.globalVisual, 46.15, y, 0.5, RESOURCE_ENERGY, {opacity: 1});
                     }
                     if (room.terminal) {
                         Cache.globalVisual.text(room.terminal.store[RESOURCE_ENERGY], 48.8, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(Cache.globalVisual, 49.15, y - 0.35, 0.5, RESOURCE_ENERGY, {opacity: 1});
+                        Drawing.resource(Cache.globalVisual, 49.15, y, 0.5, RESOURCE_ENERGY, {opacity: 1});
                     }
                 });
             }

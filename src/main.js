@@ -1015,7 +1015,7 @@ var profiler = require("screeps-profiler"),
                 Cache.globalVisual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
 
                 // Creeps
-                Cache.globalVisual.text("Creeps " + Game.creeps.length, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text("Creeps " + _.keys(Game.creeps).length, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
             
                 // Energy
                 y = 0.725;

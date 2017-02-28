@@ -764,7 +764,7 @@ var profiler = require("screeps-profiler"),
                     }
                 }
                 
-                if (Memory.visualizations && !room.unobservable) {
+                if (Memory.visualizations && !room.unobservable && roomMemory && roomMemory.roomType && roomMemory.roomType.type === "base") {
                     main.drawRoom(room);
                 }
             });

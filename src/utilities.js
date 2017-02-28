@@ -2,16 +2,12 @@ var Cache = require("cache"),
 
     Utilities = {
         nest: (seq, keys) => {
-            var first, rest;
-
             if (!keys.length) {
                 return seq;
             }
 
-            first = keys[0];
-            rest = keys.slice(1);
-            return _.mapValues(_.groupBy(seq, first), function (value) { 
-                return Utilities.nest(value, rest);
+            return _.mapValues(_.groupBy(seq, keys[0]), function (value) { 
+                return Utilities.nest(value, keys.slice(1));
             });
         },
         

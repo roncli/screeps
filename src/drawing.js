@@ -192,52 +192,52 @@ var Drawing = {
             case RESOURCE_CATALYZED_UTRIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#50D7F9", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_UTRIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#50D7F9", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#006181", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_KEANIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#A071FF", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_KEANIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#A071FF", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#371383", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_LEMERGIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#00F4A2", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#00F4A2", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#236144", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_ZYNTHIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FDD388", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FDD388", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#5D4C2E", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_GHODIUM_ACID:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
             case RESOURCE_CATALYZED_GHODIUM_ALKALIDE:
                 visual
                     .rect(x - size / 2, y - size / 2, 2.5 * size, size, {fill: "#FFFFFF", opacity: style.opacity})
-                    .text(resource, x + 0.65625 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
+                    .text(resource, x + 0.7 * size, y + 0.175 * size, {color: "#666666", font: 0.625 * size, opacity: style.opacity});
                 break;
         }
     }

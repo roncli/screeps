@@ -1030,7 +1030,7 @@ var profiler = require("screeps-profiler"),
                 Cache.globalVisual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
             
                 // Graphs
-                Drawing.sparkline(Cache.globalVisual, 23.5, 1, 20, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
+                Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#808080", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
 
                 // Energy
                 y = 0.725;
@@ -1040,11 +1040,11 @@ var profiler = require("screeps-profiler"),
                     Cache.globalVisual.text(room.name, 43.5, y, {align: "right", font: "bold 0.5 Arial"});
                     if (room.storage) {
                         Cache.globalVisual.text(room.storage.store[RESOURCE_ENERGY], 45.8, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(Cache.globalVisual, 45.8, y, 1, RESOURCE_ENERGY, {opacity: 1});
+                        Drawing.resource(Cache.globalVisual, 46.15, y - 0.35, 0.5, RESOURCE_ENERGY, {opacity: 1});
                     }
                     if (room.terminal) {
                         Cache.globalVisual.text(room.terminal.store[RESOURCE_ENERGY], 48.8, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(Cache.globalVisual, 48.8, y, 1, RESOURCE_ENERGY, {opacity: 1});
+                        Drawing.resource(Cache.globalVisual, 49.15, y - 0.35, 0.5, RESOURCE_ENERGY, {opacity: 1});
                     }
                 });
             }

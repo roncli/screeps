@@ -833,14 +833,14 @@ var profiler = require("screeps-profiler"),
             if (room.memory && room.memory.buyQueue) {
                 y += 0.7;
                 visual.text("Buy", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                visual.text(room.memory.buyQueue.amount, 2.5, y, {align: "right", font: "bold 0.5 Arial"});
+                visual.text(room.memory.buyQueue.amount, 2.5, y, {align: "right", font: "0.5 Arial"});
                 Drawing.resource(visual, 2.5, y - 0.175, 0.5, room.memory.buyQueue.resource, {opacity: 1});
             }
 
             if (room.memory && room.memory.labQueue) {
                 y += 0.7;
                 visual.text("Create", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                visual.text(room.memory.labQueue.amount, 2.5, y, {align: "right", font: "bold 0.5 Arial"});
+                visual.text(room.memory.labQueue.amount, 2.5, y, {align: "right", font: "0.5 Arial"});
                 Drawing.resource(visual, 2.5, y - 0.175, 0.5, room.memory.labQueue.resource, {opacity: 1});
             }
 
@@ -851,9 +851,9 @@ var profiler = require("screeps-profiler"),
                 _.forEach(labs, (lab) => {
                     x += 2;
                     if (lab.mineralAmount === 0) {
-                        visual.text("Empty", x, y, {align: "right", font: "bold 0.5 Arial"});
+                        visual.text("Empty", x, y, {align: "right", font: "0.5 Arial"});
                     } else {
-                        visual.text(lab.mineralAmount, x, y, {align: "right", font: "bold 0.5 Arial"});
+                        visual.text(lab.mineralAmount, x, y, {align: "right", font: "0.5 Arial"});
                         Drawing.resource(visual, x, y - 0.175, 0.5, lab.mineralType, {opacity: 1});
                     }
                 });

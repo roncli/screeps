@@ -40,7 +40,7 @@ Upgrade.prototype.run = function(creep) {
 
     // Controller not found, or no energy, or no WORK parts, then complete task.
     if (!this.controller || !creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
     
@@ -63,7 +63,7 @@ Upgrade.prototype.run = function(creep) {
     
     // If we run out of energy, complete task.
     if (creep.carry[RESOURCE_ENERGY] <= creep.getActiveBodyparts(WORK)) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 };

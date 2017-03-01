@@ -38,7 +38,7 @@ Build.prototype.run = function(creep) {
 
     // Complete task if we're out of energy, the site is gone, or we can't do the work.
     if (!creep.carry[RESOURCE_ENERGY] || !site || creep.getActiveBodyparts(WORK) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -48,7 +48,7 @@ Build.prototype.run = function(creep) {
     
     // If we have the means to complete the construction site, complete the task.
     if (Math.min(creep.getActiveBodyparts(WORK) * 5, creep.carry[RESOURCE_ENERGY]) >= site.progressTotal - site.progress) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 };

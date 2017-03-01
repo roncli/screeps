@@ -43,7 +43,7 @@ Rally.prototype.run = function(creep) {
 
     // If the rally point doesn't exist, complete the task.
     if (!this.rallyPoint) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -76,7 +76,7 @@ Rally.prototype.run = function(creep) {
     }
 
     // Always complete the task.
-    Task.prototype.complete.call(this, creep);
+    delete creep.memory.currentTask;
 };
 
 Rally.prototype.toObj = function(creep) {

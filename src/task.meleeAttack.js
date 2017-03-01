@@ -37,14 +37,14 @@ Melee.prototype.run = function(creep) {
     // If enemy is gone, we're done.
     if (!this.enemy) {
         creep.say("Get Rekt!", true);
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
     // If we're out of attack parts, we're done.    
     if (creep.getActiveBodyparts(ATTACK) === 0) {
         creep.say("Help!");
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 

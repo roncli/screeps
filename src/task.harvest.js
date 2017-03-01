@@ -48,7 +48,7 @@ Harvest.prototype.run = function(creep) {
     
     // No sources found or the source is drained, or creep is about to die or out of WORK parts, complete task.
     if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
     
@@ -62,7 +62,7 @@ Harvest.prototype.run = function(creep) {
     } else {
         this.failIn--;
         if (this.failIn === 0) {
-            Task.prototype.complete.call(this, creep);
+            delete creep.memory.currentTask;
         }
     }
 };

@@ -54,7 +54,7 @@ CollectEnergy.prototype.run = function(creep) {
 
     // If the creep is about to die or if the object doesn't exist, complete.
     if (creep.ticksToLive < 150 || !obj) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -62,7 +62,7 @@ CollectEnergy.prototype.run = function(creep) {
 
     // If the creep is full on capacity or the energy is empty, complete.
     if (_.sum(creep.carry) === creep.carryCapacity || energy === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -78,7 +78,7 @@ CollectEnergy.prototype.run = function(creep) {
     }
 
     if (creep.withdraw(obj, RESOURCE_ENERGY) === OK) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
     }
 };
 

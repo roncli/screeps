@@ -42,7 +42,7 @@ Mine.prototype.run = function(creep) {
     
     // Container is not found, complete the task.
     if (!container) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
     

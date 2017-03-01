@@ -37,7 +37,7 @@ Pickup.prototype.run = function(creep) {
 
     // Resource is gone or we are full or it's not close enough.
     if (!this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource)) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -45,7 +45,7 @@ Pickup.prototype.run = function(creep) {
     Pathing.moveTo(creep, this.resource, 1);
     if (creep.pickup(this.resource) === OK) {
         // Task always is completed one way or another upon successful transfer.
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
 
         // If there is a container here, change the task.
         let structures = _.filter(creep.room.lookForAt(LOOK_STRUCTURES, this.resource), (s) => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY]);

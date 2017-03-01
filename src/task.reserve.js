@@ -41,7 +41,7 @@ Reserve.prototype.run = function(creep) {
 
     // If no controller, or controller is mine, or no CLAIM parts, bail.
     if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
     

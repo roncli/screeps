@@ -34,7 +34,7 @@ Claim.prototype.run = function(creep) {
     "use strict";
 
     if (!creep.room.controller || creep.room.controller.my || !creep.getActiveBodyparts(CLAIM) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 

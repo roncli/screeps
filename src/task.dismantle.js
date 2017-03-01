@@ -38,7 +38,7 @@ Dismantle.prototype.run = function(creep) {
 
     // If we're at capacity, the structure is destroyed, or we have no WORK parts, we're done.
     if (_.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
     
@@ -48,7 +48,7 @@ Dismantle.prototype.run = function(creep) {
     
     // If the unit can destroy the structure, complete the task.
     if (Math.min(creep.getActiveBodyparts(WORK), creep.carry[RESOURCE_ENERGY]) * 50 >= structure.hits) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 };

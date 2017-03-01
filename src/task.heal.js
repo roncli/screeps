@@ -40,7 +40,7 @@ Heal.prototype.run = function(creep) {
 
     // Ally is gone, complete task.
     if (!this.ally) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return true;
     }
 
@@ -57,7 +57,7 @@ Heal.prototype.run = function(creep) {
     }
 
     // Always complete so we can switch targets.
-    Task.prototype.complete.call(this, creep);
+    delete creep.memory.currentTask;
     return true;
 };
 

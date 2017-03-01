@@ -58,7 +58,7 @@ CollectMinerals.prototype.run = function(creep) {
 
     // If the amount is less than 0, or the creep is about to die, or if the object doesn't exist, complete.
     if (amount < 0 || creep.ticksToLive < 150 || !obj) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -66,7 +66,7 @@ CollectMinerals.prototype.run = function(creep) {
 
     // If we're full, complete task.
     if (_.sum(creep.carry) === creep.carryCapacity) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -74,7 +74,7 @@ CollectMinerals.prototype.run = function(creep) {
     if (obj.structureType === STRUCTURE_LAB) {
         // Lab is empty, complete task.
         if (obj.mineralType === null) {
-            Task.prototype.complete.call(this, creep);
+            delete creep.memory.currentTask;
             return;
         }
         minerals = [obj.mineralType];
@@ -86,7 +86,7 @@ CollectMinerals.prototype.run = function(creep) {
 
     // We're out of minerals, complete task.
     if (minerals.length === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
@@ -96,14 +96,14 @@ CollectMinerals.prototype.run = function(creep) {
     // Collect from the object.
     if (amount) {
         if (creep.withdraw(obj, minerals[0], Math.min(amount, creepCarryCapacity - _.sum(creepCarry))) === OK) {
-            Task.prototype.complete.call(this, creep);
+            delete creep.memory.currentTask;
         }
         return;
     }
 
     if (creep.withdraw(obj, minerals[0]) === OK) {
         // Complete task.
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 };

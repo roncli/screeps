@@ -58,20 +58,20 @@ FillEnergy.prototype.run = function(creep) {
 
     // If the object is at capacity, we're done.
     if ((obj.energy || _.sum(obj.store)) === (obj.energyCapacity || obj.storeCapacity)) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
     // Object not found or we have no energy, complete task.
     if (!obj || !creep.carry[RESOURCE_ENERGY]) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
     // Move to the object and fill it.
     Pathing.moveTo(creep, obj, 1);
     if (creep.transfer(obj, RESOURCE_ENERGY) === OK) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
     }
 };
 

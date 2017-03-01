@@ -44,7 +44,7 @@ Repair.prototype.run = function(creep) {
 
     // Check for destroyed structure, out of energy, or no WORK parts.
     if (!creep.carry[RESOURCE_ENERGY] || !structure || structure.hits === structure.hitsMax || creep.getActiveBodyparts(WORK) === 0) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
     
@@ -53,7 +53,7 @@ Repair.prototype.run = function(creep) {
     if (creep.repair(structure) === OK) {
         // If we can repair the structure completely, then complete the task.
         if (Math.min(creep.getActiveBodyparts(WORK), creep.carry[RESOURCE_ENERGY]) * 100 >= structure.hitsMax - structure.hits) {
-            Task.prototype.complete.call(this, creep);
+            delete creep.memory.currentTask;
             return;
         }
     }

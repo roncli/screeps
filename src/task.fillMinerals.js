@@ -62,13 +62,13 @@ FillMinerals.prototype.run = function(creep) {
 
     // Object not found, complete task.
     if (!obj) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return;
     }
 
     // The container is full, complete.
     if (obj.storeCapacity && _.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0 || (_.sum(obj.store) || 0) === obj.storeCapacity) {
-        Task.prototype.complete.call(this, creep);
+        delete creep.memory.currentTask;
         return true;
     }
 
@@ -78,7 +78,7 @@ FillMinerals.prototype.run = function(creep) {
 
         // We're out of minerals, complete task.
         if (minerals.length === 0) {
-            Task.prototype.complete.call(this, creep);
+            delete creep.memory.currentTask;
             return;
         }
 
@@ -87,7 +87,7 @@ FillMinerals.prototype.run = function(creep) {
         if (creep.transfer(obj, minerals[0]) === OK) {
             // If we are out of minerals, complete task.
             if (_.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
-                Task.prototype.complete.call(this, creep);
+                delete creep.memory.currentTask;
             }
         }
     } else {
@@ -109,7 +109,7 @@ FillMinerals.prototype.run = function(creep) {
 
         // We're out of minerals, complete task.
         if (minerals.length === 0) {
-            Task.prototype.complete.call(this, creep);
+            delete creep.memory.currentTask;
             return;
         }
 
@@ -118,7 +118,7 @@ FillMinerals.prototype.run = function(creep) {
         if (creep.transfer(obj, minerals[0], this.resources[minerals[0]] !== null ? Math.min(this.resources[minerals[0]], creep.carry[minerals[0]]) : undefined) === OK) {
             // If we have no minerals left for this container, we're done.
             if (minerals.length === 1) {
-                Task.prototype.complete.call(this, creep);
+                delete creep.memory.currentTask;
             }
         }
     }

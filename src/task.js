@@ -6,12 +6,6 @@ Task.prototype.assign = function(creep) {
 
     Cache.creepTasks[creep.name] = this;
     this.toObj(creep);
-}
-
-Task.prototype.complete = function(creep) {
-    "use strict";
-
-    delete creep.memory.currentTask;
 };
 
 require("screeps-profiler").registerObject(Task, "Task");

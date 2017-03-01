@@ -1,4 +1,5 @@
 var Task = require("task"),
+    Cache = require("cache"),
     Pathing = require("pathing"),
     Build = function(id) {
         "use strict";

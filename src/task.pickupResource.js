@@ -1,4 +1,5 @@
 var Task = require("task"),
+    Cache = require("cache"),
     TaskCollectEnergy = require("task.collectEnergy"),
     Pathing = require("pathing"),
     Pickup = function(id) {

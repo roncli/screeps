@@ -37,7 +37,8 @@ Harvest.prototype.canAssign = function(creep) {
 
     this.source = source.id;
     
-    Task.prototype.assign.call(this, creep);
+    Cache.creepTasks[creep.name] = this;
+    this.toObj(creep);
     return true;
 };
 

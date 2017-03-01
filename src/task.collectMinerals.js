@@ -42,7 +42,8 @@ CollectMinerals.prototype.canAssign = function(creep) {
         }
     }
     
-    Task.prototype.assign.call(this, creep);
+    Cache.creepTasks[creep.name] = this;
+    this.toObj(creep);
     return true;
 }
 

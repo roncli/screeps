@@ -27,7 +27,8 @@ Melee.prototype.canAssign = function(creep) {
         return false;
     }
     
-    Task.prototype.assign.call(this, creep);
+    Cache.creepTasks[creep.name] = this;
+    this.toObj(creep);
     return true;
 };
 

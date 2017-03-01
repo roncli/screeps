@@ -26,7 +26,8 @@ Heal.prototype.canAssign = function(creep, tasks) {
         return false;
     }
 
-    Task.prototype.assign.call(this, creep, tasks);
+    Cache.creepTasks[creep.name] = this;
+    this.toObj(creep);
     return true;
 };
 

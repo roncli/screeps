@@ -1,12 +1,4 @@
-var Cache = require("cache"),
-    Task = function() {};
-
-Task.prototype.assign = function(creep) {
-    "use strict";
-
-    Cache.creepTasks[creep.name] = this;
-    this.toObj(creep);
-};
+var Task = function() {};
 
 require("screeps-profiler").registerObject(Task, "Task");
 module.exports = Task;

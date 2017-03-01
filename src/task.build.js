@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Build = function(id) {
         "use strict";
@@ -7,14 +6,9 @@ var Task = require("task"),
         this.init(id);
     };
 
-Build.prototype = Object.create(Task.prototype);
-Build.prototype.constructor = Build;
-
 Build.prototype.init = function(id) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "build";
     this.id = id;
     this.constructionSite = Game.getObjectById(id);

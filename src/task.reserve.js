@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Reserve = function(id) {
         "use strict";
@@ -7,14 +6,9 @@ var Task = require("task"),
         this.init(id);
     };
     
-Reserve.prototype = Object.create(Task.prototype);
-Reserve.prototype.constructor = Reserve;
-
 Reserve.prototype.init = function(id) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "reserve";
     this.force = true;
 };

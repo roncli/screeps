@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Harvest = function(failIn, source) {
         "use strict";
@@ -7,13 +6,8 @@ var Task = require("task"),
         this.init(failIn, source);
     };
     
-Harvest.prototype = Object.create(Task.prototype);
-Harvest.prototype.constructor = Harvest;
-
 Harvest.prototype.init = function(failIn, source) {
     "use strict";
-    
-    Task.call(this);
     
     this.type = "harvest";
     this.failIn = failIn || 10;

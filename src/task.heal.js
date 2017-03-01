@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Heal = function(id) {
         "use strict";
@@ -7,13 +6,8 @@ var Task = require("task"),
         this.init(id);
     };
     
-Heal.prototype = Object.create(Task.prototype);
-Heal.prototype.constructor = Heal;
-
 Heal.prototype.init = function(id) {
     "use strict";
-    
-    Task.call(this);
     
     this.type = "heal";
     this.id = id;

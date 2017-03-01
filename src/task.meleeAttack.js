@@ -1,20 +1,14 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Melee = function(id) {
         "use strict";
         
         this.init(id);
     };
-    
-Melee.prototype = Object.create(Task.prototype);
-Melee.prototype.constructor = Melee;
 
 Melee.prototype.init = function(id) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "meleeAttack";
     this.id = id;
     this.enemy = Game.getObjectById(id);

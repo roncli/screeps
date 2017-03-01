@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Rally = function(id, creep) {
         "use strict";
@@ -7,14 +6,9 @@ var Task = require("task"),
         this.init(id, creep);
     };
     
-Rally.prototype = Object.create(Task.prototype);
-Rally.prototype.constructor = Rally;
-
 Rally.prototype.init = function(id, creep) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "rally";
     this.id = id;
     this.creep = creep;

@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     CollectMinerals = function(id, resource, amount) {
@@ -8,14 +7,9 @@ var Task = require("task"),
         this.init(id, resource, amount);
     };
     
-CollectMinerals.prototype = Object.create(Task.prototype);
-CollectMinerals.prototype.constructor = CollectMinerals;
-
 CollectMinerals.prototype.init = function(id, resource, amount) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "collectMinerals";
     this.id = id;
     this.resource = resource;

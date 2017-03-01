@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     Upgrade = function(room) {
@@ -7,15 +6,10 @@ var Task = require("task"),
         
         this.init(room);
     };
-    
-Upgrade.prototype = Object.create(Task.prototype);
-Upgrade.prototype.constructor = Upgrade;
 
 Upgrade.prototype.init = function(room) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "upgradeController";
     this.room = room;
     this.controller = Game.rooms[room].controller;

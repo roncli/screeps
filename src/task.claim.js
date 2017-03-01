@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Claim = function(id) {
         "use strict";
@@ -7,14 +6,9 @@ var Task = require("task"),
         this.init(id);
     };
     
-Claim.prototype = Object.create(Task.prototype);
-Claim.prototype.constructor = Claim;
-
-Claim.prototype.init = function(id) {
+Claim.prototype.init = function() {
     "use strict";
     
-    Task.call(this);
-
     this.type = "claim";
 };
 

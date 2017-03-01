@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     Mine = function(id) {
@@ -8,13 +7,8 @@ var Task = require("task"),
         this.init(id);
     };
     
-Mine.prototype = Object.create(Task.prototype);
-Mine.prototype.constructor = Mine;
-
 Mine.prototype.init = function(id) {
     "use strict";
-    
-    Task.call(this);
     
     this.type = "mine";
     this.id = id;

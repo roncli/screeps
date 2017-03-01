@@ -1,5 +1,4 @@
-var Task = require("task"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Pathing = require("pathing"),
     Utilities = require("utilities"),
     FillEnergy = function(id) {
@@ -8,14 +7,9 @@ var Task = require("task"),
         this.init(id);
     };
     
-FillEnergy.prototype = Object.create(Task.prototype);
-FillEnergy.prototype.constructor = FillEnergy;
-
 FillEnergy.prototype.init = function(id) {
     "use strict";
     
-    Task.call(this);
-
     this.type = "fillEnergy";
     this.id = id;
     this.object = Game.getObjectById(id);

@@ -99,7 +99,11 @@ CollectEnergy.fromObj = function(creep) {
 CollectEnergy.getTasks = function(room) {
     "use strict";
 
-    return _.map(_.filter([].concat.apply([], [_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500), room.storage ? [room.storage] : []]), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] > 0).sort((a, b) => (b.structureType === STRUCTURE_STORAGE ? 2000 : 0 + b.store[RESOURCE_ENERGY]) - (a.structureType === STRUCTURE_STORAGE ? 2000 : 0 + a.store[RESOURCE_ENERGY])), (c) => new CollectEnergy(c.id));
+    if (room.storage && room.storage.store[RESOURCE_ENERGY] > 0) {
+        return [new CollectEnergy(room.storage.id)];
+    }
+
+    return _.map(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY]), (c) => new CollectEnergy(c.id));
 };
 
 CollectEnergy.getStorerTasks = function(room) {

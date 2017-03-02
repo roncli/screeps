@@ -40,12 +40,12 @@ Build.prototype.run = function(creep) {
 
     // Move to the construction site and build it.
     Pathing.moveTo(creep, site, Math.max(Math.min(creep.pos.getRangeTo(site) - 1, 3), 1));
-    creep.build(site, RESOURCE_ENERGY);
-    
-    // If we have the means to complete the construction site, complete the task.
-    if (Math.min(creep.getActiveBodyparts(WORK) * 5, creep.carry[RESOURCE_ENERGY]) >= site.progressTotal - site.progress) {
-        delete creep.memory.currentTask;
-        return;
+    if (creep.build(site, RESOURCE_ENERGY) === OK) {
+        // If we have the means to complete the construction site, complete the task.
+        if (Math.min(creep.getActiveBodyparts(WORK) * 5, creep.carry[RESOURCE_ENERGY]) >= site.progressTotal - site.progress) {
+            delete creep.memory.currentTask;
+            return;
+        }
     }
 };
 

@@ -533,7 +533,7 @@ Base.prototype.spawn = function(room, canSpawnWorkers) {
     }
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
-    if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length === 0)) {
+    if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
         RoleUpgrader.checkSpawn(room);
     }
 };
@@ -674,20 +674,21 @@ Base.prototype.labsInUse = function(room, labsInUse) {
 Base.prototype.run = function(room) {
     "use strict";
 
-    var roomName = room.name,
-        spawns = Cache.spawnsInRoom(room),
-        terminal = room.terminal,
-        storage = room.storage,
-        memory = room.memory,
-        labQueue = memory.labQueue,
-        labsInUse = memory.labsInUse,
-        tasks;
+    var roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {
         Game.notify("Base Room " + roomName + " is unobservable, something is wrong!");
         return;
     }
+
+    roomName = room.name;
+    spawns = Cache.spawnsInRoom(room);
+    terminal = room.terminal;
+    storage = room.storage;
+    memory = room.memory;
+    labQueue = memory.labQueue;
+    labsInUse = memory.labsInUse;
 
     // Manage room.
     if (Game.time % 100 === 0 && spawns.length > 0) {

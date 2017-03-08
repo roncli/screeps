@@ -288,7 +288,8 @@ var profiler = require("screeps-profiler"),
                     {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
                     {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 15000},
                     {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000}
+                    {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000},
+                    {resource: RESOURCE_POWER, amount: 100}
                 ];
 
                 _.forEach(minerals, (mineral) => {

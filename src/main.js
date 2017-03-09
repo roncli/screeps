@@ -363,7 +363,7 @@ var profiler = require("screeps-profiler"),
                             if (!node.children || node.children.length === 0) {
                                 node.action = "buy";
                             } else {
-                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice));
+                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice)) * 1.1;
                                 if (node.buyPrice > buyPrice) {
                                     // Ensure we have the necessary minerals.
                                     let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,

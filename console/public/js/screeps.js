@@ -1,78 +1,15 @@
 /*jslint browser: true*/
 /*global $, WebSocket, angular, moment, config*/
 
-var app = angular.module("screeps", []),
-    data = {
-        start: {},
-        messages: []
-    };
-
 (() => {
     "use strict";
 
-    var ws, scope;
-
-    app.directive("convertToNumber", function() {
-        return {
-            require: "ngModel",
-            link: function(scope, element, attrs, ngModel) {
-                ngModel.$parsers.push(function(val) {
-                    return +val;
-                });
-                ngModel.$formatters.push(function(val) {
-                    return val ? val.toString() : "";
-                });
-            }
-        };
-    });
-
-    app.directive("chrono", ["$interval", function($interval) {
-        return {
-            restrict: "E",
-            scope: {
-                direction: "@",
-                time: "@"
-            },
-            link: function(scope, element) {
-                var seconds, minutes, hours, timer,
-
-                    tick = function() {
-                        if (scope.direction === "down") {
-                            seconds = Math.floor((scope.time - new Date().getTime()) / 1000);
-                        } else {
-                            seconds = Math.floor((new Date().getTime() - scope.time) / 1000);
-                        }
-
-                        if (seconds < 0) {
-                            seconds = 0;
-                        }
-
-                        minutes = Math.floor(seconds / 60);
-                        seconds = seconds % 60;
-
-                        if (minutes < 60) {
-                            scope.display = minutes.toString() + ":" + (seconds < 10 ? "0" : "") + seconds;
-                            return;
-                        }
-
-                        hours = Math.floor(minutes / 60);
-                        minutes = minutes % 60;
-
-                        scope.display = hours.toString() + ":" + (minutes < 10 ? "0" : "") + minutes.toString() + ":" + (seconds < 10 ? "0" : "") + seconds;
-                    };
-
-                timer = $interval(tick, 1000);
-
-                tick();
-
-                element.on("$destroy", function() {
-                    $interval.cancel(timer);
-                    timer = null;
-                });
-            },
-            template: "{{display}}"
-        };
-    }]);
+    var app = angular.module("screeps", []),
+        data = {
+            start: {},
+            messages: []
+        },
+        ws, scope;
 
     app.directive("offline", function() {
         return {
@@ -156,27 +93,6 @@ var app = angular.module("screeps", []),
 
         $scope.Math = Math;
         $scope.moment = moment;
-
-        $scope.getTimestamp = function(time) {
-            var seconds = time / 1000,
-                minutes, hours;
-
-            if (seconds <= 59.999) {
-                return seconds.toFixed(2);
-            }
-
-            minutes = Math.floor(seconds / 60);
-            seconds = seconds % 60;
-
-            if (minutes < 60) {
-                return minutes.toString() + ":" + (seconds <= 9.999 ? "0" : "") + seconds.toFixed(2);
-            }
-
-            hours = Math.floor(minutes / 60);
-            minutes = minutes % 60;
-
-            return hours.toString() + ":" + (minutes < 10 ? "0" : "") + minutes.toString() + ":" + (seconds <= 9.999 ? "0" : "") + seconds.toFixed(2);
-        };
 
         $scope.getMineralDescription = function(resource) {
             Minerals = {};

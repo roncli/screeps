@@ -10,6 +10,7 @@ var profiler = require("screeps-profiler"),
     Drawing = require("drawing"),
     Market = require("market"),
     Minerals = require("minerals"),
+    Proxy = require("proxy"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -758,7 +759,8 @@ var profiler = require("screeps-profiler"),
                 
                 if (Cache.roomTypes[roomName]) {
                     if (Game.cpu.bucket >= 5000 || Game.time % 2 === 0) {
-                        Cache.roomTypes[roomName].run(room);
+                        // Run rooms.
+                        Proxy.run("main.army.run", () => Cache.roomTypes[roomName].run(room));
                     }
                     if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
                         Cache.roomTypes[roomName].toObj(room);
@@ -911,7 +913,7 @@ var profiler = require("screeps-profiler"),
                 }
 
                 // Run army.
-                Army.run(army);
+                Proxy.run("main.army.run", () => Army.run(army));
             });
         },
 
@@ -1044,7 +1046,8 @@ var profiler = require("screeps-profiler"),
                         }
                     }
 
-                    Cache.creepTasks[creep.name].run(creep);
+                    // Run creeps.
+                    Proxy.run("main.army.run", () => Cache.creepTasks[creep.name].run(creep));
 
                     // Purge current task if the creep is in a new room.
                     if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name && (!Cache.creepTasks[creep.name] || !Cache.creepTasks[creep.name].force)) {

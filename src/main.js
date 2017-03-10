@@ -760,7 +760,7 @@ var profiler = require("screeps-profiler"),
                 if (Cache.roomTypes[roomName]) {
                     if (Game.cpu.bucket >= 5000 || Game.time % 2 === 0) {
                         // Run rooms.
-                        Proxy.run("main.army.run", () => Cache.roomTypes[roomName].run(room));
+                        Proxy.run("main.rooms.run", () => Cache.roomTypes[roomName].run(room));
                     }
                     if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
                         Cache.roomTypes[roomName].toObj(room);
@@ -1047,7 +1047,7 @@ var profiler = require("screeps-profiler"),
                     }
 
                     // Run creeps.
-                    Proxy.run("main.army.run", () => Cache.creepTasks[creep.name].run(creep));
+                    Proxy.run("main.creeps.run", () => Cache.creepTasks[creep.name].run(creep));
 
                     // Purge current task if the creep is in a new room.
                     if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name && (!Cache.creepTasks[creep.name] || !Cache.creepTasks[creep.name].force)) {
@@ -1072,6 +1072,8 @@ var profiler = require("screeps-profiler"),
                     // RIP & Pepperonis :(
                     if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                         creep.suicide();
+                    } else {
+                        creep.say("Idle");
                     }
                 }
             });

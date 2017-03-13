@@ -12,14 +12,18 @@ const direction = {
 var Cache = require("cache"),
     Pathing = {
         moveTo: (creep, pos, range) => {
+            creep.memory._pathing = Pathing.move(creep, pos, range);
+        },
+
+        move: (creep, pos, range) => {
             "use strict";
 
-            var restartOn = [],
+            var pathing = creep.memory._pathing,
+                restartOn = [],
                 creepPos = creep.pos,
                 creepX = creepPos.x,
                 creepY = creepPos.y,
                 creepRoom = creepPos.roomName,
-                creepMemory = creep.memory,
                 tick = Game.time,
                 posX, posY, posRoom, wasStationary, firstPos, multiplier, path, key;
 
@@ -38,32 +42,31 @@ var Cache = require("cache"),
 
             // If creep is at the position, we're done.
             if (creepPos.getRangeTo(pos) <= range) {
-                delete creepMemory._pathing;
-                return;
+                return undefined;
             }
 
-            if (creepMemory._pathing) {
-                // If the position doesn't match where we're going, nuke _pathing.
-                if (creepMemory._pathing.dest.x !== posX || creepMemory._pathing.dest.y !== posY || creepMemory._pathing.dest.room !== posRoom) {
-                    delete creepMemory._pathing;
+            if (pathing) {
+                // If the position doesn't match where we're going, nuke pathing.
+                if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
+                    pathing = undefined;
                 }
             }
 
             // If we're in a room to restart the search on, clear the path.
-            if (creepMemory._pathing && creepMemory._pathing.restartOn && creepMemory._pathing.restartOn.indexOf(creepRoom) !== -1) {
-                delete creepMemory._pathing.path;
-                delete creepMemory._pathing.restartOn;
+            if (pathing && pathing.restartOn && pathing.restartOn.indexOf(creepRoom) !== -1) {
+                delete pathing.path;
+                delete pathing.restartOn;
             }
 
-            // If we haven't moved in 2 turns, set the position to avoid, and then nuke _pathing.path.
-            if (creepMemory._pathing) {
-                wasStationary = creepX === creepMemory._pathing.start.x && creepY === creepMemory._pathing.start.y && creepRoom === creepMemory._pathing.start.room;
+            // If we haven't moved in 2 turns, set the position to avoid, and then nuke pathing.path.
+            if (pathing) {
+                wasStationary = creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room;
                 
-                creepMemory._pathing.stationary = (wasStationary) ? creepMemory._pathing.stationary + 1 : 0;
+                pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
 
-                if (creepMemory._pathing.stationary >= 2) {
-                    if (creepMemory._pathing.path && creepMemory._pathing.path.length > 0) {
-                        let dir = direction[+creepMemory._pathing.path[0]];
+                if (pathing.stationary >= 2) {
+                    if (pathing.path && pathing.path.length > 0) {
+                        let dir = direction[+pathing.path[0]];
                         
                         firstPos = {
                             x: creepX + dir.dx,
@@ -73,52 +76,52 @@ var Cache = require("cache"),
                         };
 
                         if (firstPos.x !== creepX || firstPos.y !== creepY) {
-                            if (!creepMemory._pathing.blocked) {
-                                creepMemory._pathing.blocked = [];
+                            if (!pathing.blocked) {
+                                pathing.blocked = [];
                             }
-                            creepMemory._pathing.blocked.push(firstPos);
+                            pathing.blocked.push(firstPos);
                         }
                     }
-                    delete creepMemory._pathing.path;
-                    delete creepMemory._pathing.restartOn;
-                } else if (creepMemory._pathing.path && !wasStationary) {
+                    delete pathing.path;
+                    delete pathing.restartOn;
+                } else if (pathing.path && !wasStationary) {
                     // We were successful moving last turn, update accordingly.
-                    if (creepMemory._pathing.path.length === 1) {
+                    if (pathing.path.length === 1) {
                         // We've reached the end of the path.
-                        delete creepMemory._pathing;
+                        pathing = undefined;
                     } else {
                         // Update start position and remaining path.
-                        creepMemory._pathing.start = {
+                        pathing.start = {
                             x: creepX,
                             y: creepY,
                             room: creepRoom
                         };
-                        creepMemory._pathing.path = creepMemory._pathing.path.substring(1);
+                        pathing.path = pathing.path.substring(1);
                     }
                 }
             }
             
-            // If we don't have a _pathing, generate it.
-            if (!creepMemory._pathing || !creepMemory._pathing.path) {
+            // If we don't have a pathing, generate it.
+            if (!pathing || !pathing.path) {
                 let moveParts = creep.getActiveBodyparts(MOVE);
                 
                 // Determine multiplier to use for terrain cost.
                 multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - moveParts) / moveParts;
 
                 // Clean up blocked array.
-                if (creepMemory._pathing && creepMemory._pathing.blocked) {
-                    _.remove(creepMemory._pathing.blocked, (b) => b.blockedUntil <= tick);
+                if (pathing && pathing.blocked) {
+                    _.remove(pathing.blocked, (b) => b.blockedUntil <= tick);
                 }
 
                 key = creepRoom + "." + creepX + "." + creepY + "." + posRoom + "." + posX + "." + posY + "." + range + "." + (multiplier <= 1 ? "0" : "1");
 
-                if ((!creepMemory._pathing || creepMemory._pathing.blocked.length === 0) && Memory.paths[key]) {
+                if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
                     // Use the cache.
-                    if (creepMemory._pathing) {
-                        creepMemory._pathing.path = Memory.paths[key].path;
-                        creepMemory._pathing.restartOn = Memory.paths[key].restartOn;
+                    if (pathing) {
+                        pathing.path = Memory.paths[key].path;
+                        pathing.restartOn = Memory.paths[key].restartOn;
                     } else {
-                        creepMemory._pathing = {
+                        pathing = {
                             start: {
                                 x: creepX,
                                 y: creepY,
@@ -157,8 +160,8 @@ var Cache = require("cache"),
 
                             matrix = Cache.getCostMatrix(room);
 
-                            if (creepMemory._pathing && roomName === creepRoom) {
-                                _.forEach(creepMemory._pathing.blocked, (blocked) => {
+                            if (pathing && roomName === creepRoom) {
+                                _.forEach(pathing.blocked, (blocked) => {
                                     if (roomName === blocked.room && tick < blocked.blockedUntil) {
                                         matrix.set(blocked.x, blocked.y, 255);
                                     }
@@ -171,15 +174,15 @@ var Cache = require("cache"),
 
                     if (!path.path || path.path.length === 0) {
                         // There is no path, just return.
-                        return;
+                        return undefined;
                     }
 
                     // Serialize the path.
-                    if (creepMemory._pathing) {
-                        creepMemory._pathing.path = Pathing.serializePath(creepPos, path.path);
-                        creepMemory._pathing.restartOn = restartOn;
+                    if (pathing) {
+                        pathing.path = Pathing.serializePath(creepPos, path.path);
+                        pathing.restartOn = restartOn;
                     } else {
-                        creepMemory._pathing = {
+                        pathing = {
                             start: {
                                 x: creepX,
                                 y: creepY,
@@ -198,9 +201,9 @@ var Cache = require("cache"),
                     }
 
                     // Cache serialized path
-                    if (creepMemory._pathing.blocked.length === 0) {
+                    if (pathing.blocked.length === 0) {
                         Memory.paths[key] = {
-                            path: creepMemory._pathing.path,
+                            path: pathing.path,
                             restartOn: restartOn,
                             firstUsed: tick,
                             lastUsed: tick
@@ -210,10 +213,12 @@ var Cache = require("cache"),
             }
 
             // Attempt to move.
-            if (creep.move(+creepMemory._pathing.path[0]) !== OK) {
+            if (creep.move(+pathing.path[0]) !== OK) {
                 // We couldn't move, so don't penalize stationary movement.
-                creepMemory._pathing.stationary -= 1;
+                pathing.stationary -= 1;
             }
+
+            return pathing;
         },
 
         serializePath: (start, path) => {

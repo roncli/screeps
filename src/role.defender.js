@@ -13,7 +13,7 @@ var Cache = require("cache"),
             case 3:
                 return pos.x > 25 && pos.y < 25;
         }
-    };
+    },
 
     Defender = {
         checkSpawn: (room) => {
@@ -37,7 +37,7 @@ var Cache = require("cache"),
                     count: defenders.length,
                     max: max
                 });
-            }        
+            }
         },
         
         spawn: (room, supportRoom) => {
@@ -104,6 +104,8 @@ var Cache = require("cache"),
                 if (creep.memory.currentTask) {
                     return;
                 }
+
+                creep.memory.quadrant = (creep.memory.quadrant + 1) % 4;
             });
         }
     };

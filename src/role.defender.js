@@ -1,8 +1,19 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskHeal = require("task.heal"),
     TaskRally = require("task.rally"),
     TaskMeleeAttack = require("task.meleeAttack"),
+    checkQuadrant = (pos, quadrant) => {
+        switch (quadrant) {
+            case 0:
+                return pos.x < 25 && pos.y < 25;
+            case 1:
+                return pos.x < 25 && pos.y > 25;
+            case 2:
+                return pos.x > 25 && pos.y > 25;
+            case 3:
+                return pos.x > 25 && pos.y < 25;
+        }
+    };
 
     Defender = {
         checkSpawn: (room) => {
@@ -60,49 +71,38 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].defender || []), (c) => !c.spawning),
-                assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // If the creeps are not in the room, rally them.
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
-                var task = TaskRally.getDefenderTask(creep);
-                if (task.canAssign(creep)) {
-                    assigned.push(creep.name);
-                }
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
+                hostiles = Cache.hostilesInRoom(room),
+                keepers = Cache.sourceKeepersInRoom(room);
             
-            // Find hostiles to attack.
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskMeleeAttack.getDefenderTask(creep);
-                if (task && task.canAssign(creep)) {
-                    creep.say("Die!", true);
-                    assigned.push(creep.name);
+                // If the creep is not in the room, rally it.
+                if (creep.room.name !== creep.memory.home) {
+                    var task = TaskRally.getDefenderTask(creep);
+                    task.canAssign(creep);
+                    return;
                 }
-            });
 
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
+                // Default to quadrant 0.
+                if (!creep.memory.quadrant) {
+                    creep.memory.quadrant = 0;
+                }
 
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
+                // If there is a hostile in the quadrant, attack it.
+                _.forEach(_.filter(hostiles, (h) => checkQuadrant(h.pos, creep.memory.qudrant)), (hostile) => {
+                    return !(new TaskMeleeAttack(hostile.id)).canAssign(creep);
+                });
 
-            // Rally the troops!
-            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
-                var task = TaskRally.getDefenderTask(creep);
-                task.range = 1;
-                if (task.canAssign(creep)) {
-                    assigned.push(creep.name);
+                if (creep.memory.currentTask) {
+                    return;
+                }
+
+                // If there is a source keeper in the quadrant under 200 ticks, move towards it.
+                _.forEach(_.filter(keepers, (k) => checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
+                    return !(new TaskRally(keeper.id, creep)).canAssign(creep);
+                });
+
+                if (creep.memory.currentTask) {
+                    return;
                 }
             });
         }

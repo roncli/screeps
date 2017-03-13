@@ -95,11 +95,5 @@ Ranged.getTasks = function(room) {
     return _.map(Cache.hostilesInRoom(room).sort((a, b) => a.hits - b.hits), (h) => new Ranged(h.id));
 };
 
-Ranged.getDefenderTask = function(creep) {
-    "use strict";
-
-    return _.map(Cache.hostilesInRoom(creep.room).sort((a, b) => a.hits - b.hits), (h) => new Ranged(h.id))[0];
-};
-
 require("screeps-profiler").registerObject(Ranged, "TaskRangedAttack");
 module.exports = Ranged;

@@ -207,9 +207,11 @@ var spawnsInRoom = {},
                 _.forEach(room.find(FIND_STRUCTURES), (structure) => {
                     var pos = structure.pos;
                     if (structure.structureType === STRUCTURE_ROAD) {
-                        matrix.set(pos.x, pos.y, 1);
+                        matrix.set(pos.x, pos.y, Math.max(1, matrix.get(pos.x, pos.y)));
+                    } else if (structure.structureType === STRUCTURE_WALL) {
+                        matrix.set(pos.x, pos.y, Math.max(255, matrix.get(pos.x, pos.y)));
                     } else if (structure.structureType === STRUCTURE_CONTAINER) {
-                        matrix.set(pos.x, pos.y, 10);
+                        matrix.set(pos.x, pos.y, Math.max(10, matrix.get(pos.x, pos.y)));
                     } else if (!(structure.structureType === STRUCTURE_RAMPART) || !structure.my) {
                         matrix.set(pos.x, pos.y, 255);
                     }
@@ -217,12 +219,12 @@ var spawnsInRoom = {},
     
                 _.forEach(room.find(FIND_MY_CONSTRUCTION_SITES), (structure) => {
                     var pos = structure.pos;
-                    matrix.set(pos.x, pos.y, 5);
+                    matrix.set(pos.x, pos.y, Math.max(5, matrix.get(pos.x, pos.y)));
                 });
                 
                 _.forEach(Cache.portalsInRoom(room), (structure) => {
                     var pos = structure.pos;
-                    matrix.set(pos.x, pos.y, 5);
+                    matrix.set(pos.x, pos.y, Math.max(5, matrix.get(pos.x, pos.y)));
                 });
 
                 if (Memory.avoidSquares[roomName]) {

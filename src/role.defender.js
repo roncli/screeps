@@ -22,7 +22,6 @@ var Cache = require("cache"),
             var roomName = room.name,
                 defenders = Cache.creeps[roomName] && Cache.creeps[roomName].defender || [],
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-                supportRoomName = supportRoom.name,
                 max = 1;
 
             // See if we need to spawn a creep.
@@ -88,7 +87,7 @@ var Cache = require("cache"),
                 }
 
                 // If there is a hostile in the quadrant, attack it.
-                _.forEach(_.filter(hostiles, (h) => checkQuadrant(h.pos, creep.memory.qudrant)), (hostile) => {
+                _.forEach(_.filter(hostiles, (h) => checkQuadrant(h.pos, creep.memory.quadrant)), (hostile) => {
                     return !(new TaskMeleeAttack(hostile.id)).canAssign(creep);
                 });
 

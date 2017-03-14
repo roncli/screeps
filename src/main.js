@@ -1091,8 +1091,7 @@ var profiler = require("screeps-profiler"),
                 }
             });
             
-            // Set the 
-            paths.set();
+            // paths.set();
         },
 
         finalize: () => {

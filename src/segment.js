@@ -9,8 +9,6 @@ var memory = [],
                 memory[id] = undefined;
             }
         }
-        
-        return Segment.memory[id];
     };
 
 Segment.init = () => {

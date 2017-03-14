@@ -11,6 +11,7 @@ var profiler = require("screeps-profiler"),
     Market = require("market"),
     Minerals = require("minerals"),
     Proxy = require("proxy"),
+    Segment = require("segment"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -39,6 +40,7 @@ var profiler = require("screeps-profiler"),
     RoomMine = require("room.mine"),
     taskDeserialization = require("taskDeserialization"),
     roomDeserialization = require("roomDeserialization"),
+    paths,
     reset,
     unobservableRooms,
 
@@ -72,6 +74,9 @@ var profiler = require("screeps-profiler"),
             "use strict";
 
             var generationTick = Game.time % 1500;
+            
+            // Init memory.
+            Segment.init();
             
             // Reset the cache.
             Cache.reset();
@@ -148,6 +153,12 @@ var profiler = require("screeps-profiler"),
             if (!Memory.paths) {
                 Memory.paths = {};
             }
+
+            paths = new Segment(4);
+            if (!paths.memory) {
+                paths.memory = Memory.paths;
+            }
+            
             if (!Memory.lengthToStorage) {
                 Memory.lengthToStorage = {};
             }
@@ -211,9 +222,15 @@ var profiler = require("screeps-profiler"),
                         }
                     });
                 });
+                
                 _.forEach(Memory.paths, (value, id) => {
                     if (value.lastUsed <= Game.time - 500) {
                         delete Memory.paths[id];
+                    }
+                });
+                _.forEach(paths, (value, id) => {
+                    if (value.lastUsed <= Game.time - 500) {
+                        delete paths.memory[id];
                     }
                 });
             }
@@ -223,24 +240,20 @@ var profiler = require("screeps-profiler"),
             // Every generation, clear cache.
             switch (generationTick) {
                 case 0:
-                    delete Memory.lengthToStorage;
                     Memory.lengthToStorage = {};
                     break;
                 case 100:
-                    delete Memory.lengthToContainer;
                     Memory.lengthToContainer = {};
                     break;
                 case 200:
-                    delete Memory.lengthToController;
                     Memory.lengthToController = {};
                     break;
                 case 300:
-                    delete Memory.ranges;
                     Memory.ranges = {};
                     break;
                 case 400:
-                    delete Memory.paths;
                     Memory.paths = {};
+                    paths.memory = {};
                     break;
             }
 
@@ -1077,6 +1090,9 @@ var profiler = require("screeps-profiler"),
                     }
                 }
             });
+            
+            // Set the 
+            paths.set();
         },
 
         finalize: () => {

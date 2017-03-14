@@ -10,6 +10,7 @@ const direction = {
 };
 
 var Cache = require("cache"),
+    Segment = require("segment"),
     Pathing = {
         moveTo: (creep, pos, range) => {
             creep.memory._pathing = Pathing.move(creep, pos, range);
@@ -103,7 +104,8 @@ var Cache = require("cache"),
             
             // If we don't have a pathing, generate it.
             if (!pathing || !pathing.path) {
-                let moveParts = creep.getActiveBodyparts(MOVE);
+                let moveParts = creep.getActiveBodyparts(MOVE),
+                    paths = new Segment(4);
                 
                 // Determine multiplier to use for terrain cost.
                 multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - moveParts) / moveParts;
@@ -139,6 +141,7 @@ var Cache = require("cache"),
                         };
                     }
                     Memory.paths[key].lastUsed = tick;
+                    paths.memory[key].lastUsed = tick;
                 } else {
                     path = PathFinder.search(creepPos, {pos: pos, range: range}, {
                         plainCost: Math.ceil(1 * multiplier),
@@ -207,7 +210,13 @@ var Cache = require("cache"),
                             restartOn: restartOn,
                             firstUsed: tick,
                             lastUsed: tick
-                        }
+                        };
+                        paths.memory[key] = {
+                            path: pathing.path,
+                            restartOn: restartOn,
+                            firstUsed: tick,
+                            lastUsed: tick
+                        };
                     }
                 }
             }

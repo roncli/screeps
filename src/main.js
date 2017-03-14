@@ -154,10 +154,10 @@ var profiler = require("screeps-profiler"),
                 Memory.paths = {};
             }
 
-            paths = new Segment(4);
-            if (!paths.memory) {
-                paths.memory = Memory.paths;
-            }
+            // paths = new Segment(4);
+            // if (!paths.memory) {
+            //     paths.memory = Memory.paths;
+            // }
             
             if (!Memory.lengthToStorage) {
                 Memory.lengthToStorage = {};
@@ -228,11 +228,11 @@ var profiler = require("screeps-profiler"),
                         delete Memory.paths[id];
                     }
                 });
-                _.forEach(paths, (value, id) => {
-                    if (value.lastUsed <= Game.time - 500) {
-                        delete paths.memory[id];
-                    }
-                });
+                // _.forEach(paths, (value, id) => {
+                //     if (value.lastUsed <= Game.time - 500) {
+                //         delete paths.memory[id];
+                //     }
+                // });
             }
 
             delete Memory.flags;
@@ -253,7 +253,7 @@ var profiler = require("screeps-profiler"),
                     break;
                 case 400:
                     Memory.paths = {};
-                    paths.memory = {};
+                    // paths.memory = {};
                     break;
             }
 

@@ -141,7 +141,7 @@ var Cache = require("cache"),
                         };
                     }
                     Memory.paths[key].lastUsed = tick;
-                    paths.memory[key].lastUsed = tick;
+                    //paths.memory[key].lastUsed = tick;
                 } else {
                     path = PathFinder.search(creepPos, {pos: pos, range: range}, {
                         plainCost: Math.ceil(1 * multiplier),
@@ -211,12 +211,12 @@ var Cache = require("cache"),
                             firstUsed: tick,
                             lastUsed: tick
                         };
-                        paths.memory[key] = {
+/*                        paths.memory[key] = {
                             path: pathing.path,
                             restartOn: restartOn,
                             firstUsed: tick,
                             lastUsed: tick
-                        };
+                        };*/
                     }
                 }
             }

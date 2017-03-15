@@ -207,16 +207,23 @@ var Cache = require("cache"),
                     if (pathing.blocked.length === 0) {
                         Memory.paths[key] = {
                             path: pathing.path,
-                            restartOn: restartOn,
                             firstUsed: tick,
                             lastUsed: tick
                         };
-/*                        paths.memory[key] = {
+                        if (restartOn && restartOn.length > 0) {
+                            Memory.paths[key].restartOn = restartOn;
+                        }
+                        /*
+                        paths.memory[key] = {
                             path: pathing.path,
                             restartOn: restartOn,
                             firstUsed: tick,
                             lastUsed: tick
-                        };*/
+                        };
+                        if (restartOn && restartOn.length > 0) {
+                            paths.memory[key].restartOn = restartOn;
+                        }
+                        */
                     }
                 }
             }

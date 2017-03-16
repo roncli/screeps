@@ -70,8 +70,12 @@ var Cache = require("cache"),
 
             var roomName = room.name,
                 creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].defender || []), (c) => !c.spawning),
-                hostiles = Cache.hostilesInRoom(room),
+                hostiles, keepers;
+            
+            if (room && !room.unobservable) {
+                hostiles = Cache.hostilesInRoom(room);
                 keepers = Cache.sourceKeepersInRoom(room);
+            }
             
             _.forEach(creepsWithNoTask, (creep) => {
                 // If the creep is not in the room, rally it.

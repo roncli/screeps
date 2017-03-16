@@ -74,7 +74,7 @@ var profiler = require("screeps-profiler"),
             "use strict";
 
             var generationTick = Game.time % 1500;
-            delete Memory.paths;
+
             // Init memory.
             Segment.init();
             

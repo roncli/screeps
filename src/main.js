@@ -223,13 +223,14 @@ var profiler = require("screeps-profiler"),
                     });
                 });
                 
+                // Paths are good for 500 ticks if unused, 1500 ticks if used.
                 _.forEach(Memory.paths, (value, id) => {
-                    if (value[3] <= Game.time - 200) {
+                    if (value[3] <= Game.time - 500 || value[2] <= Game.time - 1500) {
                         delete Memory.paths[id];
                     }
                 });
                 // _.forEach(paths, (value, id) => {
-                //     if (value[3] <= Game.time - 200) {
+                //    if (value[3] <= Game.time - 500 || value[2] <= Game.time - 1500) {
                 //         delete paths.memory[id];
                 //     }
                 // });
@@ -250,10 +251,6 @@ var profiler = require("screeps-profiler"),
                     break;
                 case 300:
                     Memory.ranges = {};
-                    break;
-                case 400:
-                    Memory.paths = {};
-                    // paths.memory = {};
                     break;
             }
 

@@ -1,11 +1,10 @@
-var msgpack = require("msgpack"),
-    memory = [],
+var memory = [],
     Segment = function(id) {
         this.id = id;
         
         if (!memory[id]) {
             try {
-                memory[id] = msgpack.decode(Buffer.from(RawMemory.segments[id], "binary"));
+                memory[id] = JSON.parse(RawMemory.segments[id]);
             } catch (e) {
                 memory[id] = undefined;
             }
@@ -27,7 +26,7 @@ Segment.prototype = {
 };
 
 Segment.prototype.set = function() {
-    RawMemory.segments[this.id] = msgpack.encode(memory[this.id]).toString("binary");
+    RawMemory.segments[this.id] = JSON.stringify(memory[this.id]);
 };
 
 require("screeps-profiler").registerObject(Segment, "Segment");

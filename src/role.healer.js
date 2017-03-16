@@ -111,6 +111,7 @@ var Cache = require("cache"),
             // Rally the troops!
             _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
                 var task = TaskRally.getDefenderTask(creep);
+                task.range = 1;
                 if (task.canAssign(creep)) {
                     assigned.push(creep.name);
                 }

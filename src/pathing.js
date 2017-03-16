@@ -146,7 +146,7 @@ var Cache = require("cache"),
                     path = PathFinder.search(creepPos, {pos: pos, range: range}, {
                         plainCost: Math.ceil(1 * multiplier),
                         swampCost: Math.ceil(5 * multiplier),
-                        maxOps: creepRoom === posRoom ? 2000 : 100000,
+                        maxOps: 100000,
                         roomCallback: (roomName) => {
                             var room = Game.rooms[roomName],
                                 matrix;

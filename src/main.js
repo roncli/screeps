@@ -53,20 +53,103 @@ var profiler = require("screeps-profiler"),
             }
 
             profiler.wrap(() => {
+                var log = "",
+                    lastCpu = Game.cpu.getUsed(),
+                    thisCpu;
+                
+                if (lastCpu >= 50) {
+                    log = "Started at " + lastCpu.toFixed(2);
+                }
                 main.init();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "init took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.minerals();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "minerals took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.baseMatrixes();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "baseMatrixes took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.deserializeCreeps();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "deserializeCreeps took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.deserializeRooms();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "deserializeRooms took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.balanceEnergy();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "balanceEnergy took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 if (Memory.log) {
                     main.log();
+
+                    thisCpu = Game.cpu.getUsed();
+                    if (thisCpu - lastCpu >= 50) {
+                        log += (log.length > 0 ? " - " : "") + "log took " + (thisCpu - lastCpu).toFixed(2); 
+                    }
+                    lastCpu = thisCpu;
                 }
+
                 main.rooms();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "rooms took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.army();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "army took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.creeps();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "creeps took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.finalize();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "finalize took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+                lastCpu = thisCpu;
                 main.drawGlobal();
+
+                thisCpu = Game.cpu.getUsed();
+                if (thisCpu - lastCpu >= 50) {
+                    log += (log.length > 0 ? " - " : "") + "drawGlobal took " + (thisCpu - lastCpu).toFixed(2); 
+                }
+
+                if (log.length > 0) {
+                    Cache.log.events.push(log);
+                }
             });
         },
 

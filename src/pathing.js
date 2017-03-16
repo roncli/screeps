@@ -204,7 +204,7 @@ var Cache = require("cache"),
                     }
 
                     // Cache serialized path
-                    if (pathing.blocked.length === 0) {
+                    if (pathing.blocked.length === 0 && pathing.path.length > 10) {
                         Memory.paths[key] = [pathing.path, [], tick, tick];
                         if (restartOn && restartOn.length > 0) {
                             Memory.paths[key][2] = restartOn;

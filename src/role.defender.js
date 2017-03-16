@@ -101,7 +101,9 @@ var Cache = require("cache"),
 
                 // If there is a source keeper in the quadrant under 200 ticks, move towards it.
                 _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
-                    return !(new TaskRally(keeper.id, creep)).canAssign(creep);
+                    var task = new TaskRally(keeper.id, creep);
+                    task.range = 1;
+                    return !(task).canAssign(creep);
                 });
 
                 if (creep.memory.currentTask) {

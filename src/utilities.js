@@ -14,7 +14,7 @@ var Cache = require("cache"),
         creepsWithNoTask: (creeps) => {
             "use strict";
 
-            return _.filter(creeps, (c) => !c.memory.currentTask);
+            return _.filter(creeps, (c) => !c.memory.currentTask || c.memory.currentTask.unimportant);
         },
 
         objectsClosestToObj: (objects, obj) => {

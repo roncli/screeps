@@ -13,6 +13,7 @@ Rally.prototype.init = function(id, creep) {
     this.id = id;
     this.creep = creep;
     this.rallyPoint = Game.getObjectById(id);
+    this.unimportant = true;
     if (!this.rallyPoint) {
         this.rallyPoint = new RoomPosition(25, 25, id);
         this.range = 5;
@@ -69,9 +70,6 @@ Rally.prototype.run = function(creep) {
     if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
         creep.rangedMassAttack();
     }
-
-    // Always complete the task.
-    delete creep.memory.currentTask;
 };
 
 Rally.prototype.toObj = function(creep) {
@@ -80,7 +78,8 @@ Rally.prototype.toObj = function(creep) {
     if (this.rallyPoint) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.id
+            id: this.id,
+            unimportant: this.unimportant
         };
     } else {
         delete creep.memory.currentTask;

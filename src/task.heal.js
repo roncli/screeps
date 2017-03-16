@@ -12,6 +12,7 @@ Heal.prototype.init = function(id) {
     this.type = "heal";
     this.id = id;
     this.ally = Game.getObjectById(id);
+    this.unimportant = true;
 };
 
 Heal.prototype.canAssign = function(creep, tasks) {
@@ -51,10 +52,6 @@ Heal.prototype.run = function(creep) {
             creep.rangedHeal(this.ally);
         }
     }
-
-    // Always complete so we can switch targets.
-    delete creep.memory.currentTask;
-    return true;
 };
 
 Heal.prototype.toObj = function(creep) {
@@ -63,7 +60,8 @@ Heal.prototype.toObj = function(creep) {
     if (this.ally) {
         creep.memory.currentTask = {
             type: this.type,
-            id: this.ally.id
+            id: this.ally.id,
+            unimportant: this.unimportant
         };
     } else {
         delete creep.memory.currentTask;

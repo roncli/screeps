@@ -74,7 +74,7 @@ var profiler = require("screeps-profiler"),
             "use strict";
 
             var generationTick = Game.time % 1500;
-            
+            delete Memory.paths;
             // Init memory.
             Segment.init();
             
@@ -224,12 +224,12 @@ var profiler = require("screeps-profiler"),
                 });
                 
                 _.forEach(Memory.paths, (value, id) => {
-                    if (value.lastUsed <= Game.time - 500) {
+                    if (value[3] <= Game.time - 200) {
                         delete Memory.paths[id];
                     }
                 });
                 // _.forEach(paths, (value, id) => {
-                //     if (value.lastUsed <= Game.time - 500) {
+                //     if (value[3] <= Game.time - 200) {
                 //         delete paths.memory[id];
                 //     }
                 // });

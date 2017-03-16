@@ -120,8 +120,8 @@ var Cache = require("cache"),
                 if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
                     // Use the cache.
                     if (pathing) {
-                        pathing.path = Memory.paths[key].path;
-                        pathing.restartOn = Memory.paths[key].restartOn;
+                        pathing.path = Memory.paths[key][0];
+                        pathing.restartOn = Memory.paths[key][1];
                     } else {
                         pathing = {
                             start: {
@@ -134,14 +134,14 @@ var Cache = require("cache"),
                                 y: posY,
                                 room: posRoom
                             },
-                            path: Memory.paths[key].path,
+                            path: Memory.paths[key][0],
                             stationary: 0,
                             blocked: [],
-                            restartOn: Memory.paths[key].restartOn
+                            restartOn: Memory.paths[key][1]
                         };
                     }
-                    Memory.paths[key].lastUsed = tick;
-                    //paths.memory[key].lastUsed = tick;
+                    Memory.paths[key][3] = tick;
+                    // paths.memory[key][3] = tick;
                 } else {
                     path = PathFinder.search(creepPos, {pos: pos, range: range}, {
                         plainCost: Math.ceil(1 * multiplier),
@@ -205,23 +205,14 @@ var Cache = require("cache"),
 
                     // Cache serialized path
                     if (pathing.blocked.length === 0) {
-                        Memory.paths[key] = {
-                            path: pathing.path,
-                            firstUsed: tick,
-                            lastUsed: tick
-                        };
+                        Memory.paths[key] = [pathing.path, [], tick, tick];
                         if (restartOn && restartOn.length > 0) {
-                            Memory.paths[key].restartOn = restartOn;
+                            Memory.paths[key][2] = restartOn;
                         }
                         /*
-                        paths.memory[key] = {
-                            path: pathing.path,
-                            restartOn: restartOn,
-                            firstUsed: tick,
-                            lastUsed: tick
-                        };
+                        paths.memory[key] = [pathing.path, [], tick, tick];
                         if (restartOn && restartOn.length > 0) {
-                            paths.memory[key].restartOn = restartOn;
+                            paths.memory[key][2] = restartOn;
                         }
                         */
                     }

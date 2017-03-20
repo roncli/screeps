@@ -836,7 +836,7 @@ var profiler = require("screeps-profiler"),
                     roomMemory = Memory.rooms[roomName];
                 
                 if (Cache.roomTypes[roomName]) {
-                    if (Game.cpu.bucket >= 5000 || Game.time % 2 === 0) {
+                    if (roomMemory.roomType.type === "source" || Game.cpu.bucket >= 9500 || Game.time % 2 === 0) {
                         // Run rooms.
                         Proxy.run("main.rooms.run", () => Cache.roomTypes[roomName].run(room));
                     }

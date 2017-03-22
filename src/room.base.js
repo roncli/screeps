@@ -161,6 +161,92 @@ Base.prototype.manage = function(room) {
     }
 };
 
+// Basic philosophy: We want to respond appropriately to incoming threats, but we also don't want to overdo it.
+// 0-50 ticks - Enemy is being annoying, let towers deal with them.
+// 50-500 ticks - Enemy is proving to be at least a basic threat, deal with them using a standard army.
+// 500-1000 ticks - Light  threat.  Use boosts with the standard army.
+// 1000-1500 ticks - Moderate threat.  All bases in the region should send an army to any rooms identified as a threat.
+// 1500+ ticks - Massive sustained threat.  Use boosts with all armies.
+// Casualties taken? - Create an army of similar size that respects the base matrixes.  If a base matrix has not yet been created, queue one for creation.
+// Enemy spending a lot of time on 0/49 tiles? - Create an army of similar size that goes after creeps in the border room they are trying to drain from.
+Base.prototype.defend = function(room) {
+    var roomName = room.name,
+        roomMemory = room.memory,
+        hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
+        armySize, attackTicks;
+
+    if (hostiles.length > 0) {
+        roomMemory.lastHostile = Game.time;
+        if (!roomMemory.currentAttack) {
+            roomMemory.currentAttack = Game.time;
+        }
+        if (!roomMemory.threats) {
+            roomMemory.threats = {};
+        }
+        if (!roomMemory.edgeTicks) {
+            roomMemory.edgeTicks = {
+                n: 0,
+                s: 0,
+                e: 0,
+                w: 0
+            };
+        }
+        
+        _.forEach(_.filter(_.map(hostiles, (h) => ({id: h.id, threat: _.filter(h.body, (b) => [ATTACK, RANGED_ATTACK, HEAL].indexOf(b) !== -1).length}))), (hostile) => {
+            roomMemory.threats[hostile.id] = hostile.threat;
+        });
+        armySize = Math.ceil(_.sum(roomMemory.threats) / 20);
+
+        if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
+            roomMemory.edgeTicks.n++;
+        }
+
+        if (_.filter(hostiles, (h) => h.pos.x === 49).length > 0) {
+            roomMemory.edgeTicks.s++;
+        }
+
+        if (_.filter(hostiles, (h) => h.pos.y === 0).length > 0) {
+            roomMemory.edgeTicks.w++;
+        }
+
+        if (_.filter(hostiles, (h) => h.pos.y === 49).length > 0) {
+            roomMemory.edgeTicks.e++;
+        }
+
+        if (!Memory.army[roomName + "-defense"]) {
+            Game.notify("Warning! " + roomName + " is under attack!");
+            Commands.createArmy(roomName + "-defense", {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            Memory.army[roomName + "-defense"].creepCount = 0;
+        } else {
+            attackTicks = Game.time - roomMemory.currentAttack;
+
+            if (attackTicks >= 500 && attackTicks < 1000) {
+                // Boost army.
+            } else if (attackTicks >= 1000 && attackTicks < 1500) {
+                // Get armies from other rooms in the region.
+            } else if (attackTicks >= 1500) {
+                // Boost armies from other rooms.
+            }
+
+            // Check edgeTicks, if any are over 50, spawn an army for that room, or update it if one already exists.
+
+            // Test army casualties taken.  If 4 or more units are lost, reduce army size and queue & respect base matrix.
+        }
+    } else if (Memory.army[roomName + "-defense"]) {
+        // This is a true success only if 50 ticks have passed since the last hostile was seen.
+        if (roomMemory.lastHostile + 50 < Game.time) {
+            if (Memory.army[roomName + "-defense"]) {
+                Memory.army[roomName + "-defense"].directive = "attack";
+                Memory.army[roomName + "-defense"].success = true;
+            }
+            delete roomMemory.lastHostile;
+            delete roomMemory.currentAttack;
+            delete roomMemory.threats;
+            delete roomMemory.edgeTicks;
+        }
+    }
+};
+
 Base.prototype.transferEnergy = function(room) {
     "use strict";
     
@@ -694,6 +780,9 @@ Base.prototype.run = function(room) {
     if (Game.time % 100 === 0 && spawns.length > 0) {
         this.manage(room);
     }
+
+    // Defend base.
+    this.defend(room);
 
     // Transfer energy from near link to far link.
     if (spawns.length > 0) {

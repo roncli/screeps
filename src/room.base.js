@@ -164,16 +164,17 @@ Base.prototype.manage = function(room) {
 // Basic philosophy: We want to respond appropriately to incoming threats, but we also don't want to overdo it.
 // 0-50 ticks - Enemy is being annoying, let towers deal with them.
 // 50-500 ticks - Enemy is proving to be at least a basic threat, deal with them using a standard army.
-// 500-1000 ticks - Light  threat.  Use boosts with the standard army.
-// 1000-1500 ticks - Moderate threat.  All bases in the region should send an army to any rooms identified as a threat.
-// 1500+ ticks - Massive sustained threat.  Use boosts with all armies.
+// 500-2000 ticks - Light threat.  Use boosts with the standard army.
+// 2000-2500 ticks - Moderate threat.  All bases in the region should send an army to any rooms identified as a threat.
+// 2500+ ticks - Massive sustained threat.  Use boosts with all armies.
 // Casualties taken? - Create an army of similar size that respects the base matrixes.  If a base matrix has not yet been created, queue one for creation.
 // Enemy spending a lot of time on 0/49 tiles? - Create an army of similar size that goes after creeps in the border room they are trying to drain from.
 Base.prototype.defend = function(room) {
     var roomName = room.name,
         roomMemory = room.memory,
         hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
-        armySize, attackTicks;
+        armyName = roomName + "-defense",
+        armySize, attackTicks, exits;
 
     if (hostiles.length > 0) {
         roomMemory.lastHostile = Game.time;
@@ -185,52 +186,70 @@ Base.prototype.defend = function(room) {
         }
         if (!roomMemory.edgeTicks) {
             roomMemory.edgeTicks = {
-                n: 0,
-                s: 0,
-                e: 0,
-                w: 0
+                1: 0,
+                3: 0,
+                5: 0,
+                7: 0
             };
         }
         
         _.forEach(_.filter(_.map(hostiles, (h) => ({id: h.id, threat: _.filter(h.body, (b) => [ATTACK, RANGED_ATTACK, HEAL].indexOf(b) !== -1).length}))), (hostile) => {
             roomMemory.threats[hostile.id] = hostile.threat;
         });
-        armySize = Math.ceil(_.sum(roomMemory.threats) / 20);
+        armySize = Math.min(Math.ceil(_.sum(roomMemory.threats) / 20), 3);
 
         if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
-            roomMemory.edgeTicks.n++;
+            roomMemory.edgeTicks[TOP]++;
         }
 
         if (_.filter(hostiles, (h) => h.pos.x === 49).length > 0) {
-            roomMemory.edgeTicks.s++;
+            roomMemory.edgeTicks[BOTTOM]++;
         }
 
         if (_.filter(hostiles, (h) => h.pos.y === 0).length > 0) {
-            roomMemory.edgeTicks.w++;
+            roomMemory.edgeTicks[LEFT]++;
         }
 
         if (_.filter(hostiles, (h) => h.pos.y === 49).length > 0) {
-            roomMemory.edgeTicks.e++;
+            roomMemory.edgeTicks[RIGHT]++;
         }
 
-        if (!Memory.army[roomName + "-defense"]) {
+        if (!Memory.army[armyName]) {
             Game.notify("Warning! " + roomName + " is under attack!");
-            Commands.createArmy(roomName + "-defense", {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-            Memory.army[roomName + "-defense"].creepCount = 0;
+            Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            Memory.army[armyName].creepCount = 0;
         } else {
             attackTicks = Game.time - roomMemory.currentAttack;
 
-            if (attackTicks >= 500 && attackTicks < 1000) {
-                // Boost army.
-            } else if (attackTicks >= 1000 && attackTicks < 1500) {
-                // Get armies from other rooms in the region.
-            } else if (attackTicks >= 1500) {
-                // Boost armies from other rooms.
+            if (attackTicks >= 500 && attackTicks < 2000) {
+                Memory.army[armyName].boostRoom = roomName;
+            } else if (attackTicks >= 2000 && attackTicks < 2500) {
+                _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
+                    var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
+                    if (!Memory.army[remoteRoom.name + "-defense"] && !Memory.army[remoteArmyName]) {
+                        Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+                    }
+                });
+            } else if (attackTicks >= 2500) {
+                _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
+                    var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
+                    if (Memory.army[remoteArmyName]) {
+                        Memory.army[remoteArmyName].boostRoom = remoteRoom.name;
+                    }
+                });
             }
 
             // Check edgeTicks, if any are over 50, spawn an army for that room, or update it if one already exists.
+            exits = Game.map.describeExits(roomName);
+            _.forEach(_.keys(exits), (dir) => {
+                var dirArmyName = roomName + "-" + dir.toString() + "-border-defense";
+                if (!Memory.army[dirArmyName] && roomMemory.edgeTicks[dir] >= 50) {
+                    Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+                }
+            });
 
             // Test army casualties taken.  If 4 or more units are lost, reduce army size and queue & respect base matrix.
+            // TODO
         }
     } else if (Memory.army[roomName + "-defense"]) {
         // This is a true success only if 50 ticks have passed since the last hostile was seen.

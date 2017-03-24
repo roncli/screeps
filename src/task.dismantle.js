@@ -33,7 +33,7 @@ Dismantle.prototype.run = function(creep) {
     var structure = this.structure;
 
     // If we're at capacity, the structure is destroyed, or we have no WORK parts, we're done.
-    if (_.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
+    if (creep.carryCapacity > 0 && _.sum(creep.carry) === creep.carryCapacity || !this.structure || creep.getActiveBodyparts(WORK) === 0) {
         delete creep.memory.currentTask;
         return;
     }

@@ -238,7 +238,7 @@ var spawnsInRoom = {},
                         var pos = creep.pos;
                         for (let x = pos.x - 3; x < pos.x + 3; x++) {
                             for (let y = pos.y - 3; y < pos.y + 3; y++) {
-                                matrix.set(x, y, 255);
+//                                matrix.set(x, y, 255);
                             }
                         }
                     });

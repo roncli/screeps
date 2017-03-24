@@ -46,6 +46,15 @@ var Cache = require("cache"),
                 army.directive = "preparing";
             }
 
+            // If the attack room is in safe mode, activate backup plan, if any.
+            if (army.safeMode && armyAttackRoom && armyAttackRoom.controller && armyAttackRoom.controller.safeMode) {
+                army.directive = "staging";
+                army.stageRoom = army.safeMode.stageRoom;
+                army.attackRoom = army.safeMode.attackRoom;
+                army.dismantle = army.safeMode.dismantle;
+                army.safeMode = army.safeMode.safeMode;
+            }
+
             // Determine conditions for next stage or success.
             switch (army.directive) {
                 case "preparing":

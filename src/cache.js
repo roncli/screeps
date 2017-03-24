@@ -224,7 +224,7 @@ var spawnsInRoom = {},
                 
                 _.forEach(Cache.portalsInRoom(room), (structure) => {
                     var pos = structure.pos;
-                    matrix.set(pos.x, pos.y, Math.max(5, matrix.get(pos.x, pos.y)));
+                    matrix.set(pos.x, pos.y, 5);
                 });
 
                 if (Memory.avoidSquares[roomName]) {

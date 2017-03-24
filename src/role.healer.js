@@ -10,7 +10,6 @@ var Cache = require("cache"),
             var roomName = room.name,
                 healers = Cache.creeps[roomName] && Cache.creeps[roomName].healer || [],
                 supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-                supportRoomName = supportRoom.name,
                 max = 1;
             
             // See if we need to spawn a creep.

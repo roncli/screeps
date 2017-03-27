@@ -121,6 +121,27 @@ var Cache = require("cache"),
                 return;
             }
 
+            // Check for dropped resources in current room.
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                    if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                        return;
+                    }
+                    if (task.canAssign(creep)) {
+                        creep.say("Pickup");
+                        assigned.push(creep.name);
+                        return false;
+                    }
+                });
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+
             // Check for unfilled storage.
             _.forEach(tasks.fillEnergy.storageTasks, (task) => {
                 var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
@@ -227,27 +248,6 @@ var Cache = require("cache"),
                     }
                 });
             }
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
-            // Check for dropped resources in current room.
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Pickup");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-            });
 
             _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
             assigned = [];

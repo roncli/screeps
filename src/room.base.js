@@ -1,5 +1,6 @@
 var RoomObj = require("roomObj"),
     Cache = require("cache"),
+    Commands = require("commands"),
     Market = require("market"),
     Minerals = require("minerals"),
     Utilities = require("utilities"),

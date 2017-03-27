@@ -215,7 +215,7 @@ Base.prototype.defend = function(room) {
             roomMemory.edgeTicks[RIGHT]++;
         }
 
-        if (!Memory.army[armyName]) {
+        if (!Memory.army[armyName] && armySize > 0) {
             Game.notify("Warning! " + roomName + " is under attack!");
             Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             Memory.army[armyName].creepCount = 0;

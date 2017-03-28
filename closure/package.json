@@ -4,6 +4,7 @@
     "author": "roncli",
     "version": "1.0.0",
     "dependencies": {
-        "google-closure-compiler-js": "20170124.0.0"
+        "google-closure-compiler-js": "20170218.0.0",
+        "module-concat": "2.1.4"
     }
 }

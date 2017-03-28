@@ -1,11 +1,14 @@
 var fs = require("fs"),
+    modConcat = require("module-concat"),
     compile = require("google-closure-compiler-js").compile;
 
-fs.readdir("../src", (err, files) => {
-    files.forEach((file) => {
-        fs.readFile("../src/" + file, {encoding: "utf8"}, (err, data) => {
-            fs.writeFile("../bin/" + file, compile({jsCode: [{src: data}]}).compiledCode, () => {});
-            console.log(file);
-        });
+modConcat("../src/main.js", "./main.js", {paths: ["../src"]}, (err, stats) => {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    console.log(stats);
+    fs.readFile("./main.js", {encoding: "utf8"}, (err, data) => {
+        fs.writeFile("../bin/main.js", compile({jsCode: [{src: data}]}).compiledCode, () => {});
     });
 });

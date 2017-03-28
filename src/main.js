@@ -52,7 +52,7 @@ var profiler = require("screeps-profiler"),
                 return;
             }
 
-            profiler.wrap(() => {
+            var loop = () => {
                 var log = "",
                     lastCpu = Game.cpu.getUsed(),
                     thisCpu;
@@ -135,7 +135,13 @@ var profiler = require("screeps-profiler"),
                 if (Memory.logCpu) {
                     Cache.log.events.push(log);
                 }
-            });
+            };
+
+            if (Memory.profiling) {
+                profiler.wrap(loop());
+            } else {
+                loop();
+            }
         },
 
         init: () => {

@@ -138,7 +138,7 @@ var profiler = require("screeps-profiler"),
             };
 
             if (Memory.profiling) {
-                profiler.wrap(loop());
+                profiler.wrap(loop);
             } else {
                 loop();
             }

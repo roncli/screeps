@@ -1,2 +1,0 @@
-var Cache=require("cache"),RoomBase=require("room.base"),RoomCleanup=require("room.cleanup"),RoomMine=require("room.mine"),RoomSource=require("room.source"),deserialization=function(a,b){switch(a.roomType.type){case "base":Cache.roomTypes[b]=RoomBase.fromObj(a);break;case "cleanup":Cache.roomTypes[b]=RoomCleanup.fromObj(a);break;case "mine":Cache.roomTypes[b]=RoomMine.fromObj(a);break;case "source":Cache.roomTypes[b]=RoomSource.fromObj(a)}};
-require("screeps-profiler").registerObject(deserialization,"RoomDeserialization");module.exports=deserialization;

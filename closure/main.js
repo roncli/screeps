@@ -9490,12 +9490,16 @@ Rally.prototype.init = function(id, creep) {
     this.type = "rally";
     this.id = id;
     this.creep = creep;
-    this.rallyPoint = Game.getObjectById(id);
-    this.unimportant = true;
-    if (!this.rallyPoint) {
-        this.rallyPoint = new RoomPosition(25, 25, id);
-        this.range = 5;
+    if (id instanceof RoomPosition) {
+        this.rallyPoint = new RoomPosition(id.x, id.y, id.roomName);
+    } else {
+        this.rallyPoint = Game.getObjectById(id);
+        if (!this.rallyPoint) {
+            this.rallyPoint = new RoomPosition(25, 25, id);
+            this.range = 5;
+        }
     }
+    this.unimportant = true;
 };
 
 Rally.prototype.canAssign = function(creep) {
@@ -9559,7 +9563,11 @@ Rally.prototype.toObj = function(creep) {
 Rally.fromObj = function(creep) {
     "use strict";
 
-    return new Rally(creep.memory.currentTask.id);
+    if (creep.memory.currentTask.id.roomName) {
+        return new Rally(new RoomPosition(creep.memory.currentTask.id.x, creep.memory.currentTask.id.y, creep.memory.currentTask.id.roomName));
+    } else {
+        return new Rally(creep.memory.currentTask.id);
+    }
 };
 
 Rally.getHarvesterTasks = function(creeps) {

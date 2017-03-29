@@ -94,7 +94,6 @@ Rally.fromObj = function(creep) {
     "use strict";
 
     if (creep.memory.currentTask.id.roomName) {
-        console.log(creep.memory.currentTask.id);
         return new Rally(new RoomPosition(creep.memory.currentTask.id.x, creep.memory.currentTask.id.y, creep.memory.currentTask.id.roomName));
     } else {
         return new Rally(creep.memory.currentTask.id);

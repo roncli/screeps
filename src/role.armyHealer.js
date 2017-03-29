@@ -118,10 +118,6 @@ var Cache = require("cache"),
 
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
 
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             switch (directive) {
                 case "building":
                     // If not yet boosted, go get boosts.

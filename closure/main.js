@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0)({
     optimizePathFinding: false,
@@ -1204,7 +1204,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 var originalFindPath = Room.prototype.findPath;
@@ -2933,10 +2933,6 @@ var Cache = __require(4,12),
                 dismantle = army.dismantle,
                 task, structures, healers;
 
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             switch (directive) {
                 case "building":
                     _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
@@ -3221,10 +3217,6 @@ var Cache = __require(4,13),
 
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
 
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             switch (directive) {
                 case "building":
                     _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
@@ -3496,10 +3488,6 @@ var Cache = __require(4,14),
                 attackRoomName = army.attackRoom,
                 dismantle = army.dismantle,
                 task, healers;
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
 
             switch (directive) {
                 case "building":
@@ -3789,10 +3777,6 @@ var Cache = __require(4,15),
                 attackRoomName = army.attackRoom,
                 dismantle = army.dismantle,
                 task, healers;
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
 
             switch (directive) {
                 case "building":

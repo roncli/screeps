@@ -102,10 +102,6 @@ var Cache = require("cache"),
                 dismantle = army.dismantle,
                 task, structures, healers;
 
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-
             switch (directive) {
                 case "building":
                     // If not yet boosted, go get boosts.

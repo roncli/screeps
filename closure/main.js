@@ -11828,7 +11828,7 @@ var Cache = __require(4,58),
                         roomCallback: (roomName) => {
                             var room = Game.rooms[roomName],
                                 matrix;
-                            if (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote"))) {
+                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote")))) {
                                 return false;
                             }
 

@@ -152,7 +152,7 @@ var Cache = require("cache"),
                                 matrix;
 
                             // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room and this creep is not a remote worker.
-                            if (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote"))) {
+                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote")))) {
                                 return false;
                             }
 

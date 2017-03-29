@@ -171,7 +171,7 @@ var Cache = require("cache"),
                     if (stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
                         task.range = 22;
-                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
+                        _.forEach(_.filter(Cache.creeps[armyName].armyHealer, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
                             assigned.push(creep.name);
@@ -231,7 +231,7 @@ var Cache = require("cache"),
                     if (stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
                         task.range = 22;
-                        _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
+                        _.forEach(_.filter(Cache.creeps[armyName].armyHealer, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
                             assigned.push(creep.name);

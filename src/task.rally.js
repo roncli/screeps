@@ -12,12 +12,16 @@ Rally.prototype.init = function(id, creep) {
     this.type = "rally";
     this.id = id;
     this.creep = creep;
-    this.rallyPoint = Game.getObjectById(id);
-    this.unimportant = true;
-    if (!this.rallyPoint) {
-        this.rallyPoint = new RoomPosition(25, 25, id);
-        this.range = 5;
+    if (typeof id === RoomPosition) {
+        this.rallyPoint = id;
+    } else {
+        this.rallyPoint = Game.getObjectById(id);
+        if (!this.rallyPoint) {
+            this.rallyPoint = new RoomPosition(25, 25, id);
+            this.range = 5;
+        }
     }
+    this.unimportant = true;
 };
 
 Rally.prototype.canAssign = function(creep) {

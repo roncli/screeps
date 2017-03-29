@@ -300,8 +300,7 @@ var Cache = require("cache"),
 
                     // Rally to army's attack location.
                     if (army.restPosition) {
-                        task = new TaskRally(attackRoomName);
-                        //task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                        task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
                     } else {
                         task = new TaskRally(attackRoomName);
                     }

@@ -150,5 +150,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Miner, "RoleMiner");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Miner, "RoleMiner");
+}
 module.exports = Miner;

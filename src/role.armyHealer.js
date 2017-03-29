@@ -311,5 +311,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Healer, "ArmyHealer");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Healer, "ArmyHealer");
+}
 module.exports = Healer;

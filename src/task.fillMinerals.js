@@ -241,5 +241,7 @@ FillMinerals.getPowerSpawnTasks = function(room) {
     return [new FillMinerals(spawns[0].id, resources)];
 };
 
-require("screeps-profiler").registerObject(FillMinerals, "TaskFillMinerals");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(FillMinerals, "TaskFillMinerals");
+}
 module.exports = FillMinerals;

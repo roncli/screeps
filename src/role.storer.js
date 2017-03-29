@@ -331,5 +331,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Storer, "RoleStorer");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Storer, "RoleStorer");
+}
 module.exports = Storer;

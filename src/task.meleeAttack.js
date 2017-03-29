@@ -84,5 +84,7 @@ Melee.getTasks = function(room) {
     return _.map(Cache.hostilesInRoom(room).sort((a, b) => a.hits - b.hits), (h) => new Melee(h.id));
 };
 
-require("screeps-profiler").registerObject(Melee, "TaskMeleeAttack");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Melee, "TaskMeleeAttack");
+}
 module.exports = Melee;

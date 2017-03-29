@@ -29,5 +29,7 @@ Segment.prototype.set = function() {
     RawMemory.segments[this.id] = JSON.stringify(memory[this.id]);
 };
 
-require("screeps-profiler").registerObject(Segment, "Segment");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Segment, "Segment");
+}
 module.exports = Segment;

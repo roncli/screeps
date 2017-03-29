@@ -173,5 +173,7 @@ FillEnergy.getPowerSpawnTasks = function(room) {
     return [new FillEnergy(spawns[0].id)];
 };
 
-require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(FillEnergy, "TaskFillEnergy");
+}
 module.exports = FillEnergy;

@@ -74,5 +74,7 @@ Build.getTasks = function(room) {
     return _.map(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => new Build(s.id));
 };
 
-require("screeps-profiler").registerObject(Build, "TaskBuild");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Build, "TaskBuild");
+}
 module.exports = Build;

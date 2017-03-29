@@ -1248,10 +1248,9 @@ var profiler = require("screeps-profiler"),
         }
     };
 
-profiler.registerObject(main, "main");
-
 // Don't forget to reload global when reactivating the profiler.
 if (Memory.profiling) {
+    profiler.registerObject(main, "main");
     profiler.enable();
 }
 

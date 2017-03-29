@@ -156,5 +156,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Army, "Army");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Army, "Army");
+}
 module.exports = Army;

@@ -118,5 +118,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Healer, "RoleHealer");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Healer, "RoleHealer");
+}
 module.exports = Healer;

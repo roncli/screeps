@@ -127,5 +127,7 @@ Upgrade.getTasks = function(room) {
     }
 };
 
-require("screeps-profiler").registerObject(Upgrade, "TaskUpgradeController");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Upgrade, "TaskUpgradeController");
+}
 module.exports = Upgrade;

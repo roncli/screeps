@@ -277,5 +277,7 @@ CollectMinerals.getTerminalTasks = function(room) {
     return tasks;
 };
 
-require("screeps-profiler").registerObject(CollectMinerals, "TaskCollectMinerals");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(CollectMinerals, "TaskCollectMinerals");
+}
 module.exports = CollectMinerals;

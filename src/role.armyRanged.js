@@ -313,5 +313,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Ranged, "ArmyRanged");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Ranged, "ArmyRanged");
+}
 module.exports = Ranged;

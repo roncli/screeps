@@ -115,5 +115,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Defender, "RoleDefender");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Defender, "RoleDefender");
+}
 module.exports = Defender;

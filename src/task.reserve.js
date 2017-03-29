@@ -79,5 +79,7 @@ Reserve.getRemoteTask = function(creep) {
     }
 };
 
-require("screeps-profiler").registerObject(Reserve, "TaskReserve");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Reserve, "TaskReserve");
+}
 module.exports = Reserve;

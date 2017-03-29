@@ -247,5 +247,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(RemoteDismantler, "RoleRemoteDismantler");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(RemoteDismantler, "RoleRemoteDismantler");
+}
 module.exports = RemoteDismantler;

@@ -278,5 +278,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Upgrader, "RoleUpgrader");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Upgrader, "RoleUpgrader");
+}
 module.exports = Upgrader;

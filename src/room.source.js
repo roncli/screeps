@@ -335,5 +335,7 @@ Source.fromObj = function(roomMemory) {
     return new Source(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
 };
 
-require("screeps-profiler").registerObject(Source, "RoomSource");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Source, "RoomSource");
+}
 module.exports = Source;

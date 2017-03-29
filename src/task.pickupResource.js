@@ -77,5 +77,7 @@ Pickup.getTasks = function(room) {
     return _.map(room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount), (r) => new Pickup(r.id));
 };
 
-require("screeps-profiler").registerObject(Pickup, "TaskPickupResource");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Pickup, "TaskPickupResource");
+}
 module.exports = Pickup;

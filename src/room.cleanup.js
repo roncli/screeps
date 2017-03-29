@@ -164,5 +164,7 @@ Cleanup.fromObj = function(roomMemory) {
     return new Cleanup(roomMemory.roomType.supportRoom);
 };
 
-require("screeps-profiler").registerObject(Cleanup, "RoomCleanup");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Cleanup, "RoomCleanup");
+}
 module.exports = Cleanup;

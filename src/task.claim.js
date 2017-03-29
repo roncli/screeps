@@ -65,5 +65,7 @@ Claim.getTask = function(creep) {
     }
 };
 
-require("screeps-profiler").registerObject(Claim, "TaskClaim");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Claim, "TaskClaim");
+}
 module.exports = Claim;

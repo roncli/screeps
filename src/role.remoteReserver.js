@@ -154,5 +154,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Reserver, "RoleRemoteReserver");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Reserver, "RoleRemoteReserver");
+}
 module.exports = Reserver;

@@ -361,5 +361,7 @@ Mine.fromObj = function(roomMemory) {
     return new Mine(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
 };
 
-require("screeps-profiler").registerObject(Mine, "RoomMine");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Mine, "RoomMine");
+}
 module.exports = Mine;

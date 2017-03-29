@@ -217,5 +217,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Builder, "RoleRemoteBuilder");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Builder, "RoleRemoteBuilder");
+}
 module.exports = Builder;

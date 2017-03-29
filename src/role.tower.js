@@ -29,5 +29,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Tower, "RoleTower");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Tower, "RoleTower");
+}
 module.exports = Tower;

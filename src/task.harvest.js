@@ -79,5 +79,7 @@ Harvest.fromObj = function(creep) {
     return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
 };
 
-require("screeps-profiler").registerObject(Harvest, "TaskHarvest");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Harvest, "TaskHarvest");
+}
 module.exports = Harvest;

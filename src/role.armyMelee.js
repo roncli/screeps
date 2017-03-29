@@ -314,5 +314,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Melee, "ArmyMelee");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Melee, "ArmyMelee");
+}
 module.exports = Melee;

@@ -237,5 +237,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(RemoteCollector, "RoleRemoteCollector");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(RemoteCollector, "RoleRemoteCollector");
+}
 module.exports = RemoteCollector;

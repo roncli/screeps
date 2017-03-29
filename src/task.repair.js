@@ -91,5 +91,7 @@ Repair.getTasks = function(room) {
     return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), 5), (s) => new Repair(s.id));
 };
 
-require("screeps-profiler").registerObject(Repair, "TaskRepair");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Repair, "TaskRepair");
+}
 module.exports = Repair;

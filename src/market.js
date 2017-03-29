@@ -61,5 +61,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Market, "Market");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Market, "Market");
+}
 module.exports = Market;

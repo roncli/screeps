@@ -11,5 +11,7 @@ var Profiler = require("screeps-profiler"),
         }
     };
 
-Profiler.registerObject(Proxy, "Proxy");
+if (Memory.profiling) {
+    Profiler.registerObject(Proxy, "Proxy");
+}
 module.exports = Proxy;

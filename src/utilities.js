@@ -288,5 +288,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Utilities, "Utilities");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Utilities, "Utilities");
+}
 module.exports = Utilities;

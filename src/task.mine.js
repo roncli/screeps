@@ -98,5 +98,7 @@ Mine.fromObj = function(creep) {
     return new Mine(creep.memory.currentTask.id);
 };
 
-require("screeps-profiler").registerObject(Mine, "TaskMine");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Mine, "TaskMine");
+}
 module.exports = Mine;

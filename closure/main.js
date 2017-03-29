@@ -1195,9 +1195,8 @@ var profiler = __require(2,0),
 
         }
     };
-
-profiler.registerObject(main, "main");
 if (Memory.profiling) {
+    profiler.registerObject(main, "main");
     profiler.enable();
 }
 
@@ -1750,7 +1749,9 @@ var Cache = __require(4,3),
         }
     };
 
-__require(2,3).registerObject(Army, "Army");
+if (Memory.profiling) {
+    __require(2,3).registerObject(Army, "Army");
+}
 module.exports = Army;
 
 return module.exports;
@@ -1978,7 +1979,9 @@ var spawnsInRoom = {},
         }
     };
 
-__require(2,4).registerObject(Cache, "Cache");
+if (Memory.profiling) {
+    __require(2,4).registerObject(Cache, "Cache");
+}
 module.exports = Cache;
 
 return module.exports;
@@ -2113,7 +2116,9 @@ var Cache = __require(4,5),
         }
     };
 
-__require(2,5).registerObject(Commands, "Commands");
+if (Memory.profiling) {
+    __require(2,5).registerObject(Commands, "Commands");
+}
 module.exports = Commands;
 
 return module.exports;
@@ -2366,7 +2371,9 @@ var Drawing = {
     }
 };
 
-__require(2,6).registerObject(Drawing, "Drawing");
+if (Memory.profiling) {
+    __require(2,6).registerObject(Drawing, "Drawing");
+}
 module.exports = Drawing;
 
 return module.exports;
@@ -2437,7 +2444,9 @@ var Cache = __require(4,7),
         }
     };
 
-__require(2,7).registerObject(Market, "Market");
+if (Memory.profiling) {
+    __require(2,7).registerObject(Market, "Market");
+}
 module.exports = Market;
 
 return module.exports;
@@ -2509,7 +2518,9 @@ var Profiler = __require(2,9),
         }
     };
 
-Profiler.registerObject(Proxy, "Proxy");
+if (Memory.profiling) {
+    Profiler.registerObject(Proxy, "Proxy");
+}
 module.exports = Proxy;
 
 return module.exports;
@@ -2548,7 +2559,9 @@ Segment.prototype.set = function() {
     RawMemory.segments[this.id] = JSON.stringify(memory[this.id]);
 };
 
-__require(2,10).registerObject(Segment, "Segment");
+if (Memory.profiling) {
+    __require(2,10).registerObject(Segment, "Segment");
+}
 module.exports = Segment;
 
 return module.exports;
@@ -2817,7 +2830,9 @@ var Cache = __require(4,11),
         }
     };
 
-__require(2,11).registerObject(Utilities, "Utilities");
+if (Memory.profiling) {
+    __require(2,11).registerObject(Utilities, "Utilities");
+}
 module.exports = Utilities;
 
 return module.exports;
@@ -3090,7 +3105,9 @@ var Cache = __require(4,12),
         }
     };
 
-__require(2,12).registerObject(Dismantler, "ArmyDismantler");
+if (Memory.profiling) {
+    __require(2,12).registerObject(Dismantler, "ArmyDismantler");
+}
 module.exports = Dismantler;
 
 return module.exports;
@@ -3375,7 +3392,9 @@ var Cache = __require(4,13),
         }
     };
 
-__require(2,13).registerObject(Healer, "ArmyHealer");
+if (Memory.profiling) {
+    __require(2,13).registerObject(Healer, "ArmyHealer");
+}
 module.exports = Healer;
 
 return module.exports;
@@ -3664,7 +3683,9 @@ var Cache = __require(4,14),
         }
     };
 
-__require(2,14).registerObject(Melee, "ArmyMelee");
+if (Memory.profiling) {
+    __require(2,14).registerObject(Melee, "ArmyMelee");
+}
 module.exports = Melee;
 
 return module.exports;
@@ -3952,7 +3973,9 @@ var Cache = __require(4,15),
         }
     };
 
-__require(2,15).registerObject(Ranged, "ArmyRanged");
+if (Memory.profiling) {
+    __require(2,15).registerObject(Ranged, "ArmyRanged");
+}
 module.exports = Ranged;
 
 return module.exports;
@@ -4061,7 +4084,9 @@ var Cache = __require(4,16),
         }
     };
 
-__require(2,16).registerObject(Claimer, "RoleClaimer");
+if (Memory.profiling) {
+    __require(2,16).registerObject(Claimer, "RoleClaimer");
+}
 module.exports = Claimer;
 
 return module.exports;
@@ -4387,7 +4412,9 @@ var Cache = __require(4,17),
         }
     };
 
-__require(2,17).registerObject(Collector, "RoleCollector");
+if (Memory.profiling) {
+    __require(2,17).registerObject(Collector, "RoleCollector");
+}
 module.exports = Collector;
 
 return module.exports;
@@ -4497,7 +4524,9 @@ var Cache = __require(4,18),
         }
     };
 
-__require(2,18).registerObject(Defender, "RoleDefender");
+if (Memory.profiling) {
+    __require(2,18).registerObject(Defender, "RoleDefender");
+}
 module.exports = Defender;
 
 return module.exports;
@@ -4728,7 +4757,9 @@ var Cache = __require(4,19),
         }
     };
 
-__require(2,19).registerObject(Dismantler, "RoleDismantler");
+if (Memory.profiling) {
+    __require(2,19).registerObject(Dismantler, "RoleDismantler");
+}
 module.exports = Dismantler;
 
 return module.exports;
@@ -4840,7 +4871,9 @@ var Cache = __require(4,20),
         }
     };
 
-__require(2,20).registerObject(Healer, "RoleHealer");
+if (Memory.profiling) {
+    __require(2,20).registerObject(Healer, "RoleHealer");
+}
 module.exports = Healer;
 
 return module.exports;
@@ -4976,7 +5009,9 @@ var Cache = __require(4,21),
         }
     };
 
-__require(2,21).registerObject(Miner, "RoleMiner");
+if (Memory.profiling) {
+    __require(2,21).registerObject(Miner, "RoleMiner");
+}
 module.exports = Miner;
 
 return module.exports;
@@ -5177,7 +5212,9 @@ var Cache = __require(4,22),
         }
     };
 
-__require(2,22).registerObject(Builder, "RoleRemoteBuilder");
+if (Memory.profiling) {
+    __require(2,22).registerObject(Builder, "RoleRemoteBuilder");
+}
 module.exports = Builder;
 
 return module.exports;
@@ -5397,7 +5434,9 @@ var Cache = __require(4,23),
         }
     };
 
-__require(2,23).registerObject(RemoteCollector, "RoleRemoteCollector");
+if (Memory.profiling) {
+    __require(2,23).registerObject(RemoteCollector, "RoleRemoteCollector");
+}
 module.exports = RemoteCollector;
 
 return module.exports;
@@ -5624,7 +5663,9 @@ var Cache = __require(4,24),
         }
     };
 
-__require(2,24).registerObject(RemoteDismantler, "RoleRemoteDismantler");
+if (Memory.profiling) {
+    __require(2,24).registerObject(RemoteDismantler, "RoleRemoteDismantler");
+}
 module.exports = RemoteDismantler;
 
 return module.exports;
@@ -5775,7 +5816,9 @@ var Cache = __require(4,25),
         }
     };
 
-__require(2,25).registerObject(Miner, "RoleRemoteMiner");
+if (Memory.profiling) {
+    __require(2,25).registerObject(Miner, "RoleRemoteMiner");
+}
 module.exports = Miner;
 
 return module.exports;
@@ -5916,7 +5959,9 @@ var Cache = __require(4,26),
         }
     };
 
-__require(2,26).registerObject(Reserver, "RoleRemoteReserver");
+if (Memory.profiling) {
+    __require(2,26).registerObject(Reserver, "RoleRemoteReserver");
+}
 module.exports = Reserver;
 
 return module.exports;
@@ -6164,7 +6209,9 @@ var Cache = __require(4,27),
         }
     };
 
-__require(2,27).registerObject(Storer, "RoleRemoteStorer");
+if (Memory.profiling) {
+    __require(2,27).registerObject(Storer, "RoleRemoteStorer");
+}
 module.exports = Storer;
 
 return module.exports;
@@ -6468,7 +6515,9 @@ var Cache = __require(4,28),
         }
     };
 
-__require(2,28).registerObject(Worker, "RoleRemoteWorker");
+if (Memory.profiling) {
+    __require(2,28).registerObject(Worker, "RoleRemoteWorker");
+}
 module.exports = Worker;
 
 return module.exports;
@@ -6888,7 +6937,9 @@ var Cache = __require(4,29),
         }
     };
 
-__require(2,29).registerObject(Scientist, "RoleScientist");
+if (Memory.profiling) {
+    __require(2,29).registerObject(Scientist, "RoleScientist");
+}
 module.exports = Scientist;
 
 return module.exports;
@@ -7192,7 +7243,9 @@ var Cache = __require(4,30),
         }
     };
 
-__require(2,30).registerObject(Storer, "RoleStorer");
+if (Memory.profiling) {
+    __require(2,30).registerObject(Storer, "RoleStorer");
+}
 module.exports = Storer;
 
 return module.exports;
@@ -7225,7 +7278,9 @@ var Cache = __require(4,31),
         }
     };
 
-__require(2,31).registerObject(Tower, "RoleTower");
+if (Memory.profiling) {
+    __require(2,31).registerObject(Tower, "RoleTower");
+}
 module.exports = Tower;
 
 return module.exports;
@@ -7477,7 +7532,9 @@ var Cache = __require(4,32),
         }
     };
 
-__require(2,32).registerObject(Upgrader, "RoleUpgrader");
+if (Memory.profiling) {
+    __require(2,32).registerObject(Upgrader, "RoleUpgrader");
+}
 module.exports = Upgrader;
 
 return module.exports;
@@ -7912,7 +7969,9 @@ var Cache = __require(4,33),
         }
     };
 
-__require(2,33).registerObject(Worker, "RoleWorker");
+if (Memory.profiling) {
+    __require(2,33).registerObject(Worker, "RoleWorker");
+}
 module.exports = Worker;
 
 return module.exports;
@@ -8698,7 +8757,9 @@ Base.fromObj = function(room) {
     return new Base();
 };
 
-__require(2,34).registerObject(Base, "RoomBase");
+if (Memory.profiling) {
+    __require(2,34).registerObject(Base, "RoomBase");
+}
 module.exports = Base;
 
 return module.exports;
@@ -8849,7 +8910,9 @@ Cleanup.fromObj = function(roomMemory) {
     return new Cleanup(roomMemory.roomType.supportRoom);
 };
 
-__require(2,35).registerObject(Cleanup, "RoomCleanup");
+if (Memory.profiling) {
+    __require(2,35).registerObject(Cleanup, "RoomCleanup");
+}
 module.exports = Cleanup;
 
 return module.exports;
@@ -9177,7 +9240,9 @@ Mine.fromObj = function(roomMemory) {
     return new Mine(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
 };
 
-__require(2,36).registerObject(Mine, "RoomMine");
+if (Memory.profiling) {
+    __require(2,36).registerObject(Mine, "RoomMine");
+}
 module.exports = Mine;
 
 return module.exports;
@@ -9262,7 +9327,9 @@ var Cache = __require(4,37),
         }
     };
 
-__require(2,37).registerObject(deserialization, "TaskDeserialization");
+if (Memory.profiling) {
+    __require(2,37).registerObject(deserialization, "TaskDeserialization");
+}
 module.exports = deserialization;
 
 return module.exports;
@@ -9295,7 +9362,9 @@ var Cache = __require(4,38),
         }
     };
 
-__require(2,38).registerObject(deserialization, "RoomDeserialization");
+if (Memory.profiling) {
+    __require(2,38).registerObject(deserialization, "RoomDeserialization");
+}
 module.exports = deserialization;
 
 return module.exports;
@@ -9384,7 +9453,9 @@ Heal.getDefenderTask = function(creep) {
     return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax && c.id !== creep.id).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
 };
 
-__require(2,39).registerObject(Heal, "TaskHeal");
+if (Memory.profiling) {
+    __require(2,39).registerObject(Heal, "TaskHeal");
+}
 module.exports = Heal;
 
 return module.exports;
@@ -9468,7 +9539,9 @@ Melee.getTasks = function(room) {
     return _.map(Cache.hostilesInRoom(room).sort((a, b) => a.hits - b.hits), (h) => new Melee(h.id));
 };
 
-__require(2,40).registerObject(Melee, "TaskMeleeAttack");
+if (Memory.profiling) {
+    __require(2,40).registerObject(Melee, "TaskMeleeAttack");
+}
 module.exports = Melee;
 
 return module.exports;
@@ -9594,7 +9667,9 @@ Rally.getClaimerTask = function(creep) {
     return new Rally(creep.memory.claim, creep);
 };
 
-__require(2,41).registerObject(Rally, "TaskRally");
+if (Memory.profiling) {
+    __require(2,41).registerObject(Rally, "TaskRally");
+}
 module.exports = Rally;
 
 return module.exports;
@@ -9687,7 +9762,9 @@ Ranged.getTasks = function(room) {
     return _.map(Cache.hostilesInRoom(room).sort((a, b) => a.hits - b.hits), (h) => new Ranged(h.id));
 };
 
-__require(2,42).registerObject(Ranged, "TaskRangedAttack");
+if (Memory.profiling) {
+    __require(2,42).registerObject(Ranged, "TaskRangedAttack");
+}
 module.exports = Ranged;
 
 return module.exports;
@@ -9765,7 +9842,9 @@ Dismantle.getCleanupTasks = function(structures) {
     return _.map(structures, (s) => new Dismantle(s.id));
 };
 
-__require(2,43).registerObject(Dismantle, "TaskDismantle");
+if (Memory.profiling) {
+    __require(2,43).registerObject(Dismantle, "TaskDismantle");
+}
 module.exports = Dismantle;
 
 return module.exports;
@@ -9838,7 +9917,9 @@ Claim.getTask = function(creep) {
     }
 };
 
-__require(2,44).registerObject(Claim, "TaskClaim");
+if (Memory.profiling) {
+    __require(2,44).registerObject(Claim, "TaskClaim");
+}
 module.exports = Claim;
 
 return module.exports;
@@ -9923,7 +10004,9 @@ Harvest.fromObj = function(creep) {
     return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
 };
 
-__require(2,45).registerObject(Harvest, "TaskHarvest");
+if (Memory.profiling) {
+    __require(2,45).registerObject(Harvest, "TaskHarvest");
+}
 module.exports = Harvest;
 
 return module.exports;
@@ -10003,7 +10086,9 @@ Pickup.getTasks = function(room) {
     return _.map(room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount), (r) => new Pickup(r.id));
 };
 
-__require(2,46).registerObject(Pickup, "TaskPickupResource");
+if (Memory.profiling) {
+    __require(2,46).registerObject(Pickup, "TaskPickupResource");
+}
 module.exports = Pickup;
 
 return module.exports;
@@ -10082,7 +10167,9 @@ Build.getTasks = function(room) {
     return _.map(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => new Build(s.id));
 };
 
-__require(2,47).registerObject(Build, "TaskBuild");
+if (Memory.profiling) {
+    __require(2,47).registerObject(Build, "TaskBuild");
+}
 module.exports = Build;
 
 return module.exports;
@@ -10176,7 +10263,9 @@ Repair.getTasks = function(room) {
     return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), 5), (s) => new Repair(s.id));
 };
 
-__require(2,48).registerObject(Repair, "TaskRepair");
+if (Memory.profiling) {
+    __require(2,48).registerObject(Repair, "TaskRepair");
+}
 module.exports = Repair;
 
 return module.exports;
@@ -10274,7 +10363,9 @@ Mine.fromObj = function(creep) {
     return new Mine(creep.memory.currentTask.id);
 };
 
-__require(2,49).registerObject(Mine, "TaskMine");
+if (Memory.profiling) {
+    __require(2,49).registerObject(Mine, "TaskMine");
+}
 module.exports = Mine;
 
 return module.exports;
@@ -10394,7 +10485,9 @@ CollectEnergy.getCleanupTasks = function(structures) {
     return _.map(_.filter(structures, (s) => s.energy || (s.store && s.store[RESOURCE_ENERGY])).sort((a, b) => (a.energy || a.store[RESOURCE_ENERGY]) - (b.energy || b.store[RESOURCE_ENERGY])), (s) => new CollectEnergy(s.id));
 };
 
-__require(2,50).registerObject(CollectEnergy, "TaskCollectEnergy");
+if (Memory.profiling) {
+    __require(2,50).registerObject(CollectEnergy, "TaskCollectEnergy");
+}
 module.exports = CollectEnergy;
 
 return module.exports;
@@ -10479,7 +10572,9 @@ Reserve.getRemoteTask = function(creep) {
     }
 };
 
-__require(2,51).registerObject(Reserve, "TaskReserve");
+if (Memory.profiling) {
+    __require(2,51).registerObject(Reserve, "TaskReserve");
+}
 module.exports = Reserve;
 
 return module.exports;
@@ -10743,7 +10838,9 @@ CollectMinerals.getTerminalTasks = function(room) {
     return tasks;
 };
 
-__require(2,52).registerObject(CollectMinerals, "TaskCollectMinerals");
+if (Memory.profiling) {
+    __require(2,52).registerObject(CollectMinerals, "TaskCollectMinerals");
+}
 module.exports = CollectMinerals;
 
 return module.exports;
@@ -10752,8 +10849,6 @@ return module.exports;
 /********** Start module 53: ..\src\roomObj.js **********/
 __modules[53] = function(module, exports) {
 var RoomObj = function() {};
-
-__require(2,53).registerObject(RoomObj, "RoomObj");
 module.exports = RoomObj;
 
 return module.exports;
@@ -10930,7 +11025,9 @@ FillEnergy.getPowerSpawnTasks = function(room) {
     return [new FillEnergy(spawns[0].id)];
 };
 
-__require(2,54).registerObject(FillEnergy, "TaskFillEnergy");
+if (Memory.profiling) {
+    __require(2,54).registerObject(FillEnergy, "TaskFillEnergy");
+}
 module.exports = FillEnergy;
 
 return module.exports;
@@ -11151,7 +11248,9 @@ FillMinerals.getPowerSpawnTasks = function(room) {
     return [new FillMinerals(spawns[0].id, resources)];
 };
 
-__require(2,55).registerObject(FillMinerals, "TaskFillMinerals");
+if (Memory.profiling) {
+    __require(2,55).registerObject(FillMinerals, "TaskFillMinerals");
+}
 module.exports = FillMinerals;
 
 return module.exports;
@@ -11280,7 +11379,9 @@ Upgrade.getTasks = function(room) {
     }
 };
 
-__require(2,56).registerObject(Upgrade, "TaskUpgradeController");
+if (Memory.profiling) {
+    __require(2,56).registerObject(Upgrade, "TaskUpgradeController");
+}
 module.exports = Upgrade;
 
 return module.exports;
@@ -11585,7 +11686,9 @@ Source.fromObj = function(roomMemory) {
     return new Source(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
 };
 
-__require(2,57).registerObject(Source, "RoomSource");
+if (Memory.profiling) {
+    __require(2,57).registerObject(Source, "RoomSource");
+}
 module.exports = Source;
 
 return module.exports;
@@ -11857,7 +11960,9 @@ var Cache = __require(4,58),
         }
     };
 
-__require(2,58).registerObject(Pathing, "Pathing");
+if (Memory.profiling) {
+    __require(2,58).registerObject(Pathing, "Pathing");
+}
 module.exports = Pathing;
 
 return module.exports;

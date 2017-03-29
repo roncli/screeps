@@ -75,5 +75,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(deserialization, "TaskDeserialization");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(deserialization, "TaskDeserialization");
+}
 module.exports = deserialization;

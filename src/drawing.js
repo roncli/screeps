@@ -243,5 +243,7 @@ var Drawing = {
     }
 };
 
-require("screeps-profiler").registerObject(Drawing, "Drawing");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Drawing, "Drawing");
+}
 module.exports = Drawing;

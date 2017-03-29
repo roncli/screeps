@@ -251,5 +251,7 @@ var spawnsInRoom = {},
         }
     };
 
-require("screeps-profiler").registerObject(Cache, "Cache");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Cache, "Cache");
+}
 module.exports = Cache;

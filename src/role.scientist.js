@@ -465,5 +465,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Scientist, "RoleScientist");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Scientist, "RoleScientist");
+}
 module.exports = Scientist;

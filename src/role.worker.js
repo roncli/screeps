@@ -480,5 +480,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Worker, "RoleWorker");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Worker, "RoleWorker");
+}
 module.exports = Worker;

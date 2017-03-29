@@ -74,5 +74,7 @@ Dismantle.getCleanupTasks = function(structures) {
     return _.map(structures, (s) => new Dismantle(s.id));
 };
 
-require("screeps-profiler").registerObject(Dismantle, "TaskDismantle");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Dismantle, "TaskDismantle");
+}
 module.exports = Dismantle;

@@ -850,5 +850,7 @@ Base.fromObj = function(room) {
     return new Base();
 };
 
-require("screeps-profiler").registerObject(Base, "RoomBase");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Base, "RoomBase");
+}
 module.exports = Base;

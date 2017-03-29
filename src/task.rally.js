@@ -124,5 +124,7 @@ Rally.getClaimerTask = function(creep) {
     return new Rally(creep.memory.claim, creep);
 };
 
-require("screeps-profiler").registerObject(Rally, "TaskRally");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Rally, "TaskRally");
+}
 module.exports = Rally;

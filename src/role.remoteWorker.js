@@ -332,5 +332,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Worker, "RoleRemoteWorker");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Worker, "RoleRemoteWorker");
+}
 module.exports = Worker;

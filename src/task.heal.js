@@ -86,5 +86,7 @@ Heal.getDefenderTask = function(creep) {
     return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax && c.id !== creep.id).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
 };
 
-require("screeps-profiler").registerObject(Heal, "TaskHeal");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Heal, "TaskHeal");
+}
 module.exports = Heal;

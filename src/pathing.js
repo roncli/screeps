@@ -304,5 +304,7 @@ var Cache = require("cache"),
         }
     };
 
-require("screeps-profiler").registerObject(Pathing, "Pathing");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(Pathing, "Pathing");
+}
 module.exports = Pathing;

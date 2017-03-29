@@ -118,5 +118,7 @@ CollectEnergy.getCleanupTasks = function(structures) {
     return _.map(_.filter(structures, (s) => s.energy || (s.store && s.store[RESOURCE_ENERGY])).sort((a, b) => (a.energy || a.store[RESOURCE_ENERGY]) - (b.energy || b.store[RESOURCE_ENERGY])), (s) => new CollectEnergy(s.id));
 };
 
-require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");
+if (Memory.profiling) {
+    require("screeps-profiler").registerObject(CollectEnergy, "TaskCollectEnergy");
+}
 module.exports = CollectEnergy;

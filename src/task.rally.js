@@ -83,7 +83,8 @@ Rally.prototype.toObj = function(creep) {
         creep.memory.currentTask = {
             type: this.type,
             id: this.id,
-            unimportant: this.unimportant
+            unimportant: this.unimportant,
+            range: this.range
         };
     } else {
         delete creep.memory.currentTask;
@@ -93,11 +94,19 @@ Rally.prototype.toObj = function(creep) {
 Rally.fromObj = function(creep) {
     "use strict";
 
+    var task;
+
     if (creep.memory.currentTask.id.roomName) {
-        return new Rally(new RoomPosition(creep.memory.currentTask.id.x, creep.memory.currentTask.id.y, creep.memory.currentTask.id.roomName));
+        task = new Rally(new RoomPosition(creep.memory.currentTask.id.x, creep.memory.currentTask.id.y, creep.memory.currentTask.id.roomName));
     } else {
-        return new Rally(creep.memory.currentTask.id);
+        task = new Rally(creep.memory.currentTask.id);
     }
+
+    if (creep.memory.currentTask.range) {
+        task.range = creep.memory.currentTask.range;
+    }
+
+    return task;
 };
 
 Rally.getHarvesterTasks = function(creeps) {

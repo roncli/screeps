@@ -12,7 +12,7 @@ Dismantle.prototype.init = function(id) {
     this.type = "dismantle";
     this.id = id;
     this.structure = Game.getObjectById(id);
-    this.force = true;
+    this.unimportant = true;
 };
 
 Dismantle.prototype.canAssign = function(creep) {

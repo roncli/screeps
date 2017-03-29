@@ -2981,6 +2981,7 @@ var Cache = __require(4,12),
                     healers = Cache.creeps[armyName].armyHealer || [];
                     if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3041,6 +3042,7 @@ var Cache = __require(4,12),
                     healers = Cache.creeps[armyName].armyHealer || [];
                     if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3266,6 +3268,7 @@ var Cache = __require(4,13),
                 case "dismantle":
                     if (stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3318,6 +3321,7 @@ var Cache = __require(4,13),
                 case "attack":
                     if (stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3541,6 +3545,7 @@ var Cache = __require(4,14),
                     healers = Cache.creeps[armyName].armyHealer || [];
                     if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3620,6 +3625,7 @@ var Cache = __require(4,14),
                     healers = Cache.creeps[armyName].armyHealer || [];
                     if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3831,6 +3837,7 @@ var Cache = __require(4,15),
                     healers = Cache.creeps[armyName].armyHealer || [];
                     if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -3910,6 +3917,7 @@ var Cache = __require(4,15),
                     healers = Cache.creeps[armyName].armyHealer || [];
                     if (healers.length > 0 && stageRoomName !== attackRoomName) {
                         task = new TaskRally(stageRoomName);
+                        task.range = 22;
                         _.forEach(_.filter(creepsWithNoTask, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
                             creep.say("Ouch!");
                             task.canAssign(creep);
@@ -9786,7 +9794,7 @@ Dismantle.prototype.init = function(id) {
     this.type = "dismantle";
     this.id = id;
     this.structure = Game.getObjectById(id);
-    this.force = true;
+    this.unimportant = true;
 };
 
 Dismantle.prototype.canAssign = function(creep) {

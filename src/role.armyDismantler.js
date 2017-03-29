@@ -282,7 +282,11 @@ var Cache = require("cache"),
                     });
 
                     // Rally to army's attack location.
-                    task = new TaskRally(attackRoomName);
+                    if (army.restPosition) {
+                        task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                    } else {
+                        task = new TaskRally(attackRoomName);
+                    }
                     _.forEach(creepsWithNoTask, (creep) => {
                         task.canAssign(creep);
                     });

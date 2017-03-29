@@ -12,7 +12,7 @@ Rally.prototype.init = function(id, creep) {
     this.type = "rally";
     this.id = id;
     this.creep = creep;
-    if (typeof id === RoomPosition) {
+    if (id instanceof "RoomPosition") {
         this.rallyPoint = id;
     } else {
         this.rallyPoint = Game.getObjectById(id);

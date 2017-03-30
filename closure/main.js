@@ -8274,7 +8274,7 @@ Base.prototype.terminal = function(room, terminal) {
         flips = [],
         storageStore = {},
         market = Game.market,
-        maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal), (r) => r.storage ? r.storage.store[RESOURCE_ENERGY] : 0)),
+        maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my), (r) => (r.storage && r.storage.my) ? r.storage.store[RESOURCE_ENERGY] : 0)),
         bases, terminalMinerals, bestOrder, transCost, amount;
         
     if (storage) {

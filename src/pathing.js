@@ -151,8 +151,8 @@ var Cache = require("cache"),
                             var room = Game.rooms[roomName],
                                 matrix;
 
-                            // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room and this creep is not a remote worker.
-                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote")))) {
+                            // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room and this creep is not a remote worker or army creep.
+                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army")))) {
                                 return false;
                             }
 

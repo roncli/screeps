@@ -3210,7 +3210,7 @@ var Cache = __require(4,13),
                     delete creep.memory.escorting;
                     return;
                 }
-                if (!new TaskHeal(creep.memory.escorting).canAssign(creep)) {
+                if (creep.hitsMax - creep.hits < 1000 && !new TaskHeal(creep.memory.escorting).canAssign(creep)) {
                     new TaskRally(creep.memory.escorting).canAssign(creep);
                 }
             });
@@ -11719,7 +11719,7 @@ var Cache = __require(4,58),
                         roomCallback: (roomName) => {
                             var room = Game.rooms[roomName],
                                 matrix;
-                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote")))) {
+                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army")))) {
                                 return false;
                             }
 

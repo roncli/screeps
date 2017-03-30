@@ -109,9 +109,9 @@ var Cache = require("cache"),
                     delete creep.memory.escorting;
                     return;
                 }
-
-                // Heal the escortee if possible, rally to it otherwise.
-                if (!new TaskHeal(creep.memory.escorting).canAssign(creep)) {
+                
+                // Heal the escortee if under 1000 damage, rally to it otherwise.
+                if (creep.hitsMax - creep.hits < 1000 && !new TaskHeal(creep.memory.escorting).canAssign(creep)) {
                     new TaskRally(creep.memory.escorting).canAssign(creep);
                 }
             });

@@ -98,6 +98,12 @@ CollectEnergy.fromObj = function(creep) {
 
 CollectEnergy.getTasks = function(room) {
     "use strict";
+    
+    var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0));
+    
+    if (structures.length > 0) {
+        return _.map(structures, (s) => new CollectEnergy(s.id));
+    }
 
     if (room.storage && room.storage.store[RESOURCE_ENERGY] > 0) {
         return [new CollectEnergy(room.storage.id)];

@@ -4120,7 +4120,7 @@ var Cache = __require(4,17),
                 roomName = room.name,
                 collectors = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
                 count, sources, capacity, adjustment;
-            if (Cache.containersInRoom(room).length !== 0 && room.storage) {
+            if (Cache.containersInRoom(room).length !== 0 && room.storage && room.storage.my) {
                 return;
             }
             if (spawns.length === 0) {
@@ -6993,7 +6993,7 @@ var Cache = __require(4,31),
                 length = 0,
                 max = 0,
                 controller, army, storers, sources, lengthToStorage;
-            if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage) {
+            if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage || !room.storage.my) {
                 return;
             }
 
@@ -7592,8 +7592,8 @@ var Cache = __require(4,34),
             if (room.find(FIND_SOURCES).length === 0) {
                 return;
             }
-            count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage ? 150 : 300)).length;
-            max = canSpawn ? storage ? 1 : 2 : 0;
+            count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= ((storage && storage.my) ? 150 : 300)).length;
+            max = canSpawn ? (storage && storage.my) ? 1 : 2 : 0;
 
             if (count < max) {
                 Worker.spawn(room);
@@ -10580,6 +10580,12 @@ CollectEnergy.fromObj = function(creep) {
 
 CollectEnergy.getTasks = function(room) {
     "use strict";
+    
+    var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0));
+    
+    if (structures.length > 0) {
+        return _.map(structures, (s) => new CollectEnergy(s.id));
+    }
 
     if (room.storage && room.storage.store[RESOURCE_ENERGY] > 0) {
         return [new CollectEnergy(room.storage.id)];

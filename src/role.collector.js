@@ -15,7 +15,7 @@ var Cache = require("cache"),
                 count, sources, capacity, adjustment;
             
             // If there is storage and containers in the room, ignore the room.
-            if (Cache.containersInRoom(room).length !== 0 && room.storage) {
+            if (Cache.containersInRoom(room).length !== 0 && room.storage && room.storage.my) {
                 return;
             }
 

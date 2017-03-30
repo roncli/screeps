@@ -13,7 +13,7 @@ var Cache = require("cache"),
                 controller, army, storers, sources, lengthToStorage;
             
             // If there are no spawns, containers, or storages in the room, ignore the room.
-            if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage) {
+            if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage || !room.storage.my) {
                 return;
             }
 

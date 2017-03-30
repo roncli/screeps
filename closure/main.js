@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0)({
     optimizePathFinding: false,
@@ -1204,7 +1204,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 var originalFindPath = Room.prototype.findPath;
@@ -8795,7 +8795,7 @@ Cleanup.prototype.run = function(room) {
     "use strict";
 
     var roomName = room.name,
-        ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [],
+        ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [], junk = [],
         supportRoom, tasks;
     if (!(supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom])) {
         return;
@@ -8850,17 +8850,20 @@ Cleanup.prototype.run = function(room) {
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
         noEnergyStructures = _.filter(structures, (s) => (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
         energyStructures = _.filter(structures, (s) => s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0);
+        junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
         tasks.pickupResource.tasks = TaskPickupResource.getTasks(room);
 
         if (noEnergyStructures.length > 0) {
             tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(noEnergyStructures);
-        } else {
+        } else if (ramparts.length > 0) {
             tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);
+        } else {
+            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(junk);
         }
 
-        if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0 && Cache.powerBanksInRoom(room).length === 0) {
+        if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
             _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [], (creep) => {
                 creep.memory.role = "storer";

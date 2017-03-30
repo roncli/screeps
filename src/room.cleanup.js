@@ -34,7 +34,7 @@ Cleanup.prototype.run = function(room) {
     "use strict";
 
     var roomName = room.name,
-        ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [],
+        ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [], junk = [],
         supportRoom, tasks;
 
     // Can't see the support room, we have bigger problems, so just bail.
@@ -98,6 +98,9 @@ Cleanup.prototype.run = function(room) {
         noEnergyStructures = _.filter(structures, (s) => (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
         energyStructures = _.filter(structures, (s) => s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0);
 
+        // Find all walls and roads.
+        junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);
+
         // Collect energy and minerals from structures that aren't under ramparts.
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
@@ -106,12 +109,15 @@ Cleanup.prototype.run = function(room) {
         if (noEnergyStructures.length > 0) {
             // Dismantle structures with no energy or minerals that aren't under ramparts.
             tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(noEnergyStructures);
-        } else {
+        } else if (ramparts.length > 0) {
             // Dismantle ramparts.
             tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);
+        } else {
+            // Dismantle junk.
+            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(junk);
         }
 
-        if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0 && Cache.powerBanksInRoom(room).length === 0) {
+        if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
             // Notify that the room is cleaned up.
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
             

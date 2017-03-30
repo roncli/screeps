@@ -7718,29 +7718,6 @@ var Cache = __require(4,34),
             if (creepsWithNoTask.length === 0) {
                 return;
             }
-            if (!controller || controller.level < 6) {
-                if (Cache.hostilesInRoom(room).length === 0) {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                            if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                                return;
-                            }
-                            if (task.canAssign(creep)) {
-                                creep.say("Pickup");
-                                assigned.push(creep.name);
-                                return false;
-                            }
-                        });
-                    });
-                }
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-            }
             _.forEach(tasks.fillMinerals.storageTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
                     if (task.canAssign(creep)) {
@@ -7953,6 +7930,29 @@ var Cache = __require(4,34),
                     assigned = [];
                 });
                 
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
+            }
+            if (!controller || controller.level < 6) {
+                if (Cache.hostilesInRoom(room).length === 0) {
+                    _.forEach(creepsWithNoTask, (creep) => {
+                        _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                            if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                                return;
+                            }
+                            if (task.canAssign(creep)) {
+                                creep.say("Pickup");
+                                assigned.push(creep.name);
+                                return false;
+                            }
+                        });
+                    });
+                }
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -10824,7 +10824,7 @@ CollectMinerals.getStorerTasks = function(room) {
 CollectMinerals.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(_.filter(structures, (s) => (s.store || s.structureType === STRUCTURE_LAB) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0)).sort((a, b) => (a.structureType === STRUCTURE_LAB ? a.mineralAmount : _.sum(a.store) - a.store[RESOURCE_ENERGY]) - (b.structureType === STRUCTURE_LAB ? b.mineralAmount : _.sum(b.store) - b.store[RESOURCE_ENERGY])), (s) => new CollectMinerals(s.id));
+    return _.map(_.filter(structures, (s) => (s.store || [STRUCTURE_LAB, STRUCTURE_NUKER, STRUCTURE_POWER_SPAWN].indexOf(s.structureType) !== -1) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0 || s.ghodium > 0 || s.power > 0)).sort((a, b) => (a.mineralAmount || a.ghodium || a.power || (_.sum(a.store) - a.store[RESOURCE_ENERGY])) - (b.mineralAmount || b.ghodium || b.power || (_.sum(b.store) - b.store[RESOURCE_ENERGY]))), (s) => new CollectMinerals(s.id));
 };
 
 CollectMinerals.getLabTasks = function(room) {

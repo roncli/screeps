@@ -163,31 +163,6 @@ var Cache = require("cache"),
                 return;
             }
 
-            // Check for dropped resources in current room if there are no hostiles.
-            if (!controller || controller.level < 6) {
-                if (Cache.hostilesInRoom(room).length === 0) {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                            if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                                return;
-                            }
-                            if (task.canAssign(creep)) {
-                                creep.say("Pickup");
-                                assigned.push(creep.name);
-                                return false;
-                            }
-                        });
-                    });
-                }
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-            }
-
             // Check for unfilled storage for minerals.
             _.forEach(tasks.fillMinerals.storageTasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {
@@ -422,6 +397,31 @@ var Cache = require("cache"),
                     assigned = [];
                 });
                 
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
+            }
+
+            // Check for dropped resources in current room if there are no hostiles.
+            if (!controller || controller.level < 6) {
+                if (Cache.hostilesInRoom(room).length === 0) {
+                    _.forEach(creepsWithNoTask, (creep) => {
+                        _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                            if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                                return;
+                            }
+                            if (task.canAssign(creep)) {
+                                creep.say("Pickup");
+                                assigned.push(creep.name);
+                                return false;
+                            }
+                        });
+                    });
+                }
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }

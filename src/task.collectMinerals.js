@@ -133,7 +133,7 @@ CollectMinerals.getStorerTasks = function(room) {
 CollectMinerals.getCleanupTasks = function(structures) {
     "use strict";
 
-    return _.map(_.filter(structures, (s) => (s.store || s.structureType === STRUCTURE_LAB) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0)).sort((a, b) => (a.structureType === STRUCTURE_LAB ? a.mineralAmount : _.sum(a.store) - a.store[RESOURCE_ENERGY]) - (b.structureType === STRUCTURE_LAB ? b.mineralAmount : _.sum(b.store) - b.store[RESOURCE_ENERGY])), (s) => new CollectMinerals(s.id));
+    return _.map(_.filter(structures, (s) => (s.store || [STRUCTURE_LAB, STRUCTURE_NUKER, STRUCTURE_POWER_SPAWN].indexOf(s.structureType) !== -1) && ((_.sum(s.store) > 0 && s.store[RESOURCE_ENERGY] < _.sum(s.store)) || s.mineralAmount > 0 || s.ghodium > 0 || s.power > 0)).sort((a, b) => (a.mineralAmount || a.ghodium || a.power || (_.sum(a.store) - a.store[RESOURCE_ENERGY])) - (b.mineralAmount || b.ghodium || b.power || (_.sum(b.store) - b.store[RESOURCE_ENERGY]))), (s) => new CollectMinerals(s.id));
 };
 
 CollectMinerals.getLabTasks = function(room) {

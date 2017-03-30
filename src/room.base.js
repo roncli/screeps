@@ -6,6 +6,7 @@ var RoomObj = require("roomObj"),
     Utilities = require("utilities"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
+    RoleConverter = require("role.converter"),
     RoleDismantler = require("role.dismantler"),
     RoleMiner = require("role.miner"),
     RoleScientist = require("role.scientist"),
@@ -352,7 +353,7 @@ Base.prototype.terminal = function(room, terminal) {
         } else {
             // Transfer what we have in excess to rooms in need if we have the minimum credits.
             if (Cache.credits >= Memory.minimumCredits && Memory.buy) {
-                bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal);
+                bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal && r.terminal.my);
                 _.forEach(bases, (otherRoom) => {
                     var otherRoomName = otherRoom.name;
 
@@ -641,6 +642,7 @@ Base.prototype.spawn = function(room, canSpawnWorkers) {
     }
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
+    RoleConverter.checkSpawn(room);
     if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
         RoleUpgrader.checkSpawn(room);
     }
@@ -656,6 +658,7 @@ Base.prototype.assignTasks = function(room, tasks) {
     RoleDismantler.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
+    RoleConverter.assignTasks(room, tasks);
     RoleUpgrader.assignTasks(room, tasks);
 
     RoleTower.assignTasks(room, tasks);

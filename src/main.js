@@ -19,6 +19,7 @@ var profiler = require("screeps-profiler"),
     RoleArmyRanged = require("role.armyRanged"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
+    RoleConverter = require("role.converter"),
     RoleDefender = require("role.defender"),
     RoleDismantler = require("role.dismantler"),
     RoleHealer = require("role.healer"),
@@ -183,6 +184,7 @@ var profiler = require("screeps-profiler"),
                     ArmyRanged: RoleArmyRanged,
                     Claimer: RoleClaimer,
                     Collector: RoleCollector,
+                    Converter: RoleConverter,
                     Defender: RoleDefender,
                     Dismantler: RoleDismantler,
                     Healer: RoleHealer,
@@ -636,7 +638,7 @@ var profiler = require("screeps-profiler"),
             // See if there is some energy balancing we can do.
             var rooms, energyGoal;
 
-            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
+            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
             if (rooms.length > 1) {
                 energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
@@ -1154,7 +1156,7 @@ var profiler = require("screeps-profiler"),
                     delete creep.memory.currentTask;
 
                     // RIP & Pepperonis :(
-                    if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                    if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                         creep.suicide();
                     } else {
                         creep.say("Idle");

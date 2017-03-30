@@ -72,27 +72,28 @@ var profiler = __require(2,0),
     RoleArmyRanged = __require(15,0),
     RoleClaimer = __require(16,0),
     RoleCollector = __require(17,0),
-    RoleDefender = __require(18,0),
-    RoleDismantler = __require(19,0),
-    RoleHealer = __require(20,0),
-    RoleMiner = __require(21,0),
-    RoleRemoteBuilder = __require(22,0),
-    RoleRemoteCollector = __require(23,0),
-    RoleRemoteDismantler = __require(24,0),
-    RoleRemoteMiner = __require(25,0),
-    RoleRemoteReserver = __require(26,0),
-    RoleRemoteStorer = __require(27,0),
-    RoleRemoteWorker = __require(28,0),
-    RoleScientist = __require(29,0),
-    RoleStorer = __require(30,0),
-    RoleTower = __require(31,0),
-    RoleUpgrader = __require(32,0),
-    RoleWorker = __require(33,0),
-    RoomBase = __require(34,0),
-    RoomCleanup = __require(35,0),
-    RoomMine = __require(36,0),
-    taskDeserialization = __require(37,0),
-    roomDeserialization = __require(38,0),
+    RoleConverter = __require(18,0),
+    RoleDefender = __require(19,0),
+    RoleDismantler = __require(20,0),
+    RoleHealer = __require(21,0),
+    RoleMiner = __require(22,0),
+    RoleRemoteBuilder = __require(23,0),
+    RoleRemoteCollector = __require(24,0),
+    RoleRemoteDismantler = __require(25,0),
+    RoleRemoteMiner = __require(26,0),
+    RoleRemoteReserver = __require(27,0),
+    RoleRemoteStorer = __require(28,0),
+    RoleRemoteWorker = __require(29,0),
+    RoleScientist = __require(30,0),
+    RoleStorer = __require(31,0),
+    RoleTower = __require(32,0),
+    RoleUpgrader = __require(33,0),
+    RoleWorker = __require(34,0),
+    RoomBase = __require(35,0),
+    RoomCleanup = __require(36,0),
+    RoomMine = __require(37,0),
+    taskDeserialization = __require(38,0),
+    roomDeserialization = __require(39,0),
     paths,
     reset,
     unobservableRooms,
@@ -230,6 +231,7 @@ var profiler = __require(2,0),
                     ArmyRanged: RoleArmyRanged,
                     Claimer: RoleClaimer,
                     Collector: RoleCollector,
+                    Converter: RoleConverter,
                     Defender: RoleDefender,
                     Dismantler: RoleDismantler,
                     Healer: RoleHealer,
@@ -633,7 +635,7 @@ var profiler = __require(2,0),
         balanceEnergy: () => {
             var rooms, energyGoal;
 
-            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.terminal).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
+            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
             if (rooms.length > 1) {
                 energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
                 _.forEach(rooms, (room, index) => {
@@ -1123,7 +1125,7 @@ var profiler = __require(2,0),
                     }
                 } else {
                     delete creep.memory.currentTask;
-                    if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                    if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                         creep.suicide();
                     } else {
                         creep.say("Idle");
@@ -1615,10 +1617,10 @@ var Cache = __require(4,3),
     RoleArmyHealer = __require(13,3),
     RoleArmyMelee = __require(14,3),
     RoleArmyRanged = __require(15,3),
-    TaskHeal = __require(39,3),
-    TaskMeleeAttack = __require(40,3),
-    TaskRally = __require(41,3),
-    TaskRangedAttack = __require(42,3),
+    TaskHeal = __require(40,3),
+    TaskMeleeAttack = __require(41,3),
+    TaskRally = __require(42,3),
+    TaskRangedAttack = __require(43,3),
 
     Army = {
         run: (name) => {
@@ -2019,6 +2021,23 @@ var Cache = __require(4,5),
                 Memory.maxCreeps.claimer[fromRoom][toRoom] = true;
             } else {
                 delete Memory.maxCreeps.claimer[fromRoom][toRoom];
+            }
+        },
+        attackRoom: (fromRoom, toRoom, attack) => {
+            "use strict";
+
+            if (!Memory.maxCreeps.converter) {
+                Memory.maxCreeps.converter = {};
+            }
+
+            if (!Memory.maxCreeps.converter[fromRoom]) {
+                Memory.maxCreeps.converter[fromRoom] = {};
+            }
+            
+            if (attack) {
+                Memory.maxCreeps.converter[fromRoom][toRoom] = true;
+            } else {
+                delete Memory.maxCreeps.converter[fromRoom][toRoom];
             }
         },
         claimMine: (room) => {
@@ -2842,8 +2861,8 @@ return module.exports;
 __modules[12] = function(module, exports) {
 var Cache = __require(4,12),
     Utilities = __require(11,12),
-    TaskDismantle = __require(43,12),
-    TaskRally = __require(41,12),
+    TaskDismantle = __require(44,12),
+    TaskRally = __require(42,12),
 
     Dismantler = {
         checkSpawn: (armyName, portals) => {
@@ -3115,8 +3134,8 @@ return module.exports;
 __modules[13] = function(module, exports) {
 var Cache = __require(4,13),
     Utilities = __require(11,13),
-    TaskHeal = __require(39,13),
-    TaskRally = __require(41,13),
+    TaskHeal = __require(40,13),
+    TaskRally = __require(42,13),
 
     Healer = {
         checkSpawn: (armyName, portals) => {
@@ -3400,7 +3419,7 @@ return module.exports;
 __modules[14] = function(module, exports) {
 var Cache = __require(4,14),
     Utilities = __require(11,14),
-    TaskRally = __require(41,14),
+    TaskRally = __require(42,14),
 
     Melee = {
         checkSpawn: (armyName, portals) => {
@@ -3689,7 +3708,7 @@ return module.exports;
 __modules[15] = function(module, exports) {
 var Cache = __require(4,15),
     Utilities = __require(11,15),
-    TaskRally = __require(41,15),
+    TaskRally = __require(42,15),
 
     Ranged = {
         checkSpawn: (armyName, portals) => {
@@ -3978,8 +3997,8 @@ __modules[16] = function(module, exports) {
 var Cache = __require(4,16),
     Commands = __require(5,16),
     Utilities = __require(11,16),
-    TaskRally = __require(41,16),
-    TaskClaim = __require(44,16),
+    TaskRally = __require(42,16),
+    TaskClaim = __require(45,16),
 
     Claimer = {
         checkSpawn: (room) => {
@@ -4088,9 +4107,9 @@ return module.exports;
 __modules[17] = function(module, exports) {
 var Cache = __require(4,17),
     Utilities = __require(11,17),
-    TaskHarvest = __require(45,17),
-    TaskPickupResource = __require(46,17),
-    TaskRally = __require(41,17),
+    TaskHarvest = __require(46,17),
+    TaskPickupResource = __require(47,17),
+    TaskRally = __require(42,17),
 
     Collector = {
         checkSpawn: (room) => {
@@ -4412,12 +4431,135 @@ module.exports = Collector;
 return module.exports;
 }
 /********** End of module 17: ../src/role.collector.js **********/
-/********** Start module 18: ../src/role.defender.js **********/
+/********** Start module 18: ../src/role.converter.js **********/
 __modules[18] = function(module, exports) {
 var Cache = __require(4,18),
+    Commands = __require(5,18),
     Utilities = __require(11,18),
-    TaskRally = __require(41,18),
-    TaskMeleeAttack = __require(40,18),
+    TaskRally = __require(42,18),
+    TaskAttack = __require(48,18),
+
+    Converter = {
+        checkSpawn: (room) => {
+            "use strict";
+
+            var converter = Memory.maxCreeps.converter,
+                roomName = room.name,
+                converters = Cache.creeps[roomName] && Cache.creeps[roomName].converter || [],
+                num = 0,
+                max = 0;
+            if (converter) {
+                _.forEach(converter[roomName], (value, toRoom) => {
+                    var count = _.filter(converters, (c) => c.memory.attack === toRoom).length;
+
+                    num += count;
+                    max += 1;
+
+                    if (count === 0) {
+                        Converter.spawn(room, toRoom);
+                    }
+                });
+            }
+            if (Memory.log && (converters.length > 0 || max > 0)) {
+                Cache.log.rooms[roomName].creeps.push({
+                    role: "converter",
+                    count: converters.length,
+                    max: max
+                });
+            }        
+        },
+        
+        spawn: (room, toRoom) => {
+            "use strict";
+
+            var body = [],
+                roomName = room.name,
+                spawns = Cache.spawnsInRoom(room),
+                supportRoomName = supportRoom.name,
+                energy, units, count, spawnToUse, name;
+            if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+                return false;
+            }
+            energy = Math.min(supportRoom.energyCapacityAvailable, 24400);
+            units = Math.floor(energy / 3050);
+            for (count = 0; count < units; count++) {
+                body.push(CLAIM);
+                body.push(CLAIM);
+                body.push(CLAIM);
+                body.push(CLAIM);
+                body.push(CLAIM);
+            }
+
+            for (count = 0; count < units; count++) {
+                body.push(MOVE);
+            }
+            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
+            if (!spawnToUse) {
+                return false;
+            }
+            name = spawnToUse.createCreep(body, "converter-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "converter", home: room.name, attack: toRoom});
+            Cache.spawning[spawnToUse.id] = typeof name !== "number";
+
+            return typeof name !== "number";
+        },
+
+        assignTasks: (room, tasks) => {
+            "use strict";
+
+            var roomName = room.name,
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].converter || []),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.attack), (creep) => {
+                var task = TaskRally.getClaimerTask(creep);
+                if (task.canAssign(creep)) {
+                    assigned.push(creep.name);
+                }
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task = TaskAttack.getTask(creep);
+                if (task.canAssign(creep)) {
+                    creep.say("Attacking");
+                    assigned.push(creep.name);
+                }
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(creepsWithNoTask, (creep) => {
+                creep.suicide();
+            });
+        }
+    };
+
+if (Memory.profiling) {
+    __require(2,18).registerObject(Converter, "RoleConverter");
+}
+module.exports = Converter;
+
+return module.exports;
+}
+/********** End of module 18: ../src/role.converter.js **********/
+/********** Start module 19: ../src/role.defender.js **********/
+__modules[19] = function(module, exports) {
+var Cache = __require(4,19),
+    Utilities = __require(11,19),
+    TaskRally = __require(42,19),
+    TaskMeleeAttack = __require(41,19),
     checkQuadrant = (pos, quadrant) => {
         switch (quadrant) {
             case 0:
@@ -4517,21 +4659,21 @@ var Cache = __require(4,18),
     };
 
 if (Memory.profiling) {
-    __require(2,18).registerObject(Defender, "RoleDefender");
+    __require(2,19).registerObject(Defender, "RoleDefender");
 }
 module.exports = Defender;
 
 return module.exports;
 }
-/********** End of module 18: ../src/role.defender.js **********/
-/********** Start module 19: ../src/role.dismantler.js **********/
-__modules[19] = function(module, exports) {
-var Cache = __require(4,19),
-    Utilities = __require(11,19),
-    TaskBuild = __require(47,19),
-    TaskPickupResource = __require(46,19),
-    TaskRally = __require(41,19),
-    TaskRepair = __require(48,19),
+/********** End of module 19: ../src/role.defender.js **********/
+/********** Start module 20: ../src/role.dismantler.js **********/
+__modules[20] = function(module, exports) {
+var Cache = __require(4,20),
+    Utilities = __require(11,20),
+    TaskBuild = __require(49,20),
+    TaskPickupResource = __require(47,20),
+    TaskRally = __require(42,20),
+    TaskRepair = __require(50,20),
 
     Dismantler = {
         checkSpawn: (room, supportRoom) => {
@@ -4750,19 +4892,19 @@ var Cache = __require(4,19),
     };
 
 if (Memory.profiling) {
-    __require(2,19).registerObject(Dismantler, "RoleDismantler");
+    __require(2,20).registerObject(Dismantler, "RoleDismantler");
 }
 module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 19: ../src/role.dismantler.js **********/
-/********** Start module 20: ../src/role.healer.js **********/
-__modules[20] = function(module, exports) {
-var Cache = __require(4,20),
-    Utilities = __require(11,20),
-    TaskHeal = __require(39,20),
-    TaskRally = __require(41,20),
+/********** End of module 20: ../src/role.dismantler.js **********/
+/********** Start module 21: ../src/role.healer.js **********/
+__modules[21] = function(module, exports) {
+var Cache = __require(4,21),
+    Utilities = __require(11,21),
+    TaskHeal = __require(40,21),
+    TaskRally = __require(42,21),
 
     Healer = {
         checkSpawn: (room) => {
@@ -4864,19 +5006,19 @@ var Cache = __require(4,20),
     };
 
 if (Memory.profiling) {
-    __require(2,20).registerObject(Healer, "RoleHealer");
+    __require(2,21).registerObject(Healer, "RoleHealer");
 }
 module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 20: ../src/role.healer.js **********/
-/********** Start module 21: ../src/role.miner.js **********/
-__modules[21] = function(module, exports) {
-var Cache = __require(4,21),
-    Utilities = __require(11,21),
-    TaskMine = __require(49,21),
-    TaskRally = __require(41,21),
+/********** End of module 21: ../src/role.healer.js **********/
+/********** Start module 22: ../src/role.miner.js **********/
+__modules[22] = function(module, exports) {
+var Cache = __require(4,22),
+    Utilities = __require(11,22),
+    TaskMine = __require(51,22),
+    TaskRally = __require(42,22),
 
     Miner = {
         checkSpawn: (room) => {
@@ -5002,22 +5144,22 @@ var Cache = __require(4,21),
     };
 
 if (Memory.profiling) {
-    __require(2,21).registerObject(Miner, "RoleMiner");
+    __require(2,22).registerObject(Miner, "RoleMiner");
 }
 module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 21: ../src/role.miner.js **********/
-/********** Start module 22: ../src/role.remoteBuilder.js **********/
-__modules[22] = function(module, exports) {
-var Cache = __require(4,22),
-    Utilities = __require(11,22),
-    TaskBuild = __require(47,22),
-    TaskHarvest = __require(45,22),
-    TaskPickupResource = __require(46,22),
-    TaskRally = __require(41,22),
-    TaskRepair = __require(48,22),
+/********** End of module 22: ../src/role.miner.js **********/
+/********** Start module 23: ../src/role.remoteBuilder.js **********/
+__modules[23] = function(module, exports) {
+var Cache = __require(4,23),
+    Utilities = __require(11,23),
+    TaskBuild = __require(49,23),
+    TaskHarvest = __require(46,23),
+    TaskPickupResource = __require(47,23),
+    TaskRally = __require(42,23),
+    TaskRepair = __require(50,23),
 
     Builder = {
         checkSpawn: (room) => {
@@ -5205,20 +5347,20 @@ var Cache = __require(4,22),
     };
 
 if (Memory.profiling) {
-    __require(2,22).registerObject(Builder, "RoleRemoteBuilder");
+    __require(2,23).registerObject(Builder, "RoleRemoteBuilder");
 }
 module.exports = Builder;
 
 return module.exports;
 }
-/********** End of module 22: ../src/role.remoteBuilder.js **********/
-/********** Start module 23: ../src/role.remoteCollector.js **********/
-__modules[23] = function(module, exports) {
-var Cache = __require(4,23),
-    Utilities = __require(11,23),
-    TaskCollectEnergy = __require(50,23),
-    TaskPickupResource = __require(46,23),
-    TaskRally = __require(41,23),
+/********** End of module 23: ../src/role.remoteBuilder.js **********/
+/********** Start module 24: ../src/role.remoteCollector.js **********/
+__modules[24] = function(module, exports) {
+var Cache = __require(4,24),
+    Utilities = __require(11,24),
+    TaskCollectEnergy = __require(52,24),
+    TaskPickupResource = __require(47,24),
+    TaskRally = __require(42,24),
 
     RemoteCollector = {
         checkSpawn: (room, supportRoom, max) => {
@@ -5430,20 +5572,20 @@ var Cache = __require(4,23),
     };
 
 if (Memory.profiling) {
-    __require(2,23).registerObject(RemoteCollector, "RoleRemoteCollector");
+    __require(2,24).registerObject(RemoteCollector, "RoleRemoteCollector");
 }
 module.exports = RemoteCollector;
 
 return module.exports;
 }
-/********** End of module 23: ../src/role.remoteCollector.js **********/
-/********** Start module 24: ../src/role.remoteDismantler.js **********/
-__modules[24] = function(module, exports) {
-var Cache = __require(4,24),
-    Utilities = __require(11,24),
-    TaskBuild = __require(47,24),
-    TaskPickupResource = __require(46,24),
-    TaskRally = __require(41,24),
+/********** End of module 24: ../src/role.remoteCollector.js **********/
+/********** Start module 25: ../src/role.remoteDismantler.js **********/
+__modules[25] = function(module, exports) {
+var Cache = __require(4,25),
+    Utilities = __require(11,25),
+    TaskBuild = __require(49,25),
+    TaskPickupResource = __require(47,25),
+    TaskRally = __require(42,25),
 
     RemoteDismantler = {
         checkSpawn: (room, supportRoom) => {
@@ -5555,19 +5697,19 @@ var Cache = __require(4,24),
     };
 
 if (Memory.profiling) {
-    __require(2,24).registerObject(RemoteDismantler, "RoleRemoteDismantler");
+    __require(2,25).registerObject(RemoteDismantler, "RoleRemoteDismantler");
 }
 module.exports = RemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 24: ../src/role.remoteDismantler.js **********/
-/********** Start module 25: ../src/role.remoteMiner.js **********/
-__modules[25] = function(module, exports) {
-var Cache = __require(4,25),
-    Utilities = __require(11,25),
-    TaskMine = __require(49,25),
-    TaskRally = __require(41,25),
+/********** End of module 25: ../src/role.remoteDismantler.js **********/
+/********** Start module 26: ../src/role.remoteMiner.js **********/
+__modules[26] = function(module, exports) {
+var Cache = __require(4,26),
+    Utilities = __require(11,26),
+    TaskMine = __require(51,26),
+    TaskRally = __require(42,26),
 
     Miner = {
         checkSpawn: (room) => {
@@ -5708,20 +5850,20 @@ var Cache = __require(4,25),
     };
 
 if (Memory.profiling) {
-    __require(2,25).registerObject(Miner, "RoleRemoteMiner");
+    __require(2,26).registerObject(Miner, "RoleRemoteMiner");
 }
 module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 25: ../src/role.remoteMiner.js **********/
-/********** Start module 26: ../src/role.remoteReserver.js **********/
-__modules[26] = function(module, exports) {
-var Cache = __require(4,26),
-    Commands = __require(5,26),
-    Utilities = __require(11,26),
-    TaskRally = __require(41,26),
-    TaskReserve = __require(51,26),
+/********** End of module 26: ../src/role.remoteMiner.js **********/
+/********** Start module 27: ../src/role.remoteReserver.js **********/
+__modules[27] = function(module, exports) {
+var Cache = __require(4,27),
+    Commands = __require(5,27),
+    Utilities = __require(11,27),
+    TaskRally = __require(42,27),
+    TaskReserve = __require(53,27),
 
     Reserver = {
         checkSpawn: (room) => {
@@ -5851,21 +5993,21 @@ var Cache = __require(4,26),
     };
 
 if (Memory.profiling) {
-    __require(2,26).registerObject(Reserver, "RoleRemoteReserver");
+    __require(2,27).registerObject(Reserver, "RoleRemoteReserver");
 }
 module.exports = Reserver;
 
 return module.exports;
 }
-/********** End of module 26: ../src/role.remoteReserver.js **********/
-/********** Start module 27: ../src/role.remoteStorer.js **********/
-__modules[27] = function(module, exports) {
-var Cache = __require(4,27),
-    Utilities = __require(11,27),
-    TaskCollectEnergy = __require(50,27),
-    TaskCollectMinerals = __require(52,27),
-    TaskPickupResource = __require(46,27),
-    TaskRally = __require(41,27),
+/********** End of module 27: ../src/role.remoteReserver.js **********/
+/********** Start module 28: ../src/role.remoteStorer.js **********/
+__modules[28] = function(module, exports) {
+var Cache = __require(4,28),
+    Utilities = __require(11,28),
+    TaskCollectEnergy = __require(52,28),
+    TaskCollectMinerals = __require(54,28),
+    TaskPickupResource = __require(47,28),
+    TaskRally = __require(42,28),
 
     Storer = {
         checkSpawn: (room) => {
@@ -6101,23 +6243,23 @@ var Cache = __require(4,27),
     };
 
 if (Memory.profiling) {
-    __require(2,27).registerObject(Storer, "RoleRemoteStorer");
+    __require(2,28).registerObject(Storer, "RoleRemoteStorer");
 }
 module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 27: ../src/role.remoteStorer.js **********/
-/********** Start module 28: ../src/role.remoteWorker.js **********/
-__modules[28] = function(module, exports) {
-var Cache = __require(4,28),
-    Utilities = __require(11,28),
-    TaskBuild = __require(47,28),
-    TaskCollectEnergy = __require(50,28),
-    TaskHarvest = __require(45,28),
-    TaskPickupResource = __require(46,28),
-    TaskRally = __require(41,28),
-    TaskRepair = __require(48,28),
+/********** End of module 28: ../src/role.remoteStorer.js **********/
+/********** Start module 29: ../src/role.remoteWorker.js **********/
+__modules[29] = function(module, exports) {
+var Cache = __require(4,29),
+    Utilities = __require(11,29),
+    TaskBuild = __require(49,29),
+    TaskCollectEnergy = __require(52,29),
+    TaskHarvest = __require(46,29),
+    TaskPickupResource = __require(47,29),
+    TaskRally = __require(42,29),
+    TaskRepair = __require(50,29),
 
     Worker = {
         checkSpawn: (room) => {
@@ -6407,19 +6549,19 @@ var Cache = __require(4,28),
     };
 
 if (Memory.profiling) {
-    __require(2,28).registerObject(Worker, "RoleRemoteWorker");
+    __require(2,29).registerObject(Worker, "RoleRemoteWorker");
 }
 module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 28: ../src/role.remoteWorker.js **********/
-/********** Start module 29: ../src/role.scientist.js **********/
-__modules[29] = function(module, exports) {
-var Cache = __require(4,29),
-    Utilities = __require(11,29),
-    TaskPickupResource = __require(46,29),
-    TaskRally = __require(41,29),
+/********** End of module 29: ../src/role.remoteWorker.js **********/
+/********** Start module 30: ../src/role.scientist.js **********/
+__modules[30] = function(module, exports) {
+var Cache = __require(4,30),
+    Utilities = __require(11,30),
+    TaskPickupResource = __require(47,30),
+    TaskRally = __require(42,30),
 
     Scientist = {
         checkSpawn: (room) => {
@@ -6829,18 +6971,18 @@ var Cache = __require(4,29),
     };
 
 if (Memory.profiling) {
-    __require(2,29).registerObject(Scientist, "RoleScientist");
+    __require(2,30).registerObject(Scientist, "RoleScientist");
 }
 module.exports = Scientist;
 
 return module.exports;
 }
-/********** End of module 29: ../src/role.scientist.js **********/
-/********** Start module 30: ../src/role.storer.js **********/
-__modules[30] = function(module, exports) {
-var Cache = __require(4,30),
-    Utilities = __require(11,30),
-    TaskRally = __require(41,30),
+/********** End of module 30: ../src/role.scientist.js **********/
+/********** Start module 31: ../src/role.storer.js **********/
+__modules[31] = function(module, exports) {
+var Cache = __require(4,31),
+    Utilities = __require(11,31),
+    TaskRally = __require(42,31),
 
     Storer = {
         checkSpawn: (room) => {
@@ -7135,16 +7277,16 @@ var Cache = __require(4,30),
     };
 
 if (Memory.profiling) {
-    __require(2,30).registerObject(Storer, "RoleStorer");
+    __require(2,31).registerObject(Storer, "RoleStorer");
 }
 module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 30: ../src/role.storer.js **********/
-/********** Start module 31: ../src/role.tower.js **********/
-__modules[31] = function(module, exports) {
-var Cache = __require(4,31),
+/********** End of module 31: ../src/role.storer.js **********/
+/********** Start module 32: ../src/role.tower.js **********/
+__modules[32] = function(module, exports) {
+var Cache = __require(4,32),
     Tower = {
         assignTasks: (room, tasks) => {
             "use strict";
@@ -7170,20 +7312,20 @@ var Cache = __require(4,31),
     };
 
 if (Memory.profiling) {
-    __require(2,31).registerObject(Tower, "RoleTower");
+    __require(2,32).registerObject(Tower, "RoleTower");
 }
 module.exports = Tower;
 
 return module.exports;
 }
-/********** End of module 31: ../src/role.tower.js **********/
-/********** Start module 32: ../src/role.upgrader.js **********/
-__modules[32] = function(module, exports) {
-var Cache = __require(4,32),
-    Utilities = __require(11,32),
-    TaskCollectEnergy = __require(50,32),
-    TaskHarvest = __require(45,32),
-    TaskRally = __require(41,32),
+/********** End of module 32: ../src/role.tower.js **********/
+/********** Start module 33: ../src/role.upgrader.js **********/
+__modules[33] = function(module, exports) {
+var Cache = __require(4,33),
+    Utilities = __require(11,33),
+    TaskCollectEnergy = __require(52,33),
+    TaskHarvest = __require(46,33),
+    TaskRally = __require(42,33),
 
     Upgrader = {
         checkSpawn: (room) => {
@@ -7424,20 +7566,20 @@ var Cache = __require(4,32),
     };
 
 if (Memory.profiling) {
-    __require(2,32).registerObject(Upgrader, "RoleUpgrader");
+    __require(2,33).registerObject(Upgrader, "RoleUpgrader");
 }
 module.exports = Upgrader;
 
 return module.exports;
 }
-/********** End of module 32: ../src/role.upgrader.js **********/
-/********** Start module 33: ../src/role.worker.js **********/
-__modules[33] = function(module, exports) {
-var Cache = __require(4,33),
-    Utilities = __require(11,33),
-    TaskHarvest = __require(45,33),
-    TaskPickupResource = __require(46,33),
-    TaskRally = __require(41,33),
+/********** End of module 33: ../src/role.upgrader.js **********/
+/********** Start module 34: ../src/role.worker.js **********/
+__modules[34] = function(module, exports) {
+var Cache = __require(4,34),
+    Utilities = __require(11,34),
+    TaskHarvest = __require(46,34),
+    TaskPickupResource = __require(47,34),
+    TaskRally = __require(42,34),
 
     Worker = {
         checkSpawn: (room, canSpawn) => {
@@ -7861,40 +8003,41 @@ var Cache = __require(4,33),
     };
 
 if (Memory.profiling) {
-    __require(2,33).registerObject(Worker, "RoleWorker");
+    __require(2,34).registerObject(Worker, "RoleWorker");
 }
 module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 33: ../src/role.worker.js **********/
-/********** Start module 34: ../src/room.base.js **********/
-__modules[34] = function(module, exports) {
-var RoomObj = __require(53,34),
-    Cache = __require(4,34),
-    Commands = __require(5,34),
-    Market = __require(7,34),
-    Minerals = __require(8,34),
-    Utilities = __require(11,34),
-    RoleClaimer = __require(16,34),
-    RoleCollector = __require(17,34),
-    RoleDismantler = __require(19,34),
-    RoleMiner = __require(21,34),
-    RoleScientist = __require(29,34),
-    RoleStorer = __require(30,34),
-    RoleTower = __require(31,34),
-    RoleUpgrader = __require(32,34),
-    RoleWorker = __require(33,34),
-    TaskBuild = __require(47,34),
-    TaskCollectEnergy = __require(50,34),
-    TaskCollectMinerals = __require(52,34),
-    TaskDismantle = __require(43,34),
-    TaskFillEnergy = __require(54,34),
-    TaskFillMinerals = __require(55,34),
-    TaskHeal = __require(39,34),
-    TaskRangedAttack = __require(42,34),
-    TaskRepair = __require(48,34),
-    TaskUpgradeController = __require(56,34),
+/********** End of module 34: ../src/role.worker.js **********/
+/********** Start module 35: ../src/room.base.js **********/
+__modules[35] = function(module, exports) {
+var RoomObj = __require(55,35),
+    Cache = __require(4,35),
+    Commands = __require(5,35),
+    Market = __require(7,35),
+    Minerals = __require(8,35),
+    Utilities = __require(11,35),
+    RoleClaimer = __require(16,35),
+    RoleCollector = __require(17,35),
+    RoleConverter = __require(18,35),
+    RoleDismantler = __require(20,35),
+    RoleMiner = __require(22,35),
+    RoleScientist = __require(30,35),
+    RoleStorer = __require(31,35),
+    RoleTower = __require(32,35),
+    RoleUpgrader = __require(33,35),
+    RoleWorker = __require(34,35),
+    TaskBuild = __require(49,35),
+    TaskCollectEnergy = __require(52,35),
+    TaskCollectMinerals = __require(54,35),
+    TaskDismantle = __require(44,35),
+    TaskFillEnergy = __require(56,35),
+    TaskFillMinerals = __require(57,35),
+    TaskHeal = __require(40,35),
+    TaskRangedAttack = __require(43,35),
+    TaskRepair = __require(50,35),
+    TaskUpgradeController = __require(58,35),
     Base = function() {
         "use strict";
     
@@ -8182,7 +8325,7 @@ Base.prototype.terminal = function(room, terminal) {
             }
         } else {
             if (Cache.credits >= Memory.minimumCredits && Memory.buy) {
-                bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal);
+                bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal && r.terminal.my);
                 _.forEach(bases, (otherRoom) => {
                     var otherRoomName = otherRoom.name;
 
@@ -8459,6 +8602,7 @@ Base.prototype.spawn = function(room, canSpawnWorkers) {
     }
     RoleCollector.checkSpawn(room);
     RoleClaimer.checkSpawn(room);
+    RoleConverter.checkSpawn(room);
     if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
         RoleUpgrader.checkSpawn(room);
     }
@@ -8474,6 +8618,7 @@ Base.prototype.assignTasks = function(room, tasks) {
     RoleDismantler.assignTasks(room, tasks);
     RoleCollector.assignTasks(room, tasks);
     RoleClaimer.assignTasks(room, tasks);
+    RoleConverter.assignTasks(room, tasks);
     RoleUpgrader.assignTasks(room, tasks);
 
     RoleTower.assignTasks(room, tasks);
@@ -8649,27 +8794,27 @@ Base.fromObj = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,34).registerObject(Base, "RoomBase");
+    __require(2,35).registerObject(Base, "RoomBase");
 }
 module.exports = Base;
 
 return module.exports;
 }
-/********** End of module 34: ../src/room.base.js **********/
-/********** Start module 35: ../src/room.cleanup.js **********/
-__modules[35] = function(module, exports) {
-var RoomObj = __require(53,35),
-    Cache = __require(4,35),
-    Commands = __require(5,35),
-    Utilities = __require(11,35),
-    RoleRemoteDismantler = __require(24,35),
-    RoleRemoteCollector = __require(23,35),
-    TaskCollectEnergy = __require(50,35),
-    TaskCollectMinerals = __require(52,35),
-    TaskDismantle = __require(43,35),
-    TaskFillEnergy = __require(54,35),
-    TaskFillMinerals = __require(55,35),
-    TaskPickupResource = __require(46,35);
+/********** End of module 35: ../src/room.base.js **********/
+/********** Start module 36: ../src/room.cleanup.js **********/
+__modules[36] = function(module, exports) {
+var RoomObj = __require(55,36),
+    Cache = __require(4,36),
+    Commands = __require(5,36),
+    Utilities = __require(11,36),
+    RoleRemoteDismantler = __require(25,36),
+    RoleRemoteCollector = __require(24,36),
+    TaskCollectEnergy = __require(52,36),
+    TaskCollectMinerals = __require(54,36),
+    TaskDismantle = __require(44,36),
+    TaskFillEnergy = __require(56,36),
+    TaskFillMinerals = __require(57,36),
+    TaskPickupResource = __require(47,36);
 
     Cleanup = function(supportRoom) {
         "use strict";
@@ -8793,29 +8938,29 @@ Cleanup.fromObj = function(roomMemory) {
 };
 
 if (Memory.profiling) {
-    __require(2,35).registerObject(Cleanup, "RoomCleanup");
+    __require(2,36).registerObject(Cleanup, "RoomCleanup");
 }
 module.exports = Cleanup;
 
 return module.exports;
 }
-/********** End of module 35: ../src/room.cleanup.js **********/
-/********** Start module 36: ../src/room.mine.js **********/
-__modules[36] = function(module, exports) {
-var RoomObj = __require(53,36),
-    Cache = __require(4,36),
-    Commands = __require(5,36),
-    Utilities = __require(11,36),
-    RoleDismantler = __require(19,36),
-    RoleRemoteBuilder = __require(22,36),
-    RoleRemoteMiner = __require(25,36),
-    RoleRemoteReserver = __require(26,36),
-    RoleRemoteStorer = __require(27,36),
-    RoleRemoteWorker = __require(28,36),
-    TaskBuild = __require(47,36),
-    TaskDismantle = __require(43,36),
-    TaskFillEnergy = __require(54,36),
-    TaskFillMinerals = __require(55,36),
+/********** End of module 36: ../src/room.cleanup.js **********/
+/********** Start module 37: ../src/room.mine.js **********/
+__modules[37] = function(module, exports) {
+var RoomObj = __require(55,37),
+    Cache = __require(4,37),
+    Commands = __require(5,37),
+    Utilities = __require(11,37),
+    RoleDismantler = __require(20,37),
+    RoleRemoteBuilder = __require(23,37),
+    RoleRemoteMiner = __require(26,37),
+    RoleRemoteReserver = __require(27,37),
+    RoleRemoteStorer = __require(28,37),
+    RoleRemoteWorker = __require(29,37),
+    TaskBuild = __require(49,37),
+    TaskDismantle = __require(44,37),
+    TaskFillEnergy = __require(56,37),
+    TaskFillMinerals = __require(57,37),
     Mine = function(supportRoom, stage) {
         "use strict";
     
@@ -9123,38 +9268,42 @@ Mine.fromObj = function(roomMemory) {
 };
 
 if (Memory.profiling) {
-    __require(2,36).registerObject(Mine, "RoomMine");
+    __require(2,37).registerObject(Mine, "RoomMine");
 }
 module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 36: ../src/room.mine.js **********/
-/********** Start module 37: ../src/taskDeserialization.js **********/
-__modules[37] = function(module, exports) {
-var Cache = __require(4,37),
-    TaskBuild = __require(47,37),
-    TaskClaim = __require(44,37),
-    TaskCollectEnergy = __require(50,37),
-    TaskCollectMinerals = __require(52,37),
-    TaskDismantle = __require(43,37),
-    TaskFillEnergy = __require(54,37),
-    TaskFillMinerals = __require(55,37),
-    TaskHarvest = __require(45,37),
-    TaskHeal = __require(39,37),
-    TaskMeleeAttack = __require(40,37),
-    TaskMine = __require(49,37),
-    TaskPickupResource = __require(46,37),
-    TaskRally = __require(41,37),
-    TaskRangedAttack = __require(42,37),
-    TaskRepair = __require(48,37),
-    TaskReserve = __require(51,37),
-    TaskUpgradeController = __require(56,37),
+/********** End of module 37: ../src/room.mine.js **********/
+/********** Start module 38: ../src/taskDeserialization.js **********/
+__modules[38] = function(module, exports) {
+var Cache = __require(4,38),
+    TaskAttack = __require(48,38),
+    TaskBuild = __require(49,38),
+    TaskClaim = __require(45,38),
+    TaskCollectEnergy = __require(52,38),
+    TaskCollectMinerals = __require(54,38),
+    TaskDismantle = __require(44,38),
+    TaskFillEnergy = __require(56,38),
+    TaskFillMinerals = __require(57,38),
+    TaskHarvest = __require(46,38),
+    TaskHeal = __require(40,38),
+    TaskMeleeAttack = __require(41,38),
+    TaskMine = __require(51,38),
+    TaskPickupResource = __require(47,38),
+    TaskRally = __require(42,38),
+    TaskRangedAttack = __require(43,38),
+    TaskRepair = __require(50,38),
+    TaskReserve = __require(53,38),
+    TaskUpgradeController = __require(58,38),
     
     deserialization = (creep) => {
         "use strict";
 
         switch (creep.memory.currentTask.type) {
+            case "attack":
+                Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
+                break;
             case "build":
                 Cache.creepTasks[creep.name] = TaskBuild.fromObj(creep);
                 break;
@@ -9210,20 +9359,20 @@ var Cache = __require(4,37),
     };
 
 if (Memory.profiling) {
-    __require(2,37).registerObject(deserialization, "TaskDeserialization");
+    __require(2,38).registerObject(deserialization, "TaskDeserialization");
 }
 module.exports = deserialization;
 
 return module.exports;
 }
-/********** End of module 37: ../src/taskDeserialization.js **********/
-/********** Start module 38: ../src/roomDeserialization.js **********/
-__modules[38] = function(module, exports) {
-var Cache = __require(4,38),
-    RoomBase = __require(34,38),
-    RoomCleanup = __require(35,38),
-    RoomMine = __require(36,38),
-    RoomSource = __require(57,38),
+/********** End of module 38: ../src/taskDeserialization.js **********/
+/********** Start module 39: ../src/roomDeserialization.js **********/
+__modules[39] = function(module, exports) {
+var Cache = __require(4,39),
+    RoomBase = __require(35,39),
+    RoomCleanup = __require(36,39),
+    RoomMine = __require(37,39),
+    RoomSource = __require(59,39),
     
     deserialization = (roomMemory, name) => {
         "use strict";
@@ -9245,17 +9394,17 @@ var Cache = __require(4,38),
     };
 
 if (Memory.profiling) {
-    __require(2,38).registerObject(deserialization, "RoomDeserialization");
+    __require(2,39).registerObject(deserialization, "RoomDeserialization");
 }
 module.exports = deserialization;
 
 return module.exports;
 }
-/********** End of module 38: ../src/roomDeserialization.js **********/
-/********** Start module 39: ../src/task.heal.js **********/
-__modules[39] = function(module, exports) {
-var Cache = __require(4,39),
-    Pathing = __require(58,39),
+/********** End of module 39: ../src/roomDeserialization.js **********/
+/********** Start module 40: ../src/task.heal.js **********/
+__modules[40] = function(module, exports) {
+var Cache = __require(4,40),
+    Pathing = __require(60,40),
     Heal = function(id) {
         "use strict";
         
@@ -9336,17 +9485,17 @@ Heal.getDefenderTask = function(creep) {
 };
 
 if (Memory.profiling) {
-    __require(2,39).registerObject(Heal, "TaskHeal");
+    __require(2,40).registerObject(Heal, "TaskHeal");
 }
 module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 39: ../src/task.heal.js **********/
-/********** Start module 40: ../src/task.meleeAttack.js **********/
-__modules[40] = function(module, exports) {
-var Cache = __require(4,40),
-    Pathing = __require(58,40),
+/********** End of module 40: ../src/task.heal.js **********/
+/********** Start module 41: ../src/task.meleeAttack.js **********/
+__modules[41] = function(module, exports) {
+var Cache = __require(4,41),
+    Pathing = __require(60,41),
     Melee = function(id) {
         "use strict";
         
@@ -9422,17 +9571,17 @@ Melee.getTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,40).registerObject(Melee, "TaskMeleeAttack");
+    __require(2,41).registerObject(Melee, "TaskMeleeAttack");
 }
 module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 40: ../src/task.meleeAttack.js **********/
-/********** Start module 41: ../src/task.rally.js **********/
-__modules[41] = function(module, exports) {
-var Cache = __require(4,41),
-    Pathing = __require(58,41),
+/********** End of module 41: ../src/task.meleeAttack.js **********/
+/********** Start module 42: ../src/task.rally.js **********/
+__modules[42] = function(module, exports) {
+var Cache = __require(4,42),
+    Pathing = __require(60,42),
     Rally = function(id, creep) {
         "use strict";
         
@@ -9559,17 +9708,17 @@ Rally.getClaimerTask = function(creep) {
 };
 
 if (Memory.profiling) {
-    __require(2,41).registerObject(Rally, "TaskRally");
+    __require(2,42).registerObject(Rally, "TaskRally");
 }
 module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 41: ../src/task.rally.js **********/
-/********** Start module 42: ../src/task.rangedAttack.js **********/
-__modules[42] = function(module, exports) {
-var Cache = __require(4,42),
-    Pathing = __require(58,42),
+/********** End of module 42: ../src/task.rally.js **********/
+/********** Start module 43: ../src/task.rangedAttack.js **********/
+__modules[43] = function(module, exports) {
+var Cache = __require(4,43),
+    Pathing = __require(60,43),
     Ranged = function(id) {
         "use strict";
         
@@ -9654,17 +9803,17 @@ Ranged.getTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,42).registerObject(Ranged, "TaskRangedAttack");
+    __require(2,43).registerObject(Ranged, "TaskRangedAttack");
 }
 module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 42: ../src/task.rangedAttack.js **********/
-/********** Start module 43: ../src/task.dismantle.js **********/
-__modules[43] = function(module, exports) {
-var Cache = __require(4,43),
-    Pathing = __require(58,43),
+/********** End of module 43: ../src/task.rangedAttack.js **********/
+/********** Start module 44: ../src/task.dismantle.js **********/
+__modules[44] = function(module, exports) {
+var Cache = __require(4,44),
+    Pathing = __require(60,44),
     Dismantle = function(id) {
         "use strict";
         
@@ -9734,17 +9883,17 @@ Dismantle.getCleanupTasks = function(structures) {
 };
 
 if (Memory.profiling) {
-    __require(2,43).registerObject(Dismantle, "TaskDismantle");
+    __require(2,44).registerObject(Dismantle, "TaskDismantle");
 }
 module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 43: ../src/task.dismantle.js **********/
-/********** Start module 44: ../src/task.claim.js **********/
-__modules[44] = function(module, exports) {
-var Cache = __require(4,44),
-    Pathing = __require(58,44),
+/********** End of module 44: ../src/task.dismantle.js **********/
+/********** Start module 45: ../src/task.claim.js **********/
+__modules[45] = function(module, exports) {
+var Cache = __require(4,45),
+    Pathing = __require(60,45),
     Claim = function(id) {
         "use strict";
         
@@ -9809,17 +9958,17 @@ Claim.getTask = function(creep) {
 };
 
 if (Memory.profiling) {
-    __require(2,44).registerObject(Claim, "TaskClaim");
+    __require(2,45).registerObject(Claim, "TaskClaim");
 }
 module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 44: ../src/task.claim.js **********/
-/********** Start module 45: ../src/task.harvest.js **********/
-__modules[45] = function(module, exports) {
-var Cache = __require(4,45),
-    Pathing = __require(58,45),
+/********** End of module 45: ../src/task.claim.js **********/
+/********** Start module 46: ../src/task.harvest.js **********/
+__modules[46] = function(module, exports) {
+var Cache = __require(4,46),
+    Pathing = __require(60,46),
     Harvest = function(failIn, source) {
         "use strict";
         
@@ -9896,18 +10045,18 @@ Harvest.fromObj = function(creep) {
 };
 
 if (Memory.profiling) {
-    __require(2,45).registerObject(Harvest, "TaskHarvest");
+    __require(2,46).registerObject(Harvest, "TaskHarvest");
 }
 module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 45: ../src/task.harvest.js **********/
-/********** Start module 46: ../src/task.pickupResource.js **********/
-__modules[46] = function(module, exports) {
-var Cache = __require(4,46),
-    TaskCollectEnergy = __require(50,46),
-    Pathing = __require(58,46),
+/********** End of module 46: ../src/task.harvest.js **********/
+/********** Start module 47: ../src/task.pickupResource.js **********/
+__modules[47] = function(module, exports) {
+var Cache = __require(4,47),
+    TaskCollectEnergy = __require(52,47),
+    Pathing = __require(60,47),
     Pickup = function(id) {
         "use strict";
         
@@ -9978,17 +10127,92 @@ Pickup.getTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,46).registerObject(Pickup, "TaskPickupResource");
+    __require(2,47).registerObject(Pickup, "TaskPickupResource");
 }
 module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 46: ../src/task.pickupResource.js **********/
-/********** Start module 47: ../src/task.build.js **********/
-__modules[47] = function(module, exports) {
-var Cache = __require(4,47),
-    Pathing = __require(58,47),
+/********** End of module 47: ../src/task.pickupResource.js **********/
+/********** Start module 48: ../src/task.attack.js **********/
+__modules[48] = function(module, exports) {
+var Cache = __require(4,48),
+    Pathing = __require(60,48),
+    Attack = function(id) {
+        "use strict";
+        
+        this.init(id);
+    };
+    
+Attack.prototype.init = function() {
+    "use strict";
+    
+    this.type = "attack";
+};
+
+Attack.prototype.canAssign = function(creep) {
+    "use strict";
+
+    var controller = creep.room.controller;
+
+    if (creep.spawning || creep.memory.role !== "converter" || !controller || controller.level === 0 || creep.getActiveBodyparts(CLAIM) === 0) {
+        return false;
+    }
+    
+    Cache.creepTasks[creep.name] = this;
+    this.toObj(creep);
+    return true;
+};
+
+Attack.prototype.run = function(creep) {
+    "use strict";
+
+    if (!creep.room.controller || creep.room.controller.level === 0 || !creep.getActiveBodyparts(CLAIM) === 0) {
+        delete creep.memory.currentTask;
+        return;
+    }
+    Pathing.moveTo(creep, creep.room.controller, 1);
+    creep.attackController(creep.room.controller);
+};
+
+Attack.prototype.toObj = function(creep) {
+    "use strict";
+
+    if (creep.room.controller) {
+        creep.memory.currentTask = {
+            type: this.type
+        };
+    } else {
+        delete creep.memory.currentTask;
+    }
+};
+
+Attack.fromObj = function(creep) {
+    "use strict";
+
+    return new Attack();
+};
+
+Attack.getTask = function(creep) {
+    "use strict";
+
+    if (creep.room.controller) {
+        return new Attack();
+    }
+};
+
+if (Memory.profiling) {
+    __require(2,48).registerObject(Attack, "TaskAttack");
+}
+module.exports = Attack;
+
+return module.exports;
+}
+/********** End of module 48: ../src/task.attack.js **********/
+/********** Start module 49: ../src/task.build.js **********/
+__modules[49] = function(module, exports) {
+var Cache = __require(4,49),
+    Pathing = __require(60,49),
     Build = function(id) {
         "use strict";
     
@@ -10059,17 +10283,17 @@ Build.getTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,47).registerObject(Build, "TaskBuild");
+    __require(2,49).registerObject(Build, "TaskBuild");
 }
 module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 47: ../src/task.build.js **********/
-/********** Start module 48: ../src/task.repair.js **********/
-__modules[48] = function(module, exports) {
-var Cache = __require(4,48),
-    Pathing = __require(58,48),
+/********** End of module 49: ../src/task.build.js **********/
+/********** Start module 50: ../src/task.repair.js **********/
+__modules[50] = function(module, exports) {
+var Cache = __require(4,50),
+    Pathing = __require(60,50),
     Repair = function(id) {
         "use strict";
         
@@ -10155,18 +10379,18 @@ Repair.getTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,48).registerObject(Repair, "TaskRepair");
+    __require(2,50).registerObject(Repair, "TaskRepair");
 }
 module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 48: ../src/task.repair.js **********/
-/********** Start module 49: ../src/task.mine.js **********/
-__modules[49] = function(module, exports) {
-var Cache = __require(4,49),
-    Pathing = __require(58,49),
-    Utilities = __require(11,49),
+/********** End of module 50: ../src/task.repair.js **********/
+/********** Start module 51: ../src/task.mine.js **********/
+__modules[51] = function(module, exports) {
+var Cache = __require(4,51),
+    Pathing = __require(60,51),
+    Utilities = __require(11,51),
     Mine = function(id) {
         "use strict";
         
@@ -10255,17 +10479,17 @@ Mine.fromObj = function(creep) {
 };
 
 if (Memory.profiling) {
-    __require(2,49).registerObject(Mine, "TaskMine");
+    __require(2,51).registerObject(Mine, "TaskMine");
 }
 module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 49: ../src/task.mine.js **********/
-/********** Start module 50: ../src/task.collectEnergy.js **********/
-__modules[50] = function(module, exports) {
-var Cache = __require(4,50),
-    Pathing = __require(58,50),
+/********** End of module 51: ../src/task.mine.js **********/
+/********** Start module 52: ../src/task.collectEnergy.js **********/
+__modules[52] = function(module, exports) {
+var Cache = __require(4,52),
+    Pathing = __require(60,52),
     CollectEnergy = function(id) {
         "use strict";
         
@@ -10377,17 +10601,17 @@ CollectEnergy.getCleanupTasks = function(structures) {
 };
 
 if (Memory.profiling) {
-    __require(2,50).registerObject(CollectEnergy, "TaskCollectEnergy");
+    __require(2,52).registerObject(CollectEnergy, "TaskCollectEnergy");
 }
 module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 50: ../src/task.collectEnergy.js **********/
-/********** Start module 51: ../src/task.reserve.js **********/
-__modules[51] = function(module, exports) {
-var Cache = __require(4,51),
-    Pathing = __require(58,51),
+/********** End of module 52: ../src/task.collectEnergy.js **********/
+/********** Start module 53: ../src/task.reserve.js **********/
+__modules[53] = function(module, exports) {
+var Cache = __require(4,53),
+    Pathing = __require(60,53),
     Reserve = function(id) {
         "use strict";
         
@@ -10464,18 +10688,18 @@ Reserve.getRemoteTask = function(creep) {
 };
 
 if (Memory.profiling) {
-    __require(2,51).registerObject(Reserve, "TaskReserve");
+    __require(2,53).registerObject(Reserve, "TaskReserve");
 }
 module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 51: ../src/task.reserve.js **********/
-/********** Start module 52: ../src/task.collectMinerals.js **********/
-__modules[52] = function(module, exports) {
-var Cache = __require(4,52),
-    Pathing = __require(58,52),
-    Utilities = __require(11,52),
+/********** End of module 53: ../src/task.reserve.js **********/
+/********** Start module 54: ../src/task.collectMinerals.js **********/
+__modules[54] = function(module, exports) {
+var Cache = __require(4,54),
+    Pathing = __require(60,54),
+    Utilities = __require(11,54),
     CollectMinerals = function(id, resource, amount) {
         "use strict";
         
@@ -10730,26 +10954,26 @@ CollectMinerals.getTerminalTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,52).registerObject(CollectMinerals, "TaskCollectMinerals");
+    __require(2,54).registerObject(CollectMinerals, "TaskCollectMinerals");
 }
 module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 52: ../src/task.collectMinerals.js **********/
-/********** Start module 53: ../src/roomObj.js **********/
-__modules[53] = function(module, exports) {
+/********** End of module 54: ../src/task.collectMinerals.js **********/
+/********** Start module 55: ../src/roomObj.js **********/
+__modules[55] = function(module, exports) {
 var RoomObj = function() {};
 module.exports = RoomObj;
 
 return module.exports;
 }
-/********** End of module 53: ../src/roomObj.js **********/
-/********** Start module 54: ../src/task.fillEnergy.js **********/
-__modules[54] = function(module, exports) {
-var Cache = __require(4,54),
-    Pathing = __require(58,54),
-    Utilities = __require(11,54),
+/********** End of module 55: ../src/roomObj.js **********/
+/********** Start module 56: ../src/task.fillEnergy.js **********/
+__modules[56] = function(module, exports) {
+var Cache = __require(4,56),
+    Pathing = __require(60,56),
+    Utilities = __require(11,56),
     FillEnergy = function(id) {
         "use strict";
         
@@ -10861,7 +11085,7 @@ FillEnergy.getContainerTasks = function(room) {
     
     var containers = _.filter(Cache.containersInRoom(room), (c) => _.sum(c.store) < c.storeCapacity);
     
-    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
+    if (room.storage && room.storage.my && _.sum(room.storage.store) < room.storage.storeCapacity) {
         containers.unshift(room.storage);
     }
 
@@ -10871,7 +11095,7 @@ FillEnergy.getContainerTasks = function(room) {
 FillEnergy.getStorageTasks = function(room) {
     "use strict";
 
-    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
+    if (room.storage && room.storage.my && _.sum(room.storage.store) < room.storage.storeCapacity) {
         return [new FillEnergy(room.storage.id)];
     } else {
         return [];
@@ -10917,18 +11141,18 @@ FillEnergy.getPowerSpawnTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,54).registerObject(FillEnergy, "TaskFillEnergy");
+    __require(2,56).registerObject(FillEnergy, "TaskFillEnergy");
 }
 module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 54: ../src/task.fillEnergy.js **********/
-/********** Start module 55: ../src/task.fillMinerals.js **********/
-__modules[55] = function(module, exports) {
-var Cache = __require(4,55),
-    Pathing = __require(58,55),
-    Utilities = __require(11,55),
+/********** End of module 56: ../src/task.fillEnergy.js **********/
+/********** Start module 57: ../src/task.fillMinerals.js **********/
+__modules[57] = function(module, exports) {
+var Cache = __require(4,57),
+    Pathing = __require(60,57),
+    Utilities = __require(11,57),
     FillMinerals = function(id, resources) {
         "use strict";
         
@@ -11075,10 +11299,10 @@ FillMinerals.getStorageTasks = function(room) {
     var storage = room.storage,
         store,
         resources;
-    if (storage && !room.terminal) {
+    if (storage && storage.my && (!room.terminal || !room.terminal.my)) {
         return [new FillMinerals(storage.id)];
     }
-    if (storage && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
+    if (storage && storage.my && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
         resources = {};
         _.forEach(_.keys(Memory.reserveMinerals), (resource) => {
             var amount = (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - (store[resource] || 0);
@@ -11093,7 +11317,7 @@ FillMinerals.getStorageTasks = function(room) {
 FillMinerals.getTerminalTasks = function(room) {
     "use strict";
 
-    if (room.terminal && _.sum(room.terminal.store) < room.terminal.storeCapacity) {
+    if (room.terminal && room.terminal.my && _.sum(room.terminal.store) < room.terminal.storeCapacity) {
         return [new FillMinerals(room.terminal.id)];
     }
     return [];
@@ -11140,18 +11364,18 @@ FillMinerals.getPowerSpawnTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,55).registerObject(FillMinerals, "TaskFillMinerals");
+    __require(2,57).registerObject(FillMinerals, "TaskFillMinerals");
 }
 module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 55: ../src/task.fillMinerals.js **********/
-/********** Start module 56: ../src/task.upgradeController.js **********/
-__modules[56] = function(module, exports) {
-var Cache = __require(4,56),
-    Pathing = __require(58,56),
-    Utilities = __require(11,56),
+/********** End of module 57: ../src/task.fillMinerals.js **********/
+/********** Start module 58: ../src/task.upgradeController.js **********/
+__modules[58] = function(module, exports) {
+var Cache = __require(4,58),
+    Pathing = __require(60,58),
+    Utilities = __require(11,58),
     Upgrade = function(room) {
         "use strict";
         
@@ -11271,31 +11495,31 @@ Upgrade.getTasks = function(room) {
 };
 
 if (Memory.profiling) {
-    __require(2,56).registerObject(Upgrade, "TaskUpgradeController");
+    __require(2,58).registerObject(Upgrade, "TaskUpgradeController");
 }
 module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 56: ../src/task.upgradeController.js **********/
-/********** Start module 57: ../src/room.source.js **********/
-__modules[57] = function(module, exports) {
-var RoomObj = __require(53,57),
-    Cache = __require(4,57),
-    Commands = __require(5,57),
-    Utilities = __require(11,57),
-    RoleDefender = __require(18,57),
-    RoleDismantler = __require(19,57),
-    RoleHealer = __require(20,57),
-    RoleRemoteBuilder = __require(22,57),
-    RoleRemoteCollector = __require(23,57),
-    RoleRemoteMiner = __require(25,57),
-    RoleRemoteStorer = __require(27,57),
-    RoleRemoteWorker = __require(28,57),
-    TaskBuild = __require(47,57),
-    TaskDismantle = __require(43,57),
-    TaskFillEnergy = __require(54,57),
-    TaskFillMinerals = __require(55,57),
+/********** End of module 58: ../src/task.upgradeController.js **********/
+/********** Start module 59: ../src/room.source.js **********/
+__modules[59] = function(module, exports) {
+var RoomObj = __require(55,59),
+    Cache = __require(4,59),
+    Commands = __require(5,59),
+    Utilities = __require(11,59),
+    RoleDefender = __require(19,59),
+    RoleDismantler = __require(20,59),
+    RoleHealer = __require(21,59),
+    RoleRemoteBuilder = __require(23,59),
+    RoleRemoteCollector = __require(24,59),
+    RoleRemoteMiner = __require(26,59),
+    RoleRemoteStorer = __require(28,59),
+    RoleRemoteWorker = __require(29,59),
+    TaskBuild = __require(49,59),
+    TaskDismantle = __require(44,59),
+    TaskFillEnergy = __require(56,59),
+    TaskFillMinerals = __require(57,59),
     Source = function(supportRoom, stage) {
         "use strict";
     
@@ -11578,15 +11802,15 @@ Source.fromObj = function(roomMemory) {
 };
 
 if (Memory.profiling) {
-    __require(2,57).registerObject(Source, "RoomSource");
+    __require(2,59).registerObject(Source, "RoomSource");
 }
 module.exports = Source;
 
 return module.exports;
 }
-/********** End of module 57: ../src/room.source.js **********/
-/********** Start module 58: ../src/pathing.js **********/
-__modules[58] = function(module, exports) {
+/********** End of module 59: ../src/room.source.js **********/
+/********** Start module 60: ../src/pathing.js **********/
+__modules[60] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
     2: {dx: 1, dy: -1},
@@ -11598,8 +11822,8 @@ const direction = {
     8: {dx: -1, dy: -1}
 };
 
-var Cache = __require(4,58),
-    Segment = __require(10,58),
+var Cache = __require(4,60),
+    Segment = __require(10,60),
     Pathing = {
         moveTo: (creep, pos, range) => {
             creep.memory._pathing = Pathing.move(creep, pos, range);
@@ -11852,13 +12076,13 @@ var Cache = __require(4,58),
     };
 
 if (Memory.profiling) {
-    __require(2,58).registerObject(Pathing, "Pathing");
+    __require(2,60).registerObject(Pathing, "Pathing");
 }
 module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 58: ../src/pathing.js **********/
+/********** End of module 60: ../src/pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

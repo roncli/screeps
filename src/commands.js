@@ -34,6 +34,25 @@ var Cache = require("cache"),
             }
         },
 
+        // Attack a room.
+        attackRoom: (fromRoom, toRoom, attack) => {
+            "use strict";
+
+            if (!Memory.maxCreeps.converter) {
+                Memory.maxCreeps.converter = {};
+            }
+
+            if (!Memory.maxCreeps.converter[fromRoom]) {
+                Memory.maxCreeps.converter[fromRoom] = {};
+            }
+            
+            if (attack) {
+                Memory.maxCreeps.converter[fromRoom][toRoom] = true;
+            } else {
+                delete Memory.maxCreeps.converter[fromRoom][toRoom];
+            }
+        },
+
         // Claim a room that's currently being reserved.  Only works if you already have a reserver on the controller.
         claimMine: (room) => {
             if (Game.rooms[room] && Cache.creeps[room]) {

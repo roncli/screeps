@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    TaskAttack = require("task.attack"),
     TaskBuild = require("task.build"),
     TaskClaim = require("task.claim"),
     TaskCollectEnergy = require("task.collectEnergy"),
@@ -21,6 +22,9 @@ var Cache = require("cache"),
         "use strict";
 
         switch (creep.memory.currentTask.type) {
+            case "attack":
+                Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
+                break;
             case "build":
                 Cache.creepTasks[creep.name] = TaskBuild.fromObj(creep);
                 break;

@@ -118,7 +118,7 @@ FillEnergy.getContainerTasks = function(room) {
     
     var containers = _.filter(Cache.containersInRoom(room), (c) => _.sum(c.store) < c.storeCapacity);
     
-    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
+    if (room.storage && room.storage.my && _.sum(room.storage.store) < room.storage.storeCapacity) {
         containers.unshift(room.storage);
     }
 
@@ -128,7 +128,7 @@ FillEnergy.getContainerTasks = function(room) {
 FillEnergy.getStorageTasks = function(room) {
     "use strict";
 
-    if (room.storage && _.sum(room.storage.store) < room.storage.storeCapacity) {
+    if (room.storage && room.storage.my && _.sum(room.storage.store) < room.storage.storeCapacity) {
         return [new FillEnergy(room.storage.id)];
     } else {
         return [];

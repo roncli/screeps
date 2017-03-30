@@ -9065,7 +9065,7 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
         sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
         containers = Cache.containersInRoom(room);
         roomName = room.name;
-        if (containers.length === sources.length) {
+        if (containers.length >= sources.length) {
             this.stage = 2;
             _.forEach(containers, (container) => {
                 var source = Utilities.objectsClosestToObj([].concat.apply([], [sources, room.find(FIND_MINERALS)]), container)[0];
@@ -9131,7 +9131,7 @@ Mine.prototype.stage2Manage = function(room, supportRoom) {
         }
     } else {
         sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []])
-        if (Cache.containersInRoom(room).length !== sources.length) {
+        if (Cache.containersInRoom(room).length < sources.length) {
             this.stage = 1;
             return;
         }

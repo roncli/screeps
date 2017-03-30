@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0)({
     optimizePathFinding: false,
@@ -1204,7 +1204,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 var originalFindPath = Room.prototype.findPath;
@@ -5221,12 +5221,15 @@ var Cache = __require(4,23),
     TaskRally = __require(41,23),
 
     RemoteCollector = {
-        checkSpawn: (room, supportRoom) => {
+        checkSpawn: (room, supportRoom, max) => {
             "use strict";
 
             var roomName = room.name,
-                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [],
+                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [];
+
+            if (!max) {
                 max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? 8 : 1;
+            }
 
             if (!supportRoom) {
                 supportRoom = room;
@@ -5448,7 +5451,7 @@ var Cache = __require(4,24),
 
             var roomName = room.name,
                 dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [],
-                max = 1;
+                max = 3;
 
             if (!supportRoom) {
                 supportRoom = room;
@@ -5478,30 +5481,14 @@ var Cache = __require(4,24),
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
-            energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
-            units = Math.floor(energy / 200);
-            remainder = energy % 200;
+            energy = Math.min(supportRoom.energyCapacityAvailable, 3750);
+            units = Math.floor(energy / 150);
+            remainder = energy % 150;
             for (count = 0; count < units; count++) {
                 body.push(WORK);
             }
 
-            if (remainder >= 150) {
-                body.push(WORK);
-            }
-
             for (count = 0; count < units; count++) {
-                body.push(CARRY);
-            }
-
-            if (remainder >= 100 && remainder < 150) {
-                body.push(CARRY);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
                 body.push(MOVE);
             }
             spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
@@ -5548,94 +5535,6 @@ var Cache = __require(4,24),
                     }
                     if (task.canAssign(creep)) {
                         creep.say("Dismantle");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(creepsWithNoTask, (creep) => {
-                var constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
-                if (constructionSites.length > 0) {
-                    var task = new TaskBuild(constructionSites[0].id);
-                    if (task.canAssign(creep)) {
-                        creep.say("Build");
-                        assigned.push(creep.name);
-                    }
-                }
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach([].concat.apply([], [tasks.fillEnergy.storageTasks, tasks.fillEnergy.containerTasks]), (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Container");
-                            assigned.push(creep.name);
-                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(tasks.fillMinerals.storageTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Storage");
-                        assigned.push(creep.name);
-                    }
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Terminal");
-                        assigned.push(creep.name);
-                    }
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Pickup");
                         assigned.push(creep.name);
                         return false;
                     }
@@ -8763,7 +8662,6 @@ var RoomObj = __require(53,35),
     Cache = __require(4,35),
     Commands = __require(5,35),
     Utilities = __require(11,35),
-    RoleDismantler = __require(19,35),
     RoleRemoteDismantler = __require(24,35),
     RoleRemoteCollector = __require(23,35),
     TaskCollectEnergy = __require(50,35),
@@ -8840,11 +8738,6 @@ Cleanup.prototype.run = function(room) {
             _.forEach(completed, (complete) => {
                 _.remove(Memory.dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
             });
-        } else {
-            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
-                creep.memory.role = "worker";
-                creep.memory.home = supportRoom.name;
-            });
         }
         ramparts = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_RAMPART);
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
@@ -8879,14 +8772,8 @@ Cleanup.prototype.run = function(room) {
     if (room.unobservable || structures.length > 0 || ramparts.length > 0) {
         RoleRemoteDismantler.checkSpawn(room, supportRoom);
     }
-    if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
-        RoleDismantler.checkSpawn(room, supportRoom);
-    }
-    if (energyStructures.length > 0) {
-        RoleRemoteCollector.checkSpawn(room, supportRoom);
-    }
+    RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? 8 : 1);
     RoleRemoteDismantler.assignTasks(room, tasks);
-    RoleDismantler.assignTasks(room, tasks);
     RoleRemoteCollector.assignTasks(room, tasks);
 };
 

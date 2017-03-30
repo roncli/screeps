@@ -2,7 +2,6 @@ var RoomObj = require("roomObj"),
     Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
-    RoleDismantler = require("role.dismantler"),
     RoleRemoteDismantler = require("role.remoteDismantler"),
     RoleRemoteCollector = require("role.remoteCollector"),
     TaskCollectEnergy = require("task.collectEnergy"),
@@ -83,11 +82,6 @@ Cleanup.prototype.run = function(room) {
             _.forEach(completed, (complete) => {
                 _.remove(Memory.dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
             });
-        } else {
-            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
-                creep.memory.role = "worker";
-                creep.memory.home = supportRoom.name;
-            });
         }
 
         // Find all ramparts.
@@ -142,16 +136,10 @@ Cleanup.prototype.run = function(room) {
     if (room.unobservable || structures.length > 0 || ramparts.length > 0) {
         RoleRemoteDismantler.checkSpawn(room, supportRoom);
     }
-    if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
-        RoleDismantler.checkSpawn(room, supportRoom);
-    }
-    if (energyStructures.length > 0) {
-        RoleRemoteCollector.checkSpawn(room, supportRoom);
-    }
+    RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? 8 : 1);
 
     // Assign tasks to creeps.                    
     RoleRemoteDismantler.assignTasks(room, tasks);
-    RoleDismantler.assignTasks(room, tasks);
     RoleRemoteCollector.assignTasks(room, tasks);
 };
 

@@ -5,12 +5,15 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
 
     RemoteCollector = {
-        checkSpawn: (room, supportRoom) => {
+        checkSpawn: (room, supportRoom, max) => {
             "use strict";
 
             var roomName = room.name,
-                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [],
+                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [];
+
+            if (!max) {
                 max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? 8 : 1;
+            }
 
             if (!supportRoom) {
                 supportRoom = room;

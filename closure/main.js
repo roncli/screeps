@@ -8910,8 +8910,8 @@ Cleanup.prototype.run = function(room) {
         }
         ramparts = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_RAMPART);
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
-        noEnergyStructures = _.filter(structures, (s) => (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
-        energyStructures = _.filter(structures, (s) => s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0);
+        noEnergyStructures = _.filter(structures, (s) => s.structureType === STRUCTURE_NUKER || ((!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0)));
+        energyStructures = _.filter(structures, (s) => s.structureType !== STRUCTURE_NUKER || (s.energy && s.energy > 0 && s.structureType !== STRUCTURE_NUKER || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
         junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
@@ -10603,7 +10603,7 @@ CollectEnergy.fromObj = function(creep) {
 CollectEnergy.getTasks = function(room) {
     "use strict";
     
-    var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0));
+    var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => (s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0)) && s.structureType !== STRUCTURE_NUKER);
     
     if (structures.length > 0) {
         return _.map(structures, (s) => new CollectEnergy(s.id));

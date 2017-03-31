@@ -7325,6 +7325,7 @@ var Cache = __require(4,33),
     Utilities = __require(11,33),
     TaskCollectEnergy = __require(52,33),
     TaskHarvest = __require(46,33),
+    TaskPickupResource = __require(47,33),
     TaskRally = __require(42,33),
 
     Upgrader = {

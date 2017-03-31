@@ -7582,7 +7582,7 @@ var Cache = __require(4,33),
                 }
             }
             _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskRally(creep.memory.home);
+                var task = new TaskRally(creep.memory.home);
                 task.canAssign(creep);
             });
         }

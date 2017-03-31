@@ -9701,7 +9701,7 @@ Rally.fromObj = function(creep) {
 Rally.getHarvesterTasks = function(creeps) {
     "use strict";
 
-    return _.map(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150), (c) => new Rally(c.memory.homeSource, c));
+    return _.map(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (c) => new Rally(c.memory.homeSource, c));
 };
 
 Rally.getDefenderTask = function(creep) {

@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0)({
     optimizePathFinding: false,
@@ -1206,7 +1206,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 var originalFindPath = Room.prototype.findPath;
@@ -7529,6 +7529,29 @@ var Cache = __require(4,33),
 
             if (creepsWithNoTask.length === 0) {
                 return;
+            }
+            if (!controller || controller.level < 6) {
+                if (Cache.hostilesInRoom(room).length === 0) {
+                    _.forEach(creepsWithNoTask, (creep) => {
+                        _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                            if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                                return;
+                            }
+                            if (task.canAssign(creep)) {
+                                creep.say("Pickup");
+                                assigned.push(creep.name);
+                                return false;
+                            }
+                        });
+                    });
+                }
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             }
             _.forEach(tasks.collectEnergy.tasks, (task) => {
                 _.forEach(creepsWithNoTask, (creep) => {

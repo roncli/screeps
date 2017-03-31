@@ -128,7 +128,7 @@ Cleanup.prototype.run = function(room) {
     if (room.unobservable || structures.length > 0 || ramparts.length > 0 || junk.length > 0) {
         RoleRemoteDismantler.checkSpawn(room, supportRoom);
     }
-    RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? 8 : 1);
+    RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1);
 
     // Assign tasks to creeps.                    
     RoleRemoteDismantler.assignTasks(room, tasks);

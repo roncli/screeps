@@ -7581,8 +7581,9 @@ var Cache = __require(4,33),
                     return;
                 }
             }
-            _.forEach(TaskRally.getHarvesterTasks(creepsWithNoTask), (task) => {
-                task.canAssign(task.creep);
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task = TaskRally(creep.memory.home);
+                task.canAssign(creep);
             });
         }
     };

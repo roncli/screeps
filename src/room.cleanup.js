@@ -100,16 +100,8 @@ Cleanup.prototype.run = function(room) {
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
         tasks.pickupResource.tasks = TaskPickupResource.getTasks(room);
 
-        if (noEnergyStructures.length > 0) {
-            // Dismantle structures with no energy or minerals that aren't under ramparts.
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(noEnergyStructures);
-        } else if (ramparts.length > 0) {
-            // Dismantle ramparts.
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);
-        } else {
-            // Dismantle junk.
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(junk);
-        }
+        // Dismantle structures.
+        tasks.remoteDismantle.cleanupTasks = [].concat.apply([], [TaskDismantle.getCleanupTasks(noEnergyStructures), TaskDismantle.getCleanupTasks(ramparts), TaskDismantle.getCleanupTasks(junk)]);
 
         if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
             // Notify that the room is cleaned up.

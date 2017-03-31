@@ -8916,14 +8916,7 @@ Cleanup.prototype.run = function(room) {
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
         tasks.pickupResource.tasks = TaskPickupResource.getTasks(room);
-
-        if (noEnergyStructures.length > 0) {
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(noEnergyStructures);
-        } else if (ramparts.length > 0) {
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);
-        } else {
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(junk);
-        }
+        tasks.remoteDismantle.cleanupTasks = [].concat.apply([], [TaskDismantle.getCleanupTasks(noEnergyStructures), TaskDismantle.getCleanupTasks(ramparts), TaskDismantle.getCleanupTasks(junk)]);
 
         if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");

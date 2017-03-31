@@ -8910,20 +8910,13 @@ Cleanup.prototype.run = function(room) {
         }
         ramparts = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_RAMPART);
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
-        noEnergyStructures = _.filter(structures, (s) => (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
-        energyStructures = _.filter(structures, (s) => s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0);
+        noEnergyStructures = _.filter(structures, (s) => s.structureType === STRUCTURE_NUKER || ((!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0)));
+        energyStructures = _.filter(structures, (s) => s.structureType !== STRUCTURE_NUKER || (s.energy && s.energy > 0 && s.structureType !== STRUCTURE_NUKER || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
         junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
         tasks.pickupResource.tasks = TaskPickupResource.getTasks(room);
-
-        if (noEnergyStructures.length > 0) {
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(noEnergyStructures);
-        } else if (ramparts.length > 0) {
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(ramparts);
-        } else {
-            tasks.remoteDismantle.cleanupTasks = TaskDismantle.getCleanupTasks(junk);
-        }
+        tasks.remoteDismantle.cleanupTasks = [].concat.apply([], [TaskDismantle.getCleanupTasks(noEnergyStructures), TaskDismantle.getCleanupTasks(ramparts), TaskDismantle.getCleanupTasks(junk)]);
 
         if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
             Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
@@ -10531,20 +10524,18 @@ CollectEnergy.prototype.init = function(id) {
 CollectEnergy.prototype.canAssign = function(creep) {
     "use strict";
 
-    var energy;
+    var obj = this.object,
+        energy;
     
     if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
 
-    if (!this.object) {
+    if (!obj) {
         return false;
     }
     
-    energy = this.object.energy;
-    if (energy === undefined) {
-        energy = this.object.store[RESOURCE_ENERGY] || 0;
-    }
+    energy = obj.energy || (obj.store && obj.store[RESOURCE_ENERGY]) || 0;
 
     if (energy === 0) {
         return false;
@@ -10565,7 +10556,7 @@ CollectEnergy.prototype.run = function(creep) {
         return;
     }
 
-    energy = obj.energy || obj.store[RESOURCE_ENERGY] || 0;
+    energy = obj.energy || (obj.store && obj.store[RESOURCE_ENERGY]) || 0;
     if (_.sum(creep.carry) === creep.carryCapacity || energy === 0) {
         delete creep.memory.currentTask;
         return;
@@ -10605,7 +10596,7 @@ CollectEnergy.fromObj = function(creep) {
 CollectEnergy.getTasks = function(room) {
     "use strict";
     
-    var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0));
+    var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => (s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0)) && s.structureType !== STRUCTURE_NUKER);
     
     if (structures.length > 0) {
         return _.map(structures, (s) => new CollectEnergy(s.id));

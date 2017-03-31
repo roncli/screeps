@@ -5042,7 +5042,7 @@ var Cache = __require(4,22),
                 }
 
                 source = Game.getObjectById(Memory.containerSource[containerId]);
-                if (source instanceof Mineral && (source.mineralAmount === 0 || !room.controller || (room.controller.my && room.controller.level >= 6))) {
+                if (source instanceof Mineral && source.mineralAmount === 0) {
                     return;
                 }
 
@@ -5742,10 +5742,8 @@ var Cache = __require(4,26),
                 }
 
                 source = Game.getObjectById(Memory.containerSource[containerId]);
-                if (source instanceof Mineral) {
-                    if (source.mineralAmount === 0) {
-                        return;
-                    }
+                if (source instanceof Mineral && (source.mineralAmount === 0 || (room.controller && (!room.controller.my || room.controller.level < 6)))) {
+                    return;
                 }
 
                 max += 1;

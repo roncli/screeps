@@ -43,11 +43,9 @@ var Cache = require("cache"),
 
                 source = Game.getObjectById(Memory.containerSource[containerId]);
 
-                // If this container is for a mineral, check to make sure it has resources.
-                if (source instanceof Mineral) {
-                    if (source.mineralAmount === 0) {
-                        return;
-                    }
+                // If this container is for a mineral, check to make sure it has resources, and we are allowed to mine it.
+                if (source instanceof Mineral && (source.mineralAmount === 0 || (room.controller && (!room.controller.my || room.controller.level < 6)))) {
+                    return;
                 }
 
                 max += 1;

@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0)({
     optimizePathFinding: false,
@@ -1206,7 +1206,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 var originalFindPath = Room.prototype.findPath;
@@ -8566,7 +8566,7 @@ Base.prototype.tasks = function(room) {
     
     Memory.towerTasks[roomName] = tasks.repair.towerTasks.length;
     
-    if (terminal) {
+    if (terminal && terminal.my) {
         terminalEnergy = terminal.store[RESOURCE_ENERGY] || 0;
         terminalId = terminal.id;
     }
@@ -8575,11 +8575,11 @@ Base.prototype.tasks = function(room) {
         storageEnergy = room.storage.store[RESOURCE_ENERGY] || 0;
     }
 
-    if ((storersWithNothing || scientistsWithNothing) && terminal && terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy || Cache.credits < Memory.minimumCredits)) {
+    if ((storersWithNothing || scientistsWithNothing) && terminal && (!terminal.my || (terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy || Cache.credits < Memory.minimumCredits)))) {
         tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
     }
 
-    if ((workersWithEnergy || storersWithEnergy || scientistsWithEnergy) && terminal && terminalEnergy < 1000) {
+    if ((workersWithEnergy || storersWithEnergy || scientistsWithEnergy) && terminal && terminal.my && terminalEnergy < 1000) {
         tasks.fillEnergy.terminalTask = new TaskFillEnergy(terminalId);
     }
 
@@ -8931,7 +8931,7 @@ Cleanup.prototype.run = function(room) {
             Commands.setRoomType(room.name);
         }
     }
-    if (room.unobservable || structures.length > 0 || ramparts.length > 0) {
+    if (room.unobservable || structures.length > 0 || ramparts.length > 0 || junk.length > 0) {
         RoleRemoteDismantler.checkSpawn(room, supportRoom);
     }
     RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? 8 : 1);

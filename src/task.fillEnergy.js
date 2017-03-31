@@ -52,7 +52,7 @@ FillEnergy.prototype.run = function(creep) {
     var obj = this.object;
 
     // If the object is at capacity, we're done.
-    if ((obj.energy || _.sum(obj.store)) === (obj.energyCapacity || obj.storeCapacity)) {
+    if (!obj || (obj.energy || _.sum(obj.store)) === (obj.energyCapacity || obj.storeCapacity)) {
         delete creep.memory.currentTask;
         return;
     }

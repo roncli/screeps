@@ -7,8 +7,9 @@ modConcat("../src/main.js", "./main.js", {paths: ["../src"]}, (err, stats) => {
         console.log(err);
         return;
     }
-    console.log(stats);
     fs.readFile("./main.js", {encoding: "utf8"}, (err, data) => {
-        fs.writeFile("../bin/main.js", compile({jsCode: [{src: data}]}).compiledCode, () => {});
+        fs.writeFile("../bin/main.js", compile({jsCode: [{src: data}]}).compiledCode, () => {
+            console.log("Complete.");
+        });
     });
 });

@@ -11053,7 +11053,7 @@ FillEnergy.prototype.run = function(creep) {
     "use strict";
     
     var obj = this.object;
-    if ((obj.energy || _.sum(obj.store)) === (obj.energyCapacity || obj.storeCapacity)) {
+    if (!obj || (obj.energy || _.sum(obj.store)) === (obj.energyCapacity || obj.storeCapacity)) {
         delete creep.memory.currentTask;
         return;
     }

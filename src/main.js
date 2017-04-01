@@ -1156,7 +1156,7 @@ var profiler = require("screeps-profiler"),
                     delete creep.memory.currentTask;
 
                     // RIP & Pepperonis :(
-                    if (!creep.spawning && creep.ticksToLive < 150 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                    if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                         creep.suicide();
                     } else {
                         creep.say("Idle");
@@ -1245,8 +1245,6 @@ var profiler = require("screeps-profiler"),
             if (Memory.visualizations) {
                 Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
             }
-
-
         }
     };
 

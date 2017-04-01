@@ -9840,6 +9840,7 @@ Dismantle.prototype.init = function(id) {
     this.type = "dismantle";
     this.id = id;
     this.structure = Game.getObjectById(id);
+    this.unimportant = true;
     this.force = true;
 };
 

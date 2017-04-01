@@ -5,7 +5,7 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
 
     RemoteDismantler = {
-        checkSpawn: (room, supportRoom) => {
+        checkSpawn: (room, supportRoom, max) => {
             "use strict";
 
             var roomName = room.name,

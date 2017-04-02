@@ -9,8 +9,7 @@ var Cache = require("cache"),
             "use strict";
 
             var roomName = room.name,
-                dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [],
-                max = 3;
+                dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [];
 
             if (!supportRoom) {
                 supportRoom = room;

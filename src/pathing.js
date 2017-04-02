@@ -61,7 +61,7 @@ var Cache = require("cache"),
 
             // If we haven't moved in 2 turns, set the position to avoid, and then nuke pathing.path.
             if (pathing) {
-                wasStationary = creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room;
+                wasStationary = (creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room) || ((Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room);
                 
                 pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
 

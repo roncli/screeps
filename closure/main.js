@@ -11883,7 +11883,7 @@ var Cache = __require(4,60),
                 delete pathing.restartOn;
             }
             if (pathing) {
-                wasStationary = creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room;
+                wasStationary = (creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room) || ((Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room);
                 
                 pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
 

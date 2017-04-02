@@ -7956,7 +7956,7 @@ var Cache = __require(4,34),
             }
             if (!controller || controller.level < 6) {
                 if (Cache.hostilesInRoom(room).length === 0) {
-                    _.forEach(creepsWithNoTask, (creep) => {
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
                         _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
                             if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
                                 return;

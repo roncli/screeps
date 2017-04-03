@@ -837,7 +837,7 @@ var profiler = __require(2,0),
                     roomMemory = Memory.rooms[roomName];
                 
                 if (Cache.roomTypes[roomName]) {
-                    if (roomMemory.roomType.type === "source" || Game.cpu.bucket >= 9500 || Game.time % 2 === 0) {
+                    if (["source", "cleanup"].indexOf(roomMemory.roomType.type) !== -1 || Game.cpu.bucket >= 9500 || Game.time % 2 === 0) {
                         Proxy.run("main.rooms.run", () => Cache.roomTypes[roomName].run(room));
                     }
                     if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
@@ -5426,7 +5426,7 @@ var Cache = __require(4,24),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || []), (c) => _.sum(c.carry) < c.carryCapacity || (!c.spawning && c.ticksToLive > 150)),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {

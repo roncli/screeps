@@ -22,7 +22,7 @@ CollectMinerals.prototype.canAssign = function(creep) {
 
     var obj = this.object;
 
-    if (this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || creep.carry[RESOURCE_ENERGY] > 0) {
+    if (this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
         return false;
     }
     

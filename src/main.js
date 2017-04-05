@@ -1158,6 +1158,11 @@ var profiler = require("screeps-profiler"),
                             creep.repair(structure);
                         });
                     }
+
+                    // Suicide a rallying creep if necessary.
+                    if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && (!creep.memory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                        creep.suicide();
+                    }
                 } else {
                     delete creep.memory.currentTask;
 

@@ -1129,6 +1129,9 @@ var profiler = __require(2,0),
                             creep.repair(structure);
                         });
                     }
+                    if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && (!creep.memory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                        creep.suicide();
+                    }
                 } else {
                     delete creep.memory.currentTask;
                     if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {

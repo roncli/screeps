@@ -90,7 +90,7 @@ Cleanup.prototype.run = function(room) {
         // Find all structures that aren't under ramparts, divided by whether they have energy or not.
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
         noEnergyStructures = _.filter(structures, (s) => s.structureType === STRUCTURE_NUKER || ((!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0)));
-        energyStructures = _.filter(structures, (s) => s.structureType !== STRUCTURE_NUKER || (s.energy && s.energy > 0 && s.structureType !== STRUCTURE_NUKER || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
+        energyStructures = _.filter(structures, (s) => s.structureType !== STRUCTURE_NUKER && (s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
 
         // Find all walls and roads.
         junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);

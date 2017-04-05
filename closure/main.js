@@ -5370,225 +5370,6 @@ return module.exports;
 /********** End of module 23: ../src/role.remoteBuilder.js **********/
 /********** Start module 24: ../src/role.remoteCollector.js **********/
 __modules[24] = function(module, exports) {
-var Cache = __require(4,24),
-    Utilities = __require(11,24),
-    TaskCollectEnergy = __require(52,24),
-    TaskPickupResource = __require(47,24),
-    TaskRally = __require(42,24),
-
-    RemoteCollector = {
-        checkSpawn: (room, supportRoom, max) => {
-            "use strict";
-
-            var roomName = room.name,
-                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [];
-
-            if (!supportRoom) {
-                supportRoom = room;
-            }
-
-            if (!max) {
-                max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1;
-            }
-            if (Cache.spawnsInRoom(supportRoom).length === 0) {
-                return;
-            }
-            if (_.filter(collectors, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-                RemoteCollector.spawn(room, supportRoom);
-            }
-
-            if (Memory.log && (collectors.length > 0 || max > 0)) {
-                Cache.log.rooms[roomName].creeps.push({
-                    role: "remoteCollector",
-                    count: collectors.length,
-                    max: max
-                });
-            }
-        },
-        
-        spawn: (room, supportRoom) => {
-            "use strict";
-
-            var body = [],
-                roomName = room.name,
-                supportRoomName = supportRoom.name,
-                energy, units, spawnToUse, name, count;
-            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-                return false;
-            }
-            energy = Math.min(supportRoom.energyCapacityAvailable, 2400);
-            units = Math.floor(energy / 150);
-            for (count = 0; count < units; count++) {
-                body.push(CARRY);
-                body.push(CARRY);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-            if (!spawnToUse) {
-                return false;
-            }
-            name = spawnToUse.createCreep(body, "remoteCollector-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteCollector", home: roomName, supportRoom: supportRoomName});
-            if (spawnToUse.room.name === supportRoomName) {
-                Cache.spawning[spawnToUse.id] = typeof name !== "number";
-            }
-
-            return typeof name !== "number";
-        },
-
-        assignTasks: (room, tasks) => {
-            "use strict";
-
-            var roomName = room.name,
-                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || []),
-                assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.sum(Cache.creeps[room.name].all, (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0).length >= task.resource.amount) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Pickup");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-            });
-
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            if (tasks.collectMinerals && tasks.collectMinerals.cleanupTasks) {
-                _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Collecting");
-                            assigned.push(creep.name);
-                        }
-                    });
-    
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-    
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-            }
-
-            if (tasks.collectEnergy && tasks.collectEnergy.cleanupTasks) {
-                _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Collecting");
-                            assigned.push(creep.name);
-                        }
-                    });
-    
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-    
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-            }
-            _.forEach(tasks.fillEnergy.storageTasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Storage");
-                            assigned.push(creep.name);
-                            energyMissing -= _.sum(creep.carry);
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(tasks.fillMinerals.storageTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Storage");
-                        assigned.push(creep.name);
-                    }
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Terminal");
-                        assigned.push(creep.name);
-                    }
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(tasks.fillEnergy.containerTasks, (task) => {
-                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
-                if (energyMissing > 0) {
-                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Container");
-                            assigned.push(creep.name);
-                            energyMissing -= _.sum(creep.carry);
-                            if (energyMissing <= 0) {
-                                return false;
-                            }
-                        }
-                    });
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-                }
-            });
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (_.sum(creep.carry) > 0) {
-                    var task = new TaskRally(creep.memory.supportRoom);
-                } else {
-                    var task = new TaskRally(creep.memory.home);
-                }
-                task.canAssign(creep);
-            });
-        }
-    };
-
-if (Memory.profiling) {
-    __require(2,24).registerObject(RemoteCollector, "RoleRemoteCollector");
-}
-module.exports = RemoteCollector;
 
 return module.exports;
 }
@@ -5874,7 +5655,7 @@ var Cache = __require(4,27),
     Commands = __require(5,27),
     Utilities = __require(11,27),
     TaskRally = __require(42,27),
-    TaskReserve = __require(53,27),
+    TaskReserve = __require(52,27),
 
     Reserver = {
         checkSpawn: (room) => {
@@ -6015,7 +5796,7 @@ return module.exports;
 __modules[28] = function(module, exports) {
 var Cache = __require(4,28),
     Utilities = __require(11,28),
-    TaskCollectEnergy = __require(52,28),
+    TaskCollectEnergy = __require(53,28),
     TaskCollectMinerals = __require(54,28),
     TaskPickupResource = __require(47,28),
     TaskRally = __require(42,28),
@@ -6266,7 +6047,7 @@ __modules[29] = function(module, exports) {
 var Cache = __require(4,29),
     Utilities = __require(11,29),
     TaskBuild = __require(49,29),
-    TaskCollectEnergy = __require(52,29),
+    TaskCollectEnergy = __require(53,29),
     TaskHarvest = __require(46,29),
     TaskPickupResource = __require(47,29),
     TaskRally = __require(42,29),
@@ -7334,7 +7115,7 @@ return module.exports;
 __modules[33] = function(module, exports) {
 var Cache = __require(4,33),
     Utilities = __require(11,33),
-    TaskCollectEnergy = __require(52,33),
+    TaskCollectEnergy = __require(53,33),
     TaskHarvest = __require(46,33),
     TaskPickupResource = __require(47,33),
     TaskRally = __require(42,33),
@@ -8065,7 +7846,7 @@ var RoomObj = __require(55,35),
     RoleUpgrader = __require(33,35),
     RoleWorker = __require(34,35),
     TaskBuild = __require(49,35),
-    TaskCollectEnergy = __require(52,35),
+    TaskCollectEnergy = __require(53,35),
     TaskCollectMinerals = __require(54,35),
     TaskDismantle = __require(44,35),
     TaskFillEnergy = __require(56,35),
@@ -8845,7 +8626,7 @@ var RoomObj = __require(55,36),
     Utilities = __require(11,36),
     RoleRemoteDismantler = __require(25,36),
     RoleRemoteCollector = __require(24,36),
-    TaskCollectEnergy = __require(52,36),
+    TaskCollectEnergy = __require(53,36),
     TaskCollectMinerals = __require(54,36),
     TaskDismantle = __require(44,36),
     TaskFillEnergy = __require(56,36),
@@ -8923,7 +8704,7 @@ Cleanup.prototype.run = function(room) {
         ramparts = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_RAMPART);
         structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(ramparts, s)[0]) > 0));
         noEnergyStructures = _.filter(structures, (s) => s.structureType === STRUCTURE_NUKER || ((!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0)));
-        energyStructures = _.filter(structures, (s) => s.structureType !== STRUCTURE_NUKER || (s.energy && s.energy > 0 && s.structureType !== STRUCTURE_NUKER || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
+        energyStructures = _.filter(structures, (s) => s.structureType !== STRUCTURE_NUKER && (s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
         junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);
         tasks.collectEnergy.cleanupTasks = TaskCollectEnergy.getCleanupTasks(energyStructures);
         tasks.collectMinerals.cleanupTasks = TaskCollectMinerals.getCleanupTasks(energyStructures);
@@ -9310,7 +9091,7 @@ var Cache = __require(4,38),
     TaskAttack = __require(48,38),
     TaskBuild = __require(49,38),
     TaskClaim = __require(45,38),
-    TaskCollectEnergy = __require(52,38),
+    TaskCollectEnergy = __require(53,38),
     TaskCollectMinerals = __require(54,38),
     TaskDismantle = __require(44,38),
     TaskFillEnergy = __require(56,38),
@@ -9323,7 +9104,7 @@ var Cache = __require(4,38),
     TaskRally = __require(42,38),
     TaskRangedAttack = __require(43,38),
     TaskRepair = __require(50,38),
-    TaskReserve = __require(53,38),
+    TaskReserve = __require(52,38),
     TaskUpgradeController = __require(58,38),
     
     deserialization = (creep) => {
@@ -10085,7 +9866,7 @@ return module.exports;
 /********** Start module 47: ../src/task.pickupResource.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(4,47),
-    TaskCollectEnergy = __require(52,47),
+    TaskCollectEnergy = __require(53,47),
     Pathing = __require(60,47),
     Pickup = function(id) {
         "use strict";
@@ -10516,10 +10297,97 @@ module.exports = Mine;
 return module.exports;
 }
 /********** End of module 51: ../src/task.mine.js **********/
-/********** Start module 52: ../src/task.collectEnergy.js **********/
+/********** Start module 52: ../src/task.reserve.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(4,52),
     Pathing = __require(60,52),
+    Reserve = function(id) {
+        "use strict";
+        
+        this.init(id);
+    };
+    
+Reserve.prototype.init = function(id) {
+    "use strict";
+    
+    this.type = "reserve";
+    this.force = true;
+};
+
+Reserve.prototype.canAssign = function(creep) {
+    "use strict";
+
+    if (creep.spawning || creep.getActiveBodyparts(CLAIM) === 0) {
+        return false;
+    }
+
+    if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
+        return false;
+    }
+
+    Cache.creepTasks[creep.name] = this;
+    this.toObj(creep);
+    return true;
+};
+
+Reserve.prototype.run = function(creep) {
+    "use strict";
+    creep.say(["You", "spin", "me", "right", "round", "baby", "right", "round", "like a", "record", "baby", "right", "round", "round", "round", ""][Game.time % 16], true);
+    if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
+        delete creep.memory.currentTask;
+        return;
+    }
+    
+    Pathing.moveTo(creep, Game.rooms[creep.memory.home].controller, 1);
+    creep.reserveController(Game.rooms[creep.memory.home].controller);
+
+    if (Memory.signs && Memory.signs[creep.room.name] && (!creep.room.controller.sign || creep.room.controller.sign.username !== "roncli")) {
+        creep.signController(creep.room.controller, Memory.signs[creep.room.name]);
+    }
+};
+
+Reserve.prototype.toObj = function(creep) {
+    "use strict";
+
+    creep.memory.currentTask = {
+        type: this.type
+    };
+};
+
+Reserve.fromObj = function(creep) {
+    "use strict";
+
+    return new Reserve();
+};
+
+Reserve.getTask = function(creep) {
+    "use strict";
+
+    if (creep.room.controller) {
+        return new Reserve();
+    }
+};
+
+Reserve.getRemoteTask = function(creep) {
+    "use strict";
+
+    if (Game.rooms[creep.memory.home] && Game.rooms[creep.memory.home].controller) {
+        return new Reserve();
+    }
+};
+
+if (Memory.profiling) {
+    __require(2,52).registerObject(Reserve, "TaskReserve");
+}
+module.exports = Reserve;
+
+return module.exports;
+}
+/********** End of module 52: ../src/task.reserve.js **********/
+/********** Start module 53: ../src/task.collectEnergy.js **********/
+__modules[53] = function(module, exports) {
+var Cache = __require(4,53),
+    Pathing = __require(60,53),
     CollectEnergy = function(id) {
         "use strict";
         
@@ -10635,100 +10503,13 @@ CollectEnergy.getCleanupTasks = function(structures) {
 };
 
 if (Memory.profiling) {
-    __require(2,52).registerObject(CollectEnergy, "TaskCollectEnergy");
+    __require(2,53).registerObject(CollectEnergy, "TaskCollectEnergy");
 }
 module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 52: ../src/task.collectEnergy.js **********/
-/********** Start module 53: ../src/task.reserve.js **********/
-__modules[53] = function(module, exports) {
-var Cache = __require(4,53),
-    Pathing = __require(60,53),
-    Reserve = function(id) {
-        "use strict";
-        
-        this.init(id);
-    };
-    
-Reserve.prototype.init = function(id) {
-    "use strict";
-    
-    this.type = "reserve";
-    this.force = true;
-};
-
-Reserve.prototype.canAssign = function(creep) {
-    "use strict";
-
-    if (creep.spawning || creep.getActiveBodyparts(CLAIM) === 0) {
-        return false;
-    }
-
-    if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
-        return false;
-    }
-
-    Cache.creepTasks[creep.name] = this;
-    this.toObj(creep);
-    return true;
-};
-
-Reserve.prototype.run = function(creep) {
-    "use strict";
-    creep.say(["You", "spin", "me", "right", "round", "baby", "right", "round", "like a", "record", "baby", "right", "round", "round", "round", ""][Game.time % 16], true);
-    if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
-        delete creep.memory.currentTask;
-        return;
-    }
-    
-    Pathing.moveTo(creep, Game.rooms[creep.memory.home].controller, 1);
-    creep.reserveController(Game.rooms[creep.memory.home].controller);
-
-    if (Memory.signs && Memory.signs[creep.room.name] && (!creep.room.controller.sign || creep.room.controller.sign.username !== "roncli")) {
-        creep.signController(creep.room.controller, Memory.signs[creep.room.name]);
-    }
-};
-
-Reserve.prototype.toObj = function(creep) {
-    "use strict";
-
-    creep.memory.currentTask = {
-        type: this.type
-    };
-};
-
-Reserve.fromObj = function(creep) {
-    "use strict";
-
-    return new Reserve();
-};
-
-Reserve.getTask = function(creep) {
-    "use strict";
-
-    if (creep.room.controller) {
-        return new Reserve();
-    }
-};
-
-Reserve.getRemoteTask = function(creep) {
-    "use strict";
-
-    if (Game.rooms[creep.memory.home] && Game.rooms[creep.memory.home].controller) {
-        return new Reserve();
-    }
-};
-
-if (Memory.profiling) {
-    __require(2,53).registerObject(Reserve, "TaskReserve");
-}
-module.exports = Reserve;
-
-return module.exports;
-}
-/********** End of module 53: ../src/task.reserve.js **********/
+/********** End of module 53: ../src/task.collectEnergy.js **********/
 /********** Start module 54: ../src/task.collectMinerals.js **********/
 __modules[54] = function(module, exports) {
 var Cache = __require(4,54),

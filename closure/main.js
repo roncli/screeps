@@ -5370,6 +5370,226 @@ return module.exports;
 /********** End of module 23: ../src/role.remoteBuilder.js **********/
 /********** Start module 24: ../src/role.remoteCollector.js **********/
 __modules[24] = function(module, exports) {
+var Cache = __require(4,24),
+    Utilities = __require(11,24),
+    TaskPickupResource = __require(47,24),
+    TaskRally = __require(42,24),
+
+    RemoteCollector = {
+        checkSpawn: (room, supportRoom, max) => {
+            "use strict";
+
+            var roomName = room.name,
+                collectors = Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [];
+
+            if (!supportRoom) {
+                supportRoom = room;
+            }
+
+            if (!max) {
+                max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1;
+            }
+            if (Cache.spawnsInRoom(supportRoom).length === 0) {
+                return;
+            }
+            if (_.filter(collectors, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
+                RemoteCollector.spawn(room, supportRoom);
+            }
+
+            if (Memory.log && (collectors.length > 0 || max > 0)) {
+                Cache.log.rooms[roomName].creeps.push({
+                    role: "remoteCollector",
+                    count: collectors.length,
+                    max: max
+                });
+            }
+        },
+        
+        spawn: (room, supportRoom) => {
+            "use strict";
+
+            var body = [],
+                roomName = room.name,
+                supportRoomName = supportRoom.name,
+                energy, units, spawnToUse, name, count;
+            if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+                return false;
+            }
+            energy = Math.min(supportRoom.energyCapacityAvailable, 2400);
+            units = Math.floor(energy / 150);
+            for (count = 0; count < units; count++) {
+                body.push(CARRY);
+                body.push(CARRY);
+            }
+
+            for (count = 0; count < units; count++) {
+                body.push(MOVE);
+            }
+            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
+            if (!spawnToUse) {
+                return false;
+            }
+            name = spawnToUse.createCreep(body, "remoteCollector-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteCollector", home: roomName, supportRoom: supportRoomName});
+            if (spawnToUse.room.name === supportRoomName) {
+                Cache.spawning[spawnToUse.id] = typeof name !== "number";
+            }
+
+            return typeof name !== "number";
+        },
+
+        assignTasks: (room, tasks) => {
+            "use strict";
+
+            var roomName = room.name,
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || []),
+                assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(creepsWithNoTask, (creep) => {
+                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                    if (_.sum(Cache.creeps[room.name].all, (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
+                        return;
+                    }
+                    if (task.canAssign(creep)) {
+                        creep.say("Pickup");
+                        assigned.push(creep.name);
+                        return false;
+                    }
+                });
+            });
+
+            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+            assigned = [];
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            if (tasks.collectMinerals && tasks.collectMinerals.cleanupTasks) {
+                _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
+                    _.forEach(creepsWithNoTask, (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Collecting");
+                            assigned.push(creep.name);
+                        }
+                    });
+    
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+    
+                    if (creepsWithNoTask.length === 0) {
+                        return;
+                    }
+                });
+            }
+
+            if (tasks.collectEnergy && tasks.collectEnergy.cleanupTasks) {
+                _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
+                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Collecting");
+                            assigned.push(creep.name);
+                        }
+                    });
+    
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+    
+                    if (creepsWithNoTask.length === 0) {
+                        return;
+                    }
+                });
+            }
+            _.forEach(tasks.fillEnergy.storageTasks, (task) => {
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Storage");
+                            assigned.push(creep.name);
+                            energyMissing -= _.sum(creep.carry);
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(tasks.fillMinerals.storageTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Storage");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
+                _.forEach(creepsWithNoTask, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say("Terminal");
+                        assigned.push(creep.name);
+                    }
+                });
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(tasks.fillEnergy.containerTasks, (task) => {
+                var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("Container");
+                            assigned.push(creep.name);
+                            energyMissing -= _.sum(creep.carry);
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+            _.forEach(creepsWithNoTask, (creep) => {
+                var task;
+                
+                if (_.sum(creep.carry) > 0) {
+                    task = new TaskRally(creep.memory.supportRoom);
+                } else {
+                    task = new TaskRally(creep.memory.home);
+                }
+                task.canAssign(creep);
+            });
+        }
+    };
+
+if (Memory.profiling) {
+    __require(2,24).registerObject(RemoteCollector, "RoleRemoteCollector");
+}
+module.exports = RemoteCollector;
 
 return module.exports;
 }

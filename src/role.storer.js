@@ -53,7 +53,7 @@ var Cache = require("cache"),
             });
 
             // If we don't have a storer for each container, spawn one.
-            max += Math.ceil(2 * length / (controller && controller.level >= 6 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
+            max += Math.ceil(2 * length / (controller && controller.level == 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
             if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
                 Storer.spawn(room);
             }

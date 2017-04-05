@@ -82,7 +82,7 @@ Repair.getTowerTasks = function(room) {
 Repair.getCriticalTasks = function(room) {
     "use strict";
 
-    return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 100000 && s.hits / s.hitsMax < 0.5), 5), (s) => new Repair(s.id));
+    return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), 5), (s) => new Repair(s.id));
 };
 
 Repair.getTasks = function(room) {

@@ -121,6 +121,12 @@ var profiler = require("screeps-profiler"),
                 thisCpu = Game.cpu.getUsed();
                 log += (log.length > 0 ? " - " : "") + "creeps took " + (thisCpu - lastCpu).toFixed(2); 
                 lastCpu = thisCpu;
+                
+                main.debug();
+                
+                thisCpu = Game.cpu.getUsed();
+                log += (log.length > 0 ? " - " : "") + "debug took " + (thisCpu - lastCpu).toFixed(2);
+                lastCpu = thisCpu;
 
                 main.finalize();
 
@@ -1165,6 +1171,14 @@ var profiler = require("screeps-profiler"),
             });
             
             // paths.set();
+        },
+        
+        debug: () => {
+            if (Memory.debug) {
+                _.forEach(Game.creeps, (creep) => {
+                    creep.room.visual.text(creep.name + "\n" + creep.memory.role + "\n" + (creep.memory.currentTask ? creep.memory.currentTask.type : ""), creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
+                });
+            }
         },
 
         finalize: () => {

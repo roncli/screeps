@@ -1176,9 +1176,9 @@ var profiler = require("screeps-profiler"),
         debug: () => {
             if (Memory.debug) {
                 _.forEach(Game.creeps, (creep) => {
-                    creep.room.visual.text(creep.name, creep.pos.x + 0.5, creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
-                    creep.room.visual.text(creep.memory.role, creep.pos.x + 0.5, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"});
-                    creep.room.visual.text((creep.memory.currentTask ? creep.memory.currentTask.type : ""), creep.pos.x + 0.5, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
+                    creep.room.visual.text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
+                    creep.room.visual.text(creep.memory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"});
+                    creep.room.visual.text((creep.memory.currentTask ? creep.memory.currentTask.type : ""), creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
                 });
             }
         },

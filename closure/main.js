@@ -5426,7 +5426,7 @@ var Cache = __require(4,24),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || []), (c) => (!c.spawning && c.ticksToLive > 150)),
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -5453,7 +5453,7 @@ var Cache = __require(4,24),
             }
             if (tasks.collectMinerals && tasks.collectMinerals.cleanupTasks) {
                 _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                    _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
+                    _.forEach(creepsWithNoTask, (creep) => {
                         if (task.canAssign(creep)) {
                             creep.say("Collecting");
                             assigned.push(creep.name);

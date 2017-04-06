@@ -6318,23 +6318,24 @@ var Cache = __require(4,29),
             var body = [],
                 roomName = room.name,
                 supportRoomName = supportRoom.name,
-                energy, units, secondUnits, remainder, count, spawnToUse, name;
+                energy, units, secondUnits, remainder, secondRemainder, count, spawnToUse, name;
             if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
                 return false;
             }
-            energy = Math.min(supportRoom.energyCapacityAvailable, 2750);
+            energy = Math.min(supportRoom.energyCapacityAvailable, 3000);
             units = Math.floor(energy / 200);
-            secondUnits = Math.floor((energy - 1000) / 150);
+            secondUnits = Math.floor((energy - 2000) / 150);
             remainder = energy % 200;
-            for (count = 0; count < units && count < 5; count++) {
+            secondRemainder = (energy - 2000) % 150;
+            for (count = 0; count < units && count < 10; count++) {
                 body.push(WORK);
             }
 
-            if (energy < 1000 && remainder >= 150) {
+            if (energy < 2000 && remainder >= 150) {
                 body.push(WORK);
             }
 
-            for (count = 0; count < units && count < 5; count++) {
+            for (count = 0; count < units && count < 10; count++) {
                 body.push(CARRY);
             }
 
@@ -6343,15 +6344,15 @@ var Cache = __require(4,29),
                 body.push(CARRY);
             }
 
-            if (energy < 1000 && remainder >= 100 && remainder < 150) {
+            if (energy < 2000 && remainder >= 100 && remainder < 150) {
                 body.push(CARRY);
             }
 
-            if (energy > 1000 && (energy - 1000) % 150 >= 100) {
+            if (energy > 2000 && secondRemainder >= 100) {
                 body.push(CARRY);
             }
 
-            for (count = 0; count < units && count < 5; count++) {
+            for (count = 0; count < units && count < 10; count++) {
                 body.push(MOVE);
             }
 
@@ -6359,11 +6360,11 @@ var Cache = __require(4,29),
                 body.push(MOVE);
             }
 
-            if (energy < 1000 && remainder >= 50) {
+            if (energy < 2000 && remainder >= 50) {
                 body.push(MOVE);
             }
 
-            if (energy > 1000 && (energy - 1000) % 150 >= 50) {
+            if (energy > 2000 && secondRemainder >= 50) {
                 body.push(MOVE);
             }
             spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];

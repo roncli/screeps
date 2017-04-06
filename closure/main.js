@@ -834,19 +834,25 @@ var profiler = __require(2,0),
 
         rooms: () => {
             "use strict";
+            
+            var roomOrder = ["base", "source", "mine", "cleanup", ""],
+                memoryRooms = Memory.rooms,
+                roomsToAlwaysRun = ["source", "cleanup"],
+                runRooms = Game.cpu.bucket >= 9000 || Game.time % 2 === 0;
 
             Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
             _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]).sort((a, b) => {
-                return ["base", "source", "mine", "cleanup", ""].indexOf(Memory.rooms[a.name] && Memory.rooms[a.name].roomType && Memory.rooms[a.name].roomType.type || "") - ["base", "source", "mine", "cleanup", ""].indexOf(Memory.rooms[b.name] && Memory.rooms[b.name].roomType && Memory.rooms[b.name].roomType.type || "");
+                return roomOrder.indexOf(memoryRooms[a.name] && memoryRooms[a.name].roomType && memoryRooms[a.name].roomType.type || "") - roomOrder.indexOf(memoryRooms[b.name] && memoryRooms[b.name].roomType && memoryRooms[b.name].roomType.type || "");
             }), (room) => {
                 var roomName = room.name,
-                    roomMemory = Memory.rooms[roomName];
+                    roomMemory = memoryRooms[roomName],
+                    roomType = roomMemory.roomType;
                 
                 if (Cache.roomTypes[roomName]) {
-                    if (["source", "cleanup"].indexOf(roomMemory.roomType.type) !== -1 || Game.cpu.bucket >= 9500 || Game.time % 2 === 0) {
-                        Proxy.run("main.rooms.run", () => Cache.roomTypes[roomName].run(room));
+                    if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
+                        Cache.roomTypes[roomName].run(room);
                     }
-                    if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
+                    if (roomType.type === Cache.roomTypes[roomName].type) {
                         Cache.roomTypes[roomName].toObj(room);
                     }
                 }
@@ -5452,7 +5458,7 @@ var Cache = __require(4,24),
             }
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.sum(Cache.creeps[room.name].all, (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
+                    if (_.sum(Cache.creeps[room.name] && Cache.creeps[room.name].all || [], (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
                         return;
                     }
                     if (task.canAssign(creep)) {
@@ -6116,7 +6122,7 @@ var Cache = __require(4,28),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -6124,7 +6130,7 @@ var Cache = __require(4,28),
             }
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                    if (_.sum(Cache.creeps[room.name] && Cache.creeps[room.name].all || [], (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
                         return;
                     }
                     if (task.canAssign(creep)) {

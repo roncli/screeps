@@ -114,7 +114,7 @@ var Cache = require("cache"),
             "use strict";
 
             var roomName = room.name,
-                creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+                creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []),
                 assigned = [];
 
             if (creepsWithNoTask.length === 0) {
@@ -124,7 +124,7 @@ var Cache = require("cache"),
             // Check for dropped resources in current room.
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
+                    if (_.sum(Cache.creeps[room.name] && Cache.creeps[room.name].all || [], (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
                         return;
                     }
                     if (task.canAssign(creep)) {

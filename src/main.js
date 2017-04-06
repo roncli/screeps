@@ -839,22 +839,28 @@ var profiler = require("screeps-profiler"),
 
         rooms: () => {
             "use strict";
+            
+            var roomOrder = ["base", "source", "mine", "cleanup", ""],
+                memoryRooms = Memory.rooms,
+                roomsToAlwaysRun = ["source", "cleanup"],
+                runRooms = Game.cpu.bucket >= 9000 || Game.time % 2 === 0;
 
             Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
 
             // Loop through each room to determine the required tasks for the room, and then serialize the room.
             _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]).sort((a, b) => {
-                return ["base", "source", "mine", "cleanup", ""].indexOf(Memory.rooms[a.name] && Memory.rooms[a.name].roomType && Memory.rooms[a.name].roomType.type || "") - ["base", "source", "mine", "cleanup", ""].indexOf(Memory.rooms[b.name] && Memory.rooms[b.name].roomType && Memory.rooms[b.name].roomType.type || "");
+                return roomOrder.indexOf(memoryRooms[a.name] && memoryRooms[a.name].roomType && memoryRooms[a.name].roomType.type || "") - roomOrder.indexOf(memoryRooms[b.name] && memoryRooms[b.name].roomType && memoryRooms[b.name].roomType.type || "");
             }), (room) => {
                 var roomName = room.name,
-                    roomMemory = Memory.rooms[roomName];
+                    roomMemory = memoryRooms[roomName],
+                    roomType = roomMemory.roomType;
                 
                 if (Cache.roomTypes[roomName]) {
-                    if (["source", "cleanup"].indexOf(roomMemory.roomType.type) !== -1 || Game.cpu.bucket >= 9500 || Game.time % 2 === 0) {
+                    if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                         // Run rooms.
-                        Proxy.run("main.rooms.run", () => Cache.roomTypes[roomName].run(room));
+                        Cache.roomTypes[roomName].run(room);
                     }
-                    if (roomMemory && roomMemory.roomType && roomMemory.roomType.type === Cache.roomTypes[roomName].type) {
+                    if (roomType.type === Cache.roomTypes[roomName].type) {
                         Cache.roomTypes[roomName].toObj(room);
                     }
                 }

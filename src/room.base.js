@@ -317,7 +317,7 @@ Base.prototype.terminal = function(room, terminal) {
             buyQueue = undefined;
         }
 
-        if (buyQueue && maxEnergy > Memory.marketEnergy) {
+        if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {
             // Buy what we need to for the lab queue.
             bestOrder = (Market.getFilteredOrders().sell[buyQueue.resource] || [])[0];
             if (bestOrder) {

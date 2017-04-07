@@ -312,7 +312,7 @@ Base.prototype.terminal = function(room, terminal) {
             Memory.minimumSell = {};
         }
         
-        if (Cache.credits < Memory.minimumCredits) {
+        if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
             delete memory.buyQueue;
             buyQueue = undefined;
         }
@@ -405,17 +405,15 @@ Base.prototype.terminal = function(room, terminal) {
                     _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                         var resource = topResource.resource;
 
-                        if (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) {
-                            delete Memory.minimumSell[topResource.resource];
-                        }
-                        
-                        bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
+                        bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
                         if (bestOrder) {
                             transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
                             if (terminalEnergy > transCost) {
                                 Market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), roomName);
                                 dealMade = true;
-                                delete Memory.minimumSell[bestOrder.resourceType];
+                                if (topResource.amount < 5005) {
+                                    delete Memory.minimumSell[bestOrder.resourceType];
+                                }
                                 return false;
                             } else {
                                 if (terminalEnergy > 0) {

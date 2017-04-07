@@ -162,14 +162,15 @@ Source.prototype.stage1 = function(room, supportRoom) {
 
 Source.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
-        supportRoomName = supportRoom.name;
+        supportRoomName = supportRoom.name,
+        creeps = Cache.creeps[roomName];
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
         if (
-            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []).length === 0 &&
-            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length === 0 &&
-            (Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length === 0
+            (creeps && creeps.remoteMiner || []).length === 0 &&
+            (creeps && creeps.remoteWorker || []).length === 0 &&
+            (creeps && creeps.remoteStorer || []).length === 0
         ) {
             this.stage = 1;
         }

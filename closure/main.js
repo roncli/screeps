@@ -105,10 +105,10 @@ var profiler = __require(2,0),
             if (Game.cpu.getUsed() >= 10) {
                 if (Game.cpu.bucket < 9000) {
                     Game.notify("CPU started at " + Game.cpu.getUsed().toFixed(2) + " with bucket at " + Game.cpu.bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+                    return;
                 } else {
                     Game.notify("CPU started at " + Game.cpu.getUsed().toFixed(2) + ", warning! " + Game.time.toFixed(0));
                 }
-                return;
             }
 
             if (Game.cpu.bucket < Game.cpu.tickLimit) {

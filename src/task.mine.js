@@ -13,6 +13,7 @@ Mine.prototype.init = function(id) {
     this.type = "mine";
     this.id = id;
     this.source = Game.getObjectById(id);
+    this.force = true;
 };
 
 Mine.prototype.canAssign = function(creep) {

@@ -5470,7 +5470,7 @@ var Cache = __require(4,24),
             }
             _.forEach(creepsWithNoTask, (creep) => {
                 _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.sum(creeps && creeps.all || [], (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
+                    if (_.sum(creeps && creeps.all || [], (c) => c.memory.currentTask && c.memory.currentTask.id === task.idG ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
                         return;
                     }
                     if (task.canAssign(creep)) {
@@ -9519,7 +9519,11 @@ Heal.prototype.toObj = function(creep) {
 Heal.fromObj = function(creep) {
     "use strict";
 
-    return new Heal(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Heal(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Heal.getTasks = function(room) {
@@ -9611,7 +9615,11 @@ Melee.prototype.toObj = function(creep) {
 Melee.fromObj = function(creep) {
     "use strict";
 
-    return new Melee(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Melee(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Melee.getTasks = function(room) {
@@ -9723,10 +9731,12 @@ Rally.fromObj = function(creep) {
     if (creep.memory.currentTask.id.roomName) {
         task = new Rally(new RoomPosition(creep.memory.currentTask.id.x, creep.memory.currentTask.id.y, creep.memory.currentTask.id.roomName));
     } else {
-        task = new Rally(creep.memory.currentTask.id);
+        if (Game.getObjectById(creep.memory.currentTask.id)) {
+            task = new Rally(creep.memory.currentTask.id);
+        }
     }
 
-    if (creep.memory.currentTask.range) {
+    if (task && creep.memory.currentTask.range) {
         task.range = creep.memory.currentTask.range;
     }
 
@@ -9843,7 +9853,11 @@ Ranged.prototype.toObj = function(creep) {
 Ranged.fromObj = function(creep) {
     "use strict";
 
-    return new Ranged(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Ranged(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Ranged.getTasks = function(room) {
@@ -9924,7 +9938,11 @@ Dismantle.prototype.toObj = function(creep) {
 Dismantle.fromObj = function(creep) {
     "use strict";
 
-    return new Dismantle(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Dismantle(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Dismantle.getCleanupTasks = function(structures) {
@@ -10092,7 +10110,11 @@ Harvest.prototype.toObj = function(creep) {
 Harvest.fromObj = function(creep) {
     "use strict";
 
-    return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
+    if (Game.getObjectById(creep.memory.currentTask.source)) {
+        return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
+    } else {
+        return;
+    }
 };
 
 if (Memory.profiling) {
@@ -10155,7 +10177,11 @@ Pickup.prototype.run = function(creep) {
 Pickup.fromObj = function(creep) {
     "use strict";
 
-    return new Pickup(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Pickup(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Pickup.prototype.toObj = function(creep) {
@@ -10324,7 +10350,11 @@ Build.prototype.toObj = function(creep) {
 Build.fromObj = function(creep) {
     "use strict";
 
-    return new Build(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Build(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Build.getTasks = function(room) {
@@ -10408,7 +10438,11 @@ Repair.prototype.toObj = function(creep) {
 Repair.fromObj = function(creep) {
     "use strict";
 
-    return new Repair(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Repair(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Repair.getTowerTasks = function(room) {
@@ -10526,7 +10560,11 @@ Mine.prototype.toObj = function(creep) {
 Mine.fromObj = function(creep) {
     "use strict";
 
-    return new Mine(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Mine(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 if (Memory.profiling) {
@@ -10711,7 +10749,11 @@ CollectEnergy.prototype.toObj = function(creep) {
 CollectEnergy.fromObj = function(creep) {
     "use strict";
 
-    return new CollectEnergy(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new CollectEnergy(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 CollectEnergy.getTasks = function(room) {
@@ -10861,7 +10903,11 @@ CollectMinerals.prototype.toObj = function(creep) {
 CollectMinerals.fromObj = function(creep) {
     "use strict";
 
-    return new CollectMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resource, creep.memory.currentTask.amount);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new CollectMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resource, creep.memory.currentTask.amount);
+    } else {
+        return;
+    }
 };
 
 CollectMinerals.getStorerTasks = function(room) {
@@ -11108,7 +11154,11 @@ FillEnergy.prototype.toObj = function(creep) {
 FillEnergy.fromObj = function(creep) {
     "use strict";
 
-    return new FillEnergy(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new FillEnergy(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 FillEnergy.getExtensionTasks = function(room) {
@@ -11317,7 +11367,11 @@ FillMinerals.prototype.toObj = function(creep) {
 FillMinerals.fromObj = function(creep) {
     "use strict";
 
-    return new FillMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resources);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new FillMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resources);
+    } else {
+        return;
+    }
 };
 
 FillMinerals.getLabTasks = function(room) {

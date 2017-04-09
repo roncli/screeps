@@ -75,7 +75,11 @@ Melee.prototype.toObj = function(creep) {
 Melee.fromObj = function(creep) {
     "use strict";
 
-    return new Melee(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Melee(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Melee.getTasks = function(room) {

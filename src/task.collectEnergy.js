@@ -91,7 +91,11 @@ CollectEnergy.prototype.toObj = function(creep) {
 CollectEnergy.fromObj = function(creep) {
     "use strict";
 
-    return new CollectEnergy(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new CollectEnergy(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 CollectEnergy.getTasks = function(room) {

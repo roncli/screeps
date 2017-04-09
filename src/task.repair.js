@@ -70,7 +70,11 @@ Repair.prototype.toObj = function(creep) {
 Repair.fromObj = function(creep) {
     "use strict";
 
-    return new Repair(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Repair(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Repair.getTowerTasks = function(room) {

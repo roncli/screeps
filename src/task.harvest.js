@@ -76,7 +76,11 @@ Harvest.prototype.toObj = function(creep) {
 Harvest.fromObj = function(creep) {
     "use strict";
 
-    return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
+    if (Game.getObjectById(creep.memory.currentTask.source)) {
+        return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
+    } else {
+        return;
+    }
 };
 
 if (Memory.profiling) {

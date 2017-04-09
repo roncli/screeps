@@ -136,7 +136,11 @@ FillMinerals.prototype.toObj = function(creep) {
 FillMinerals.fromObj = function(creep) {
     "use strict";
 
-    return new FillMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resources);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new FillMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resources);
+    } else {
+        return;
+    }
 };
 
 FillMinerals.getLabTasks = function(room) {

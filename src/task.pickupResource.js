@@ -55,7 +55,11 @@ Pickup.prototype.run = function(creep) {
 Pickup.fromObj = function(creep) {
     "use strict";
 
-    return new Pickup(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Pickup(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Pickup.prototype.toObj = function(creep) {

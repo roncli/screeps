@@ -86,7 +86,11 @@ Ranged.prototype.toObj = function(creep) {
 Ranged.fromObj = function(creep) {
     "use strict";
 
-    return new Ranged(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Ranged(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Ranged.getTasks = function(room) {

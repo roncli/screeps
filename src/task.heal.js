@@ -71,7 +71,11 @@ Heal.prototype.toObj = function(creep) {
 Heal.fromObj = function(creep) {
     "use strict";
 
-    return new Heal(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Heal(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Heal.getTasks = function(room) {

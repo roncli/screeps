@@ -65,7 +65,11 @@ Build.prototype.toObj = function(creep) {
 Build.fromObj = function(creep) {
     "use strict";
 
-    return new Build(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Build(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Build.getTasks = function(room) {

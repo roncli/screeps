@@ -99,10 +99,12 @@ Rally.fromObj = function(creep) {
     if (creep.memory.currentTask.id.roomName) {
         task = new Rally(new RoomPosition(creep.memory.currentTask.id.x, creep.memory.currentTask.id.y, creep.memory.currentTask.id.roomName));
     } else {
-        task = new Rally(creep.memory.currentTask.id);
+        if (Game.getObjectById(creep.memory.currentTask.id)) {
+            task = new Rally(creep.memory.currentTask.id);
+        }
     }
 
-    if (creep.memory.currentTask.range) {
+    if (task && creep.memory.currentTask.range) {
         task.range = creep.memory.currentTask.range;
     }
 

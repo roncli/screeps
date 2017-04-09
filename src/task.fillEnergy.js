@@ -86,7 +86,11 @@ FillEnergy.prototype.toObj = function(creep) {
 FillEnergy.fromObj = function(creep) {
     "use strict";
 
-    return new FillEnergy(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new FillEnergy(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 FillEnergy.getExtensionTasks = function(room) {

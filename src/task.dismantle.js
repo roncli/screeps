@@ -66,7 +66,11 @@ Dismantle.prototype.toObj = function(creep) {
 Dismantle.fromObj = function(creep) {
     "use strict";
 
-    return new Dismantle(creep.memory.currentTask.id);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new Dismantle(creep.memory.currentTask.id);
+    } else {
+        return;
+    }
 };
 
 Dismantle.getCleanupTasks = function(structures) {

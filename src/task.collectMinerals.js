@@ -121,7 +121,11 @@ CollectMinerals.prototype.toObj = function(creep) {
 CollectMinerals.fromObj = function(creep) {
     "use strict";
 
-    return new CollectMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resource, creep.memory.currentTask.amount);
+    if (Game.getObjectById(creep.memory.currentTask.id)) {
+        return new CollectMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resource, creep.memory.currentTask.amount);
+    } else {
+        return;
+    }
 };
 
 CollectMinerals.getStorerTasks = function(room) {

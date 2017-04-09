@@ -122,9 +122,8 @@ var profiler = __require(2,0),
                 
                 if (Memory.logCpu) {
                     lastCpu = thisCpu;
+                    log = "Started at " + lastCpu.toFixed(2);
                 }
-
-                log = "Started at " + lastCpu.toFixed(2);
 
                 main.init();
 

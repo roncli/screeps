@@ -69,9 +69,8 @@ var profiler = require("screeps-profiler"),
                 
                 if (Memory.logCpu) {
                     lastCpu = thisCpu;
+                    log = "Started at " + lastCpu.toFixed(2);
                 }
-
-                log = "Started at " + lastCpu.toFixed(2);
 
                 main.init();
 

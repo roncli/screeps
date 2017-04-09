@@ -96,7 +96,7 @@ Mine.prototype.toObj = function(creep) {
 Mine.fromObj = function(creep) {
     "use strict";
 
-    if (creep.memory.currentTask.id && Game.getObjectById(creep.memory.currentTask.id)) {
+    if (!creep.memory.currentTask.id || Game.getObjectById(creep.memory.currentTask.id)) {
         return new Mine(creep.memory.currentTask.id);
     } else {
         return;

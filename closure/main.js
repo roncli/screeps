@@ -6107,7 +6107,7 @@ var Cache = __require(4,28),
                     foundFirstSource = true;
                 }
                 length = Memory.lengthToContainer[id][supportRoom.name];
-                count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 58, 58][supportRoom.controller.level]), 0);
+                count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoom.controller.level]), 0);
                 max += count;
                 if (_.filter(storers, (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === id).length < count) {
                     Storer.spawn(room, supportRoom, id);

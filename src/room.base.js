@@ -308,10 +308,6 @@ Base.prototype.terminal = function(room, terminal) {
     }
     
     if (terminal && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
-        if (!Memory.minimumSell) {
-            Memory.minimumSell = {};
-        }
-        
         if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
             delete memory.buyQueue;
             buyQueue = undefined;
@@ -405,7 +401,7 @@ Base.prototype.terminal = function(room, terminal) {
                     _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                         var resource = topResource.resource;
 
-                        bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
+                        bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || (!Memory.minimumSell[resource] && !Memory.flipPrice[resource]) || (Memory.minimumSell[resource] && o.price >= Memory.minimumSell[resource]) || (Memory.flipPrice[resource] && o.price >= Memory.flipPrice[resource].price) || (Memory.flipPrice[resource] && Game.time > Memory.flipPrice[resource].expiration))[0];
                         if (bestOrder) {
                             transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
                             if (terminalEnergy > transCost) {
@@ -471,7 +467,7 @@ Base.prototype.terminal = function(room, terminal) {
                     transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
                     if (terminalEnergy > transCost) {
                         Market.deal(sell.id, amount, roomName);
-                        Memory.minimumSell[flip.resource] = sell.price;
+                        Memory.flipPrice[flip.resource] = {price: sell.price, expiration: Game.time + 100};
                         dealMade = true;
                         return false;
                     }
@@ -480,7 +476,7 @@ Base.prototype.terminal = function(room, terminal) {
                         amount = Math.floor(amount * terminalEnergy / transCost);
                         if (amount > 0) {
                             Market.deal(sell.id, amount, roomName);
-                            Memory.minimumSell[flip.resource] = sell.price;
+                            Memory.flipPrice[flip.resource] = {price: sell.price, expiration: Game.time + 100};
                             dealMade = true;
                             return false;
                         }

@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: H:\dev\git\github\screeps\src\main.js **********/
+/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0);
 
@@ -1261,8 +1261,8 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: H:\dev\git\github\screeps\src\main.js **********/
-/********** Start module 1: ..\src\screeps-perf.js **********/
+/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.filter = function(callback, thisArg) {
     var results = [];
@@ -1293,8 +1293,8 @@ Array.prototype.map = function(callback, thisArg) {
 
 return module.exports;
 }
-/********** End of module 1: ..\src\screeps-perf.js **********/
-/********** Start module 2: ..\src\screeps-profiler.js **********/
+/********** End of module 1: ../src/screeps-perf.js **********/
+/********** Start module 2: ../src/screeps-profiler.js **********/
 __modules[2] = function(module, exports) {
 let usedOnStart = 0;
 let enabled = false;
@@ -1579,8 +1579,8 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 2: ..\src\screeps-profiler.js **********/
-/********** Start module 3: ..\src\army.js **********/
+/********** End of module 2: ../src/screeps-profiler.js **********/
+/********** Start module 3: ../src/army.js **********/
 __modules[3] = function(module, exports) {
 var Cache = __require(4,3),
     Utilities = __require(11,3),
@@ -1729,8 +1729,8 @@ module.exports = Army;
 
 return module.exports;
 }
-/********** End of module 3: ..\src\army.js **********/
-/********** Start module 4: ..\src\cache.js **********/
+/********** End of module 3: ../src/army.js **********/
+/********** Start module 4: ../src/cache.js **********/
 __modules[4] = function(module, exports) {
 var spawnsInRoom = {},
     powerSpawnsInRoom = {},
@@ -1967,8 +1967,8 @@ module.exports = Cache;
 
 return module.exports;
 }
-/********** End of module 4: ..\src\cache.js **********/
-/********** Start module 5: ..\src\commands.js **********/
+/********** End of module 4: ../src/cache.js **********/
+/********** Start module 5: ../src/commands.js **********/
 __modules[5] = function(module, exports) {
 var Cache = __require(4,5),
 
@@ -2121,8 +2121,8 @@ module.exports = Commands;
 
 return module.exports;
 }
-/********** End of module 5: ..\src\commands.js **********/
-/********** Start module 6: ..\src\drawing.js **********/
+/********** End of module 5: ../src/commands.js **********/
+/********** Start module 6: ../src/drawing.js **********/
 __modules[6] = function(module, exports) {
 var Drawing = {
     progressBar: (visual, x, y, w, h, value, max, options) => {
@@ -2376,8 +2376,8 @@ module.exports = Drawing;
 
 return module.exports;
 }
-/********** End of module 6: ..\src\drawing.js **********/
-/********** Start module 7: ..\src\market.js **********/
+/********** End of module 6: ../src/drawing.js **********/
+/********** Start module 7: ../src/market.js **********/
 __modules[7] = function(module, exports) {
 var Cache = __require(4,7),
     Utilities = __require(11,7),
@@ -2449,8 +2449,8 @@ module.exports = Market;
 
 return module.exports;
 }
-/********** End of module 7: ..\src\market.js **********/
-/********** Start module 8: ..\src\minerals.js **********/
+/********** End of module 7: ../src/market.js **********/
+/********** Start module 8: ../src/minerals.js **********/
 __modules[8] = function(module, exports) {
 var Minerals = {};
 
@@ -2500,8 +2500,8 @@ module.exports = Minerals;
 
 return module.exports;
 }
-/********** End of module 8: ..\src\minerals.js **********/
-/********** Start module 9: ..\src\proxy.js **********/
+/********** End of module 8: ../src/minerals.js **********/
+/********** Start module 9: ../src/proxy.js **********/
 __modules[9] = function(module, exports) {
 /**
  * A way to proxy calls so the profiler picks them up.
@@ -2523,8 +2523,8 @@ module.exports = Proxy;
 
 return module.exports;
 }
-/********** End of module 9: ..\src\proxy.js **********/
-/********** Start module 10: ..\src\segment.js **********/
+/********** End of module 9: ../src/proxy.js **********/
+/********** Start module 10: ../src/segment.js **********/
 __modules[10] = function(module, exports) {
 var memory = [],
     Segment = function(id) {
@@ -2564,8 +2564,8 @@ module.exports = Segment;
 
 return module.exports;
 }
-/********** End of module 10: ..\src\segment.js **********/
-/********** Start module 11: ..\src\utilities.js **********/
+/********** End of module 10: ../src/segment.js **********/
+/********** Start module 11: ../src/utilities.js **********/
 __modules[11] = function(module, exports) {
 var Cache = __require(4,11),
 
@@ -2835,8 +2835,8 @@ module.exports = Utilities;
 
 return module.exports;
 }
-/********** End of module 11: ..\src\utilities.js **********/
-/********** Start module 12: ..\src\role.armyDismantler.js **********/
+/********** End of module 11: ../src/utilities.js **********/
+/********** Start module 12: ../src/role.armyDismantler.js **********/
 __modules[12] = function(module, exports) {
 var Cache = __require(4,12),
     Utilities = __require(11,12),
@@ -3108,8 +3108,8 @@ module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 12: ..\src\role.armyDismantler.js **********/
-/********** Start module 13: ..\src\role.armyHealer.js **********/
+/********** End of module 12: ../src/role.armyDismantler.js **********/
+/********** Start module 13: ../src/role.armyHealer.js **********/
 __modules[13] = function(module, exports) {
 var Cache = __require(4,13),
     Utilities = __require(11,13),
@@ -3393,8 +3393,8 @@ module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 13: ..\src\role.armyHealer.js **********/
-/********** Start module 14: ..\src\role.armyMelee.js **********/
+/********** End of module 13: ../src/role.armyHealer.js **********/
+/********** Start module 14: ../src/role.armyMelee.js **********/
 __modules[14] = function(module, exports) {
 var Cache = __require(4,14),
     Utilities = __require(11,14),
@@ -3682,8 +3682,8 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 14: ..\src\role.armyMelee.js **********/
-/********** Start module 15: ..\src\role.armyRanged.js **********/
+/********** End of module 14: ../src/role.armyMelee.js **********/
+/********** Start module 15: ../src/role.armyRanged.js **********/
 __modules[15] = function(module, exports) {
 var Cache = __require(4,15),
     Utilities = __require(11,15),
@@ -3970,8 +3970,8 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 15: ..\src\role.armyRanged.js **********/
-/********** Start module 16: ..\src\role.claimer.js **********/
+/********** End of module 15: ../src/role.armyRanged.js **********/
+/********** Start module 16: ../src/role.claimer.js **********/
 __modules[16] = function(module, exports) {
 var Cache = __require(4,16),
     Commands = __require(5,16),
@@ -4081,8 +4081,8 @@ module.exports = Claimer;
 
 return module.exports;
 }
-/********** End of module 16: ..\src\role.claimer.js **********/
-/********** Start module 17: ..\src\role.collector.js **********/
+/********** End of module 16: ../src/role.claimer.js **********/
+/********** Start module 17: ../src/role.collector.js **********/
 __modules[17] = function(module, exports) {
 var Cache = __require(4,17),
     Utilities = __require(11,17),
@@ -4409,8 +4409,8 @@ module.exports = Collector;
 
 return module.exports;
 }
-/********** End of module 17: ..\src\role.collector.js **********/
-/********** Start module 18: ..\src\role.converter.js **********/
+/********** End of module 17: ../src/role.collector.js **********/
+/********** Start module 18: ../src/role.converter.js **********/
 __modules[18] = function(module, exports) {
 var Cache = __require(4,18),
     Commands = __require(5,18),
@@ -4532,8 +4532,8 @@ module.exports = Converter;
 
 return module.exports;
 }
-/********** End of module 18: ..\src\role.converter.js **********/
-/********** Start module 19: ..\src\role.defender.js **********/
+/********** End of module 18: ../src/role.converter.js **********/
+/********** Start module 19: ../src/role.defender.js **********/
 __modules[19] = function(module, exports) {
 var Cache = __require(4,19),
     Utilities = __require(11,19),
@@ -4644,8 +4644,8 @@ module.exports = Defender;
 
 return module.exports;
 }
-/********** End of module 19: ..\src\role.defender.js **********/
-/********** Start module 20: ..\src\role.dismantler.js **********/
+/********** End of module 19: ../src/role.defender.js **********/
+/********** Start module 20: ../src/role.dismantler.js **********/
 __modules[20] = function(module, exports) {
 var Cache = __require(4,20),
     Utilities = __require(11,20),
@@ -4877,8 +4877,8 @@ module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 20: ..\src\role.dismantler.js **********/
-/********** Start module 21: ..\src\role.healer.js **********/
+/********** End of module 20: ../src/role.dismantler.js **********/
+/********** Start module 21: ../src/role.healer.js **********/
 __modules[21] = function(module, exports) {
 var Cache = __require(4,21),
     Utilities = __require(11,21),
@@ -4991,8 +4991,8 @@ module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 21: ..\src\role.healer.js **********/
-/********** Start module 22: ..\src\role.miner.js **********/
+/********** End of module 21: ../src/role.healer.js **********/
+/********** Start module 22: ../src/role.miner.js **********/
 __modules[22] = function(module, exports) {
 var Cache = __require(4,22),
     Utilities = __require(11,22),
@@ -5129,8 +5129,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 22: ..\src\role.miner.js **********/
-/********** Start module 23: ..\src\role.remoteBuilder.js **********/
+/********** End of module 22: ../src/role.miner.js **********/
+/********** Start module 23: ../src/role.remoteBuilder.js **********/
 __modules[23] = function(module, exports) {
 var Cache = __require(4,23),
     Utilities = __require(11,23),
@@ -5332,8 +5332,8 @@ module.exports = Builder;
 
 return module.exports;
 }
-/********** End of module 23: ..\src\role.remoteBuilder.js **********/
-/********** Start module 24: ..\src\role.remoteCollector.js **********/
+/********** End of module 23: ../src/role.remoteBuilder.js **********/
+/********** Start module 24: ../src/role.remoteCollector.js **********/
 __modules[24] = function(module, exports) {
 var Cache = __require(4,24),
     Utilities = __require(11,24),
@@ -5560,8 +5560,8 @@ module.exports = RemoteCollector;
 
 return module.exports;
 }
-/********** End of module 24: ..\src\role.remoteCollector.js **********/
-/********** Start module 25: ..\src\role.remoteDismantler.js **********/
+/********** End of module 24: ../src/role.remoteCollector.js **********/
+/********** Start module 25: ../src/role.remoteDismantler.js **********/
 __modules[25] = function(module, exports) {
 var Cache = __require(4,25),
     Utilities = __require(11,25),
@@ -5684,8 +5684,8 @@ module.exports = RemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 25: ..\src\role.remoteDismantler.js **********/
-/********** Start module 26: ..\src\role.remoteMiner.js **********/
+/********** End of module 25: ../src/role.remoteDismantler.js **********/
+/********** Start module 26: ../src/role.remoteMiner.js **********/
 __modules[26] = function(module, exports) {
 var Cache = __require(4,26),
     Utilities = __require(11,26),
@@ -5835,8 +5835,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 26: ..\src\role.remoteMiner.js **********/
-/********** Start module 27: ..\src\role.remoteReserver.js **********/
+/********** End of module 26: ../src/role.remoteMiner.js **********/
+/********** Start module 27: ../src/role.remoteReserver.js **********/
 __modules[27] = function(module, exports) {
 var Cache = __require(4,27),
     Commands = __require(5,27),
@@ -5978,8 +5978,8 @@ module.exports = Reserver;
 
 return module.exports;
 }
-/********** End of module 27: ..\src\role.remoteReserver.js **********/
-/********** Start module 28: ..\src\role.remoteStorer.js **********/
+/********** End of module 27: ../src/role.remoteReserver.js **********/
+/********** Start module 28: ../src/role.remoteStorer.js **********/
 __modules[28] = function(module, exports) {
 var Cache = __require(4,28),
     Utilities = __require(11,28),
@@ -6228,8 +6228,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 28: ..\src\role.remoteStorer.js **********/
-/********** Start module 29: ..\src\role.remoteWorker.js **********/
+/********** End of module 28: ../src/role.remoteStorer.js **********/
+/********** Start module 29: ../src/role.remoteWorker.js **********/
 __modules[29] = function(module, exports) {
 var Cache = __require(4,29),
     Utilities = __require(11,29),
@@ -6535,8 +6535,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 29: ..\src\role.remoteWorker.js **********/
-/********** Start module 30: ..\src\role.scientist.js **********/
+/********** End of module 29: ../src/role.remoteWorker.js **********/
+/********** Start module 30: ../src/role.scientist.js **********/
 __modules[30] = function(module, exports) {
 var Cache = __require(4,30),
     Utilities = __require(11,30),
@@ -6957,8 +6957,8 @@ module.exports = Scientist;
 
 return module.exports;
 }
-/********** End of module 30: ..\src\role.scientist.js **********/
-/********** Start module 31: ..\src\role.storer.js **********/
+/********** End of module 30: ../src/role.scientist.js **********/
+/********** Start module 31: ../src/role.storer.js **********/
 __modules[31] = function(module, exports) {
 var Cache = __require(4,31),
     Utilities = __require(11,31),
@@ -7263,8 +7263,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 31: ..\src\role.storer.js **********/
-/********** Start module 32: ..\src\role.tower.js **********/
+/********** End of module 31: ../src/role.storer.js **********/
+/********** Start module 32: ../src/role.tower.js **********/
 __modules[32] = function(module, exports) {
 var Cache = __require(4,32),
     Tower = {
@@ -7298,8 +7298,8 @@ module.exports = Tower;
 
 return module.exports;
 }
-/********** End of module 32: ..\src\role.tower.js **********/
-/********** Start module 33: ..\src\role.upgrader.js **********/
+/********** End of module 32: ../src/role.tower.js **********/
+/********** Start module 33: ../src/role.upgrader.js **********/
 __modules[33] = function(module, exports) {
 var Cache = __require(4,33),
     Utilities = __require(11,33),
@@ -7577,8 +7577,8 @@ module.exports = Upgrader;
 
 return module.exports;
 }
-/********** End of module 33: ..\src\role.upgrader.js **********/
-/********** Start module 34: ..\src\role.worker.js **********/
+/********** End of module 33: ../src/role.upgrader.js **********/
+/********** Start module 34: ../src/role.worker.js **********/
 __modules[34] = function(module, exports) {
 var Cache = __require(4,34),
     Utilities = __require(11,34),
@@ -8014,797 +8014,14 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 34: ..\src\role.worker.js **********/
-/********** Start module 35: ..\src\room.base.js **********/
+/********** End of module 34: ../src/role.worker.js **********/
+/********** Start module 35: ../src/room.base.js **********/
 __modules[35] = function(module, exports) {
-var RoomObj = __require(55,35),
-    Cache = __require(4,35),
-    Commands = __require(5,35),
-    Market = __require(7,35),
-    Minerals = __require(8,35),
-    Utilities = __require(11,35),
-    RoleClaimer = __require(16,35),
-    RoleCollector = __require(17,35),
-    RoleConverter = __require(18,35),
-    RoleDismantler = __require(20,35),
-    RoleMiner = __require(22,35),
-    RoleScientist = __require(30,35),
-    RoleStorer = __require(31,35),
-    RoleTower = __require(32,35),
-    RoleUpgrader = __require(33,35),
-    RoleWorker = __require(34,35),
-    TaskBuild = __require(49,35),
-    TaskCollectEnergy = __require(53,35),
-    TaskCollectMinerals = __require(54,35),
-    TaskDismantle = __require(44,35),
-    TaskFillEnergy = __require(56,35),
-    TaskFillMinerals = __require(57,35),
-    TaskHeal = __require(40,35),
-    TaskRangedAttack = __require(43,35),
-    TaskRepair = __require(50,35),
-    TaskUpgradeController = __require(58,35),
-    Base = function() {
-        "use strict";
-    
-        this.init();
-    };
-
-Base.prototype = Object.create(RoomObj.prototype);
-Base.prototype.constructor = Base;
-
-Base.prototype.init = function() {
-    "use strict";
-    
-    RoomObj.call(this);
-
-    this.type = "base";
-};
-
-Base.prototype.manage = function(room) {
-    "use strict";
-
-    var controller = room.controller,
-        rcl = controller.level,
-        sites = room.find(FIND_MY_CONSTRUCTION_SITES),
-        spawn = Cache.spawnsInRoom(room)[0],
-        spawnPos = spawn.pos,
-        storage = room.storage,
-        minerals = room.find(FIND_MINERALS),
-        roomName = room.name,
-        extensionsToBuild;
-    if (!controller || rcl === 0) {
-        return;
-    }
-    if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][rcl - 1] - (Cache.extensionsInRoom(room).length + _.filter(sites, (c) => c.structureType === STRUCTURE_EXTENSION).length)) > 0) {
-        Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, spawn);
-    }
-    if (rcl >= 3 && Cache.towersInRoom(room).length === 0 && _.filter(sites, (c) => c.structureType === STRUCTURE_TOWER).length === 0) {
-        Utilities.buildStructures(room, STRUCTURE_TOWER, 1, spawn);
-    }
-    if (rcl >= 3) {
-        _.forEach(room.find(FIND_SOURCES), (source) => {
-            var location = PathFinder.search(source.pos, {pos: spawnPos, range: 1}, {swampCost: 1}).path[0],
-                structures = location.lookFor(LOOK_STRUCTURES),
-                x = location.x,
-                y = location.y;
-
-            if (
-                _.filter(structures, (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
-                _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_CONTAINER).length === 0
-            ) {
-                _.forEach(_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
-                    structure.destroy();
-                });
-                room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
-            }
-        });
-    }
-    if (rcl >= 4 && !storage && _.filter(sites, (c) => c.structureType === STRUCTURE_STORAGE).length === 0) {
-        Utilities.buildStructures(room, STRUCTURE_STORAGE, 1, spawn);
-    }
-    if (rcl >= 6 && storage && !room.terminal && _.filter(sites, (c) => c.structureType === STRUCTURE_TERMINAL).length === 0) {
-        Utilities.buildStructures(room, STRUCTURE_TERMINAL, 1, storage);
-    }
-    if (rcl >= 6 && minerals.length !== Cache.extractorsInRoom(room).length) {
-        _.forEach(minerals, (mineral) => {
-            var mineralPos = mineral.pos,
-                mineralX = mineralPos.x,
-                mineralY = mineralPos.y;
-            
-            if (
-                _.filter(mineralPos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTRACTOR).length === 0 &&
-                _.filter(sites, (s) => s.pos.x === mineralX && s.pos.y === mineralY && s.structureType === STRUCTURE_EXTRACTOR).length === 0
-            ) {
-                room.createConstructionSite(mineralX, mineralY, STRUCTURE_EXTRACTOR);
-            }
-        });
-    }
-    if (rcl >= 6) {
-        _.forEach(minerals, (mineral) => {
-            var location = PathFinder.search(mineral.pos, {pos: spawnPos, range: 1}, {swampCost: 1}).path[0],
-                structures = location.lookFor(LOOK_STRUCTURES),
-                x = location.x,
-                y = location.y;
-
-            if (
-                _.filter(structures, (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
-                _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_CONTAINER).length === 0
-            ) {
-                _.forEach(_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
-                    structure.destroy();
-                });
-                room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
-            }
-        });
-    }
-    if (rcl >= 3) {
-        _.forEach(_.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_TOWER || s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_TERMINAL), (structure) => {
-            var structureX = structure.pos.x,
-                structureY = structure.pos.y;
-                
-            _.forEach([new RoomPosition(structureX - 1, structureY, roomName), new RoomPosition(structureX + 1, structureY, roomName), new RoomPosition(structureX, structureY - 1, roomName), new RoomPosition(structureX, structureY + 1, roomName)], (pos) => {
-                var x = pos.x,
-                    y = pos.y;
-                
-                if (
-                    _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD).length === 0 &&
-                    _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_ROAD).length === 0
-                ) {
-                    room.createConstructionSite(x, y, STRUCTURE_ROAD);
-                }
-            });
-        });
-    }
-};
-Base.prototype.defend = function(room) {
-    var roomName = room.name,
-        roomMemory = room.memory,
-        hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
-        armyName = roomName + "-defense",
-        armySize, attackTicks, exits;
-
-    if (hostiles.length > 0) {
-        roomMemory.lastHostile = Game.time;
-        if (!roomMemory.currentAttack) {
-            roomMemory.currentAttack = Game.time;
-        }
-        if (!roomMemory.threats) {
-            roomMemory.threats = {};
-        }
-        if (!roomMemory.edgeTicks) {
-            roomMemory.edgeTicks = {
-                1: 0,
-                3: 0,
-                5: 0,
-                7: 0
-            };
-        }
-        
-        _.forEach(_.filter(_.map(hostiles, (h) => ({id: h.id, threat: _.filter(h.body, (b) => [ATTACK, RANGED_ATTACK, HEAL].indexOf(b) !== -1).length}))), (hostile) => {
-            roomMemory.threats[hostile.id] = hostile.threat;
-        });
-        armySize = Math.min(Math.ceil(_.sum(roomMemory.threats) / 20), 3);
-
-        if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
-            roomMemory.edgeTicks[TOP]++;
-        }
-
-        if (_.filter(hostiles, (h) => h.pos.x === 49).length > 0) {
-            roomMemory.edgeTicks[BOTTOM]++;
-        }
-
-        if (_.filter(hostiles, (h) => h.pos.y === 0).length > 0) {
-            roomMemory.edgeTicks[LEFT]++;
-        }
-
-        if (_.filter(hostiles, (h) => h.pos.y === 49).length > 0) {
-            roomMemory.edgeTicks[RIGHT]++;
-        }
-
-        if (armySize > 0) {
-            if (!Memory.army[armyName]) {
-                Game.notify("Warning! " + roomName + " is under attack!");
-                Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-                Memory.army[armyName].creepCount = 0;
-            } else {
-                attackTicks = Game.time - roomMemory.currentAttack;
-
-                if (attackTicks >= 500 && attackTicks < 2000) {
-                    Memory.army[armyName].boostRoom = roomName;
-                } else if (attackTicks >= 2000 && attackTicks < 2500) {
-                    _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                        var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
-                        if (!Memory.army[remoteRoom.name + "-defense"] && !Memory.army[remoteArmyName]) {
-                            Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-                        }
-                    });
-                } else if (attackTicks >= 2500) {
-                    _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                        var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
-                        if (Memory.army[remoteArmyName]) {
-                            Memory.army[remoteArmyName].boostRoom = remoteRoom.name;
-                        }
-                    });
-                }
-                exits = Game.map.describeExits(roomName);
-                _.forEach(_.keys(exits), (dir) => {
-                    var dirArmyName = roomName + "-" + dir.toString() + "-border-defense";
-                    if (!Memory.army[dirArmyName] && roomMemory.edgeTicks[dir] >= 50) {
-                        Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-                    }
-                });
-            }
-        }
-    } else if (Memory.army[roomName + "-defense"]) {
-        if (roomMemory.lastHostile + 50 < Game.time) {
-            if (Memory.army[roomName + "-defense"]) {
-                Memory.army[roomName + "-defense"].directive = "attack";
-                Memory.army[roomName + "-defense"].success = true;
-            }
-            delete roomMemory.lastHostile;
-            delete roomMemory.currentAttack;
-            delete roomMemory.threats;
-            delete roomMemory.edgeTicks;
-        }
-    }
-};
-
-Base.prototype.transferEnergy = function(room) {
-    "use strict";
-    
-    var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
-        firstLink = links[0];
-
-    _.forEach(links, (link, index) => {
-        if (index === 0) {
-            return;
-        }
-
-        if (!firstLink.cooldown && firstLink.energy > 0 && link.energy <= 300) {
-            firstLink.transferEnergy(link);
-        }
-    });
-};
-
-Base.prototype.terminal = function(room, terminal) {
-    "use strict";
-    
-    var terminalStore = terminal.store,
-        terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
-        storage = room.storage,
-        roomName = room.name,
-        memory = room.memory,
-        buyQueue = memory.buyQueue,
-        dealMade = false,
-        flips = [],
-        storageStore = {},
-        market = Game.market,
-        maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my), (r) => (r.storage && r.storage.my) ? r.storage.store[RESOURCE_ENERGY] : 0)),
-        bases, terminalMinerals, bestOrder, transCost, amount;
-        
-    if (storage) {
-        storageStore = storage.store;
-    }
-    
-    if (terminal && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
-        if (!Memory.minimumSell) {
-            Memory.minimumSell = {};
-        }
-        
-        if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
-            delete memory.buyQueue;
-            buyQueue = undefined;
-        }
-
-        if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {
-            bestOrder = (Market.getFilteredOrders().sell[buyQueue.resource] || [])[0];
-            if (bestOrder) {
-                if (bestOrder.price > buyQueue.price) {
-                    delete memory.buyQueue;
-                    buyQueue = undefined;
-                } else {
-                    transCost = market.calcTransactionCost(Math.min(buyQueue.amount, bestOrder.amount), roomName, bestOrder.roomName);
-                        if (terminalEnergy > transCost && Cache.credits >= buyQueue.amount * bestOrder.price) {
-                        Market.deal(bestOrder.id, Math.min(buyQueue.amount, bestOrder.amount), roomName);
-                        dealMade = true;
-                        buyQueue.amount -= Math.min(buyQueue.amount, bestOrder.amount);
-                    } else {
-                        if (terminalEnergy > 0) {
-                            amount = Math.min(Math.floor(Math.min(buyQueue.amount, bestOrder.amount) * terminalEnergy / transCost), Math.floor(Cache.credits / bestOrder.price));
-                            if (amount > 0) {
-                                Market.deal(bestOrder.id, amount, roomName);
-                                dealMade = true;
-                                buyQueue.amount -= amount;
-                            }
-                        }
-                    }
-                }
-            } else {
-                delete memory.buyQueue;
-                buyQueue = undefined;
-            }
-
-            if (buyQueue && buyQueue.amount <= 0) {
-                delete memory.buyQueue;
-                buyQueue = undefined;
-            }
-        } else {
-            if (Cache.credits >= Memory.minimumCredits && Memory.buy) {
-                bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal && r.terminal.my);
-                _.forEach(bases, (otherRoom) => {
-                    var otherRoomName = otherRoom.name;
-
-                    dealMade = false;
-                    if (roomName === otherRoom.name) {
-                        return;
-                    }
-
-                    _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
-                        resource: k,
-                        amount: Math.min(Memory.reserveMinerals ? s + storageStore[k] - (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) : 0, s),
-                        otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
-                        needed: Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0
-                    })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed && r.amount > 0 && r.needed - r.otherRoomAmount > 0 && Math.min(r.amount, r.needed - r.otherRoomAmount) >= 100), (resource) => {
-                        var amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount);
-
-                        transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
-                        if (terminalEnergy > transCost) {
-                            if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
-                                dealMade = true;
-                                return false;
-                            }
-                        } else {
-                            if (terminalEnergy > 0) {
-                                amount = Math.floor(amount * terminalEnergy / transCost);
-                                if (amount > 0) {
-                                    if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                        Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
-                                        dealMade = true;
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    return !dealMade;
-                });
-            }
-            if (!dealMade) {
-                terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
-                    return {resource: k, amount: Math.min(s, s - (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))};
-                }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
-
-                if (terminalMinerals.length > 0) {
-                    _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
-                        var resource = topResource.resource;
-
-                        bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || !Memory.minimumSell[resource] || o.price >= Memory.minimumSell[resource])[0];
-                        if (bestOrder) {
-                            transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
-                            if (terminalEnergy > transCost) {
-                                Market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), roomName);
-                                dealMade = true;
-                                if (topResource.amount < 5005) {
-                                    delete Memory.minimumSell[bestOrder.resourceType];
-                                }
-                                return false;
-                            } else {
-                                if (terminalEnergy > 0) {
-                                    amount = Math.floor(Math.min(topResource.amount, bestOrder.amount) * terminalEnergy / transCost);
-                                    if (amount > 0) {
-                                        Market.deal(bestOrder.id, amount, roomName);
-                                        dealMade = true;
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-            if (!dealMade && storage && maxEnergy > Memory.marketEnergy) {
-                _.forEach(Minerals, (children, resource) => {
-                    var sellOrder, buyOrder;
-                    if (!storageStore || storageStore[resource] < Memory.reserveMinerals[resource]) {
-                        return;
-                    }
-                    if ([RESOURCE_ENERGY, SUBSCRIPTION_TOKEN].indexOf(resource) !== -1) {
-                        return;
-                    }
-                    sellOrder = (Market.getFilteredOrders().sell[resource] || [])[0];
-                    buyOrder = (Market.getFilteredOrders().buy[resource] || [])[0];
-
-                    if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < Cache.credits) {
-                        flips.push({resource: resource, buy: buyOrder, sell: sellOrder});
-                    }
-                });
-
-                _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
-                    var buy = flip.buy,
-                        sell = flip.sell;
-
-                    amount = Math.min(buy.amount, sell.amount);
-                    if (amount * sell.price > Cache.credits) {
-                        amount = Math.floor(Cache.credits / sell.price);
-                    }
-
-                    if (index === 0) {
-                        Cache.log.events.push("Biggest flip: " + flip.resource + " x" + amount + " " + sell.price.toFixed(2) + " to " + buy.price.toFixed(2));
-                    }
-                    transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
-                    if (terminalEnergy > transCost) {
-                        Market.deal(sell.id, amount, roomName);
-                        Memory.minimumSell[flip.resource] = sell.price;
-                        dealMade = true;
-                        return false;
-                    }
-
-                    if (terminalEnergy > 0) {
-                        amount = Math.floor(amount * terminalEnergy / transCost);
-                        if (amount > 0) {
-                            Market.deal(sell.id, amount, roomName);
-                            Memory.minimumSell[flip.resource] = sell.price;
-                            dealMade = true;
-                            return false;
-                        }
-                    }
-                });
-            }
-        }
-    }
-};
-
-Base.prototype.tasks = function(room) {
-    "use strict";
-    
-    var terminal = room.terminal,
-        dismantle = Memory.dismantle,
-        roomName = room.name,
-        terminalEnergy = 0,
-        storageEnergy = 0,
-        terminalId,
-
-        workerList = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
-        workersWithEnergy = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
-        workersWithMinerals = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)).length > 0,
-        workersWithNothing = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
-
-        collectorList = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
-        collectorsWithEnergy = _.filter(collectorList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
-        collectorsWithNothing = _.filter(collectorList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
-        
-        storerList = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [],
-        storersWithEnergy = _.filter(storerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
-        storersWithMinerals = _.filter(storerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)).length > 0,
-        storersWithNothing = _.filter(storerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
-
-        scientistList = Cache.creeps[roomName] && Cache.creeps[roomName].scientist || [],
-        scientistsWithEnergy = _.filter(scientistList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
-        scientistsWithMinerals = _.filter(scientistList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)).length > 0,
-        scientistsWithNothing = _.filter(scientistList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
-
-        upgraderList = Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || [],
-        upgradersWithEnergy = _.filter(upgraderList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
-        upgradersWithNothing = _.filter(upgraderList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
-
-        dismantlers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []).length > 0,
-        noWorkers = Game.time % 10 === 0 && workerList.length + collectorList.length === 0,
-        tasks = {
-            build: {
-                tasks: workersWithEnergy || collectorsWithEnergy ? TaskBuild.getTasks(room) : []
-            },
-            collectEnergy: {
-                tasks: workersWithNothing || storersWithNothing || scientistsWithNothing || collectorsWithNothing || upgradersWithNothing ? TaskCollectEnergy.getTasks(room) : [],
-                storerTasks: storersWithNothing ? TaskCollectEnergy.getStorerTasks(room) : []
-            },
-            collectMinerals: {
-                storerTasks: storersWithNothing || storersWithMinerals ? TaskCollectMinerals.getStorerTasks(room) : [],
-                labTasks: scientistsWithNothing || scientistsWithMinerals ? TaskCollectMinerals.getLabTasks(room) : [],
-                storageTasks: scientistsWithNothing || scientistsWithMinerals ? TaskCollectMinerals.getStorageTasks(room) : [],
-                terminalTasks: scientistsWithNothing || scientistsWithMinerals ? TaskCollectMinerals.getTerminalTasks(room) : []
-            },
-            fillEnergy: {
-                extensionTasks: workersWithEnergy || storersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getExtensionTasks(room) : [],
-                spawnTasks: workersWithEnergy || storersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getSpawnTasks(room) : [],
-                powerSpawnTasks: scientistsWithEnergy ? TaskFillEnergy.getPowerSpawnTasks(room) : [],
-                towerTasks: workersWithEnergy || scientistsWithEnergy || collectorsWithEnergy ? TaskFillEnergy.getTowerTasks(room) : [],
-                storageTasks: storersWithEnergy || scientistsWithEnergy || dismantlers ? TaskFillEnergy.getStorageTasks(room) : [],
-                containerTasks: dismantlers ? TaskFillEnergy.getContainerTasks(room) : [],
-                labTasks: scientistsWithEnergy ? TaskFillEnergy.getLabTasks(room) : [],
-                linkTasks: storersWithEnergy ? TaskFillEnergy.getLinkTasks(room) : [],
-                nukerTasks: scientistsWithEnergy ? TaskFillEnergy.getNukerTasks(room) : []
-            },
-            fillMinerals: {
-                labTasks: scientistsWithMinerals ? TaskFillMinerals.getLabTasks(room) : [],
-                storageTasks: workersWithMinerals || storersWithMinerals || scientistsWithMinerals || dismantlers ? TaskFillMinerals.getStorageTasks(room) : [],
-                terminalTasks: workersWithMinerals || storersWithMinerals || scientistsWithMinerals || dismantlers ? TaskFillMinerals.getTerminalTasks(room) : [],
-                nukerTasks: scientistsWithMinerals ? TaskFillMinerals.getNukerTasks(room) : [],
-                powerSpawnTasks: scientistsWithMinerals ? TaskFillMinerals.getPowerSpawnTasks(room) : []
-            },
-            heal: {
-                tasks: TaskHeal.getTasks(room)
-            },
-            rangedAttack: {
-                tasks: TaskRangedAttack.getTasks(room)
-            },
-            repair: {
-                tasks: noWorkers || workersWithEnergy || collectorsWithEnergy ? TaskRepair.getTasks(room) : [],
-                criticalTasks: noWorkers || workersWithEnergy || collectorsWithEnergy ? TaskRepair.getCriticalTasks(room) : [],
-                towerTasks: Memory.towerTasks[roomName] || Game.time % 10 === 0 ? TaskRepair.getTowerTasks(room) : []
-            },
-            upgradeController: {
-                tasks: workersWithEnergy || collectorsWithEnergy || upgradersWithEnergy ? TaskUpgradeController.getTasks(room) : [],
-                criticalTasks: noWorkers || workersWithEnergy || collectorsWithEnergy ? TaskUpgradeController.getCriticalTasks(room) : []
-            },
-            dismantle: {
-                tasks: []
-            }
-        };
-    
-    Memory.towerTasks[roomName] = tasks.repair.towerTasks.length;
-    
-    if (terminal && terminal.my) {
-        terminalEnergy = terminal.store[RESOURCE_ENERGY] || 0;
-        terminalId = terminal.id;
-    }
-    
-    if (room.storage) {
-        storageEnergy = room.storage.store[RESOURCE_ENERGY] || 0;
-    }
-
-    if ((storersWithNothing || scientistsWithNothing) && terminal && (!terminal.my || (terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.dealEnergy || Cache.credits < Memory.minimumCredits)))) {
-        tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
-    }
-
-    if ((workersWithEnergy || storersWithEnergy || scientistsWithEnergy) && terminal && terminal.my && terminalEnergy < 1000) {
-        tasks.fillEnergy.terminalTask = new TaskFillEnergy(terminalId);
-    }
-
-    if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-        let completed = [];
-        
-        _.forEach(dismantle[roomName], (pos) => {
-            var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
-            
-            if (structures.length === 0) {
-                completed.push(pos);
-            } else {
-                if (dismantlers) {
-                    tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
-                }
-            }
-        });
-        _.forEach(completed, (complete) => {
-            _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
-        });
-    } else {
-        _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
-            creep.memory.role = "remoteWorker";
-            creep.memory.container = Cache.containersInRoom(room)[0].id;
-        });
-    }
-
-    return tasks;
-};
-
-Base.prototype.spawn = function(room, canSpawnWorkers) {
-    "use strict";
-    
-    var dismantle = Memory.dismantle,
-        roomName = room.name,
-        controller = room.controller;
-
-    RoleWorker.checkSpawn(room, canSpawnWorkers);
-    RoleMiner.checkSpawn(room);
-    RoleStorer.checkSpawn(room);
-    RoleScientist.checkSpawn(room);
-    if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-        RoleDismantler.checkSpawn(room);
-    }
-    RoleCollector.checkSpawn(room);
-    RoleClaimer.checkSpawn(room);
-    RoleConverter.checkSpawn(room);
-    if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
-        RoleUpgrader.checkSpawn(room);
-    }
-};
-
-Base.prototype.assignTasks = function(room, tasks) {
-    "use strict";
-    
-    RoleWorker.assignTasks(room, tasks);
-    RoleMiner.assignTasks(room, tasks);
-    RoleStorer.assignTasks(room, tasks);
-    RoleScientist.assignTasks(room, tasks);
-    RoleDismantler.assignTasks(room, tasks);
-    RoleCollector.assignTasks(room, tasks);
-    RoleClaimer.assignTasks(room, tasks);
-    RoleConverter.assignTasks(room, tasks);
-    RoleUpgrader.assignTasks(room, tasks);
-
-    RoleTower.assignTasks(room, tasks);
-};
-
-Base.prototype.labQueue = function(room, labQueue) {
-    "use strict";
-    
-    var memory = room.memory,
-        labs = Cache.labsInRoom(room),
-        labsInUse = memory.labsInUse,
-        sourceLabs = labQueue.sourceLabs || [],
-        children = labQueue.children || [],
-        sourceLab0 = Game.getObjectById(sourceLabs[0]),
-        sourceLab1 = Game.getObjectById(sourceLabs[1]),
-        resource = labQueue.resource;
-    
-    switch (labQueue.status) {
-        case "clearing":
-            if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
-                labQueue.status = "moving";
-            }
-            break;
-        case "moving":
-            if (!labQueue.start || labQueue.start + 500 < Game.time) {
-                delete memory.labQueue;
-                labQueue = undefined;
-            } else {
-                let moved = true;
-                _.forEach(children, (resource) => {
-                    if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
-                        moved = false;
-                        return false;
-                    }
-                });
-
-                if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
-                    _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                        if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
-                            labQueue.amount -= 5;
-                        }
-                    });
-                }
-
-                if (moved) {
-                    labQueue.status = "creating";
-                }
-            }
-            break;
-        case "creating":
-            _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                if (lab.mineralAmount === LAB_MINERAL_CAPACITY) {
-                    labQueue.status = "returning";
-                }
-                if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
-                    labQueue.amount -= 5;
-                }
-            });
-
-            if (_.sum(_.filter(labs, (l) => sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
-                labQueue.status = "returning";
-            }
-            break;
-        case "returning":
-            if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) === 0) {
-                delete memory.labQueue;
-                labQueue = undefined;
-            }
-            break;
-        default:
-            labQueue.status = "clearing";
-            labQueue.sourceLabs = Utilities.getSourceLabs(room);
-            break;
-    }
-};
-
-Base.prototype.labsInUse = function(room, labsInUse) {
-    "use strict";
-    
-    var boosted = [];
-
-    _.forEach(labsInUse, (queue) => {
-        var lab = Game.getObjectById(queue.id);
-        
-        switch (queue.status) {
-            case "emptying":
-                if (lab.mineralAmount === 0) {
-                    queue.status = "filling";
-                }
-                break;
-            case "filling":
-                if (lab.mineralAmount === queue.amount && lab.mineralType === queue.resource) {
-                    queue.status = "waiting";
-                }
-                break;
-            case "waiting":
-            default:
-                let creep = Game.creeps[queue.creepToBoost];
-                
-                if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
-                    if (lab.boostCreep(creep) === OK) {
-                        _.remove(creep.memory.labs, (l) => l === queue.id);
-                        if (!queue.status || queue.oldAmount === 0) {
-                            boosted.push(queue);
-                        } else {
-                            queue.status = "refilling";
-                        }
-                    }
-                }
-                break;
-            case "refilling":
-                if (lab.mineralAmount === queue.oldAmount && lab.mineralType === queue.oldResource) {
-                    boosted.push(queue);
-                }
-                break;
-        }
-    });
-
-    _.forEach(boosted, (queue) => {
-        _.remove(labsInUse, (l) => l.id === queue.id);
-    });
-};
-
-Base.prototype.run = function(room) {
-    "use strict";
-
-    var roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
-    if (room.unobservable) {
-        Game.notify("Base Room " + roomName + " is unobservable, something is wrong!");
-        return;
-    }
-
-    roomName = room.name;
-    spawns = Cache.spawnsInRoom(room);
-    terminal = room.terminal;
-    storage = room.storage;
-    memory = room.memory;
-    labQueue = memory.labQueue;
-    labsInUse = memory.labsInUse;
-    if (Game.time % 100 === 0 && spawns.length > 0) {
-        this.manage(room);
-    }
-    this.defend(room);
-    if (spawns.length > 0) {
-        this.transferEnergy(room);
-    }
-    if (terminal) {
-        this.terminal(room, terminal);
-    }
-    tasks = this.tasks(room);
-    this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
-    this.assignTasks(room, tasks);
-    if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
-        this.labQueue(room, labQueue);
-    }
-    if (labsInUse) {
-        this.labsInUse(room, labsInUse);
-    }
-};
-
-Base.prototype.toObj = function(room) {
-    "use strict";
-
-    Memory.rooms[room.name].roomType = {
-        type: this.type
-    };
-};
-
-Base.fromObj = function(room) {
-    "use strict";
-
-    return new Base();
-};
-
-if (Memory.profiling) {
-    __require(2,35).registerObject(Base, "RoomBase");
-}
-module.exports = Base;
 
 return module.exports;
 }
-/********** End of module 35: ..\src\room.base.js **********/
-/********** Start module 36: ..\src\room.cleanup.js **********/
+/********** End of module 35: ../src/room.base.js **********/
+/********** Start module 36: ../src/room.cleanup.js **********/
 __modules[36] = function(module, exports) {
 var RoomObj = __require(55,36),
     Cache = __require(4,36),
@@ -8940,8 +8157,8 @@ module.exports = Cleanup;
 
 return module.exports;
 }
-/********** End of module 36: ..\src\room.cleanup.js **********/
-/********** Start module 37: ..\src\room.mine.js **********/
+/********** End of module 36: ../src/room.cleanup.js **********/
+/********** Start module 37: ../src/room.mine.js **********/
 __modules[37] = function(module, exports) {
 var RoomObj = __require(55,37),
     Cache = __require(4,37),
@@ -9270,8 +8487,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 37: ..\src\room.mine.js **********/
-/********** Start module 38: ..\src\taskDeserialization.js **********/
+/********** End of module 37: ../src/room.mine.js **********/
+/********** Start module 38: ../src/taskDeserialization.js **********/
 __modules[38] = function(module, exports) {
 var Cache = __require(4,38),
     TaskAttack = __require(48,38),
@@ -9361,8 +8578,8 @@ module.exports = deserialization;
 
 return module.exports;
 }
-/********** End of module 38: ..\src\taskDeserialization.js **********/
-/********** Start module 39: ..\src\roomDeserialization.js **********/
+/********** End of module 38: ../src/taskDeserialization.js **********/
+/********** Start module 39: ../src/roomDeserialization.js **********/
 __modules[39] = function(module, exports) {
 var Cache = __require(4,39),
     RoomBase = __require(35,39),
@@ -9396,8 +8613,8 @@ module.exports = deserialization;
 
 return module.exports;
 }
-/********** End of module 39: ..\src\roomDeserialization.js **********/
-/********** Start module 40: ..\src\task.heal.js **********/
+/********** End of module 39: ../src/roomDeserialization.js **********/
+/********** Start module 40: ../src/task.heal.js **********/
 __modules[40] = function(module, exports) {
 var Cache = __require(4,40),
     Pathing = __require(60,40),
@@ -9491,8 +8708,8 @@ module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 40: ..\src\task.heal.js **********/
-/********** Start module 41: ..\src\task.meleeAttack.js **********/
+/********** End of module 40: ../src/task.heal.js **********/
+/********** Start module 41: ../src/task.meleeAttack.js **********/
 __modules[41] = function(module, exports) {
 var Cache = __require(4,41),
     Pathing = __require(60,41),
@@ -9581,8 +8798,8 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 41: ..\src\task.meleeAttack.js **********/
-/********** Start module 42: ..\src\task.rally.js **********/
+/********** End of module 41: ../src/task.meleeAttack.js **********/
+/********** Start module 42: ../src/task.rally.js **********/
 __modules[42] = function(module, exports) {
 var Cache = __require(4,42),
     Pathing = __require(60,42),
@@ -9718,8 +8935,8 @@ module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 42: ..\src\task.rally.js **********/
-/********** Start module 43: ..\src\task.rangedAttack.js **********/
+/********** End of module 42: ../src/task.rally.js **********/
+/********** Start module 43: ../src/task.rangedAttack.js **********/
 __modules[43] = function(module, exports) {
 var Cache = __require(4,43),
     Pathing = __require(60,43),
@@ -9817,8 +9034,8 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 43: ..\src\task.rangedAttack.js **********/
-/********** Start module 44: ..\src\task.dismantle.js **********/
+/********** End of module 43: ../src/task.rangedAttack.js **********/
+/********** Start module 44: ../src/task.dismantle.js **********/
 __modules[44] = function(module, exports) {
 var Cache = __require(4,44),
     Pathing = __require(60,44),
@@ -9902,8 +9119,8 @@ module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 44: ..\src\task.dismantle.js **********/
-/********** Start module 45: ..\src\task.claim.js **********/
+/********** End of module 44: ../src/task.dismantle.js **********/
+/********** Start module 45: ../src/task.claim.js **********/
 __modules[45] = function(module, exports) {
 var Cache = __require(4,45),
     Pathing = __require(60,45),
@@ -9977,8 +9194,8 @@ module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 45: ..\src\task.claim.js **********/
-/********** Start module 46: ..\src\task.harvest.js **********/
+/********** End of module 45: ../src/task.claim.js **********/
+/********** Start module 46: ../src/task.harvest.js **********/
 __modules[46] = function(module, exports) {
 var Cache = __require(4,46),
     Pathing = __require(60,46),
@@ -10068,8 +9285,8 @@ module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 46: ..\src\task.harvest.js **********/
-/********** Start module 47: ..\src\task.pickupResource.js **********/
+/********** End of module 46: ../src/task.harvest.js **********/
+/********** Start module 47: ../src/task.pickupResource.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(4,47),
     TaskCollectEnergy = __require(53,47),
@@ -10154,8 +9371,8 @@ module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 47: ..\src\task.pickupResource.js **********/
-/********** Start module 48: ..\src\task.attack.js **********/
+/********** End of module 47: ../src/task.pickupResource.js **********/
+/********** Start module 48: ../src/task.attack.js **********/
 __modules[48] = function(module, exports) {
 var Cache = __require(4,48),
     Pathing = __require(60,48),
@@ -10229,8 +9446,8 @@ module.exports = Attack;
 
 return module.exports;
 }
-/********** End of module 48: ..\src\task.attack.js **********/
-/********** Start module 49: ..\src\task.build.js **********/
+/********** End of module 48: ../src/task.attack.js **********/
+/********** Start module 49: ../src/task.build.js **********/
 __modules[49] = function(module, exports) {
 var Cache = __require(4,49),
     Pathing = __require(60,49),
@@ -10314,8 +9531,8 @@ module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 49: ..\src\task.build.js **********/
-/********** Start module 50: ..\src\task.repair.js **********/
+/********** End of module 49: ../src/task.build.js **********/
+/********** Start module 50: ../src/task.repair.js **********/
 __modules[50] = function(module, exports) {
 var Cache = __require(4,50),
     Pathing = __require(60,50),
@@ -10414,8 +9631,8 @@ module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 50: ..\src\task.repair.js **********/
-/********** Start module 51: ..\src\task.mine.js **********/
+/********** End of module 50: ../src/task.repair.js **********/
+/********** Start module 51: ../src/task.mine.js **********/
 __modules[51] = function(module, exports) {
 var Cache = __require(4,51),
     Pathing = __require(60,51),
@@ -10519,8 +9736,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 51: ..\src\task.mine.js **********/
-/********** Start module 52: ..\src\task.reserve.js **********/
+/********** End of module 51: ../src/task.mine.js **********/
+/********** Start module 52: ../src/task.reserve.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(4,52),
     Pathing = __require(60,52),
@@ -10606,8 +9823,8 @@ module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 52: ..\src\task.reserve.js **********/
-/********** Start module 53: ..\src\task.collectEnergy.js **********/
+/********** End of module 52: ../src/task.reserve.js **********/
+/********** Start module 53: ../src/task.collectEnergy.js **********/
 __modules[53] = function(module, exports) {
 var Cache = __require(4,53),
     Pathing = __require(60,53),
@@ -10736,8 +9953,8 @@ module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 53: ..\src\task.collectEnergy.js **********/
-/********** Start module 54: ..\src\task.collectMinerals.js **********/
+/********** End of module 53: ../src/task.collectEnergy.js **********/
+/********** Start module 54: ../src/task.collectMinerals.js **********/
 __modules[54] = function(module, exports) {
 var Cache = __require(4,54),
     Pathing = __require(60,54),
@@ -11006,16 +10223,16 @@ module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 54: ..\src\task.collectMinerals.js **********/
-/********** Start module 55: ..\src\roomObj.js **********/
+/********** End of module 54: ../src/task.collectMinerals.js **********/
+/********** Start module 55: ../src/roomObj.js **********/
 __modules[55] = function(module, exports) {
 var RoomObj = function() {};
 module.exports = RoomObj;
 
 return module.exports;
 }
-/********** End of module 55: ..\src\roomObj.js **********/
-/********** Start module 56: ..\src\task.fillEnergy.js **********/
+/********** End of module 55: ../src/roomObj.js **********/
+/********** Start module 56: ../src/task.fillEnergy.js **********/
 __modules[56] = function(module, exports) {
 var Cache = __require(4,56),
     Pathing = __require(60,56),
@@ -11197,8 +10414,8 @@ module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 56: ..\src\task.fillEnergy.js **********/
-/********** Start module 57: ..\src\task.fillMinerals.js **********/
+/********** End of module 56: ../src/task.fillEnergy.js **********/
+/********** Start module 57: ../src/task.fillMinerals.js **********/
 __modules[57] = function(module, exports) {
 var Cache = __require(4,57),
     Pathing = __require(60,57),
@@ -11424,8 +10641,8 @@ module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 57: ..\src\task.fillMinerals.js **********/
-/********** Start module 58: ..\src\task.upgradeController.js **********/
+/********** End of module 57: ../src/task.fillMinerals.js **********/
+/********** Start module 58: ../src/task.upgradeController.js **********/
 __modules[58] = function(module, exports) {
 var Cache = __require(4,58),
     Pathing = __require(60,58),
@@ -11555,8 +10772,8 @@ module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 58: ..\src\task.upgradeController.js **********/
-/********** Start module 59: ..\src\room.source.js **********/
+/********** End of module 58: ../src/task.upgradeController.js **********/
+/********** Start module 59: ../src/room.source.js **********/
 __modules[59] = function(module, exports) {
 var RoomObj = __require(55,59),
     Cache = __require(4,59),
@@ -11863,8 +11080,8 @@ module.exports = Source;
 
 return module.exports;
 }
-/********** End of module 59: ..\src\room.source.js **********/
-/********** Start module 60: ..\src\pathing.js **********/
+/********** End of module 59: ../src/room.source.js **********/
+/********** Start module 60: ../src/pathing.js **********/
 __modules[60] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
@@ -12137,7 +11354,7 @@ module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 60: ..\src\pathing.js **********/
+/********** End of module 60: ../src/pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

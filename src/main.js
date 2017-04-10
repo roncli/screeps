@@ -1,7 +1,4 @@
-require("screeps-perf")({
-    optimizePathFinding: false,
-    cleanUpCreepMemory: false
-});
+require("screeps-perf");
 
 var profiler = require("screeps-profiler"),
     Army = require("army"),

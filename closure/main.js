@@ -515,6 +515,10 @@ var profiler = __require(2,0),
                                 node.action = "buy";
                             } else {
                                 buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice)) * 1.2;
+                                Memory.minimumSell[resource] = Math.min(Infinity, buyPrice);
+                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                    delete Memory.minimumSell[resource];
+                                }
                                 if (node.buyPrice > buyPrice) {
                                     let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
                                         roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
@@ -539,21 +543,13 @@ var profiler = __require(2,0),
                                     start: Game.time
                                 };
                             }
-
-                            if (node.buyPrice) {
-                                Memory.minimumSell[resource] = Math.min(Infinity, node.buyPrice);
-                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
-                                    delete Memory.minimumSell[resource];
-                                }
-                            }
                         };
 
                         fx(mineral, fx);
                     });
                     if (labQueue && !roomMemory.labQueue) {
                         var fx = (node, innerFx) => {
-                            var resource = node.resource,
-                                price;
+                            var resource = node.resource;
                             if (node.amount <= 0) {
                                 return;
                             }
@@ -571,14 +567,6 @@ var profiler = __require(2,0),
                                 _.forEach(node.children, (child) => {
                                     innerFx(child, innerFx);
                                 });
-
-                                price = _.sum(node.children, (c) => c.price);
-                                if (node.children.length > 0 && price > 0) {
-                                    Memory.minimumSell[resource] = Math.min(Infinity, price);
-                                    if (Memory.minimumSell[resource] <= 0 || Memory.minimumSell[resource] === Infinity) {
-                                        delete Memory.minimumSell[resource];
-                                    }
-                                }
                             }
                         };
 

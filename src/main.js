@@ -497,6 +497,10 @@ var profiler = require("screeps-profiler"),
                                 node.action = "buy";
                             } else {
                                 buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice)) * 1.2;
+                                Memory.minimumSell[resource] = Math.min(Infinity, buyPrice);
+                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                    delete Memory.minimumSell[resource];
+                                }
                                 if (node.buyPrice > buyPrice) {
                                     // Ensure we have the necessary minerals.
                                     let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
@@ -524,13 +528,6 @@ var profiler = require("screeps-profiler"),
                                     start: Game.time
                                 };
                             }
-
-                            if (node.buyPrice) {
-                                Memory.minimumSell[resource] = Math.min(Infinity, node.buyPrice);
-                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
-                                    delete Memory.minimumSell[resource];
-                                }
-                            }
                         };
 
                         fx(mineral, fx);
@@ -539,8 +536,7 @@ var profiler = require("screeps-profiler"),
                     // Set the lab queue if necessary.
                     if (labQueue && !roomMemory.labQueue) {
                         var fx = (node, innerFx) => {
-                            var resource = node.resource,
-                                price;
+                            var resource = node.resource;
 
                             // If we have the requested mineral, we're done.
                             if (node.amount <= 0) {
@@ -563,14 +559,6 @@ var profiler = require("screeps-profiler"),
                                 _.forEach(node.children, (child) => {
                                     innerFx(child, innerFx);
                                 });
-
-                                price = _.sum(node.children, (c) => c.price);
-                                if (node.children.length > 0 && price > 0) {
-                                    Memory.minimumSell[resource] = Math.min(Infinity, price);
-                                    if (Memory.minimumSell[resource] <= 0 || Memory.minimumSell[resource] === Infinity) {
-                                        delete Memory.minimumSell[resource];
-                                    }
-                                }
                             }
                         };
 

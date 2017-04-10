@@ -78,7 +78,7 @@ Pickup.prototype.toObj = function(creep) {
 Pickup.getTasks = function(room) {
     "use strict";
     
-    return _.map(room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount), (r) => new Pickup(r.id));
+    return _.map(Cache.resourcesInRoom(room), (r) => new Pickup(r.id));
 };
 
 if (Memory.profiling) {

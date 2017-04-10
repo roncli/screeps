@@ -1834,6 +1834,7 @@ var spawnsInRoom = {},
     hostilesInRoom = {},
     sourceKeepersInRoom = {},
     powerBanksInRoom = {},
+    resourcesInRoom = {},
     costMatricies = {},
 
     Cache = {
@@ -1860,6 +1861,7 @@ var spawnsInRoom = {},
             hostilesInRoom = {};
             sourceKeepersInRoom = {};
             powerBanksInRoom = {};
+            resourcesInRoom = {};
             costMatricies = {};
             Cache.creepTasks = {};
             Cache.roomTypes = {};
@@ -1980,6 +1982,12 @@ var spawnsInRoom = {},
             "use strict";
 
             return powerBanksInRoom[room.name] ? powerBanksInRoom[room.name] : powerBanksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
+        },
+
+        resourcesInRoom: (room) => {
+            "use strict";
+
+            return resourcesInRoom[room.name] ? resourcesInRoom[room.name] : resourcesInRoom[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount);
         },
         getCostMatrix: (room) => {
             "use strict";
@@ -10223,7 +10231,7 @@ Pickup.prototype.toObj = function(creep) {
 Pickup.getTasks = function(room) {
     "use strict";
     
-    return _.map(room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount), (r) => new Pickup(r.id));
+    return _.map(Cache.resourcesInRoom(room), (r) => new Pickup(r.id));
 };
 
 if (Memory.profiling) {

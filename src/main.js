@@ -45,18 +45,19 @@ var profiler = require("screeps-profiler"),
     main = {
         loop: () => {
             "use strict";
+            
+            var cpu = Game.cpu.getUsed(),
+                bucket = Game.cpu.bucket;
 
-            if (Game.cpu.getUsed() >= 10) {
+            if (cpu >= 10) {
                 if (Game.cpu.bucket < 9000) {
-                    Game.notify("CPU started at " + Game.cpu.getUsed().toFixed(2) + " with bucket at " + Game.cpu.bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+                    Game.notify("CPU started at " + cpu.toFixed(2) + " with bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
                     return;
-                } else {
-                    Game.notify("CPU started at " + Game.cpu.getUsed().toFixed(2) + ", warning! " + Game.time.toFixed(0));
                 }
             }
 
-            if (Game.cpu.bucket < Game.cpu.tickLimit) {
-                Game.notify("Bucket at " + Game.cpu.bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+            if (bucket < Game.cpu.tickLimit) {
+                Game.notify("Bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
                 return;
             }
             

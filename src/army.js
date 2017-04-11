@@ -35,7 +35,6 @@ var Cache = require("cache"),
 
             // Delete the army if we're successful.
             if (allCreepsInArmy.length === 0 && army.success) {
-                Game.notify("Army " + name + " operation successful!");
                 delete Memory.army[name];
                 return;
             }

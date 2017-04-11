@@ -776,6 +776,16 @@ Base.prototype.labsInUse = function(room, labsInUse) {
     });
 };
 
+Base.prototype.processPower = function(room) {
+    "use strict";
+    
+    _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
+        if (spawn.power >= 1 && spawn.energy >= 50) {
+            spawn.processPower();
+        }
+    });
+};
+
 Base.prototype.run = function(room) {
     "use strict";
 
@@ -831,6 +841,8 @@ Base.prototype.run = function(room) {
     if (labsInUse) {
         this.labsInUse(room, labsInUse);
     }
+    
+    this.processPower(room);
 };
 
 Base.prototype.toObj = function(room) {

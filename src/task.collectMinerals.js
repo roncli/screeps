@@ -246,8 +246,8 @@ CollectMinerals.getStorageTasks = function(room) {
 
             // If we have a power spawn, transfer power.
             _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
-                if (spawn.power < spawn.powerCapacity) {
-                    tasks.push(new CollectMinerals(room.storage.id, RESOURCE_POWER, spawn.powerCapacity - spawn.power));
+                if (spawn.power < spawn.powerCapacity && room.storage.store[RESOURCE_POWER]) {
+                    tasks.push(new CollectMinerals(room.storage.id, RESOURCE_POWER, Math.min(spawn.powerCapacity - spawn.power, room.storage.store[RESOURCE_POWER])));
                 }
             });
         }

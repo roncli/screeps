@@ -1,87 +1,74 @@
 var Cache = require("cache"),
-    Pathing = require("pathing"),
-    Harvest = function(failIn, source) {
-        "use strict";
-        
-        this.init(failIn, source);
-    };
-    
-Harvest.prototype.init = function(failIn, source) {
-    "use strict";
-    
-    this.type = "harvest";
-    this.failIn = failIn || 10;
-    this.source = source;
-};
+    Pathing = require("pathing");
 
-Harvest.prototype.canAssign = function(creep) {
-    "use strict";
-
-    var source = Game.getObjectById(creep.memory.homeSource);
-
-    if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || creep.getActiveBodyparts(WORK) === 0) {
-        return false;
+class Harvest {
+    constructor(failIn, source) {
+        this.type = "harvest";
+        this.failIn = failIn || 10;
+        this.source = source;
     }
-
-    if (source.energy === 0) {
-        source = creep.room.find(FIND_SOURCES_ACTIVE)[0];
-        if (!source) {
+    
+    canAssign(creep) {
+        var source = Game.getObjectById(creep.memory.homeSource);
+    
+        if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || creep.getActiveBodyparts(WORK) === 0) {
             return false;
         }
-    }
-
-    this.source = source.id;
     
-    Cache.creepTasks[creep.name] = this;
-    this.toObj(creep);
-    return true;
-};
-
-Harvest.prototype.run = function(creep) {
-    "use strict";
-
-    var source = Game.getObjectById(this.source || creep.memory.homeSource);
-    
-    // No sources found or the source is drained, or creep is about to die or out of WORK parts, complete task.
-    if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
-        delete creep.memory.currentTask;
-        return;
-    }
-    
-    // Move to the source and harvest it.
-    Pathing.moveTo(creep, source, 1);
-    if (creep.harvest(source) === OK) {
-        if (Memory.rooms[creep.room.name].harvested === undefined) {
-            Memory.rooms[creep.room.name].harvested = 30000;
+        if (source.energy === 0) {
+            source = creep.room.find(FIND_SOURCES_ACTIVE)[0];
+            if (!source) {
+                return false;
+            }
         }
-        Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
-    } else {
-        this.failIn--;
-        if (this.failIn === 0) {
+    
+        this.source = source.id;
+        
+        Cache.creepTasks[creep.name] = this;
+        this.toObj(creep);
+        return true;
+    }
+    
+    run(creep) {
+        var source = Game.getObjectById(this.source || creep.memory.homeSource);
+        
+        // No sources found or the source is drained, or creep is about to die or out of WORK parts, complete task.
+        if (creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || source.energy === 0 || creep.getActiveBodyparts(WORK) === 0) {
             delete creep.memory.currentTask;
+            return;
+        }
+        
+        // Move to the source and harvest it.
+        Pathing.moveTo(creep, source, 1);
+        if (creep.harvest(source) === OK) {
+            if (Memory.rooms[creep.room.name].harvested === undefined) {
+                Memory.rooms[creep.room.name].harvested = 30000;
+            }
+            Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
+        } else {
+            this.failIn--;
+            if (this.failIn === 0) {
+                delete creep.memory.currentTask;
+            }
         }
     }
-};
-
-Harvest.prototype.toObj = function(creep) {
-    "use strict";
-
-    creep.memory.currentTask = {
-        type: this.type,
-        failIn: this.failIn,
-        source: this.source
-    };
-};
-
-Harvest.fromObj = function(creep) {
-    "use strict";
-
-    if (Game.getObjectById(creep.memory.currentTask.source)) {
-        return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
-    } else {
-        return;
+    
+    toObj(creep) {
+        creep.memory.currentTask = {
+            type: this.type,
+            failIn: this.failIn,
+            source: this.source
+        };
     }
-};
+    
+    static fromObj(creep) {
+        if (Game.getObjectById(creep.memory.currentTask.source)) {
+            return new Harvest(creep.memory.currentTask.failIn, creep.memory.currentTask.source);
+        } else {
+            return;
+        }
+    }
+}
 
 if (Memory.profiling) {
     require("screeps-profiler").registerObject(Harvest, "TaskHarvest");

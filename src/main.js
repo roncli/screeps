@@ -50,7 +50,7 @@ var profiler = require("screeps-profiler"),
                 bucket = Game.cpu.bucket;
 
             if (cpu >= 10) {
-                if (Game.cpu.bucket < 9000) {
+                if (Game.cpu.bucket < 9800) {
                     Game.notify("CPU started at " + cpu.toFixed(2) + " with bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
                     return;
                 }
@@ -874,7 +874,7 @@ var profiler = require("screeps-profiler"),
             var roomOrder = ["base", "source", "mine", "cleanup", ""],
                 memoryRooms = Memory.rooms,
                 roomsToAlwaysRun = ["source", "cleanup"],
-                runRooms = Game.cpu.bucket >= 9000 || Game.time % 2 === 0;
+                runRooms = Game.cpu.bucket >= 9800 || Game.time % 2 === 0;
 
             Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
 

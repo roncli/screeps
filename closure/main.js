@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0);
 
@@ -103,7 +103,7 @@ var profiler = __require(2,0),
                 bucket = Game.cpu.bucket;
 
             if (cpu >= 10) {
-                if (Game.cpu.bucket < 9000) {
+                if (Game.cpu.bucket < 9800) {
                     Game.notify("CPU started at " + cpu.toFixed(2) + " with bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
                     return;
                 }
@@ -869,7 +869,7 @@ var profiler = __require(2,0),
             var roomOrder = ["base", "source", "mine", "cleanup", ""],
                 memoryRooms = Memory.rooms,
                 roomsToAlwaysRun = ["source", "cleanup"],
-                runRooms = Game.cpu.bucket >= 9000 || Game.time % 2 === 0;
+                runRooms = Game.cpu.bucket >= 9800 || Game.time % 2 === 0;
 
             Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
             _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]).sort((a, b) => {
@@ -1260,7 +1260,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.filter = function(callback, thisArg) {

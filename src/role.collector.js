@@ -307,7 +307,7 @@ var Cache = require("cache"),
             // Check for dropped resources in current room if there are no hostiles.
             if (Cache.hostilesInRoom(room).length === 0) {
                 _.forEach(creepsWithNoTask, (creep) => {
-                    _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
+                    _.forEach(TaskPickupResource.getCollectorTasks(creep.room), (task) => {
                         if (_.filter(Cache.creeps[task.resource.room.name] && Cache.creeps[task.resource.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
                             return;
                         }

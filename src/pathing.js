@@ -115,7 +115,7 @@ var Cache = require("cache"),
                     _.remove(pathing.blocked, (b) => b.blockedUntil <= tick);
                 }
 
-                key = creepRoom + "." + creepX + "." + creepY + "." + posRoom + "." + posX + "." + posY + "." + range + "." + (multiplier <= 1 ? "0" : "1");
+                key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`;
 
                 if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
                     // Use the cache.

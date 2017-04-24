@@ -104,13 +104,13 @@ var profiler = __require(2,0),
 
             if (cpu >= 10) {
                 if (Game.cpu.bucket < 9800) {
-                    Game.notify("CPU started at " + cpu.toFixed(2) + " with bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+                    Game.notify(`CPU started at ${cpu.toFixed(2)} with bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
                     return;
                 }
             }
 
             if (bucket < Game.cpu.tickLimit) {
-                Game.notify("Bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+                Game.notify(`Bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
                 return;
             }
             
@@ -120,14 +120,14 @@ var profiler = __require(2,0),
                 
                 if (Memory.logCpu) {
                     lastCpu = thisCpu;
-                    log = "Started at " + lastCpu.toFixed(2);
+                    log = `Started at ${lastCpu.toFixed(2)}`;
                 }
 
                 main.init();
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "init took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}init took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -135,7 +135,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "minerals took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}minerals took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -143,7 +143,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "baseMatrixes took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}baseMatrixes took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -151,7 +151,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "deserializeCreeps took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}deserializeCreeps took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -159,7 +159,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "deserializeRooms took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}deserializeRooms took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -167,7 +167,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "balanceEnergy took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}balanceEnergy took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -176,7 +176,7 @@ var profiler = __require(2,0),
 
                     if (Memory.logCpu) {
                         thisCpu = Game.cpu.getUsed();
-                        log += (log.length > 0 ? " - " : "") + "log took " + (thisCpu - lastCpu).toFixed(2); 
+                        log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
                         lastCpu = thisCpu;
                     }
                 }
@@ -185,7 +185,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "rooms took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}rooms took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -193,7 +193,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "army took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}army took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -201,7 +201,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "creeps took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}creeps took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
                 
@@ -209,7 +209,7 @@ var profiler = __require(2,0),
                 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "debug took " + (thisCpu - lastCpu).toFixed(2);
+                    log += `${log.length > 0 ? " - " : ""}debug took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -217,7 +217,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "finalize took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -225,7 +225,7 @@ var profiler = __require(2,0),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "drawGlobal took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}drawGlobal took ${(thisCpu - lastCpu).toFixed(2)}`;
                     Cache.log.events.push(log);
                 }
             };
@@ -691,7 +691,7 @@ var profiler = __require(2,0),
                         transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoom.name, room.name);
 
                         otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), room.name);
-                        Cache.log.events.push("Sending " + Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))) + " energy from " + otherRoom.name + " to " + room.name);
+                        Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoom.name} to ${room.name}`);
                     }
                 });
             }
@@ -1618,7 +1618,7 @@ var Cache = __require(4,3),
                 return;
             }
             if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
-                Game.notify("Army " + name + " operation failed, restarting.");
+                Game.notify(`Army ${name} operation failed, restarting.`);
                 army.directive = "preparing";
             }
             if (army.safeMode && armyAttackRoom && armyAttackRoom.controller && armyAttackRoom.controller.safeMode) {
@@ -2133,7 +2133,7 @@ var Drawing = {
         visual
             .rect(x, y, w, h, {fill: options.background})
             .rect(x, y, w * Math.min(value / max, 1), h, {fill: options.bar})
-            .text((options.label ? options.label + " " : "") + value.toFixed(options.valueDecimals) + (options.showMax ? "/" + max.toFixed(0) : "") + (options.showDetails ? " (" + (100 * value / max).toFixed(3) + "%) " + (max - value).toFixed(0) + " to go" : ""), x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
+            .text(`${options.label ? `${options.label} ` : ""}${value.toFixed(options.valueDecimals)}${options.showMax ? `/${max.toFixed(0)}` : ""}${options.showDetails ? ` (${(100 * value / max).toFixed(3)}%) ${(max - value).toFixed(0)} to go` : ""}`, x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
     },
 
     sparkline: (visual, x, y, w, h, values, options) => {
@@ -2420,17 +2420,17 @@ var Cache = __require(4,7),
                         Cache.credits -= order.amount * order.price;
                     }
                     if (order.amount <= amount) {
-                        Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " sold out " + order.id);
+                        Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} sold out ${order.id}`);
                         _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
                         _.remove(Market.orders, (m) => m.id === orderId);
                     } else {
                         order.amount -= amount;
-                        Cache.log.events.push(yourRoomName + " " + order.resourceType + " x" + amount + " @ " +  order.price + " completed, " + order.type + " " + order.amount + " remaining on " + order.id);
+                        Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} ${order.amount} remaining on ${order.id}`);
                     }
                 }
             } else {
                 if (order) {
-                    Cache.log.events.push(yourRoomName + " failed to process order ID " + orderId + ": " + ret);
+                    Cache.log.events.push(`${yourRoomName} failed to process order ID ${orderId}: ${ret}`);
                     _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
                     _.remove(Market.orders, (m) => m.id === orderId);
                 }
@@ -2894,7 +2894,7 @@ var Cache = __require(4,12),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyDismantler-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+            name = spawnToUse.createCreep(body, `armyDismantler-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && boostRoom) {
@@ -3169,7 +3169,7 @@ var Cache = __require(4,13),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyHealer-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+            name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && boostRoom) {
@@ -3451,7 +3451,7 @@ var Cache = __require(4,14),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyMelee-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyMelee", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+            name = spawnToUse.createCreep(body, `armyMelee-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyMelee", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && boostRoom) {
@@ -3740,7 +3740,7 @@ var Cache = __require(4,15),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyRanged-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+            name = spawnToUse.createCreep(body, `armyRanged-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && boostRoom) {
@@ -4020,7 +4020,7 @@ var Cache = __require(4,16),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "claimer-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "claimer", home: room.name, claim: toRoom});
+            name = spawnToUse.createCreep(body, `claimer-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "claimer", home: room.name, claim: toRoom});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";
@@ -4168,7 +4168,7 @@ var Cache = __require(4,17),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "collector-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "collector", home: roomName, homeSource: id});
+            name = spawnToUse.createCreep(body, `collector-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "collector", home: roomName, homeSource: id});
             if (spawnToUse.room.name === roomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -4474,7 +4474,7 @@ var Cache = __require(4,18),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "converter-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "converter", home: room.name, attack: toRoom});
+            name = spawnToUse.createCreep(body, `converter-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "converter", home: room.name, attack: toRoom});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";
@@ -4584,7 +4584,7 @@ var Cache = __require(4,19),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "defender-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "defender", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `defender-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "defender", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -4718,7 +4718,7 @@ var Cache = __require(4,20),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "dismantler-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "dismantler", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `dismantler-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "dismantler", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -4927,7 +4927,7 @@ var Cache = __require(4,21),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "healer-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "healer", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `healer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "healer", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -5084,7 +5084,7 @@ var Cache = __require(4,22),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "miner-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "miner", home: roomName, container: id});
+            name = spawnToUse.createCreep(body, `miner-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "miner", home: roomName, container: id});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
             return typeof name !== "number";
         },
@@ -5201,7 +5201,7 @@ var Cache = __require(4,23),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteBuilder-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteBuilder", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `remoteBuilder-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteBuilder", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -5393,7 +5393,7 @@ var Cache = __require(4,24),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteCollector-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteCollector", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `remoteCollector-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteCollector", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -5616,7 +5616,7 @@ var Cache = __require(4,25),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteDismantler-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteDismantler", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `remoteDismantler-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteDismantler", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -5785,7 +5785,7 @@ var Cache = __require(4,26),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteMiner-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteMiner", home: roomName, supportRoom: supportRoomName, container: id});
+            name = spawnToUse.createCreep(body, `remoteMiner-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteMiner", home: roomName, supportRoom: supportRoomName, container: id});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -5912,7 +5912,7 @@ var Cache = __require(4,27),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteReserver-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteReserver", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `remoteReserver-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteReserver", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -6066,7 +6066,7 @@ var Cache = __require(4,28),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteStorer-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteStorer", home: roomName, supportRoom: supportRoomName, container: id});
+            name = spawnToUse.createCreep(body, `remoteStorer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteStorer", home: roomName, supportRoom: supportRoomName, container: id});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -6333,7 +6333,7 @@ var Cache = __require(4,29),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "remoteWorker-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "remoteWorker", home: roomName, supportRoom: supportRoomName, container: id});
+            name = spawnToUse.createCreep(body, `remoteWorker-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteWorker", home: roomName, supportRoom: supportRoomName, container: id});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }
@@ -6600,7 +6600,7 @@ var Cache = __require(4,30),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "scientist-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
+            name = spawnToUse.createCreep(body, `scientist-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";
@@ -7043,7 +7043,7 @@ var Cache = __require(4,31),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "storer-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "storer", home: roomName});
+            name = spawnToUse.createCreep(body, `storer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "storer", home: roomName});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";
@@ -7437,7 +7437,7 @@ var Cache = __require(4,33),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, `upgrader-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "upgrader", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
@@ -7676,7 +7676,7 @@ var Cache = __require(4,34),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "worker-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "worker", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, `worker-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "worker", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {
@@ -8158,7 +8158,7 @@ Base.prototype.defend = function(room) {
     var roomName = room.name,
         roomMemory = room.memory,
         hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
-        armyName = roomName + "-defense",
+        armyName = `${roomName}-defense`,
         armySize, attackTicks, exits;
 
     if (hostiles.length > 0) {
@@ -8201,7 +8201,7 @@ Base.prototype.defend = function(room) {
 
         if (armySize > 0) {
             if (!Memory.army[armyName]) {
-                Game.notify("Warning! " + roomName + " is under attack!");
+                Game.notify(`Warning! ${roomName} is under attack!`);
                 Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                 Memory.army[armyName].creepCount = 0;
             } else {
@@ -8211,14 +8211,14 @@ Base.prototype.defend = function(room) {
                     Memory.army[armyName].boostRoom = roomName;
                 } else if (attackTicks >= 2000 && attackTicks < 2500) {
                     _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                        var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
-                        if (!Memory.army[remoteRoom.name + "-defense"] && !Memory.army[remoteArmyName]) {
+                        var remoteArmyName = `${remoteRoom.name}-defense-for-${roomName}`;
+                        if (!Memory.army[`${remoteRoom.name}-defense`] && !Memory.army[remoteArmyName]) {
                             Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                         }
                     });
                 } else if (attackTicks >= 2500) {
                     _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                        var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
+                        var remoteArmyName = `${remoteRoom.name}-defense-for-${roomName}`;
                         if (Memory.army[remoteArmyName]) {
                             Memory.army[remoteArmyName].boostRoom = remoteRoom.name;
                         }
@@ -8226,18 +8226,18 @@ Base.prototype.defend = function(room) {
                 }
                 exits = Game.map.describeExits(roomName);
                 _.forEach(_.keys(exits), (dir) => {
-                    var dirArmyName = roomName + "-" + dir.toString() + "-border-defense";
+                    var dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
                     if (!Memory.army[dirArmyName] && roomMemory.edgeTicks[dir] >= 50) {
                         Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                     }
                 });
             }
         }
-    } else if (Memory.army[roomName + "-defense"]) {
+    } else if (Memory.army[armyName]) {
         if (roomMemory.lastHostile + 50 < Game.time) {
-            if (Memory.army[roomName + "-defense"]) {
-                Memory.army[roomName + "-defense"].directive = "attack";
-                Memory.army[roomName + "-defense"].success = true;
+            if (Memory.army[armyName]) {
+                Memory.army[armyName].directive = "attack";
+                Memory.army[armyName].success = true;
             }
             delete roomMemory.lastHostile;
             delete roomMemory.currentAttack;
@@ -8344,7 +8344,7 @@ Base.prototype.terminal = function(room, terminal) {
                         transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
                         if (terminalEnergy > transCost) {
                             if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                                Cache.log.events.push(`Sending ${amount} ${resource.resource} from ${roomName} to ${otherRoomName}`);
                                 dealMade = true;
                                 return false;
                             }
@@ -8353,7 +8353,7 @@ Base.prototype.terminal = function(room, terminal) {
                                 amount = Math.floor(amount * terminalEnergy / transCost);
                                 if (amount > 0) {
                                     if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                        Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                                        Cache.log.events.push(`Sending ${amount} ${resource.resource} from ${roomName} to ${otherRoomName}`);
                                         dealMade = true;
                                         return false;
                                     }
@@ -8425,7 +8425,7 @@ Base.prototype.terminal = function(room, terminal) {
                     }
 
                     if (index === 0) {
-                        Cache.log.events.push("Biggest flip: " + flip.resource + " x" + amount + " " + sell.price.toFixed(2) + " to " + buy.price.toFixed(2));
+                        Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sell.price.toFixed(2)} to ${buy.price.toFixed(2)}`);
                     }
                     transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
                     if (terminalEnergy > transCost) {
@@ -8754,7 +8754,7 @@ Base.prototype.run = function(room) {
 
     var roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
     if (room.unobservable) {
-        Game.notify("Base Room " + roomName + " is unobservable, something is wrong!");
+        Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
         return;
     }
 
@@ -8904,7 +8904,7 @@ Cleanup.prototype.run = function(room) {
         tasks.remoteDismantle.cleanupTasks = [].concat.apply([], [TaskDismantle.getCleanupTasks(noEnergyStructures), TaskDismantle.getCleanupTasks(ramparts), TaskDismantle.getCleanupTasks(junk)]);
 
         if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
-            Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
+            Game.notify(`Cleanup Room ${room.name} is squeaky clean!`);
             _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [], (creep) => {
                 creep.memory.role = "storer";
                 creep.memory.home = supportRoom.name;
@@ -9061,7 +9061,7 @@ Mine.prototype.stage1AssignTasks = function(room, tasks) {
 
 Mine.prototype.stage1Manage = function(room, supportRoom) {
     var supportRoomName = supportRoom.name,
-        sources, containers, roomName, sites;
+        sources, containers, roomName, armyName, sites;
     
     if (!room.unobservable) {
         sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
@@ -9097,13 +9097,14 @@ Mine.prototype.stage1Manage = function(room, supportRoom) {
             });
         } 
 
+        armyName = `${roomName}-defense`;
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-            if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
+            if (!Memory.army[armyName]) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
             }
-        } else if (Memory.army[roomName + "-defense"]) {
-            Memory.army[roomName + "-defense"].directive = "attack";
-            Memory.army[roomName + "-defense"].success = true;
+        } else if (Memory.army[armyName]) {
+            Memory.army[armyName].directive = "attack";
+            Memory.army[armyName].success = true;
         }
     }
 };
@@ -9120,7 +9121,7 @@ Mine.prototype.stage1 = function(room, supportRoom) {
 Mine.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
         supportRoomName = supportRoom.name,
-        sources;
+        sources, armyName;
     if (room.unobservable) {
         if (
             (Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []).length === 0 &&
@@ -9138,13 +9139,14 @@ Mine.prototype.stage2Manage = function(room, supportRoom) {
             return;
         }
 
+        armyName = `${roomName}-defense`;
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-            if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
+            if (!Memory.army[armyName]) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
             }
-        } else if (Memory.army[roomName + "-defense"]) {
-            Memory.army[roomName + "-defense"].directive = "attack";
-            Memory.army[roomName + "-defense"].success = true;
+        } else if (Memory.army[armyName]) {
+            Memory.army[armyName].directive = "attack";
+            Memory.army[armyName].success = true;
         }
     }
 };
@@ -11345,7 +11347,7 @@ Source.prototype.stage1AssignTasks = function(room, tasks) {
 
 Source.prototype.stage1Manage = function(room, supportRoom) {
     var supportRoomName = supportRoom.name,
-        sources, containers, roomName, sites;
+        sources, containers, roomName, armyName, sites;
     
     if (!room.unobservable) {
         sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
@@ -11381,13 +11383,14 @@ Source.prototype.stage1Manage = function(room, supportRoom) {
             });
         }
 
+        armyName = `${roomName}-defense`;
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-            if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            if (!Memory.army[armyName]) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             }
-        } else if (Memory.army[roomName + "-defense"]) {
-            Memory.army[roomName + "-defense"].directive = "attack";
-            Memory.army[roomName + "-defense"].success = true;
+        } else if (Memory.army[armyName]) {
+            Memory.army[armyName].directive = "attack";
+            Memory.army[armyName].success = true;
         }
     }
 };
@@ -11404,7 +11407,8 @@ Source.prototype.stage1 = function(room, supportRoom) {
 Source.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
         supportRoomName = supportRoom.name,
-        creeps = Cache.creeps[roomName];
+        creeps = Cache.creeps[roomName],
+        armyName;
     if (room.unobservable) {
         if (
             (creeps && creeps.remoteMiner || []).length === 0 &&
@@ -11419,13 +11423,14 @@ Source.prototype.stage2Manage = function(room, supportRoom) {
             this.stage = 1;
         }
 
+        armyName = `${roomName}-defense`;
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-            if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            if (!Memory.army[armyName]) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             }
-        } else if (Memory.army[roomName + "-defense"]) {
-            Memory.army[roomName + "-defense"].directive = "attack";
-            Memory.army[roomName + "-defense"].success = true;
+        } else if (Memory.army[armyName]) {
+            Memory.army[armyName].directive = "attack";
+            Memory.army[armyName].success = true;
         }
     }
 };
@@ -11665,7 +11670,7 @@ var Cache = __require(4,60),
                     _.remove(pathing.blocked, (b) => b.blockedUntil <= tick);
                 }
 
-                key = creepRoom + "." + creepX + "." + creepY + "." + posRoom + "." + posX + "." + posY + "." + range + "." + (multiplier <= 1 ? "0" : "1");
+                key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`;
 
                 if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
                     if (pathing) {

@@ -76,7 +76,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "scientist-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
+            name = spawnToUse.createCreep(body, `scientist-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";

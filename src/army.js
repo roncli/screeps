@@ -41,7 +41,7 @@ var Cache = require("cache"),
 
             // Reset army if we have no creeps.
             if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
-                Game.notify("Army " + name + " operation failed, restarting.");
+                Game.notify(`Army ${name} operation failed, restarting.`);
                 army.directive = "preparing";
             }
 

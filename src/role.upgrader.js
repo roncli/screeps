@@ -156,7 +156,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "upgrader-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "upgrader", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
+            name = spawnToUse.createCreep(body, `upgrader-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "upgrader", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && canBoost) {

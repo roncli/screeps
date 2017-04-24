@@ -66,7 +66,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "armyHealer-" + armyName + "-" + Game.time.toFixed(0).substring(4), {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+            name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             if (typeof name !== "number" && boostRoom) {

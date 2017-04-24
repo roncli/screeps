@@ -55,7 +55,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "claimer-" + toRoom + "-" + Game.time.toFixed(0).substring(4), {role: "claimer", home: room.name, claim: toRoom});
+            name = spawnToUse.createCreep(body, `claimer-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "claimer", home: room.name, claim: toRoom});
             Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
             return typeof name !== "number";

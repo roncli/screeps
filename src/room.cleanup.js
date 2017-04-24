@@ -105,7 +105,7 @@ Cleanup.prototype.run = function(room) {
 
         if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
             // Notify that the room is cleaned up.
-            Game.notify("Cleanup Room " + room.name + " is squeaky clean!");
+            Game.notify(`Cleanup Room ${room.name} is squeaky clean!`);
             
             // No longer need remote collectors.
             _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [], (creep) => {

@@ -57,7 +57,7 @@ var Cache = require("cache"),
             if (!spawnToUse) {
                 return false;
             }
-            name = spawnToUse.createCreep(body, "defender-" + roomName + "-" + Game.time.toFixed(0).substring(4), {role: "defender", home: roomName, supportRoom: supportRoomName});
+            name = spawnToUse.createCreep(body, `defender-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "defender", home: roomName, supportRoom: supportRoomName});
             if (spawnToUse.room.name === supportRoomName) {
                 Cache.spawning[spawnToUse.id] = typeof name !== "number";
             }

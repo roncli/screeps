@@ -51,13 +51,13 @@ var profiler = require("screeps-profiler"),
 
             if (cpu >= 10) {
                 if (Game.cpu.bucket < 9800) {
-                    Game.notify("CPU started at " + cpu.toFixed(2) + " with bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+                    Game.notify(`CPU started at ${cpu.toFixed(2)} with bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
                     return;
                 }
             }
 
             if (bucket < Game.cpu.tickLimit) {
-                Game.notify("Bucket at " + bucket.toFixed(0) + ", aborting! " + Game.time.toFixed(0));
+                Game.notify(`Bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
                 return;
             }
             
@@ -67,14 +67,14 @@ var profiler = require("screeps-profiler"),
                 
                 if (Memory.logCpu) {
                     lastCpu = thisCpu;
-                    log = "Started at " + lastCpu.toFixed(2);
+                    log = `Started at ${lastCpu.toFixed(2)}`;
                 }
 
                 main.init();
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "init took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}init took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -82,7 +82,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "minerals took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}minerals took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -90,7 +90,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "baseMatrixes took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}baseMatrixes took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -98,7 +98,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "deserializeCreeps took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}deserializeCreeps took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -106,7 +106,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "deserializeRooms took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}deserializeRooms took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -114,7 +114,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "balanceEnergy took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}balanceEnergy took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -123,7 +123,7 @@ var profiler = require("screeps-profiler"),
 
                     if (Memory.logCpu) {
                         thisCpu = Game.cpu.getUsed();
-                        log += (log.length > 0 ? " - " : "") + "log took " + (thisCpu - lastCpu).toFixed(2); 
+                        log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
                         lastCpu = thisCpu;
                     }
                 }
@@ -132,7 +132,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "rooms took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}rooms took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -140,7 +140,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "army took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}army took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -148,7 +148,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "creeps took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}creeps took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
                 
@@ -156,7 +156,7 @@ var profiler = require("screeps-profiler"),
                 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "debug took " + (thisCpu - lastCpu).toFixed(2);
+                    log += `${log.length > 0 ? " - " : ""}debug took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -164,7 +164,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "finalize took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
 
@@ -172,7 +172,7 @@ var profiler = require("screeps-profiler"),
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += (log.length > 0 ? " - " : "") + "drawGlobal took " + (thisCpu - lastCpu).toFixed(2); 
+                    log += `${log.length > 0 ? " - " : ""}drawGlobal took ${(thisCpu - lastCpu).toFixed(2)}`;
                     Cache.log.events.push(log);
                 }
             };
@@ -694,7 +694,7 @@ var profiler = require("screeps-profiler"),
                         transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoom.name, room.name);
 
                         otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), room.name);
-                        Cache.log.events.push("Sending " + Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))) + " energy from " + otherRoom.name + " to " + room.name);
+                        Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoom.name} to ${room.name}`);
                     }
                 });
             }

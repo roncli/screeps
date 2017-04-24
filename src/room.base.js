@@ -175,7 +175,7 @@ Base.prototype.defend = function(room) {
     var roomName = room.name,
         roomMemory = room.memory,
         hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
-        armyName = roomName + "-defense",
+        armyName = `${roomName}-defense`,
         armySize, attackTicks, exits;
 
     if (hostiles.length > 0) {
@@ -218,7 +218,7 @@ Base.prototype.defend = function(room) {
 
         if (armySize > 0) {
             if (!Memory.army[armyName]) {
-                Game.notify("Warning! " + roomName + " is under attack!");
+                Game.notify(`Warning! ${roomName} is under attack!`);
                 Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                 Memory.army[armyName].creepCount = 0;
             } else {
@@ -228,14 +228,14 @@ Base.prototype.defend = function(room) {
                     Memory.army[armyName].boostRoom = roomName;
                 } else if (attackTicks >= 2000 && attackTicks < 2500) {
                     _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                        var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
-                        if (!Memory.army[remoteRoom.name + "-defense"] && !Memory.army[remoteArmyName]) {
+                        var remoteArmyName = `${remoteRoom.name}-defense-for-${roomName}`;
+                        if (!Memory.army[`${remoteRoom.name}-defense`] && !Memory.army[remoteArmyName]) {
                             Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                         }
                     });
                 } else if (attackTicks >= 2500) {
                     _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                        var remoteArmyName = remoteRoom.name + "-defense-for-" + roomName;
+                        var remoteArmyName = `${remoteRoom.name}-defense-for-${roomName}`;
                         if (Memory.army[remoteArmyName]) {
                             Memory.army[remoteArmyName].boostRoom = remoteRoom.name;
                         }
@@ -245,7 +245,7 @@ Base.prototype.defend = function(room) {
                 // Check edgeTicks, if any are over 50, spawn an army for that room, or update it if one already exists.
                 exits = Game.map.describeExits(roomName);
                 _.forEach(_.keys(exits), (dir) => {
-                    var dirArmyName = roomName + "-" + dir.toString() + "-border-defense";
+                    var dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
                     if (!Memory.army[dirArmyName] && roomMemory.edgeTicks[dir] >= 50) {
                         Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                     }
@@ -255,12 +255,12 @@ Base.prototype.defend = function(room) {
                 // TODO
             }
         }
-    } else if (Memory.army[roomName + "-defense"]) {
+    } else if (Memory.army[armyName]) {
         // This is a true success only if 50 ticks have passed since the last hostile was seen.
         if (roomMemory.lastHostile + 50 < Game.time) {
-            if (Memory.army[roomName + "-defense"]) {
-                Memory.army[roomName + "-defense"].directive = "attack";
-                Memory.army[roomName + "-defense"].success = true;
+            if (Memory.army[armyName]) {
+                Memory.army[armyName].directive = "attack";
+                Memory.army[armyName].success = true;
             }
             delete roomMemory.lastHostile;
             delete roomMemory.currentAttack;
@@ -369,7 +369,7 @@ Base.prototype.terminal = function(room, terminal) {
                         transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
                         if (terminalEnergy > transCost) {
                             if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                                Cache.log.events.push(`Sending ${amount} ${resource.resource} from ${roomName} to ${otherRoomName}`);
                                 dealMade = true;
                                 return false;
                             }
@@ -378,7 +378,7 @@ Base.prototype.terminal = function(room, terminal) {
                                 amount = Math.floor(amount * terminalEnergy / transCost);
                                 if (amount > 0) {
                                     if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                        Cache.log.events.push("Sending " + amount + " " + resource.resource + " from " + roomName + " to " + otherRoomName);
+                                        Cache.log.events.push(`Sending ${amount} ${resource.resource} from ${roomName} to ${otherRoomName}`);
                                         dealMade = true;
                                         return false;
                                     }
@@ -460,7 +460,7 @@ Base.prototype.terminal = function(room, terminal) {
                     }
 
                     if (index === 0) {
-                        Cache.log.events.push("Biggest flip: " + flip.resource + " x" + amount + " " + sell.price.toFixed(2) + " to " + buy.price.toFixed(2));
+                        Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sell.price.toFixed(2)} to ${buy.price.toFixed(2)}`);
                     }
 
                     // Determine how much energy we need for the deal.
@@ -793,7 +793,7 @@ Base.prototype.run = function(room) {
 
     // Something is supremely wrong.  Notify and bail.
     if (room.unobservable) {
-        Game.notify("Base Room " + roomName + " is unobservable, something is wrong!");
+        Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
         return;
     }
 

@@ -9,7 +9,7 @@ var Drawing = {
         visual
             .rect(x, y, w, h, {fill: options.background})
             .rect(x, y, w * Math.min(value / max, 1), h, {fill: options.bar})
-            .text((options.label ? options.label + " " : "") + value.toFixed(options.valueDecimals) + (options.showMax ? "/" + max.toFixed(0) : "") + (options.showDetails ? " (" + (100 * value / max).toFixed(3) + "%) " + (max - value).toFixed(0) + " to go" : ""), x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
+            .text(`${options.label ? `${options.label} ` : ""}${value.toFixed(options.valueDecimals)}${options.showMax ? `/${max.toFixed(0)}` : ""}${options.showDetails ? ` (${(100 * value / max).toFixed(3)}%) ${(max - value).toFixed(0)} to go` : ""}`, x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
     },
 
     sparkline: (visual, x, y, w, h, values, options) => {

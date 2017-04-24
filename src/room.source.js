@@ -85,7 +85,7 @@ Source.prototype.stage1AssignTasks = function(room, tasks) {
 
 Source.prototype.stage1Manage = function(room, supportRoom) {
     var supportRoomName = supportRoom.name,
-        sources, containers, roomName, sites;
+        sources, containers, roomName, armyName, sites;
     
     if (!room.unobservable) {
         sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
@@ -132,15 +132,16 @@ Source.prototype.stage1Manage = function(room, supportRoom) {
             });
         }
 
+        armyName = `${roomName}-defense`;
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
-            if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            if (!Memory.army[armyName]) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             }
-        } else if (Memory.army[roomName + "-defense"]) {
+        } else if (Memory.army[armyName]) {
             // Cancel army if invaders are gone.
-            Memory.army[roomName + "-defense"].directive = "attack";
-            Memory.army[roomName + "-defense"].success = true;
+            Memory.army[armyName].directive = "attack";
+            Memory.army[armyName].success = true;
         }
     }
 };
@@ -163,7 +164,8 @@ Source.prototype.stage1 = function(room, supportRoom) {
 Source.prototype.stage2Manage = function(room, supportRoom) {
     var roomName = room.name,
         supportRoomName = supportRoom.name,
-        creeps = Cache.creeps[roomName];
+        creeps = Cache.creeps[roomName],
+        armyName;
 
     // If we've lost all our creeps, something probably went wrong, so revert to stage 1.
     if (room.unobservable) {
@@ -181,15 +183,16 @@ Source.prototype.stage2Manage = function(room, supportRoom) {
             this.stage = 1;
         }
 
+        armyName = `${roomName}-defense`;
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
-            if (!Memory.army[roomName + "-defense"]) {
-                Commands.createArmy(roomName + "-defense", {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            if (!Memory.army[armyName]) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             }
-        } else if (Memory.army[roomName + "-defense"]) {
+        } else if (Memory.army[armyName]) {
             // Cancel army if invaders are gone.
-            Memory.army[roomName + "-defense"].directive = "attack";
-            Memory.army[roomName + "-defense"].success = true;
+            Memory.army[armyName].directive = "attack";
+            Memory.army[armyName].success = true;
         }
     }
 };

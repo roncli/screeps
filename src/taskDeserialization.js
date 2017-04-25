@@ -19,7 +19,7 @@ var Cache = require("cache"),
     TaskUpgradeController = require("task.upgradeController");
 
 class TaskDeserialization {
-    static deserialization(creep) {
+    static deserialize(creep) {
         switch (creep.memory.currentTask.type) {
             case "attack":
                 Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);

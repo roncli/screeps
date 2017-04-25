@@ -89,7 +89,7 @@ var profiler = __require(2,0),
     RoomBase = __require(35,0),
     RoomCleanup = __require(36,0),
     RoomMine = __require(37,0),
-    taskDeserialization = __require(38,0),
+    TaskDeserialization = __require(38,0),
     roomDeserialization = __require(39,0),
     paths,
     reset,
@@ -646,7 +646,7 @@ var profiler = __require(2,0),
             "use strict";
             _.forEach(Game.creeps, (creep) => {
                 if (creep.memory.currentTask) {
-                    taskDeserialization(creep);
+                    TaskDeserialization.deserialize(creep);
                 }
             });
         },
@@ -9302,7 +9302,7 @@ var Cache = __require(4,38),
     TaskUpgradeController = __require(58,38);
 
 class TaskDeserialization {
-    static deserialization(creep) {
+    static deserialize(creep) {
         switch (creep.memory.currentTask.type) {
             case "attack":
                 Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);

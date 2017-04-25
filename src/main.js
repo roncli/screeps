@@ -36,7 +36,7 @@ var profiler = require("screeps-profiler"),
     RoomBase = require("room.base"),
     RoomCleanup = require("room.cleanup"),
     RoomMine = require("room.mine"),
-    taskDeserialization = require("taskDeserialization"),
+    TaskDeserialization = require("taskDeserialization"),
     roomDeserialization = require("roomDeserialization"),
     paths,
     reset,
@@ -647,7 +647,7 @@ var profiler = require("screeps-profiler"),
             // Loop through each creep to deserialize their task.
             _.forEach(Game.creeps, (creep) => {
                 if (creep.memory.currentTask) {
-                    taskDeserialization(creep);
+                    TaskDeserialization.deserialize(creep);
                 }
             });
         },

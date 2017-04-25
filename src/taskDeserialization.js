@@ -16,11 +16,10 @@ var Cache = require("cache"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
     TaskReserve = require("task.reserve"),
-    TaskUpgradeController = require("task.upgradeController"),
-    
-    deserialization = (creep) => {
-        "use strict";
+    TaskUpgradeController = require("task.upgradeController");
 
+class TaskDeserialization {
+    static deserialization(creep) {
         switch (creep.memory.currentTask.type) {
             case "attack":
                 Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
@@ -77,9 +76,10 @@ var Cache = require("cache"),
                 Cache.creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);
                 break;
         }
-    };
+    }
+}
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(deserialization, "TaskDeserialization");
+    require("screeps-profiler").registerObject(TaskDeserialization, "TaskDeserialization");
 }
-module.exports = deserialization;
+module.exports = TaskDeserialization;

@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0);
 
@@ -1260,7 +1260,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.filter = function(callback, thisArg) {
@@ -9299,11 +9299,10 @@ var Cache = __require(4,38),
     TaskRangedAttack = __require(43,38),
     TaskRepair = __require(50,38),
     TaskReserve = __require(52,38),
-    TaskUpgradeController = __require(58,38),
-    
-    deserialization = (creep) => {
-        "use strict";
+    TaskUpgradeController = __require(58,38);
 
+class TaskDeserialization {
+    static deserialization(creep) {
         switch (creep.memory.currentTask.type) {
             case "attack":
                 Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
@@ -9360,12 +9359,13 @@ var Cache = __require(4,38),
                 Cache.creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);
                 break;
         }
-    };
+    }
+}
 
 if (Memory.profiling) {
-    __require(2,38).registerObject(deserialization, "TaskDeserialization");
+    __require(2,38).registerObject(TaskDeserialization, "TaskDeserialization");
 }
-module.exports = deserialization;
+module.exports = TaskDeserialization;
 
 return module.exports;
 }

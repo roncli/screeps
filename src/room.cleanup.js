@@ -1,5 +1,4 @@
-var RoomObj = require("roomObj"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
     RoleRemoteDismantler = require("role.remoteDismantler"),
@@ -17,14 +16,9 @@ var RoomObj = require("roomObj"),
         this.init(supportRoom);
     };
 
-Cleanup.prototype = Object.create(RoomObj.prototype);
-Cleanup.prototype.constructor = Cleanup;
-
 Cleanup.prototype.init = function(supportRoom) {
     "use strict";
     
-    RoomObj.call(this);
-
     this.type = "cleanup";
     this.supportRoom = supportRoom;
 };

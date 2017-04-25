@@ -1,5 +1,4 @@
-var RoomObj = require("roomObj"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Commands = require("commands"),
     Market = require("market"),
     Minerals = require("minerals"),
@@ -30,14 +29,9 @@ var RoomObj = require("roomObj"),
         this.init();
     };
 
-Base.prototype = Object.create(RoomObj.prototype);
-Base.prototype.constructor = Base;
-
 Base.prototype.init = function() {
     "use strict";
     
-    RoomObj.call(this);
-
     this.type = "base";
 };
 

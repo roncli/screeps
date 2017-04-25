@@ -1,5 +1,4 @@
-var RoomObj = require("roomObj"),
-    Cache = require("cache"),
+var Cache = require("cache"),
     Commands = require("commands"),
     Utilities = require("utilities"),
     RoleDismantler = require("role.dismantler"),
@@ -18,14 +17,9 @@ var RoomObj = require("roomObj"),
         this.init(supportRoom, stage);
     };
 
-Mine.prototype = Object.create(RoomObj.prototype);
-Mine.prototype.constructor = Mine;
-
 Mine.prototype.init = function(supportRoom, stage) {
     "use strict";
     
-    RoomObj.call(this);
-
     this.type = "mine";
     this.supportRoom = supportRoom;
     this.stage = stage || 1;

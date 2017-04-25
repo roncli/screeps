@@ -2565,266 +2565,248 @@ return module.exports;
 /********** End of module 10: ../src/segment.js **********/
 /********** Start module 11: ../src/utilities.js **********/
 __modules[11] = function(module, exports) {
-var Cache = __require(4,11),
+var Cache = __require(4,11);
 
-    Utilities = {
-        nest: (seq, keys) => {
-            if (!keys.length) {
-                return seq;
-            }
+class Utilities {
+    static nest(seq, keys) {
+        if (!keys.length) {
+            return seq;
+        }
 
-            return _.mapValues(_.groupBy(seq, keys[0]), function (value) { 
-                return Utilities.nest(value, keys.slice(1));
-            });
-        },
+        return _.mapValues(_.groupBy(seq, keys[0]), function (value) { 
+            return Utilities.nest(value, keys.slice(1));
+        });
+    }
+    
+    static creepsWithNoTask(creeps) {
+        return _.filter(creeps, (c) => !c.memory.currentTask || c.memory.currentTask.unimportant);
+    }
+
+    static objectsClosestToObj(objects, obj) {
+        var objId = obj.id;
+
+        if (objects.length === 0) {
+            return [];
+        }
+
+        if (!obj) {
+            return objects;
+        }
         
-        creepsWithNoTask: (creeps) => {
-            "use strict";
-
-            return _.filter(creeps, (c) => !c.memory.currentTask || c.memory.currentTask.unimportant);
-        },
-
-        objectsClosestToObj: (objects, obj) => {
-            "use strict";
-
-            var objId = obj.id;
-
-            if (objects.length === 0) {
-                return [];
-            }
-
-            if (!obj) {
-                return objects;
-            }
+        var objList = _.map(objects, (o) => {
+            var oId = o.id,
+                range;
             
-            var objList = _.map(objects, (o) => {
-                var oId = o.id,
-                    range;
-                
-                if (Memory.ranges && Memory.ranges[objId] && Memory.ranges[objId][oId]) {
-                    range = Memory.ranges[objId][oId];
-                } else {
-                    range = obj.pos.getRangeTo(o);
-                    if (!(o instanceof Creep) && !(obj instanceof Creep)) {
-                        if (!Memory.ranges) {
-                            Memory.ranges = {};
-                        }
-                        if (!Memory.ranges[objId]) {
-                            Memory.ranges[objId] = {};
-                        }
-                        Memory.ranges[objId][oId] = range;
+            if (Memory.ranges && Memory.ranges[objId] && Memory.ranges[objId][oId]) {
+                range = Memory.ranges[objId][oId];
+            } else {
+                range = obj.pos.getRangeTo(o);
+                if (!(o instanceof Creep) && !(obj instanceof Creep)) {
+                    if (!Memory.ranges) {
+                        Memory.ranges = {};
                     }
+                    if (!Memory.ranges[objId]) {
+                        Memory.ranges[objId] = {};
+                    }
+                    Memory.ranges[objId][oId] = range;
+                }
+            }
+
+            return {
+                object: o,
+                distance: range
+            };
+        });
+        
+        objList.sort((a, b) => a.distance - b.distance);
+        
+        return _.map(objList, (o) => o.object);
+    }
+
+    static getEmptyPosAroundPos(pos) {
+        var count = 0,
+            x, y, checkPos;
+
+        for (x = pos.x - 1; x < pos.x + 2; x++) {
+            for (y = pos.y - 1; y < pos.y + 2; y++) {
+                if (x === pos.x && y === pos.y) {
+                    continue;
                 }
 
-                return {
-                    object: o,
-                    distance: range
-                };
-            });
-            
-            objList.sort((a, b) => a.distance - b.distance);
-            
-            return _.map(objList, (o) => o.object);
-        },
+                checkPos = new RoomPosition(x, y, pos.roomName);
+                if (checkPos) {
+                    count += _.filter(checkPos.look(), (o) => o.type === "terrain" && o.terrain !== "wall").length;
+                }
+            }
+        }
 
-        getEmptyPosAroundPos: (pos) => {
-            "use strict";
+        return count;
+    }
 
-            var count = 0,
-                x, y, checkPos;
+    static checkSiteIsClear(pos) {
+        var siteClear = true,
+            x = pos.x,
+            y = pos.y,
+            roomName = pos.roomName,
+            room = Game.rooms[roomName],
+            structures;
+        if (
+            new RoomPosition(x, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" ||
+            (
+                new RoomPosition(x - 1, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
+                new RoomPosition(x + 1, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
+            ) ||
+            (
+                new RoomPosition(x, y - 1, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
+                new RoomPosition(x, y + 1, roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
+            )
+        ) {
+            return false;
+        }
+        _.forEach(room.find(FIND_SOURCES), (source) => {
+            return siteClear = pos.getRangeTo(source) > 1;
+        });
+        if (!siteClear) {
+            return false;
+        }
+        _.forEach(room.find(FIND_MINERALS), (source) => {
+            return siteClear = pos.getRangeTo(source) > 1;
+        });
+        if (!siteClear) {
+            return false;
+        }
+        if (pos.getRangeTo(room.controller) <= 4) {
+            return false;
+        }
+        structures = _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType !== "rampart");
+        if (structures.length === 0) {
+            return true;
+        }
+        if (_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1).length !== structures.length) {
+            return false;
+        }
+        return structures;
+    }
 
-            for (x = pos.x - 1; x < pos.x + 2; x++) {
-                for (y = pos.y - 1; y < pos.y + 2; y++) {
-                    if (x === pos.x && y === pos.y) {
+    static buildStructures(room, structureType, structuresToBuild, buildAroundObj) {
+        var distanceFromSpawn = 1,
+            buildAroundPos = buildAroundObj.pos,
+            buildAroundx = buildAroundPos.x,
+            buildAroundy = buildAroundPos.y,
+            x, y, siteIsClear;
+
+        while (structuresToBuild > 0 && distanceFromSpawn < 50) {
+            for (x = buildAroundx - distanceFromSpawn; x <= buildAroundx + distanceFromSpawn; x += 2) {
+                for (y = buildAroundy - distanceFromSpawn; y <= buildAroundy + distanceFromSpawn; y += (Math.abs(buildAroundx - x) === distanceFromSpawn ? 2 : 2 * distanceFromSpawn)) {
+                    if (x < 1 || x > 48 || y < 1 || y > 48) {
                         continue;
                     }
-
-                    checkPos = new RoomPosition(x, y, pos.roomName);
-                    if (checkPos) {
-                        count += _.filter(checkPos.look(), (o) => o.type === "terrain" && o.terrain !== "wall").length;
+                    if (_.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === x && s.pos.y === y).length > 0) {
+                        continue;
                     }
-                }
-            }
-
-            return count;
-        },
-
-        checkSiteIsClear: (pos) => {
-            "use strict";
-
-            var siteClear = true,
-                x = pos.x,
-                y = pos.y,
-                roomName = pos.roomName,
-                room = Game.rooms[roomName],
-                structures;
-            if (
-                new RoomPosition(x, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" ||
-                (
-                    new RoomPosition(x - 1, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
-                    new RoomPosition(x + 1, y, roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
-                ) ||
-                (
-                    new RoomPosition(x, y - 1, roomName).lookFor(LOOK_TERRAIN)[0] === "wall" &&
-                    new RoomPosition(x, y + 1, roomName).lookFor(LOOK_TERRAIN)[0] === "wall"
-                )
-            ) {
-                return false;
-            }
-            _.forEach(room.find(FIND_SOURCES), (source) => {
-                return siteClear = pos.getRangeTo(source) > 1;
-            });
-            if (!siteClear) {
-                return false;
-            }
-            _.forEach(room.find(FIND_MINERALS), (source) => {
-                return siteClear = pos.getRangeTo(source) > 1;
-            });
-            if (!siteClear) {
-                return false;
-            }
-            if (pos.getRangeTo(room.controller) <= 4) {
-                return false;
-            }
-            structures = _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType !== "rampart");
-            if (structures.length === 0) {
-                return true;
-            }
-            if (_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1).length !== structures.length) {
-                return false;
-            }
-            return structures;
-        },
-
-        buildStructures: (room, structureType, structuresToBuild, buildAroundObj) => {
-            "use strict";
-
-            var distanceFromSpawn = 1,
-                buildAroundPos = buildAroundObj.pos,
-                buildAroundx = buildAroundPos.x,
-                buildAroundy = buildAroundPos.y,
-                x, y, siteIsClear;
-
-            while (structuresToBuild > 0 && distanceFromSpawn < 50) {
-                for (x = buildAroundx - distanceFromSpawn; x <= buildAroundx + distanceFromSpawn; x += 2) {
-                    for (y = buildAroundy - distanceFromSpawn; y <= buildAroundy + distanceFromSpawn; y += (Math.abs(buildAroundx - x) === distanceFromSpawn ? 2 : 2 * distanceFromSpawn)) {
-                        if (x < 1 || x > 48 || y < 1 || y > 48) {
-                            continue;
-                        }
-                        if (_.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === x && s.pos.y === y).length > 0) {
-                            continue;
-                        }
-                        siteIsClear = Utilities.checkSiteIsClear(new RoomPosition(x, y, room.name));
-                        if (siteIsClear === false) {
-                            continue;
-                        }
-                        if (siteIsClear !== true) {
-                            _.forEach(siteIsClear, (structure) => {
-                                structure.destroy();
-                            });
-                        }
-                        room.createConstructionSite(x, y, structureType);
-                        structuresToBuild--;
-                        if (structuresToBuild === 0) {
-                            break;
-                        }
+                    siteIsClear = Utilities.checkSiteIsClear(new RoomPosition(x, y, room.name));
+                    if (siteIsClear === false) {
+                        continue;
                     }
+                    if (siteIsClear !== true) {
+                        _.forEach(siteIsClear, (structure) => {
+                            structure.destroy();
+                        });
+                    }
+                    room.createConstructionSite(x, y, structureType);
+                    structuresToBuild--;
                     if (structuresToBuild === 0) {
                         break;
                     }
                 }
-
-                distanceFromSpawn++;
-            }
-        },
-        
-        getBodypartCost: (body) => {
-            "use strict";
-
-            return _.sum(_.map(body, (b) => BODYPART_COST[b]));
-        },
-
-        getSourceLabs: (room) => {
-            "use strict";
-
-            var labs = Cache.labsInRoom(room),
-                sourceLabs = [];
-
-            _.forEach(labs, (lab) => {
-                if (Utilities.objectsClosestToObj(labs, lab)[labs.length - 1].pos.getRangeTo(lab) <= 2) {
-                    sourceLabs.push(lab.id);
-                    if (sourceLabs.length >= 2) {
-                        return false;
-                    }
+                if (structuresToBuild === 0) {
+                    break;
                 }
-            });
-
-            return sourceLabs;
-        },
-
-        getLabToBoostWith: (room, count) => {
-            "use strict";
-
-            var labQueue = room.memory.labQueue,
-                sourceLabs = (labQueue && labQueue.sourceLabs) ? labQueue.sourceLabs : [],
-                labs = [],
-                labToUse = null,
-                lab, labUsed;
-
-            if (!count) {
-                count = 1;
             }
 
-            if (sourceLabs.length === 0) {
-                sourceLabs = Utilities.getSourceLabs(room);
-            }
+            distanceFromSpawn++;
+        }
+    }
+    
+    static getBodypartCost(body) {
+        return _.sum(_.map(body, (b) => BODYPART_COST[b]));
+    }
 
-            if (!room.memory.labsInUse) {
-                room.memory.labsInUse = [];
-            }
+    static getSourceLabs(room) {
+        var labs = Cache.labsInRoom(room),
+            sourceLabs = [];
 
-            for (let index = 0; index < count; index++) {
-                labToUse = {};
-                lab = _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1);
-
-                if (lab.length > 0) {
-                    labToUse = {
-                        id: lab[0].id,
-                        pause: false
-                    };
+        _.forEach(labs, (lab) => {
+            if (Utilities.objectsClosestToObj(labs, lab)[labs.length - 1].pos.getRangeTo(lab) <= 2) {
+                sourceLabs.push(lab.id);
+                if (sourceLabs.length >= 2) {
+                    return false;
                 }
-                if (!labToUse || !labToUse.id) {
-                    labToUse = {
-                        id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l) === -1)[0],
-                        pause: true
-                    }
-                    
-                    if (!labToUse.id) {
-                        return false;
-                    }
-                    labUsed = Game.getObjectById(labToUse.id);
-                    if (labUsed.mineralAmount > 0) {
-                        labToUse.status = "emptying";
-                        labToUse.oldResource = labUsed.mineralType;
-                        labToUse.oldAmount = labUsed.mineralAmount;
-                    }
+            }
+        });
+
+        return sourceLabs;
+    }
+
+    static getLabToBoostWith(room, count) {
+        var labQueue = room.memory.labQueue,
+            sourceLabs = (labQueue && labQueue.sourceLabs) ? labQueue.sourceLabs : [],
+            labs = [],
+            labToUse = null,
+            lab, labUsed;
+
+        if (!count) {
+            count = 1;
+        }
+
+        if (sourceLabs.length === 0) {
+            sourceLabs = Utilities.getSourceLabs(room);
+        }
+
+        if (!room.memory.labsInUse) {
+            room.memory.labsInUse = [];
+        }
+
+        for (let index = 0; index < count; index++) {
+            labToUse = {};
+            lab = _.filter(Cache.labsInRoom(room), (l) => sourceLabs.indexOf(l.id) === -1 && _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && _.map(labs, (liu) => liu.id).indexOf(l.id) === -1);
+
+            if (lab.length > 0) {
+                labToUse = {
+                    id: lab[0].id,
+                    pause: false
+                };
+            }
+            if (!labToUse || !labToUse.id) {
+                labToUse = {
+                    id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l) === -1)[0],
+                    pause: true
                 }
+                
                 if (!labToUse.id) {
                     return false;
                 }
-
-                labs.push(labToUse);
+                labUsed = Game.getObjectById(labToUse.id);
+                if (labUsed.mineralAmount > 0) {
+                    labToUse.status = "emptying";
+                    labToUse.oldResource = labUsed.mineralType;
+                    labToUse.oldAmount = labUsed.mineralAmount;
+                }
+            }
+            if (!labToUse.id) {
+                return false;
             }
 
-            return labs;
-        },
-
-        roomLabsArePaused: (room) => {
-            "use strict";
-
-            return room.memory.labsInUse && _.filter(room.memory.labsInUse, (l) => l.pause).length > 0;
+            labs.push(labToUse);
         }
-    };
+
+        return labs;
+    }
+
+    static roomLabsArePaused(room) {
+        return room.memory.labsInUse && _.filter(room.memory.labsInUse, (l) => l.pause).length > 0;
+    }
+}
 
 if (Memory.profiling) {
     __require(2,11).registerObject(Utilities, "Utilities");

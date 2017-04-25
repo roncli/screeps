@@ -819,7 +819,7 @@ class Base {
         };
     }
 
-    static fromObj(room) {
+    static fromObj(roomMemory) {
         return new Base();
     }
 }

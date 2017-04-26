@@ -498,8 +498,7 @@ var profiler = require("screeps-profiler"),
                     }
 
                     Cache.minerals[roomName] = _.cloneDeep(minerals);
-                    delete roomMemory.use;
-                    
+
                     // Build the mineral data.
                     _.forEach(Cache.minerals[roomName], (mineral) => {
                         var fx = (node, innerFx) => {
@@ -513,7 +512,7 @@ var profiler = require("screeps-profiler"),
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);
                             });
-                            
+
                             if (!node.children || node.children.length === 0) {
                                 node.action = "buy";
                             } else {
@@ -539,7 +538,7 @@ var profiler = require("screeps-profiler"),
                                     node.action = "buy";
                                 }
                             }
-                            
+
                             // Set the buy queue if necessary.
                             if (node.amount > 0 && node.action === "buy" && !roomMemory.buyQueue && Cache.credits >= Memory.minimumCredits && Memory.buy) {
                                 roomMemory.buyQueue = {
@@ -553,7 +552,7 @@ var profiler = require("screeps-profiler"),
 
                         fx(mineral, fx);
                     });
-                    
+
                     // Set the lab queue if necessary.
                     if (labQueue && !roomMemory.labQueue) {
                         var fx = (node, innerFx) => {

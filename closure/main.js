@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: H:\dev\git\github\screeps\src\main.js **********/
+/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0);
 
@@ -518,7 +518,6 @@ var profiler = __require(2,0),
                     }
 
                     Cache.minerals[roomName] = _.cloneDeep(minerals);
-                    delete roomMemory.use;
                     _.forEach(Cache.minerals[roomName], (mineral) => {
                         var fx = (node, innerFx) => {
                             var buyPrice,
@@ -531,7 +530,7 @@ var profiler = __require(2,0),
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);
                             });
-                            
+
                             if (!node.children || node.children.length === 0) {
                                 node.action = "buy";
                             } else {
@@ -1344,8 +1343,8 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: H:\dev\git\github\screeps\src\main.js **********/
-/********** Start module 1: ..\src\screeps-perf.js **********/
+/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.filter = function(callback, thisArg) {
     var results = [];
@@ -1376,8 +1375,8 @@ Array.prototype.map = function(callback, thisArg) {
 
 return module.exports;
 }
-/********** End of module 1: ..\src\screeps-perf.js **********/
-/********** Start module 2: ..\src\screeps-profiler.js **********/
+/********** End of module 1: ../src/screeps-perf.js **********/
+/********** Start module 2: ../src/screeps-profiler.js **********/
 __modules[2] = function(module, exports) {
 let usedOnStart = 0;
 let enabled = false;
@@ -1662,8 +1661,8 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 2: ..\src\screeps-profiler.js **********/
-/********** Start module 3: ..\src\army.js **********/
+/********** End of module 2: ../src/screeps-profiler.js **********/
+/********** Start module 3: ../src/army.js **********/
 __modules[3] = function(module, exports) {
 var Cache = __require(4,3),
     Utilities = __require(11,3),
@@ -1674,135 +1673,135 @@ var Cache = __require(4,3),
     TaskHeal = __require(48,3),
     TaskMeleeAttack = __require(49,3),
     TaskRally = __require(52,3),
-    TaskRangedAttack = __require(53,3),
+    TaskRangedAttack = __require(53,3);
 
-    Army = {
-        run: (name) => {
-            var army = Memory.army[name],
-                allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
-                armyAttackRoom = Game.rooms[army.attackRoom],
-                armyDismantlers = army.dismantler,
-                armyHealers = army.healer,
-                armyMelees = army.melee,
-                armyRangeds = army.ranged,
-                boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
-            if (army.scheduled && army.scheduled > Game.time) {
-                return;
-            }
-            
-            if (armyAttackRoom) {
-                hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
-            }
-            
-            if (army.boostRoom) {
-                boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store
-            }
-            if (allCreepsInArmy.length === 0 && army.success) {
-                delete Memory.army[name];
-                return;
-            }
-            if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
-                Game.notify(`Army ${name} operation failed, restarting.`);
-                army.directive = "preparing";
-            }
-            if (army.safeMode && armyAttackRoom && armyAttackRoom.controller && armyAttackRoom.controller.safeMode) {
-                army.directive = "staging";
-                army.stageRoom = army.safeMode.stageRoom;
-                army.attackRoom = army.safeMode.attackRoom;
-                army.dismantle = army.safeMode.dismantle;
-                army.safeMode = army.safeMode.safeMode;
-            }
+class Army {
+    static run(name) {
+        var army = Memory.army[name],
+            allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
+            armyAttackRoom = Game.rooms[army.attackRoom],
+            armyDismantlers = army.dismantler,
+            armyHealers = army.healer,
+            armyMelees = army.melee,
+            armyRangeds = army.ranged,
+            boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
+        if (army.scheduled && army.scheduled > Game.time) {
+            return;
+        }
+        
+        if (armyAttackRoom) {
+            hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+        }
+        
+        if (army.boostRoom) {
+            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store
+        }
+        if (allCreepsInArmy.length === 0 && army.success) {
+            delete Memory.army[name];
+            return;
+        }
+        if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
+            Game.notify(`Army ${name} operation failed, restarting.`);
+            army.directive = "preparing";
+        }
+        if (army.safeMode && armyAttackRoom && armyAttackRoom.controller && armyAttackRoom.controller.safeMode) {
+            army.directive = "staging";
+            army.stageRoom = army.safeMode.stageRoom;
+            army.attackRoom = army.safeMode.attackRoom;
+            army.dismantle = army.safeMode.dismantle;
+            army.safeMode = army.safeMode.safeMode;
+        }
+        switch (army.directive) {
+            case "preparing":
+                if (!army.boostRoom) {
+                    army.directive = "building";
+                } else if (
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (armyDismantlers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps + armyHealers.maxCreeps) &&
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * armyDismantlers.units * armyDismantlers.maxCreeps &&
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * armyHealers.units * armyHealers.maxCreeps
+                ) {
+                    army.directive = "building";
+                }
+                break;
+            case "building":
+                if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === army.buildRoom).length >= armyDismantlers.maxCreeps + armyHealers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps) {
+                    army.directive = "staging";
+                }
+                break;
+            case "staging":
+                if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.stageRoom).length === 0) {
+                    army.directive = "dismantle";
+                }
+                break;
+            case "dismantle":
+                if (armyAttackRoom) {
+                    army.dismantle = _.filter(army.dismantle, (d) => Game.getObjectById(d));
+
+                    if (army.dismantle.length === 0) {
+                        army.directive = "attack";
+                    }
+                }
+                break;
+            case "attack":
+                if (armyAttackRoom) {
+                    if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
+                        army.success = true;
+                    }
+                }
+                break;
+        }
+        if (army.directive === "building" || army.reinforce) {
+            RoleArmyDismantler.checkSpawn(name, army.portals);
+            RoleArmyHealer.checkSpawn(name, army.portals);
+            RoleArmyMelee.checkSpawn(name, army.portals);
+            RoleArmyRanged.checkSpawn(name, army.portals);
+        }
+        if (armyDismantlers.escort || armyMelees.escort || armyRangeds.escort) {
+            _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
+                var escort = [].concat.apply([], [
+                    armyDismantlers.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                    armyMelees.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                    armyRangeds.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
+                ])[0];
+
+                if (escort) {
+                    healer.memory.escorting = escort.id;
+                    escort.memory.escortedBy = healer.id;
+                } else {
+                    return false;
+                }
+            });
+        }
+        tasks = {
+            melee: { tasks: [] },
+            ranged: { tasks: [] },
+            heal: {
+                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => (b.hitsMax - b.hits) - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
+            },
+            rally: { tasks: [] }
+        };
+
+        if (armyAttackRoom) {
             switch (army.directive) {
-                case "preparing":
-                    if (!army.boostRoom) {
-                        army.directive = "building";
-                    } else if (
-                        (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (armyDismantlers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps + armyHealers.maxCreeps) &&
-                        (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * armyDismantlers.units * armyDismantlers.maxCreeps &&
-                        (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * armyHealers.units * armyHealers.maxCreeps
-                    ) {
-                        army.directive = "building";
-                    }
-                    break;
-                case "building":
-                    if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === army.buildRoom).length >= armyDismantlers.maxCreeps + armyHealers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps) {
-                        army.directive = "staging";
-                    }
-                    break;
-                case "staging":
-                    if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.stageRoom).length === 0) {
-                        army.directive = "dismantle";
-                    }
-                    break;
                 case "dismantle":
-                    if (armyAttackRoom) {
-                        army.dismantle = _.filter(army.dismantle, (d) => Game.getObjectById(d));
-
-                        if (army.dismantle.length === 0) {
-                            army.directive = "attack";
-                        }
-                    }
+                    hostiles = _.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
+                    tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
+                    tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
                     break;
                 case "attack":
-                    if (armyAttackRoom) {
-                        if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
-                            army.success = true;
-                        }
-                    }
+                    hostiles = Cache.hostilesInRoom(armyAttackRoom);
+                    tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
+                    tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
+                    tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
                     break;
             }
-            if (army.directive === "building" || army.reinforce) {
-                RoleArmyDismantler.checkSpawn(name, army.portals);
-                RoleArmyHealer.checkSpawn(name, army.portals);
-                RoleArmyMelee.checkSpawn(name, army.portals);
-                RoleArmyRanged.checkSpawn(name, army.portals);
-            }
-            if (armyDismantlers.escort || armyMelees.escort || armyRangeds.escort) {
-                _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
-                    var escort = [].concat.apply([], [
-                        armyDismantlers.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                        armyMelees.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                        armyRangeds.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
-                    ])[0];
-
-                    if (escort) {
-                        healer.memory.escorting = escort.id;
-                        escort.memory.escortedBy = healer.id;
-                    } else {
-                        return false;
-                    }
-                });
-            }
-            tasks = {
-                melee: { tasks: [] },
-                ranged: { tasks: [] },
-                heal: {
-                    tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => (b.hitsMax - b.hits) - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
-                },
-                rally: { tasks: [] }
-            };
-
-            if (armyAttackRoom) {
-                switch (army.directive) {
-                    case "dismantle":
-                        hostiles = _.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
-                        tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
-                        tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
-                        break;
-                    case "attack":
-                        hostiles = Cache.hostilesInRoom(armyAttackRoom);
-                        tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
-                        tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
-                        tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
-                        break;
-                }
-            }
-            RoleArmyDismantler.assignTasks(name, army.directive, tasks);
-            RoleArmyHealer.assignTasks(name, army.directive, tasks);
-            RoleArmyMelee.assignTasks(name, army.directive, tasks);
-            RoleArmyRanged.assignTasks(name, army.directive, tasks);
         }
-    };
+        RoleArmyDismantler.assignTasks(name, army.directive, tasks);
+        RoleArmyHealer.assignTasks(name, army.directive, tasks);
+        RoleArmyMelee.assignTasks(name, army.directive, tasks);
+        RoleArmyRanged.assignTasks(name, army.directive, tasks);
+    }
+}
 
 if (Memory.profiling) {
     __require(2,3).registerObject(Army, "Army");
@@ -1811,8 +1810,8 @@ module.exports = Army;
 
 return module.exports;
 }
-/********** End of module 3: ..\src\army.js **********/
-/********** Start module 4: ..\src\cache.js **********/
+/********** End of module 3: ../src/army.js **********/
+/********** Start module 4: ../src/cache.js **********/
 __modules[4] = function(module, exports) {
 var spawnsInRoom = {},
     powerSpawnsInRoom = {},
@@ -2049,8 +2048,8 @@ module.exports = Cache;
 
 return module.exports;
 }
-/********** End of module 4: ..\src\cache.js **********/
-/********** Start module 5: ..\src\commands.js **********/
+/********** End of module 4: ../src/cache.js **********/
+/********** Start module 5: ../src/commands.js **********/
 __modules[5] = function(module, exports) {
 var Cache = __require(4,5),
 
@@ -2203,8 +2202,8 @@ module.exports = Commands;
 
 return module.exports;
 }
-/********** End of module 5: ..\src\commands.js **********/
-/********** Start module 6: ..\src\drawing.js **********/
+/********** End of module 5: ../src/commands.js **********/
+/********** Start module 6: ../src/drawing.js **********/
 __modules[6] = function(module, exports) {
 var Drawing = {
     progressBar: (visual, x, y, w, h, value, max, options) => {
@@ -2458,8 +2457,8 @@ module.exports = Drawing;
 
 return module.exports;
 }
-/********** End of module 6: ..\src\drawing.js **********/
-/********** Start module 7: ..\src\market.js **********/
+/********** End of module 6: ../src/drawing.js **********/
+/********** Start module 7: ../src/market.js **********/
 __modules[7] = function(module, exports) {
 var Cache = __require(4,7),
     Utilities = __require(11,7),
@@ -2531,8 +2530,8 @@ module.exports = Market;
 
 return module.exports;
 }
-/********** End of module 7: ..\src\market.js **********/
-/********** Start module 8: ..\src\minerals.js **********/
+/********** End of module 7: ../src/market.js **********/
+/********** Start module 8: ../src/minerals.js **********/
 __modules[8] = function(module, exports) {
 var Minerals = {};
 
@@ -2582,8 +2581,8 @@ module.exports = Minerals;
 
 return module.exports;
 }
-/********** End of module 8: ..\src\minerals.js **********/
-/********** Start module 9: ..\src\proxy.js **********/
+/********** End of module 8: ../src/minerals.js **********/
+/********** Start module 9: ../src/proxy.js **********/
 __modules[9] = function(module, exports) {
 /**
  * A way to proxy calls so the profiler picks them up.
@@ -2605,8 +2604,8 @@ module.exports = Proxy;
 
 return module.exports;
 }
-/********** End of module 9: ..\src\proxy.js **********/
-/********** Start module 10: ..\src\segment.js **********/
+/********** End of module 9: ../src/proxy.js **********/
+/********** Start module 10: ../src/segment.js **********/
 __modules[10] = function(module, exports) {
 var memory = [];
 
@@ -2647,8 +2646,8 @@ module.exports = Segment;
 
 return module.exports;
 }
-/********** End of module 10: ..\src\segment.js **********/
-/********** Start module 11: ..\src\utilities.js **********/
+/********** End of module 10: ../src/segment.js **********/
+/********** Start module 11: ../src/utilities.js **********/
 __modules[11] = function(module, exports) {
 var Cache = __require(4,11);
 
@@ -2900,8 +2899,8 @@ module.exports = Utilities;
 
 return module.exports;
 }
-/********** End of module 11: ..\src\utilities.js **********/
-/********** Start module 12: ..\src\role.armyDismantler.js **********/
+/********** End of module 11: ../src/utilities.js **********/
+/********** Start module 12: ../src/role.armyDismantler.js **********/
 __modules[12] = function(module, exports) {
 var Cache = __require(4,12),
     Utilities = __require(11,12),
@@ -3173,8 +3172,8 @@ module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 12: ..\src\role.armyDismantler.js **********/
-/********** Start module 13: ..\src\role.armyHealer.js **********/
+/********** End of module 12: ../src/role.armyDismantler.js **********/
+/********** Start module 13: ../src/role.armyHealer.js **********/
 __modules[13] = function(module, exports) {
 var Cache = __require(4,13),
     Utilities = __require(11,13),
@@ -3458,8 +3457,8 @@ module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 13: ..\src\role.armyHealer.js **********/
-/********** Start module 14: ..\src\role.armyMelee.js **********/
+/********** End of module 13: ../src/role.armyHealer.js **********/
+/********** Start module 14: ../src/role.armyMelee.js **********/
 __modules[14] = function(module, exports) {
 var Cache = __require(4,14),
     Utilities = __require(11,14),
@@ -3747,8 +3746,8 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 14: ..\src\role.armyMelee.js **********/
-/********** Start module 15: ..\src\role.armyRanged.js **********/
+/********** End of module 14: ../src/role.armyMelee.js **********/
+/********** Start module 15: ../src/role.armyRanged.js **********/
 __modules[15] = function(module, exports) {
 var Cache = __require(4,15),
     Utilities = __require(11,15),
@@ -4035,8 +4034,8 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 15: ..\src\role.armyRanged.js **********/
-/********** Start module 16: ..\src\role.claimer.js **********/
+/********** End of module 15: ../src/role.armyRanged.js **********/
+/********** Start module 16: ../src/role.claimer.js **********/
 __modules[16] = function(module, exports) {
 var Cache = __require(4,16),
     Commands = __require(5,16),
@@ -4146,8 +4145,8 @@ module.exports = Claimer;
 
 return module.exports;
 }
-/********** End of module 16: ..\src\role.claimer.js **********/
-/********** Start module 17: ..\src\role.collector.js **********/
+/********** End of module 16: ../src/role.claimer.js **********/
+/********** Start module 17: ../src/role.collector.js **********/
 __modules[17] = function(module, exports) {
 var Cache = __require(4,17),
     Utilities = __require(11,17),
@@ -4474,8 +4473,8 @@ module.exports = Collector;
 
 return module.exports;
 }
-/********** End of module 17: ..\src\role.collector.js **********/
-/********** Start module 18: ..\src\role.converter.js **********/
+/********** End of module 17: ../src/role.collector.js **********/
+/********** Start module 18: ../src/role.converter.js **********/
 __modules[18] = function(module, exports) {
 var Cache = __require(4,18),
     Commands = __require(5,18),
@@ -4597,8 +4596,8 @@ module.exports = Converter;
 
 return module.exports;
 }
-/********** End of module 18: ..\src\role.converter.js **********/
-/********** Start module 19: ..\src\role.defender.js **********/
+/********** End of module 18: ../src/role.converter.js **********/
+/********** Start module 19: ../src/role.defender.js **********/
 __modules[19] = function(module, exports) {
 var Cache = __require(4,19),
     Utilities = __require(11,19),
@@ -4709,8 +4708,8 @@ module.exports = Defender;
 
 return module.exports;
 }
-/********** End of module 19: ..\src\role.defender.js **********/
-/********** Start module 20: ..\src\role.dismantler.js **********/
+/********** End of module 19: ../src/role.defender.js **********/
+/********** Start module 20: ../src/role.dismantler.js **********/
 __modules[20] = function(module, exports) {
 var Cache = __require(4,20),
     Utilities = __require(11,20),
@@ -4942,8 +4941,8 @@ module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 20: ..\src\role.dismantler.js **********/
-/********** Start module 21: ..\src\role.healer.js **********/
+/********** End of module 20: ../src/role.dismantler.js **********/
+/********** Start module 21: ../src/role.healer.js **********/
 __modules[21] = function(module, exports) {
 var Cache = __require(4,21),
     Utilities = __require(11,21),
@@ -5056,8 +5055,8 @@ module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 21: ..\src\role.healer.js **********/
-/********** Start module 22: ..\src\role.miner.js **********/
+/********** End of module 21: ../src/role.healer.js **********/
+/********** Start module 22: ../src/role.miner.js **********/
 __modules[22] = function(module, exports) {
 var Cache = __require(4,22),
     Utilities = __require(11,22),
@@ -5194,8 +5193,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 22: ..\src\role.miner.js **********/
-/********** Start module 23: ..\src\role.remoteBuilder.js **********/
+/********** End of module 22: ../src/role.miner.js **********/
+/********** Start module 23: ../src/role.remoteBuilder.js **********/
 __modules[23] = function(module, exports) {
 var Cache = __require(4,23),
     Utilities = __require(11,23),
@@ -5397,8 +5396,8 @@ module.exports = Builder;
 
 return module.exports;
 }
-/********** End of module 23: ..\src\role.remoteBuilder.js **********/
-/********** Start module 24: ..\src\role.remoteCollector.js **********/
+/********** End of module 23: ../src/role.remoteBuilder.js **********/
+/********** Start module 24: ../src/role.remoteCollector.js **********/
 __modules[24] = function(module, exports) {
 var Cache = __require(4,24),
     Utilities = __require(11,24),
@@ -5625,8 +5624,8 @@ module.exports = RemoteCollector;
 
 return module.exports;
 }
-/********** End of module 24: ..\src\role.remoteCollector.js **********/
-/********** Start module 25: ..\src\role.remoteDismantler.js **********/
+/********** End of module 24: ../src/role.remoteCollector.js **********/
+/********** Start module 25: ../src/role.remoteDismantler.js **********/
 __modules[25] = function(module, exports) {
 var Cache = __require(4,25),
     Utilities = __require(11,25),
@@ -5749,8 +5748,8 @@ module.exports = RemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 25: ..\src\role.remoteDismantler.js **********/
-/********** Start module 26: ..\src\role.remoteMiner.js **********/
+/********** End of module 25: ../src/role.remoteDismantler.js **********/
+/********** Start module 26: ../src/role.remoteMiner.js **********/
 __modules[26] = function(module, exports) {
 var Cache = __require(4,26),
     Utilities = __require(11,26),
@@ -5900,8 +5899,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 26: ..\src\role.remoteMiner.js **********/
-/********** Start module 27: ..\src\role.remoteReserver.js **********/
+/********** End of module 26: ../src/role.remoteMiner.js **********/
+/********** Start module 27: ../src/role.remoteReserver.js **********/
 __modules[27] = function(module, exports) {
 var Cache = __require(4,27),
     Commands = __require(5,27),
@@ -6043,8 +6042,8 @@ module.exports = Reserver;
 
 return module.exports;
 }
-/********** End of module 27: ..\src\role.remoteReserver.js **********/
-/********** Start module 28: ..\src\role.remoteStorer.js **********/
+/********** End of module 27: ../src/role.remoteReserver.js **********/
+/********** Start module 28: ../src/role.remoteStorer.js **********/
 __modules[28] = function(module, exports) {
 var Cache = __require(4,28),
     Utilities = __require(11,28),
@@ -6293,8 +6292,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 28: ..\src\role.remoteStorer.js **********/
-/********** Start module 29: ..\src\role.remoteWorker.js **********/
+/********** End of module 28: ../src/role.remoteStorer.js **********/
+/********** Start module 29: ../src/role.remoteWorker.js **********/
 __modules[29] = function(module, exports) {
 var Cache = __require(4,29),
     Utilities = __require(11,29),
@@ -6600,8 +6599,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 29: ..\src\role.remoteWorker.js **********/
-/********** Start module 30: ..\src\role.scientist.js **********/
+/********** End of module 29: ../src/role.remoteWorker.js **********/
+/********** Start module 30: ../src/role.scientist.js **********/
 __modules[30] = function(module, exports) {
 var Cache = __require(4,30),
     Utilities = __require(11,30),
@@ -7024,8 +7023,8 @@ module.exports = Scientist;
 
 return module.exports;
 }
-/********** End of module 30: ..\src\role.scientist.js **********/
-/********** Start module 31: ..\src\role.storer.js **********/
+/********** End of module 30: ../src/role.scientist.js **********/
+/********** Start module 31: ../src/role.storer.js **********/
 __modules[31] = function(module, exports) {
 var Cache = __require(4,31),
     Utilities = __require(11,31),
@@ -7330,8 +7329,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 31: ..\src\role.storer.js **********/
-/********** Start module 32: ..\src\role.tower.js **********/
+/********** End of module 31: ../src/role.storer.js **********/
+/********** Start module 32: ../src/role.tower.js **********/
 __modules[32] = function(module, exports) {
 var Cache = __require(4,32),
     Tower = {
@@ -7365,8 +7364,8 @@ module.exports = Tower;
 
 return module.exports;
 }
-/********** End of module 32: ..\src\role.tower.js **********/
-/********** Start module 33: ..\src\role.upgrader.js **********/
+/********** End of module 32: ../src/role.tower.js **********/
+/********** Start module 33: ../src/role.upgrader.js **********/
 __modules[33] = function(module, exports) {
 var Cache = __require(4,33),
     Utilities = __require(11,33),
@@ -7644,8 +7643,8 @@ module.exports = Upgrader;
 
 return module.exports;
 }
-/********** End of module 33: ..\src\role.upgrader.js **********/
-/********** Start module 34: ..\src\role.worker.js **********/
+/********** End of module 33: ../src/role.upgrader.js **********/
+/********** Start module 34: ../src/role.worker.js **********/
 __modules[34] = function(module, exports) {
 var Cache = __require(4,34),
     Utilities = __require(11,34),
@@ -8081,8 +8080,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 34: ..\src\role.worker.js **********/
-/********** Start module 35: ..\src\room.base.js **********/
+/********** End of module 34: ../src/role.worker.js **********/
+/********** Start module 35: ../src/room.base.js **********/
 __modules[35] = function(module, exports) {
 var Cache = __require(4,35),
     Commands = __require(5,35),
@@ -8843,8 +8842,8 @@ module.exports = Base;
 
 return module.exports;
 }
-/********** End of module 35: ..\src\room.base.js **********/
-/********** Start module 36: ..\src\room.cleanup.js **********/
+/********** End of module 35: ../src/room.base.js **********/
+/********** Start module 36: ../src/room.cleanup.js **********/
 __modules[36] = function(module, exports) {
 var Cache = __require(4,36),
     Commands = __require(5,36),
@@ -8962,8 +8961,8 @@ module.exports = Cleanup;
 
 return module.exports;
 }
-/********** End of module 36: ..\src\room.cleanup.js **********/
-/********** Start module 37: ..\src\room.mine.js **********/
+/********** End of module 36: ../src/room.cleanup.js **********/
+/********** Start module 37: ../src/room.mine.js **********/
 __modules[37] = function(module, exports) {
 var Cache = __require(4,37),
     Commands = __require(5,37),
@@ -9276,8 +9275,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 37: ..\src\room.mine.js **********/
-/********** Start module 38: ..\src\room.source.js **********/
+/********** End of module 37: ../src/room.mine.js **********/
+/********** Start module 38: ../src/room.source.js **********/
 __modules[38] = function(module, exports) {
 var Cache = __require(4,38),
     Commands = __require(5,38),
@@ -9567,8 +9566,8 @@ module.exports = Source;
 
 return module.exports;
 }
-/********** End of module 38: ..\src\room.source.js **********/
-/********** Start module 39: ..\src\task.attack.js **********/
+/********** End of module 38: ../src/room.source.js **********/
+/********** Start module 39: ../src/task.attack.js **********/
 __modules[39] = function(module, exports) {
 var Cache = __require(4,39),
     Pathing = __require(57,39);
@@ -9627,8 +9626,8 @@ module.exports = Attack;
 
 return module.exports;
 }
-/********** End of module 39: ..\src\task.attack.js **********/
-/********** Start module 40: ..\src\task.build.js **********/
+/********** End of module 39: ../src/task.attack.js **********/
+/********** Start module 40: ../src/task.build.js **********/
 __modules[40] = function(module, exports) {
 var Cache = __require(4,40),
     Pathing = __require(57,40);
@@ -9697,8 +9696,8 @@ module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 40: ..\src\task.build.js **********/
-/********** Start module 41: ..\src\task.claim.js **********/
+/********** End of module 40: ../src/task.build.js **********/
+/********** Start module 41: ../src/task.claim.js **********/
 __modules[41] = function(module, exports) {
 var Cache = __require(4,41),
     Pathing = __require(57,41);
@@ -9757,8 +9756,8 @@ module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 41: ..\src\task.claim.js **********/
-/********** Start module 42: ..\src\task.collectEnergy.js **********/
+/********** End of module 41: ../src/task.claim.js **********/
+/********** Start module 42: ../src/task.collectEnergy.js **********/
 __modules[42] = function(module, exports) {
 var Cache = __require(4,42),
     Pathing = __require(57,42);
@@ -9868,8 +9867,8 @@ module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 42: ..\src\task.collectEnergy.js **********/
-/********** Start module 43: ..\src\task.collectMinerals.js **********/
+/********** End of module 42: ../src/task.collectEnergy.js **********/
+/********** Start module 43: ../src/task.collectMinerals.js **********/
 __modules[43] = function(module, exports) {
 var Cache = __require(4,43),
     Pathing = __require(57,43),
@@ -10115,8 +10114,8 @@ module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 43: ..\src\task.collectMinerals.js **********/
-/********** Start module 44: ..\src\task.dismantle.js **********/
+/********** End of module 43: ../src/task.collectMinerals.js **********/
+/********** Start module 44: ../src/task.dismantle.js **********/
 __modules[44] = function(module, exports) {
 var Cache = __require(4,44),
     Pathing = __require(57,44);
@@ -10185,8 +10184,8 @@ module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 44: ..\src\task.dismantle.js **********/
-/********** Start module 45: ..\src\task.fillEnergy.js **********/
+/********** End of module 44: ../src/task.dismantle.js **********/
+/********** Start module 45: ../src/task.fillEnergy.js **********/
 __modules[45] = function(module, exports) {
 var Cache = __require(4,45),
     Pathing = __require(57,45),
@@ -10337,8 +10336,8 @@ module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 45: ..\src\task.fillEnergy.js **********/
-/********** Start module 46: ..\src\task.fillMinerals.js **********/
+/********** End of module 45: ../src/task.fillEnergy.js **********/
+/********** Start module 46: ../src/task.fillMinerals.js **********/
 __modules[46] = function(module, exports) {
 var Cache = __require(4,46),
     Pathing = __require(57,46),
@@ -10542,8 +10541,8 @@ module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 46: ..\src\task.fillMinerals.js **********/
-/********** Start module 47: ..\src\task.harvest.js **********/
+/********** End of module 46: ../src/task.fillMinerals.js **********/
+/********** Start module 47: ../src/task.harvest.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(4,47),
     Pathing = __require(57,47);
@@ -10620,8 +10619,8 @@ module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 47: ..\src\task.harvest.js **********/
-/********** Start module 48: ..\src\task.heal.js **********/
+/********** End of module 47: ../src/task.harvest.js **********/
+/********** Start module 48: ../src/task.heal.js **********/
 __modules[48] = function(module, exports) {
 var Cache = __require(4,48),
     Pathing = __require(57,48);
@@ -10699,8 +10698,8 @@ module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 48: ..\src\task.heal.js **********/
-/********** Start module 49: ..\src\task.meleeAttack.js **********/
+/********** End of module 48: ../src/task.heal.js **********/
+/********** Start module 49: ../src/task.meleeAttack.js **********/
 __modules[49] = function(module, exports) {
 var Cache = __require(4,49),
     Pathing = __require(57,49);
@@ -10775,8 +10774,8 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 49: ..\src\task.meleeAttack.js **********/
-/********** Start module 50: ..\src\task.mine.js **********/
+/********** End of module 49: ../src/task.meleeAttack.js **********/
+/********** Start module 50: ../src/task.mine.js **********/
 __modules[50] = function(module, exports) {
 var Cache = __require(4,50),
     Pathing = __require(57,50),
@@ -10867,8 +10866,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 50: ..\src\task.mine.js **********/
-/********** Start module 51: ..\src\task.pickupResource.js **********/
+/********** End of module 50: ../src/task.mine.js **********/
+/********** Start module 51: ../src/task.pickupResource.js **********/
 __modules[51] = function(module, exports) {
 var Cache = __require(4,51),
     TaskCollectEnergy = __require(42,51),
@@ -10943,8 +10942,8 @@ module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 51: ..\src\task.pickupResource.js **********/
-/********** Start module 52: ..\src\task.rally.js **********/
+/********** End of module 51: ../src/task.pickupResource.js **********/
+/********** Start module 52: ../src/task.rally.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(4,52),
     Pathing = __require(57,52);
@@ -11061,8 +11060,8 @@ module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 52: ..\src\task.rally.js **********/
-/********** Start module 53: ..\src\task.rangedAttack.js **********/
+/********** End of module 52: ../src/task.rally.js **********/
+/********** Start module 53: ../src/task.rangedAttack.js **********/
 __modules[53] = function(module, exports) {
 var Cache = __require(4,53),
     Pathing = __require(57,53);
@@ -11146,8 +11145,8 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 53: ..\src\task.rangedAttack.js **********/
-/********** Start module 54: ..\src\task.repair.js **********/
+/********** End of module 53: ../src/task.rangedAttack.js **********/
+/********** Start module 54: ../src/task.repair.js **********/
 __modules[54] = function(module, exports) {
 var Cache = __require(4,54),
     Pathing = __require(57,54);
@@ -11227,8 +11226,8 @@ module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 54: ..\src\task.repair.js **********/
-/********** Start module 55: ..\src\task.reserve.js **********/
+/********** End of module 54: ../src/task.repair.js **********/
+/********** Start module 55: ../src/task.reserve.js **********/
 __modules[55] = function(module, exports) {
 var Cache = __require(4,55),
     Pathing = __require(57,55);
@@ -11298,8 +11297,8 @@ module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 55: ..\src\task.reserve.js **********/
-/********** Start module 56: ..\src\task.upgradeController.js **********/
+/********** End of module 55: ../src/task.reserve.js **********/
+/********** Start module 56: ../src/task.upgradeController.js **********/
 __modules[56] = function(module, exports) {
 var Cache = __require(4,56),
     Pathing = __require(57,56),
@@ -11412,8 +11411,8 @@ module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 56: ..\src\task.upgradeController.js **********/
-/********** Start module 57: ..\src\pathing.js **********/
+/********** End of module 56: ../src/task.upgradeController.js **********/
+/********** Start module 57: ../src/pathing.js **********/
 __modules[57] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
@@ -11686,7 +11685,7 @@ module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 57: ..\src\pathing.js **********/
+/********** End of module 57: ../src/pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

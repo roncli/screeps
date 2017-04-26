@@ -1089,7 +1089,7 @@ var profiler = require("screeps-profiler"),
                 });
             }
 
-            if (room.storage) {
+            if (room.terminal) {
                 y += 1.4;
                 visual.text("Terminal", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
                 _.forEach(room.terminal.store, (amount, resource) => {

@@ -214,7 +214,7 @@ class CollectMinerals {
                 });
             }
     
-            if (room.controller.level >= 8) {
+            if (Cache.nukersInRoom(room).length > 0 && room.controller.level >= 8) {
                 // If we have a nuker, transfer ghodium.
                 _.forEach(Cache.nukersInRoom(room), (nuker) => {
                     if (nuker.ghodium < nuker.ghodiumCapacity) {

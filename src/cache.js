@@ -17,7 +17,7 @@ var spawnsInRoom = {},
     costMatricies = {};
 
 class Cache {
-    reset() {
+    static reset() {
         spawnsInRoom = {};
         powerSpawnsInRoom = {};
         extensionsInRoom = {};
@@ -57,55 +57,55 @@ class Cache {
         }
     }
 
-    spawnsInRoom(room) {
+    static spawnsInRoom(room) {
         return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
     }
 
-    powerSpawnsInRoom(room) {
+    static powerSpawnsInRoom(room) {
         return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
     }
 
-    extensionsInRoom(room) {
+    static extensionsInRoom(room) {
         return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
     }
 
-    towersInRoom(room) {
+    static towersInRoom(room) {
         return towersInRoom[room.name] ? towersInRoom[room.name] : towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
     }
 
-    labsInRoom(room) {
+    static labsInRoom(room) {
         return labsInRoom[room.name] ? labsInRoom[room.name] : labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
     }
 
-    nukersInRoom(room) {
+    static nukersInRoom(room) {
         return nukersInRoom[room.name] ? nukersInRoom[room.name] : nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
     }
 
-    containersInRoom(room) {
+    static containersInRoom(room) {
         return containersInRoom[room.name] ? containersInRoom[room.name] : containersInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
     }
 
-    linksInRoom(room) {
+    static linksInRoom(room) {
         return linksInRoom[room.name] ? linksInRoom[room.name] : linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
     }
 
-    repairableStructuresInRoom(room) {
+    static repairableStructuresInRoom(room) {
         return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
     }
 
-    sortedRepairableStructuresInRoom(room) {
+    static sortedRepairableStructuresInRoom(room) {
         return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : sortedRepairableStructuresInRoom[room.name] = this.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
     }
 
-    extractorsInRoom(room) {
+    static extractorsInRoom(room) {
         return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
     }
 
-    portalsInRoom(room) {
+    static portalsInRoom(room) {
         return portalsInRoom[room.name] ? portalsInRoom[room.name] : portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
     }
 
-    hostilesInRoom(room) {
+    static hostilesInRoom(room) {
         var roomName = room.name,
             hostiles;
 
@@ -130,19 +130,19 @@ class Cache {
         return hostiles;
     }
 
-    sourceKeepersInRoom(room) {
+    static sourceKeepersInRoom(room) {
         return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
     }
 
-    powerBanksInRoom(room) {
+    static powerBanksInRoom(room) {
         return powerBanksInRoom[room.name] ? powerBanksInRoom[room.name] : powerBanksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
     }
     
-    resourcesInRoom(room) {
+    static resourcesInRoom(room) {
         return resourcesInRoom[room.name] ? resourcesInRoom[room.name] : resourcesInRoom[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount);
     }
 
-    getCostMatrix(room) {
+    static getCostMatrix(room) {
         var roomName = room.name;
 
         if (!room || room.unobservable) {

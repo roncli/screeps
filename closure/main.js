@@ -998,7 +998,7 @@ var profiler = __require(2,0),
             }
 
             if (room.controller && room.controller.level) {
-                visual.text("RCL " + room.controller.level, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
+                visual.text(`RCL ${room.controller.level}`, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
                 if (room.controller.progress && room.controller.progressTotal) {
                     Drawing.progressBar(visual, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 }
@@ -1138,7 +1138,7 @@ var profiler = __require(2,0),
                             creep.say(":(", true);
                             break;
                         default:
-                            creep.say("TTL " + (creep.ticksToLive - 1).toString());
+                            creep.say(`TTL ${creep.ticksToLive - 1}`);
                             break;
                     }
                 }
@@ -1293,13 +1293,13 @@ var profiler = __require(2,0),
             var y;
 
             if (Memory.visualizations) {
-                Cache.globalVisual.text("GCL " + Game.gcl.level, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text(`GCL ${Game.gcl.level}`, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
                 Drawing.progressBar(Cache.globalVisual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 Drawing.progressBar(Cache.globalVisual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
-                Cache.globalVisual.text("Tick " + Game.time, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
+                Cache.globalVisual.text(`Tick ${Game.time}`, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
                 Cache.globalVisual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
-                Cache.globalVisual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
-                Cache.globalVisual.text("Creeps " + _.keys(Game.creeps).length, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text(`Credits ${Game.market.credits.toFixed(2)}`, -0.5, 0.725, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text(`Creeps ${_.keys(Game.creeps).length}`, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
                 y = 0.725;
                 _.forEach(_.filter(Game.rooms, (r) => !r.unobservable && r.memory.roomType && r.memory.roomType.type === "base"), (room) => {
                     y += 0.7;
@@ -2552,14 +2552,13 @@ __modules[9] = function(module, exports) {
  * A way to proxy calls so the profiler picks them up.
  */
 
-var Profiler = __require(2,9),
-    Proxy = {
-        run: (name, fx) => {
-            "use strict";
+var Profiler = __require(2,9);
 
-            Profiler.registerFN(fx, "Proxy." + name)();
-        }
-    };
+class Proxy {
+    static run(name, fx) {
+        Profiler.registerFN(fx, `Proxy.${name}`)();
+    }
+}
 
 if (Memory.profiling) {
     Profiler.registerObject(Proxy, "Proxy");

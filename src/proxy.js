@@ -2,14 +2,13 @@
  * A way to proxy calls so the profiler picks them up.
  */
 
-var Profiler = require("screeps-profiler"),
-    Proxy = {
-        run: (name, fx) => {
-            "use strict";
+var Profiler = require("screeps-profiler");
 
-            Profiler.registerFN(fx, "Proxy." + name)();
-        }
-    };
+class Proxy {
+    static run(name, fx) {
+        Profiler.registerFN(fx, `Proxy.${name}`)();
+    }
+}
 
 if (Memory.profiling) {
     Profiler.registerObject(Proxy, "Proxy");

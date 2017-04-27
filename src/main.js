@@ -322,7 +322,7 @@ var profiler = require("screeps-profiler"),
             if (!Memory.allies) {
                 Memory.allies = [];
             }
-            
+
             // Clear old memory every 10 ticks.
             if (Game.time % 10 === 0) {
                 _.forEach(Memory.creeps, (creep, name) => {
@@ -1006,7 +1006,7 @@ var profiler = require("screeps-profiler"),
             }
 
             if (room.controller && room.controller.level) {
-                visual.text("RCL " + room.controller.level, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
+                visual.text(`RCL ${room.controller.level}`, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
                 if (room.controller.progress && room.controller.progressTotal) {
                     Drawing.progressBar(visual, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 }
@@ -1154,7 +1154,7 @@ var profiler = require("screeps-profiler"),
                             creep.say(":(", true);
                             break;
                         default:
-                            creep.say("TTL " + (creep.ticksToLive - 1).toString());
+                            creep.say(`TTL ${creep.ticksToLive - 1}`);
                             break;
                     }
                 }
@@ -1329,21 +1329,21 @@ var profiler = require("screeps-profiler"),
 
             if (Memory.visualizations) {
                 // GCL & Progress
-                Cache.globalVisual.text("GCL " + Game.gcl.level, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text(`GCL ${Game.gcl.level}`, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
                 Drawing.progressBar(Cache.globalVisual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
                 
                 // Bucket
                 Drawing.progressBar(Cache.globalVisual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
 
                 // Time
-                Cache.globalVisual.text("Tick " + Game.time, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
+                Cache.globalVisual.text(`Tick ${Game.time}`, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
                 Cache.globalVisual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
 
                 // Credits
-                Cache.globalVisual.text("Credits " + Game.market.credits.toFixed(2), -0.5, 0.725, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text(`Credits ${Game.market.credits.toFixed(2)}`, -0.5, 0.725, {align: "left", font: "0.5 Arial"});
 
                 // Creeps
-                Cache.globalVisual.text("Creeps " + _.keys(Game.creeps).length, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
+                Cache.globalVisual.text(`Creeps ${_.keys(Game.creeps).length}`, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
             
                 // Energy
                 y = 0.725;

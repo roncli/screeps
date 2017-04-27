@@ -319,6 +319,10 @@ var profiler = require("screeps-profiler"),
                 Memory.flipPrice = {};
             }
             
+            if (!Memory.allies) {
+                Memory.allies = [];
+            }
+            
             // Clear old memory every 10 ticks.
             if (Game.time % 10 === 0) {
                 _.forEach(Memory.creeps, (creep, name) => {

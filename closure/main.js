@@ -358,6 +358,10 @@ var profiler = __require(2,0),
             if (!Memory.flipPrice) {
                 Memory.flipPrice = {};
             }
+            
+            if (!Memory.allies) {
+                Memory.allies = [];
+            }
             if (Game.time % 10 === 0) {
                 _.forEach(Memory.creeps, (creep, name) => {
                     if (!Game.creeps[name]) {
@@ -2013,149 +2017,147 @@ return module.exports;
 /********** End of module 4: ../src/cache.js **********/
 /********** Start module 5: ../src/commands.js **********/
 __modules[5] = function(module, exports) {
-var Cache = __require(4,5),
+var Cache = __require(4,5);
 
-    Commands = {
-        setRoomType: (name, options) => {
-            "use strict";
-
-            if (options === undefined) {
-                delete Memory.rooms[name].roomType;
-            } else {
-                if (!Memory.rooms[name]) {
-                    Memory.rooms[name] = {};
-                }
-                Memory.rooms[name].roomType = options;
+class Commands {
+    static setRoomType(name, options) {
+        if (options === undefined) {
+            delete Memory.rooms[name].roomType;
+        } else {
+            if (!Memory.rooms[name]) {
+                Memory.rooms[name] = {};
             }
-        },
-        claimRoom: (fromRoom, toRoom, claim) => {
-            "use strict";
-
-            if (!Memory.maxCreeps.claimer) {
-                Memory.maxCreeps.claimer = {};
-            }
-
-            if (!Memory.maxCreeps.claimer[fromRoom]) {
-                Memory.maxCreeps.claimer[fromRoom] = {};
-            }
-            
-            if (claim) {
-                Memory.maxCreeps.claimer[fromRoom][toRoom] = true;
-            } else {
-                delete Memory.maxCreeps.claimer[fromRoom][toRoom];
-            }
-        },
-        attackRoom: (fromRoom, toRoom, attack) => {
-            "use strict";
-
-            if (!Memory.maxCreeps.converter) {
-                Memory.maxCreeps.converter = {};
-            }
-
-            if (!Memory.maxCreeps.converter[fromRoom]) {
-                Memory.maxCreeps.converter[fromRoom] = {};
-            }
-            
-            if (attack) {
-                Memory.maxCreeps.converter[fromRoom][toRoom] = true;
-            } else {
-                delete Memory.maxCreeps.converter[fromRoom][toRoom];
-            }
-        },
-        claimMine: (room) => {
-            if (Game.rooms[room] && Cache.creeps[room]) {
-                _.forEach(Cache.creeps[room].remoteReserver, (creep) => {
-                    creep.claimController(Game.rooms[room].controller);
-                });
-            }
-        },
-        dismantle: (x, y, room) => {
-            "use strict";
-
-            if (!Memory.dismantle) {
-                Memory.dismantle = {};
-            }
-
-            if (!Memory.dismantle[room]) {
-                Memory.dismantle[room] = [];
-            }
-
-            Memory.dismantle[room].push({x: x, y: y});
-        },
-        stopCreep: (name) => {
-            if (Game.creeps[name]) {
-                Game.creeps[name].memory.stop = true;
-            }
-        },
-        startCreep: (name) => {
-            if (Game.creeps[name]) {
-                delete Game.creeps[name].memory.stop;
-            }
-        },
-        startAllCreeps: () => {
-            _.forEach(Game.creeps, (creep) => {
-                delete creep.memory.stop;
-            });
-        },
-        setContainerSource: (containerId, sourceId) => {
-            Memory.containerSource[containerId] = sourceId;
-        },
-        addAlly: (name) => {
-            if (!Memory.allies) {
-                Memory.allies = [];
-            }
-
-            Memory.allies.push(name);
-        },
-        removeAlly: (name) => {
-            _.pull(Memory.allies, name);
-        },
-        createArmy: (army, options) => {
-            if (options === undefined) {
-                delete Memory.army[army];
-            } else {
-                Memory.army[army] = options;
-                Memory.army[army].directive = "preparing";
-            }
-        },
-        avoidRoom: (room, avoid) => {
-            if (avoid && Memory.avoidRooms.indexOf(room) === -1) {
-                Memory.avoidRooms.push(room);
-            }
-            if (!avoid) {
-                _.remove(Memory.avoidRooms, (r) => r === room);
-            }
-        },
-        avoidSquare: (x, y, room, avoid) => {
-            if (avoid) {
-                if (!Memory.avoidSquares[room]) {
-                    Memory.avoidSquares[room] = [];
-                }
-                Memory.avoidSquares[room].push({x: x, y: y});
-            }
-            if (!avoid) {
-                if (Memory.avoidSquares[room]) {
-                    _.remove(Memory.avoidSquares[room], (s) => s.x === x && s.y === y);
-                }
-            }
-        },
-        addSign: (room, text) => {
-            if (!Memory.signs) {
-                Memory.signs = {};
-            }
-            if (text) {
-                Memory.signs[room] = text;
-            } else {
-                delete Memory.signs[room];
-            }
-        },
-        resetMatrix: (room) => {
-            Memory.baseMatrixes[room] = {};
-        },
-        recover: () => {
-            _.forEach(Game.spawns, (spawn) => {spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], "storer-emerg-" + spawn.room.name, {role: "storer", home: spawn.room.name})});            
+            Memory.rooms[name].roomType = options;
         }
-    };
+    }
+
+    static claimRoom(fromRoom, toRoom, claim) {
+        if (!Memory.maxCreeps.claimer) {
+            Memory.maxCreeps.claimer = {};
+        }
+
+        if (!Memory.maxCreeps.claimer[fromRoom]) {
+            Memory.maxCreeps.claimer[fromRoom] = {};
+        }
+        
+        if (claim) {
+            Memory.maxCreeps.claimer[fromRoom][toRoom] = true;
+        } else {
+            delete Memory.maxCreeps.claimer[fromRoom][toRoom];
+        }
+    }
+
+    static attackRoom(fromRoom, toRoom, attack) {
+        if (!Memory.maxCreeps.converter) {
+            Memory.maxCreeps.converter = {};
+        }
+
+        if (!Memory.maxCreeps.converter[fromRoom]) {
+            Memory.maxCreeps.converter[fromRoom] = {};
+        }
+        
+        if (attack) {
+            Memory.maxCreeps.converter[fromRoom][toRoom] = true;
+        } else {
+            delete Memory.maxCreeps.converter[fromRoom][toRoom];
+        }
+    }
+    static claimMine(room) {
+        if (Game.rooms[room] && Cache.creeps[room]) {
+            _.forEach(Cache.creeps[room].remoteReserver, (creep) => {
+                creep.claimController(Game.rooms[room].controller);
+            });
+        }
+    }
+
+    static dismantle(x, y, room) {
+        if (!Memory.dismantle) {
+            Memory.dismantle = {};
+        }
+
+        if (!Memory.dismantle[room]) {
+            Memory.dismantle[room] = [];
+        }
+
+        Memory.dismantle[room].push({x: x, y: y});
+    }
+
+    static stopCreep(name) {
+        if (Game.creeps[name]) {
+            Game.creeps[name].memory.stop = true;
+        }
+    }
+
+    static startCreep(name) {
+        if (Game.creeps[name]) {
+            delete Game.creeps[name].memory.stop;
+        }
+    }
+
+    static startAllCreeps() {
+        _.forEach(Game.creeps, (creep) => {
+            delete creep.memory.stop;
+        });
+    }
+    static setContainerSource(containerId, sourceId) {
+        Memory.containerSource[containerId] = sourceId;
+    }
+    static addAlly(name) {
+        Memory.allies.push(name);
+    }
+
+    static removeAlly(name) {
+        _.pull(Memory.allies, name);
+    }
+
+    static createArmy(army, options) {
+        if (options === undefined) {
+            delete Memory.army[army];
+        } else {
+            Memory.army[army] = options;
+            Memory.army[army].directive = "preparing";
+        }
+    }
+
+    static avoidRoom(room, avoid) {
+        if (avoid && Memory.avoidRooms.indexOf(room) === -1) {
+            Memory.avoidRooms.push(room);
+        }
+        if (!avoid) {
+            _.remove(Memory.avoidRooms, (r) => r === room);
+        }
+    }
+
+    static avoidSquare(x, y, room, avoid) {
+        if (avoid) {
+            if (!Memory.avoidSquares[room]) {
+                Memory.avoidSquares[room] = [];
+            }
+            Memory.avoidSquares[room].push({x: x, y: y});
+        }
+        if (!avoid) {
+            if (Memory.avoidSquares[room]) {
+                _.remove(Memory.avoidSquares[room], (s) => s.x === x && s.y === y);
+            }
+        }
+    }
+    static addSign(room, text) {
+        if (!Memory.signs) {
+            Memory.signs = {};
+        }
+        if (text) {
+            Memory.signs[room] = text;
+        } else {
+            delete Memory.signs[room];
+        }
+    }
+    static resetMatrix(room) {
+        Memory.baseMatrixes[room] = {};
+    }
+    static recover() {
+        _.forEach(Game.spawns, (spawn) => {spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], `storer-emerg-${spawn.room.name}-${spawn.name}`, {role: "storer", home: spawn.room.name})});
+    }
+}
 
 if (Memory.profiling) {
     __require(2,5).registerObject(Commands, "Commands");

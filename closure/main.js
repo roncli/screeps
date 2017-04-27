@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 __modules[0] = function(module, exports) {
 __require(1,0);
 
@@ -1343,7 +1343,7 @@ module.exports = main;
 
 return module.exports;
 }
-/********** End of module 0: /home/ubuntu/workspace/src/main.js **********/
+/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 /********** Start module 1: ../src/screeps-perf.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.filter = function(callback, thisArg) {
@@ -1829,217 +1829,179 @@ var spawnsInRoom = {},
     sourceKeepersInRoom = {},
     powerBanksInRoom = {},
     resourcesInRoom = {},
-    costMatricies = {},
+    costMatricies = {};
 
-    Cache = {
-        creepTasks: {},
-        roomTypes: {},
-        spawning: {},
-        minerals: {},
-        log: {},
-        reset: () => {
-            "use strict";
-    
-            spawnsInRoom = {};
-            powerSpawnsInRoom = {};
-            extensionsInRoom = {};
-            towersInRoom = {};
-            labsInRoom = {};
-            nukersInRoom = {};
-            containersInRoom = {};
-            linksInRoom = {};
-            repairableStructuresInRoom = {};
-            sortedRepairableStructuresInRoom = {};
-            extractorsInRoom = {};
-            portalsInRoom = {};
-            hostilesInRoom = {};
-            sourceKeepersInRoom = {};
-            powerBanksInRoom = {};
-            resourcesInRoom = {};
-            costMatricies = {};
-            Cache.creepTasks = {};
-            Cache.roomTypes = {};
-            Cache.spawning = {};
-            Cache.minerals = {};
-    
-            Cache.log = {
-                events: [],
-                hostiles: [],
-                creeps: [],
-                spawns: [],
-                structures: [],
-                rooms: {},
-                army: {}
-            };
-            
-            Cache.credits = Game.market.credits;
-            if (Memory.visualizations) {
-                Cache.globalVisual = new RoomVisual();
-            }
-            if (Memory.visualizations) {
-                Cache.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
-            }
-        },
-        spawnsInRoom: (room) => {
-            "use strict";
-    
-            return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
-        },
-        powerSpawnsInRoom: (room) => {
-            "use strict";
+class Cache {
+    reset() {
+        spawnsInRoom = {};
+        powerSpawnsInRoom = {};
+        extensionsInRoom = {};
+        towersInRoom = {};
+        labsInRoom = {};
+        nukersInRoom = {};
+        containersInRoom = {};
+        linksInRoom = {};
+        repairableStructuresInRoom = {};
+        sortedRepairableStructuresInRoom = {};
+        extractorsInRoom = {};
+        portalsInRoom = {};
+        hostilesInRoom = {};
+        sourceKeepersInRoom = {};
+        powerBanksInRoom = {};
+        resourcesInRoom = {};
+        costMatricies = {};
+        this.creepTasks = {};
+        this.roomTypes = {};
+        this.spawning = {};
+        this.minerals = {};
 
-            return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
-        },
-        extensionsInRoom: (room) => {
-            "use strict";
-    
-            return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
-        },
-        towersInRoom: (room) => {
-            "use strict";
-    
-            return towersInRoom[room.name] ? towersInRoom[room.name] : towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
-        },
-        labsInRoom: (room) => {
-            "use strict";
-    
-            return labsInRoom[room.name] ? labsInRoom[room.name] : labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
-        },
-        nukersInRoom: (room) => {
-            "use strict";
-
-            return nukersInRoom[room.name] ? nukersInRoom[room.name] : nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
-        },
-        containersInRoom: (room) => {
-            "use strict";
-    
-            return containersInRoom[room.name] ? containersInRoom[room.name] : containersInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
-        },
-        linksInRoom: (room) => {
-            "use strict";
-    
-            return linksInRoom[room.name] ? linksInRoom[room.name] : linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
-        },
-        repairableStructuresInRoom: (room) => {
-            "use strict";
-    
-            return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
-        },
+        this.log = {
+            events: [],
+            hostiles: [],
+            creeps: [],
+            spawns: [],
+            structures: [],
+            rooms: {},
+            army: {}
+        };
         
-        sortedRepairableStructuresInRoom: (room) => {
-            "use strict";
-            
-            return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : sortedRepairableStructuresInRoom[room.name] = Cache.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
-        },
-        extractorsInRoom: (room) => {
-            "use strict";
-    
-            return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
-        },
-        portalsInRoom: (room) => {
-            "use strict";
-            
-            return portalsInRoom[room.name] ? portalsInRoom[room.name] : portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
-        },
-        hostilesInRoom: (room) => {
-            "use strict";
+        this.credits = Game.market.credits;
+        if (Memory.visualizations) {
+            this.globalVisual = new RoomVisual();
+            this.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
+        }
+    }
 
-            var roomName = room.name,
-                hostiles;
+    spawnsInRoom(room) {
+        return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
+    }
 
-            if (!room || room.unobservable) {
-                return [];
+    powerSpawnsInRoom(room) {
+        return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
+    }
+
+    extensionsInRoom(room) {
+        return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
+    }
+
+    towersInRoom(room) {
+        return towersInRoom[room.name] ? towersInRoom[room.name] : towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
+    }
+
+    labsInRoom(room) {
+        return labsInRoom[room.name] ? labsInRoom[room.name] : labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
+    }
+
+    nukersInRoom(room) {
+        return nukersInRoom[room.name] ? nukersInRoom[room.name] : nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
+    }
+
+    containersInRoom(room) {
+        return containersInRoom[room.name] ? containersInRoom[room.name] : containersInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
+    }
+
+    linksInRoom(room) {
+        return linksInRoom[room.name] ? linksInRoom[room.name] : linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
+    }
+
+    repairableStructuresInRoom(room) {
+        return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
+    }
+
+    sortedRepairableStructuresInRoom(room) {
+        return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : sortedRepairableStructuresInRoom[room.name] = this.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
+    }
+
+    extractorsInRoom(room) {
+        return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
+    }
+
+    portalsInRoom(room) {
+        return portalsInRoom[room.name] ? portalsInRoom[room.name] : portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
+    }
+
+    hostilesInRoom(room) {
+        var roomName = room.name,
+            hostiles;
+
+        if (!room || room.unobservable) {
+            return [];
+        }
+
+        hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
+
+        if (!Memory.rooms[roomName].hostiles) {
+            Memory.rooms[roomName].hostiles = [];
+        }
+
+        _.forEach(hostiles, (hostile) => {
+            if (Memory.rooms[roomName].hostiles.indexOf(hostile.id) !== -1) {
+                Memory.rooms[roomName].harvested = 0;
             }
+        });
+
+        room.memory.hostiles = _.map(hostiles, (h) => h.id);
+
+        return hostiles;
+    }
+
+    sourceKeepersInRoom(room) {
+        return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
+    }
+
+    powerBanksInRoom(room) {
+        return powerBanksInRoom[room.name] ? powerBanksInRoom[room.name] : powerBanksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
+    }
     
-            hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
-    
-            if (!Memory.rooms[roomName].hostiles) {
-                Memory.rooms[roomName].hostiles = [];
-            }
-    
-            _.forEach(hostiles, (hostile) => {
-                if (Memory.rooms[roomName].hostiles.indexOf(hostile.id) !== -1) {
-                    Memory.rooms[roomName].harvested = 0;
+    resourcesInRoom(room) {
+        return resourcesInRoom[room.name] ? resourcesInRoom[room.name] : resourcesInRoom[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount);
+    }
+
+    getCostMatrix(room) {
+        var roomName = room.name;
+
+        if (!room || room.unobservable) {
+            return new PathFinder.CostMatrix();
+        }
+
+        if (!costMatricies[roomName]) {
+            let matrix = new PathFinder.CostMatrix();
+
+            _.forEach(room.find(FIND_STRUCTURES), (structure) => {
+                var pos = structure.pos;
+                if (structure.structureType === STRUCTURE_ROAD) {
+                    matrix.set(pos.x, pos.y, Math.max(1, matrix.get(pos.x, pos.y)));
+                } else if (structure.structureType === STRUCTURE_WALL) {
+                    matrix.set(pos.x, pos.y, Math.max(255, matrix.get(pos.x, pos.y)));
+                } else if (structure.structureType === STRUCTURE_CONTAINER) {
+                    matrix.set(pos.x, pos.y, Math.max(10, matrix.get(pos.x, pos.y)));
+                } else if (!(structure.structureType === STRUCTURE_RAMPART) || !structure.my) {
+                    matrix.set(pos.x, pos.y, 255);
                 }
             });
-    
-            room.memory.hostiles = _.map(hostiles, (h) => h.id);
-    
-            return hostiles;
-        },
-        sourceKeepersInRoom: (room) => {
-            "use strict";
 
-            return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
-        },
-        powerBanksInRoom: (room) => {
-            "use strict";
+            _.forEach(room.find(FIND_MY_CONSTRUCTION_SITES), (structure) => {
+                var pos = structure.pos;
+                matrix.set(pos.x, pos.y, Math.max(5, matrix.get(pos.x, pos.y)));
+            });
+            
+            _.forEach(this.portalsInRoom(room), (structure) => {
+                var pos = structure.pos;
+                matrix.set(pos.x, pos.y, 5);
+            });
 
-            return powerBanksInRoom[room.name] ? powerBanksInRoom[room.name] : powerBanksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
-        },
-
-        resourcesInRoom: (room) => {
-            "use strict";
-
-            return resourcesInRoom[room.name] ? resourcesInRoom[room.name] : resourcesInRoom[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount);
-        },
-        getCostMatrix: (room) => {
-            "use strict";
-
-            var roomName = room.name;
-    
-            if (!room || room.unobservable) {
-                return new PathFinder.CostMatrix();
-            }
-    
-            if (!costMatricies[roomName]) {
-                let matrix = new PathFinder.CostMatrix();
-    
-                _.forEach(room.find(FIND_STRUCTURES), (structure) => {
-                    var pos = structure.pos;
-                    if (structure.structureType === STRUCTURE_ROAD) {
-                        matrix.set(pos.x, pos.y, Math.max(1, matrix.get(pos.x, pos.y)));
-                    } else if (structure.structureType === STRUCTURE_WALL) {
-                        matrix.set(pos.x, pos.y, Math.max(255, matrix.get(pos.x, pos.y)));
-                    } else if (structure.structureType === STRUCTURE_CONTAINER) {
-                        matrix.set(pos.x, pos.y, Math.max(10, matrix.get(pos.x, pos.y)));
-                    } else if (!(structure.structureType === STRUCTURE_RAMPART) || !structure.my) {
-                        matrix.set(pos.x, pos.y, 255);
-                    }
+            if (Memory.avoidSquares[roomName]) {
+                _.forEach(Memory.avoidSquares[roomName], (square) => {
+                    matrix.set(square.x, square.y, 255);
                 });
-    
-                _.forEach(room.find(FIND_MY_CONSTRUCTION_SITES), (structure) => {
-                    var pos = structure.pos;
-                    matrix.set(pos.x, pos.y, Math.max(5, matrix.get(pos.x, pos.y)));
-                });
-                
-                _.forEach(Cache.portalsInRoom(room), (structure) => {
-                    var pos = structure.pos;
-                    matrix.set(pos.x, pos.y, 5);
-                });
-
-                if (Memory.avoidSquares[roomName]) {
-                    _.forEach(Memory.avoidSquares[roomName], (square) => {
-                        matrix.set(square.x, square.y, 255);
-                    });
-                }
-                
-                if (!Memory.rooms[roomName] || !Memory.rooms[roomName].roomType || Memory.rooms[roomName].roomType.type !== "source") {
-                    _.forEach(_.filter(room.find(FIND_HOSTILE_CREEPS), (c) => c.owner.username === "Source Keeper"), (creep) => {
-                        var pos = creep.pos;
-                        for (let x = pos.x - 3; x < pos.x + 3; x++) {
-                            for (let y = pos.y - 3; y < pos.y + 3; y++) {
-                            }
-                        }
-                    });
-                }
-
-                costMatricies[roomName] = matrix;
             }
             
-            return costMatricies[roomName];
+            costMatricies[roomName] = matrix;
         }
-    };
+        
+        return costMatricies[roomName];
+    }
+}
 
 if (Memory.profiling) {
     __require(2,4).registerObject(Cache, "Cache");

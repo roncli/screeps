@@ -1,5 +1,5 @@
-var Drawing = {
-    progressBar: (visual, x, y, w, h, value, max, options) => {
+class Drawing {
+    static progressBar(visual, x, y, w, h, value, max, options) {
         if (options.showMax === undefined) {
             options.showMax = true;
         }
@@ -10,16 +10,16 @@ var Drawing = {
             .rect(x, y, w, h, {fill: options.background})
             .rect(x, y, w * Math.min(value / max, 1), h, {fill: options.bar})
             .text(`${options.label ? `${options.label} ` : ""}${value.toFixed(options.valueDecimals)}${options.showMax ? `/${max.toFixed(0)}` : ""}${options.showDetails ? ` (${(100 * value / max).toFixed(3)}%) ${(max - value).toFixed(0)} to go` : ""}`, x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
-    },
+    }
 
-    sparkline: (visual, x, y, w, h, values, options) => {
+    static sparkline(visual, x, y, w, h, value, max, options) {
         visual.rect(x, y, w, h, {fill: "#404040", opacity: 0.5});
         _.forEach(options, (option) => {
             visual.poly(_.map(values, (v, i) => [x + w * (i / (values.length - 1)), y + h * (1 - (v[option.key] - option.min) / (option.max - option.min))]), option);
         });
-    },
+    }
 
-    resource: (visual, x, y, size, resource, style) => {
+    static resource(visual, x, y, size, resource, style) {
         switch (resource) {
             case RESOURCE_ENERGY:
                 visual.circle(x, y, {radius: 0.625 * size / 2, fill: "#FFE664", opacity: style.opacity});
@@ -241,7 +241,7 @@ var Drawing = {
                 break;
         }
     }
-};
+}
 
 if (Memory.profiling) {
     require("screeps-profiler").registerObject(Drawing, "Drawing");

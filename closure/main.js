@@ -2169,8 +2169,8 @@ return module.exports;
 /********** End of module 5: ../src/commands.js **********/
 /********** Start module 6: ../src/drawing.js **********/
 __modules[6] = function(module, exports) {
-var Drawing = {
-    progressBar: (visual, x, y, w, h, value, max, options) => {
+class Drawing {
+    static progressBar(visual, x, y, w, h, value, max, options) {
         if (options.showMax === undefined) {
             options.showMax = true;
         }
@@ -2181,16 +2181,16 @@ var Drawing = {
             .rect(x, y, w, h, {fill: options.background})
             .rect(x, y, w * Math.min(value / max, 1), h, {fill: options.bar})
             .text(`${options.label ? `${options.label} ` : ""}${value.toFixed(options.valueDecimals)}${options.showMax ? `/${max.toFixed(0)}` : ""}${options.showDetails ? ` (${(100 * value / max).toFixed(3)}%) ${(max - value).toFixed(0)} to go` : ""}`, x + w / 2, y + h / 2 + 0.175, {align: "center", color: options.color, font: options.font});
-    },
+    }
 
-    sparkline: (visual, x, y, w, h, values, options) => {
+    static sparkline(visual, x, y, w, h, value, max, options) {
         visual.rect(x, y, w, h, {fill: "#404040", opacity: 0.5});
         _.forEach(options, (option) => {
             visual.poly(_.map(values, (v, i) => [x + w * (i / (values.length - 1)), y + h * (1 - (v[option.key] - option.min) / (option.max - option.min))]), option);
         });
-    },
+    }
 
-    resource: (visual, x, y, size, resource, style) => {
+    static resource(visual, x, y, size, resource, style) {
         switch (resource) {
             case RESOURCE_ENERGY:
                 visual.circle(x, y, {radius: 0.625 * size / 2, fill: "#FFE664", opacity: style.opacity});
@@ -2412,7 +2412,7 @@ var Drawing = {
                 break;
         }
     }
-};
+}
 
 if (Memory.profiling) {
     __require(2,6).registerObject(Drawing, "Drawing");
@@ -2425,67 +2425,61 @@ return module.exports;
 /********** Start module 7: ../src/market.js **********/
 __modules[7] = function(module, exports) {
 var Cache = __require(4,7),
-    Utilities = __require(11,7),
+    Utilities = __require(11,7);
 
-    Market = {
-        getAllOrders: () => {
-            "use strict";
-
-            if (!Market.orders || Game.cpu.bucket >= Memory.marketBucket) {
-                Market.orders = Game.market.getAllOrders();
-                delete Market.filteredOrders;
-            }
-            
-            return Market.orders;
-        },
+class Market {
+    static getAllOrders() {
+        if (!Market.orders || Game.cpu.bucket >= Memory.marketBucket) {
+            Market.orders = Game.market.getAllOrders();
+            delete Market.filteredOrders;
+        }
         
-        getFilteredOrders: () => {
-            "use strict";
+        return Market.orders;
+    }
 
-            if (!Market.filteredOrders) {
-                Market.filteredOrders = Utilities.nest(_.filter(Market.getAllOrders(), (o) => o.amount > 0), [(d) => d.type, (d) => d.resourceType]);
-                _.forEach(Market.filteredOrders.sell, (orders, resource) => {
-                    Market.filteredOrders.sell[resource].sort((a, b) => a.price - b.price);
-                });
-                _.forEach(Market.filteredOrders.buy, (orders, resource) => {
-                    Market.filteredOrders.buy[resource].sort((a, b) => b.price - a.price);
-                });
-            }
-            
-            return Market.filteredOrders;
-        },
+    static getFilteredOrders() {
+        if (!Market.filteredOrders) {
+            Market.filteredOrders = Utilities.nest(_.filter(Market.getAllOrders(), (o) => o.amount > 0), [(d) => d.type, (d) => d.resourceType]);
+            _.forEach(Market.filteredOrders.sell, (orders, resource) => {
+                Market.filteredOrders.sell[resource].sort((a, b) => a.price - b.price);
+            });
+            _.forEach(Market.filteredOrders.buy, (orders, resource) => {
+                Market.filteredOrders.buy[resource].sort((a, b) => b.price - a.price);
+            });
+        }
         
-        deal: (orderId, amount, yourRoomName) => {
-            "use strict";
-            
-            var ret = Game.market.deal(orderId, amount, yourRoomName),
-                order = _.find(Market.orders, (m) => m.id === orderId);
-            
-            if (ret === OK) {
-                if (order) {
-                    if (order.type === "sell") {
-                        Cache.credits -= order.amount * order.price;
-                    }
-                    if (order.amount <= amount) {
-                        Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} sold out ${order.id}`);
-                        _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
-                        _.remove(Market.orders, (m) => m.id === orderId);
-                    } else {
-                        order.amount -= amount;
-                        Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} ${order.amount} remaining on ${order.id}`);
-                    }
+        return Market.filteredOrders;
+    }
+
+    static deal(orderId, amount, yourRoomName) {
+        var ret = Game.market.deal(orderId, amount, yourRoomName),
+            order = _.find(Market.orders, (m) => m.id === orderId);
+        
+        if (ret === OK) {
+            if (order) {
+                if (order.type === "sell") {
+                    Cache.credits -= order.amount * order.price;
                 }
-            } else {
-                if (order) {
-                    Cache.log.events.push(`${yourRoomName} failed to process order ID ${orderId}: ${ret}`);
+                if (order.amount <= amount) {
+                    Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} sold out ${order.id}`);
                     _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
                     _.remove(Market.orders, (m) => m.id === orderId);
+                } else {
+                    order.amount -= amount;
+                    Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} ${order.amount} remaining on ${order.id}`);
                 }
             }
-            
-            return ret;
+        } else {
+            if (order) {
+                Cache.log.events.push(`${yourRoomName} failed to process order ID ${orderId}: ${ret}`);
+                _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
+                _.remove(Market.orders, (m) => m.id === orderId);
+            }
         }
-    };
+        
+        return ret;
+    }
+}
 
 if (Memory.profiling) {
     __require(2,7).registerObject(Market, "Market");

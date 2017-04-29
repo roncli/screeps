@@ -187,7 +187,7 @@ class Mine {
                 return;
             }
         } else {
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []])
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
 
             // Check to see if we lost built containers.  If so, move to stage 1.
             if (Cache.containersInRoom(room).length < sources.length) {

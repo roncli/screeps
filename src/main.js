@@ -1310,6 +1310,7 @@ class Main {
         Cache.log.tickLimit = Game.cpu.tickLimit;
         Cache.log.bucket = Game.cpu.bucket;
         Cache.log.credits = Game.market.credits;
+        Memory.console = Cache.log;
     }
 
     static drawGlobal() {
@@ -1368,7 +1369,6 @@ class Main {
         // Update CPU
         Cache.log.cpuUsed = Game.cpu.getUsed();
         Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
-        Memory.console = Cache.log;
 
         // CPU
         Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});

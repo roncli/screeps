@@ -56,9 +56,9 @@ class Pathing {
 
         // If we haven't moved in 2 turns, set the position to avoid, and then nuke pathing.path.
         if (pathing) {
-            wasStationary = (creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room) || ((Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room);
+            wasStationary = creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room || (Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room;
             
-            pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
+            pathing.stationary = wasStationary ? pathing.stationary + 1 : 0;
 
             if (pathing.stationary >= 2) {
                 if (pathing.path && pathing.path.length > 0) {
@@ -147,7 +147,7 @@ class Pathing {
                             matrix;
 
                         // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room and this creep is not a remote worker or army creep.
-                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army")))) {
+                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army"))) {
                             return false;
                         }
 

@@ -1276,6 +1276,7 @@ class Main {
         Cache.log.tickLimit = Game.cpu.tickLimit;
         Cache.log.bucket = Game.cpu.bucket;
         Cache.log.credits = Game.market.credits;
+        Memory.console = Cache.log;
     }
 
     static drawGlobal() {
@@ -1316,7 +1317,6 @@ class Main {
         Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
         Cache.log.cpuUsed = Game.cpu.getUsed();
         Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
-        Memory.console = Cache.log;
         Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
     }
 }
@@ -8924,7 +8924,7 @@ class Mine {
                 return;
             }
         } else {
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []])
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
             if (Cache.containersInRoom(room).length < sources.length) {
                 this.stage = 1;
                 return;
@@ -11252,9 +11252,9 @@ class Pathing {
             delete pathing.restartOn;
         }
         if (pathing) {
-            wasStationary = (creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room) || ((Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room);
+            wasStationary = creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room || (Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room;
             
-            pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
+            pathing.stationary = wasStationary ? pathing.stationary + 1 : 0;
 
             if (pathing.stationary >= 2) {
                 if (pathing.path && pathing.path.length > 0) {
@@ -11330,7 +11330,7 @@ class Pathing {
                     roomCallback: (roomName) => {
                         var room = Game.rooms[roomName],
                             matrix;
-                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army")))) {
+                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army"))) {
                             return false;
                         }
 

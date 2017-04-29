@@ -86,7 +86,7 @@ class Dismantler {
         return typeof name !== "number";
     }
 
-    static assignTask(armyName, directive, tasks) {
+    static assignTasks(armyName, directive, tasks) {
         var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
             assigned = [],
             army = Memory.army[armyName],

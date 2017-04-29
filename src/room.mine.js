@@ -14,8 +14,6 @@ var Cache = require("cache"),
 
 class Mine {
     constructor(supportRoom, stage) {
-        "use strict";
-        
         this.type = "mine";
         this.supportRoom = supportRoom;
         this.stage = stage || 1;

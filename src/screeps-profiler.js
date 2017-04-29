@@ -1,3 +1,19 @@
+Array.prototype.forEach = function(callback, thisArg) {
+    var arr = this;
+    for (var iterator = 0; iterator < arr.length; iterator++) {
+        callback.call(thisArg, arr[iterator], iterator, arr);
+    }
+};
+
+Array.prototype.map = function(callback, thisArg) {
+    var arr = this;
+    var returnVal = [];
+    for (var iterator = 0; iterator < arr.length; iterator++) {
+        returnVal.push(callback.call(thisArg, arr[iterator], iterator, arr));
+    }
+    return returnVal;
+};
+
 let usedOnStart = 0;
 let enabled = false;
 let depth = 0;

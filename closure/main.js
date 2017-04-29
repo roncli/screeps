@@ -51,1316 +51,1287 @@ function __getDirname(path) {
 /********** End of header **********/
 /********** Start module 0: H:\dev\git\github\screeps\src\main.js **********/
 __modules[0] = function(module, exports) {
-__require(1,0);
-
-var profiler = __require(2,0),
-    Army = __require(3,0),
-    Cache = __require(4,0),
-    Commands = __require(5,0),
-    Drawing = __require(6,0),
-    Market = __require(7,0),
-    Minerals = __require(8,0),
-    Proxy = __require(9,0),
-    Segment = __require(10,0),
-    Utilities = __require(11,0),
-    RoleArmyDismantler = __require(12,0),
-    RoleArmyHealer = __require(13,0),
-    RoleArmyMelee = __require(14,0),
-    RoleArmyRanged = __require(15,0),
-    RoleClaimer = __require(16,0),
-    RoleCollector = __require(17,0),
-    RoleConverter = __require(18,0),
-    RoleDefender = __require(19,0),
-    RoleDismantler = __require(20,0),
-    RoleHealer = __require(21,0),
-    RoleMiner = __require(22,0),
-    RoleRemoteBuilder = __require(23,0),
-    RoleRemoteCollector = __require(24,0),
-    RoleRemoteDismantler = __require(25,0),
-    RoleRemoteMiner = __require(26,0),
-    RoleRemoteReserver = __require(27,0),
-    RoleRemoteStorer = __require(28,0),
-    RoleRemoteWorker = __require(29,0),
-    RoleScientist = __require(30,0),
-    RoleStorer = __require(31,0),
-    RoleTower = __require(32,0),
-    RoleUpgrader = __require(33,0),
-    RoleWorker = __require(34,0),
-    RoomBase = __require(35,0),
-    RoomCleanup = __require(36,0),
-    RoomMine = __require(37,0),
-    RoomSource = __require(38,0),
-    TaskAttack = __require(39,0),
-    TaskBuild = __require(40,0),
-    TaskClaim = __require(41,0),
-    TaskCollectEnergy = __require(42,0),
-    TaskCollectMinerals = __require(43,0),
-    TaskDismantle = __require(44,0),
-    TaskFillEnergy = __require(45,0),
-    TaskFillMinerals = __require(46,0),
-    TaskHarvest = __require(47,0),
-    TaskHeal = __require(48,0),
-    TaskMeleeAttack = __require(49,0),
-    TaskMine = __require(50,0),
-    TaskPickupResource = __require(51,0),
-    TaskRally = __require(52,0),
-    TaskRangedAttack = __require(53,0),
-    TaskRepair = __require(54,0),
-    TaskReserve = __require(55,0),
-    TaskUpgradeController = __require(56,0),
+var profiler = __require(1,0),
+    Army = __require(2,0),
+    Cache = __require(3,0),
+    Commands = __require(4,0),
+    Drawing = __require(5,0),
+    Market = __require(6,0),
+    Minerals = __require(7,0),
+    Proxy = __require(8,0),
+    Segment = __require(9,0),
+    Utilities = __require(10,0),
+    RoleArmyDismantler = __require(11,0),
+    RoleArmyHealer = __require(12,0),
+    RoleArmyMelee = __require(13,0),
+    RoleArmyRanged = __require(14,0),
+    RoleClaimer = __require(15,0),
+    RoleCollector = __require(16,0),
+    RoleConverter = __require(17,0),
+    RoleDefender = __require(18,0),
+    RoleDismantler = __require(19,0),
+    RoleHealer = __require(20,0),
+    RoleMiner = __require(21,0),
+    RoleRemoteBuilder = __require(22,0),
+    RoleRemoteCollector = __require(23,0),
+    RoleRemoteDismantler = __require(24,0),
+    RoleRemoteMiner = __require(25,0),
+    RoleRemoteReserver = __require(26,0),
+    RoleRemoteStorer = __require(27,0),
+    RoleRemoteWorker = __require(28,0),
+    RoleScientist = __require(29,0),
+    RoleStorer = __require(30,0),
+    RoleTower = __require(31,0),
+    RoleUpgrader = __require(32,0),
+    RoleWorker = __require(33,0),
+    RoomBase = __require(34,0),
+    RoomCleanup = __require(35,0),
+    RoomMine = __require(36,0),
+    RoomSource = __require(37,0),
+    TaskAttack = __require(38,0),
+    TaskBuild = __require(39,0),
+    TaskClaim = __require(40,0),
+    TaskCollectEnergy = __require(41,0),
+    TaskCollectMinerals = __require(42,0),
+    TaskDismantle = __require(43,0),
+    TaskFillEnergy = __require(44,0),
+    TaskFillMinerals = __require(45,0),
+    TaskHarvest = __require(46,0),
+    TaskHeal = __require(47,0),
+    TaskMeleeAttack = __require(48,0),
+    TaskMine = __require(49,0),
+    TaskPickupResource = __require(50,0),
+    TaskRally = __require(51,0),
+    TaskRangedAttack = __require(52,0),
+    TaskRepair = __require(53,0),
+    TaskReserve = __require(54,0),
+    TaskUpgradeController = __require(55,0),
     paths,
     reset,
-    unobservableRooms,
+    unobservableRooms;
 
-    main = {
-        loop: () => {
-            "use strict";
-            
-            var cpu = Game.cpu.getUsed(),
-                bucket = Game.cpu.bucket;
+class Main {
+    static loop() {
+        var cpu = Game.cpu.getUsed(),
+            bucket = Game.cpu.bucket;
 
-            if (cpu >= 10) {
-                if (Game.cpu.bucket < 9800) {
-                    Game.notify(`CPU started at ${cpu.toFixed(2)} with bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
-                    return;
-                }
-            }
-
-            if (bucket < Game.cpu.tickLimit) {
-                Game.notify(`Bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
+        if (cpu >= 10) {
+            if (Game.cpu.bucket < 9800) {
+                Game.notify(`CPU started at ${cpu.toFixed(2)} with bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
                 return;
             }
+        }
+
+        if (bucket < Game.cpu.tickLimit) {
+            Game.notify(`Bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
+            return;
+        }
+        
+        var loop = () => {
+            var log = "",
+                lastCpu, thisCpu;
             
-            var loop = () => {
-                var log = "",
-                    lastCpu, thisCpu;
-                
-                if (Memory.logCpu) {
-                    lastCpu = thisCpu;
-                    log = `Started at ${lastCpu.toFixed(2)}`;
-                }
+            if (Memory.logCpu) {
+                lastCpu = thisCpu;
+                log = `Started at ${lastCpu.toFixed(2)}`;
+            }
 
-                main.init();
+            this.init();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}init took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}init took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.minerals();
+            this.minerals();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}minerals took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}minerals took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.baseMatrixes();
+            this.baseMatrixes();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}baseMatrixes took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}baseMatrixes took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.deserializeCreeps();
+            this.deserializeCreeps();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}deserializeCreeps took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}deserializeCreeps took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.deserializeRooms();
+            this.deserializeRooms();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}deserializeRooms took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}deserializeRooms took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.balanceEnergy();
+            this.balanceEnergy();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}balanceEnergy took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}balanceEnergy took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                if (Memory.log) {
-                    main.log();
+            this.rooms();
 
-                    if (Memory.logCpu) {
-                        thisCpu = Game.cpu.getUsed();
-                        log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
-                        lastCpu = thisCpu;
-                    }
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}rooms took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.rooms();
+            this.army();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}rooms took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}army took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
 
-                main.army();
+            this.creeps();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}army took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
-
-                main.creeps();
-
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}creeps took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
-                
-                main.debug();
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}creeps took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
+            
+            if (Memory.debug) {
+                this.debug();
                 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
                     log += `${log.length > 0 ? " - " : ""}debug took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
+            }
 
-                main.finalize();
+            if (Memory.log) {
+                this.log();
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
+                    log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
+            }
 
-                main.drawGlobal();
+            if (Memory.visualizations) {
+                this.drawGlobal();
 
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
                     log += `${log.length > 0 ? " - " : ""}drawGlobal took ${(thisCpu - lastCpu).toFixed(2)}`;
                     Cache.log.events.push(log);
                 }
-            };
-
-            if (Memory.profiling) {
-                profiler.wrap(loop);
-            } else {
-                loop();
-            }
-        },
-
-        init: () => {
-            "use strict";
-
-            var generationTick = Game.time % 1500;
-            Segment.init();
-            Cache.reset();
-
-            if (!reset)
-            {
-                reset = true;
-                Cache.log.events.push("System reset.");
             }
 
-            if (Cache.credits < Memory.minimumCredits) {
-                delete Memory.buy;
+            this.finalize();
+
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
             }
 
-            if (Cache.credits >= Memory.minimumCredits * 1.5) {
-                Memory.buy = true;
-            }
-            Game.cmd = {
-                Army: Army,
-                Cache: Cache,
-                Commands: Commands,
-                Market: Market,
-                Minerals: Minerals,
-                Role: {
-                    ArmyDismantler: RoleArmyDismantler,
-                    ArmyHealer: RoleArmyHealer,
-                    ArmyMelee: RoleArmyMelee,
-                    ArmyRanged: RoleArmyRanged,
-                    Claimer: RoleClaimer,
-                    Collector: RoleCollector,
-                    Converter: RoleConverter,
-                    Defender: RoleDefender,
-                    Dismantler: RoleDismantler,
-                    Healer: RoleHealer,
-                    Miner: RoleMiner,
-                    RemoteBuilder: RoleRemoteBuilder,
-                    RemoteCollector: RoleRemoteCollector,
-                    RemoteDismantler: RoleRemoteDismantler,
-                    RemoteMiner: RoleRemoteMiner,
-                    RemoteReserver: RoleRemoteReserver,
-                    RemoteStorer: RoleRemoteStorer,
-                    RemoteWorker: RoleRemoteWorker,
-                    Scientist: RoleScientist,
-                    Storer: RoleStorer,
-                    Tower: RoleTower,
-                    Upgrader: RoleUpgrader,
-                    Worker: RoleWorker
-                },
-                Room: {
-                    Base: RoomBase,
-                    Cleanup: RoomCleanup,
-                    Mine: RoomMine,
-                    Source: RoomSource
-                },
-                Utilities: Utilities
-            };
-            if (!Memory.maxCreeps) {
-                Memory.maxCreeps = {};
-            }
-            if (!Memory.containerSource) {
-                Memory.containerSource = {};
-            }
-            if (!Memory.army) {
-                Memory.army = {};
-            }
-            if (!Memory.avoidRooms) {
-                Memory.avoidRooms = [];
-            }
-            if (!Memory.avoidSquares) {
-                Memory.avoidSquares = {};
-            }
-            if (!Memory.paths) {
-                Memory.paths = {};
-            }
-            
-            if (!Memory.lengthToStorage) {
-                Memory.lengthToStorage = {};
-            }
-            if (!Memory.towerTasks) {
-                Memory.towerTasks = {};
-            }
-            if (!Memory.stats) {
-                Memory.stats = {};
-            }
-            if (!Memory.stats.cpu) {
-                Memory.stats.cpu = [];
-            }
-            if (!Memory.stats.bucket) {
-                Memory.stats.bucket = [];
-            }
-            if (!Memory.stats.gclProgress) {
-                Memory.stats.gclProgress = [];
-            }
+        };
 
-            if (!Memory.minimumSell) {
-                Memory.minimumSell = {};
-            }
-            
-            if (!Memory.flipPrice) {
-                Memory.flipPrice = {};
-            }
-            
-            if (!Memory.allies) {
-                Memory.allies = [];
-            }
-            if (Game.time % 10 === 0) {
-                _.forEach(Memory.creeps, (creep, name) => {
-                    if (!Game.creeps[name]) {
-                        delete Memory.creeps[name];
-                    }
-                });
-                _.forEach(Memory.lengthToContainer, (value, id) => {
-                    if (!Game.getObjectById(id)) {
-                        delete Memory.lengthToContainer[id];
-                    }
-                });
-                _.forEach(Memory.lengthToController, (value, id) => {
-                    if (!Game.getObjectById(id)) {
-                        delete Memory.lengthToController[id];
-                    }
-                });
-                _.forEach(Memory.lengthToStorage, (value, id) => {
-                    if (!Game.getObjectById(id)) {
-                        delete Memory.lengthToStorage[id];
-                    }
-                });
-                _.forEach(Memory.containerSource, (value, id) => {
-                    if (!Game.getObjectById(id)) {
-                        delete Memory.containerSource[id];
-                    }
-                });
-                _.forEach(Memory.dismantle, (value, room) => {
-                    if (value.length === 0) {
-                        delete Memory.dismantle[room];
-                    }
-                });
-                _.forEach(Memory.rooms, (value, room) => {
-                    if (!value || !value.roomType) {
-                        delete Memory.rooms[room];
-                    }
-                });
-                _.forEach(Memory.maxCreeps, (max, type) => {
-                    _.forEach(Memory.maxCreeps[type], (value, room) => {
-                        if (Object.keys(value).length === 0) {
-                            delete max[room];
-                        }
-                    });
-                });
-                _.forEach(Memory.paths, (value, id) => {
-                    if (value[3] <= Game.time - 500 || value[2] <= Game.time - 1500) {
-                        delete Memory.paths[id];
-                    }
-                });
-            }
+        if (Memory.profiling) {
+            profiler.wrap(loop);
+        } else {
+            loop();
+        }
+    }
 
-            delete Memory.flags;
-            switch (generationTick) {
-                case 0:
-                    Memory.lengthToStorage = {};
-                    break;
-                case 100:
-                    Memory.lengthToContainer = {};
-                    break;
-                case 200:
-                    Memory.lengthToController = {};
-                    break;
-                case 300:
-                    Memory.ranges = {};
-                    break;
-            }
-            Cache.creeps = Utilities.nest(_.filter(Game.creeps, (c) => c.memory.home || c.memory.army), [(c) => c.memory.home || c.memory.army, (c) => c.memory.role]);
-            _.forEach(Cache.creeps, (creeps, room) => {
-                Cache.creeps[room].all = _.flatten(_.values(creeps));
+    static init() {
+        var generationTick = Game.time % 1500;
+        Segment.init();
+        Cache.reset();
+
+        if (!reset)
+        {
+            reset = true;
+            Cache.log.events.push("System reset.");
+        }
+
+        if (Cache.credits < Memory.minimumCredits) {
+            delete Memory.buy;
+        }
+
+        if (Cache.credits >= Memory.minimumCredits * 1.5) {
+            Memory.buy = true;
+        }
+        Game.cmd = {
+            Army: Army,
+            Cache: Cache,
+            Commands: Commands,
+            Market: Market,
+            Minerals: Minerals,
+            Role: {
+                ArmyDismantler: RoleArmyDismantler,
+                ArmyHealer: RoleArmyHealer,
+                ArmyMelee: RoleArmyMelee,
+                ArmyRanged: RoleArmyRanged,
+                Claimer: RoleClaimer,
+                Collector: RoleCollector,
+                Converter: RoleConverter,
+                Defender: RoleDefender,
+                Dismantler: RoleDismantler,
+                Healer: RoleHealer,
+                Miner: RoleMiner,
+                RemoteBuilder: RoleRemoteBuilder,
+                RemoteCollector: RoleRemoteCollector,
+                RemoteDismantler: RoleRemoteDismantler,
+                RemoteMiner: RoleRemoteMiner,
+                RemoteReserver: RoleRemoteReserver,
+                RemoteStorer: RoleRemoteStorer,
+                RemoteWorker: RoleRemoteWorker,
+                Scientist: RoleScientist,
+                Storer: RoleStorer,
+                Tower: RoleTower,
+                Upgrader: RoleUpgrader,
+                Worker: RoleWorker
+            },
+            Room: {
+                Base: RoomBase,
+                Cleanup: RoomCleanup,
+                Mine: RoomMine,
+                Source: RoomSource
+            },
+            Utilities: Utilities
+        };
+        if (!Memory.maxCreeps) {
+            Memory.maxCreeps = {};
+        }
+        if (!Memory.containerSource) {
+            Memory.containerSource = {};
+        }
+        if (!Memory.army) {
+            Memory.army = {};
+        }
+        if (!Memory.avoidRooms) {
+            Memory.avoidRooms = [];
+        }
+        if (!Memory.avoidSquares) {
+            Memory.avoidSquares = {};
+        }
+        if (!Memory.paths) {
+            Memory.paths = {};
+        }
+        
+        if (!Memory.lengthToStorage) {
+            Memory.lengthToStorage = {};
+        }
+        if (!Memory.towerTasks) {
+            Memory.towerTasks = {};
+        }
+        if (!Memory.stats) {
+            Memory.stats = {};
+        }
+        if (!Memory.stats.cpu) {
+            Memory.stats.cpu = [];
+        }
+        if (!Memory.stats.bucket) {
+            Memory.stats.bucket = [];
+        }
+        if (!Memory.stats.gclProgress) {
+            Memory.stats.gclProgress = [];
+        }
+
+        if (!Memory.minimumSell) {
+            Memory.minimumSell = {};
+        }
+        
+        if (!Memory.flipPrice) {
+            Memory.flipPrice = {};
+        }
+        
+        if (!Memory.allies) {
+            Memory.allies = [];
+        }
+        if (Game.time % 10 === 0) {
+            _.forEach(Memory.creeps, (creep, name) => {
+                if (!Game.creeps[name]) {
+                    delete Memory.creeps[name];
+                }
             });
-        },
+            _.forEach(Memory.lengthToContainer, (value, id) => {
+                if (!Game.getObjectById(id)) {
+                    delete Memory.lengthToContainer[id];
+                }
+            });
+            _.forEach(Memory.lengthToController, (value, id) => {
+                if (!Game.getObjectById(id)) {
+                    delete Memory.lengthToController[id];
+                }
+            });
+            _.forEach(Memory.lengthToStorage, (value, id) => {
+                if (!Game.getObjectById(id)) {
+                    delete Memory.lengthToStorage[id];
+                }
+            });
+            _.forEach(Memory.containerSource, (value, id) => {
+                if (!Game.getObjectById(id)) {
+                    delete Memory.containerSource[id];
+                }
+            });
+            _.forEach(Memory.dismantle, (value, room) => {
+                if (value.length === 0) {
+                    delete Memory.dismantle[room];
+                }
+            });
+            _.forEach(Memory.rooms, (value, room) => {
+                if (!value || !value.roomType) {
+                    delete Memory.rooms[room];
+                }
+            });
+            _.forEach(Memory.maxCreeps, (max, type) => {
+                _.forEach(Memory.maxCreeps[type], (value, room) => {
+                    if (Object.keys(value).length === 0) {
+                        delete max[room];
+                    }
+                });
+            });
+            _.forEach(Memory.paths, (value, id) => {
+                if (value[3] <= Game.time - 500 || value[2] <= Game.time - 1500) {
+                    delete Memory.paths[id];
+                }
+            });
+        }
 
-        minerals: () => {
-            var mineralOrders = {},
-                minerals, sellOrder;
+        delete Memory.flags;
+        switch (generationTick) {
+            case 0:
+                Memory.lengthToStorage = {};
+                break;
+            case 100:
+                Memory.lengthToContainer = {};
+                break;
+            case 200:
+                Memory.lengthToController = {};
+                break;
+            case 300:
+                Memory.ranges = {};
+                break;
+        }
+        Cache.creeps = Utilities.nest(_.filter(Game.creeps, (c) => c.memory.home || c.memory.army), [(c) => c.memory.home || c.memory.army, (c) => c.memory.role]);
+        _.forEach(Cache.creeps, (creeps, room) => {
+            Cache.creeps[room].all = _.flatten(_.values(creeps));
+        });
+    }
 
-            if (Game.cpu.bucket >= Memory.marketBucket) {
-                minerals = [
-                    {resource: RESOURCE_HYDROGEN, amount: 3000},
-                    {resource: RESOURCE_OXYGEN, amount: 3000},
-                    {resource: RESOURCE_ZYNTHIUM, amount: 3000},
-                    {resource: RESOURCE_KEANIUM, amount: 3000},
-                    {resource: RESOURCE_UTRIUM, amount: 3000},
-                    {resource: RESOURCE_LEMERGIUM, amount: 3000},
-                    {resource: RESOURCE_CATALYST, amount: 3000},
-                    {resource: RESOURCE_HYDROXIDE, amount: 3000},
-                    {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
-                    {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
-                    {resource: RESOURCE_GHODIUM, amount: 3000},
-                    {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
-                    {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
-                    {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
-                    {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
-                    {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
-                    {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
-                    {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
-                    {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
-                    {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
-                    {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000},
-                    {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000},
-                    {resource: RESOURCE_POWER, amount: 3000}
-                ];
+    static minerals() {
+        var mineralOrders = {},
+            minerals, sellOrder;
 
-                _.forEach(minerals, (mineral) => {
+        if (Game.cpu.bucket >= Memory.marketBucket) {
+            minerals = [
+                {resource: RESOURCE_HYDROGEN, amount: 3000},
+                {resource: RESOURCE_OXYGEN, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM, amount: 3000},
+                {resource: RESOURCE_KEANIUM, amount: 3000},
+                {resource: RESOURCE_UTRIUM, amount: 3000},
+                {resource: RESOURCE_LEMERGIUM, amount: 3000},
+                {resource: RESOURCE_CATALYST, amount: 3000},
+                {resource: RESOURCE_HYDROXIDE, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 3000},
+                {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 3000},
+                {resource: RESOURCE_GHODIUM, amount: 3000},
+                {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 3000},
+                {resource: RESOURCE_KEANIUM_OXIDE, amount: 3000},
+                {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
+                {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
+                {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
+                {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
+                {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
+                {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 3000},
+                {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
+                {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
+                {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
+                {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
+                {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000},
+                {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 15000},
+                {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000},
+                {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
+                {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 15000},
+                {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000},
+                {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000},
+                {resource: RESOURCE_POWER, amount: 3000}
+            ];
+
+            _.forEach(minerals, (mineral) => {
+                var fx = (node, innerFx) => {
+                    node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
+
+                    _.forEach(node.children, (child) => {
+                        child.amount = node.amount;
+
+                        innerFx(child, innerFx);
+                    });
+                };
+
+                fx(mineral, fx);
+            });
+            Memory.reserveMinerals = {};
+            _.forEach(minerals, (mineral) => {
+                var fx = (node, innerFx) => {
+                    if (!Memory.reserveMinerals[node.resource]) {
+                        Memory.reserveMinerals[node.resource] = 0;
+                    }
+                    Memory.reserveMinerals[node.resource] = Math.min(Memory.reserveMinerals[node.resource] + node.amount, 20000);
+                    
+                    _.forEach(node.children, (child) => {
+                        innerFx(child, innerFx);
+                    });
+
+                    node.amount = Memory.reserveMinerals[node.resource];
+                };
+
+                fx(mineral, fx);
+            });
+            _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
+                sellOrder = (Market.getFilteredOrders().sell[resource] || [])[0];
+
+                if (sellOrder) {
+                    mineralOrders[resource] = sellOrder;
+                }
+            });
+            _.forEach(Game.rooms, (room, roomName) => {
+                var lowest = Infinity,
+                    roomMemory = room.memory,
+                    allCreepsInRoom = Cache.creeps[roomName] && Cache.creeps[roomName].all,
+                    labQueue;
+
+                if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
+                    return;
+                }
+
+                Cache.minerals[roomName] = _.cloneDeep(minerals);
+                _.forEach(Cache.minerals[roomName], (mineral) => {
                     var fx = (node, innerFx) => {
-                        node.children = _.map(Minerals[node.resource], (m) => {return {resource: m};});
+                        var buyPrice,
+                            resource = node.resource,
+                            roomResources = (room.storage.store[resource] || 0) + (room.terminal.store[resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[resource] || 0);
+
+                        node.buyPrice = mineralOrders[resource] ? mineralOrders[resource].price : Infinity;
+                        node.amount = Math.max(node.amount - roomResources, 0);
 
                         _.forEach(node.children, (child) => {
-                            child.amount = node.amount;
-
                             innerFx(child, innerFx);
                         });
-                    };
 
-                    fx(mineral, fx);
-                });
-                Memory.reserveMinerals = {};
-                _.forEach(minerals, (mineral) => {
-                    var fx = (node, innerFx) => {
-                        if (!Memory.reserveMinerals[node.resource]) {
-                            Memory.reserveMinerals[node.resource] = 0;
+                        if (!node.children || node.children.length === 0) {
+                            node.action = "buy";
+                        } else {
+                            buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice)) * 1.2;
+                            Memory.minimumSell[resource] = Math.min(Infinity, buyPrice);
+                            if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
+                                delete Memory.minimumSell[resource];
+                            }
+                            if (node.buyPrice > buyPrice) {
+                                let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
+                                    roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
+
+                                node.amount = Math.min(Math.min(node.amount, roomResources1), roomResources2);
+
+                                node.action = "create";
+                                node.buyPrice = buyPrice;
+                                if (roomResources <= lowest && node.amount > 0) {
+                                    labQueue = node;
+                                    lowest = roomResources;
+                                }
+                            } else {
+                                node.action = "buy";
+                            }
                         }
-                        Memory.reserveMinerals[node.resource] = Math.min(Memory.reserveMinerals[node.resource] + node.amount, 20000);
-                        
-                        _.forEach(node.children, (child) => {
-                            innerFx(child, innerFx);
-                        });
-
-                        node.amount = Memory.reserveMinerals[node.resource];
+                        if (node.amount > 0 && node.action === "buy" && !roomMemory.buyQueue && Cache.credits >= Memory.minimumCredits && Memory.buy) {
+                            roomMemory.buyQueue = {
+                                resource: resource,
+                                amount: node.amount,
+                                price: node.buyPrice,
+                                start: Game.time
+                            };
+                        }
                     };
 
                     fx(mineral, fx);
                 });
-                _.forEach(_.uniq(_.map(Market.getAllOrders(), (o) => o.resourceType)), (resource) => {
-                    sellOrder = (Market.getFilteredOrders().sell[resource] || [])[0];
+                if (labQueue && !roomMemory.labQueue) {
+                    var fx = (node, innerFx) => {
+                        var resource = node.resource;
+                        if (node.amount <= 0) {
+                            return;
+                        }
 
-                    if (sellOrder) {
-                        mineralOrders[resource] = sellOrder;
-                    }
-                });
-                _.forEach(Game.rooms, (room, roomName) => {
-                    var lowest = Infinity,
-                        roomMemory = room.memory,
-                        allCreepsInRoom = Cache.creeps[roomName] && Cache.creeps[roomName].all,
-                        labQueue;
-
-                    if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
-                        return;
-                    }
-
-                    Cache.minerals[roomName] = _.cloneDeep(minerals);
-                    _.forEach(Cache.minerals[roomName], (mineral) => {
-                        var fx = (node, innerFx) => {
-                            var buyPrice,
-                                resource = node.resource,
-                                roomResources = (room.storage.store[resource] || 0) + (room.terminal.store[resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[resource] || 0);
-
-                            node.buyPrice = mineralOrders[resource] ? mineralOrders[resource].price : Infinity;
-                            node.amount = Math.max(node.amount - roomResources, 0);
+                        if (node.action === "create") {
+                            let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
+                                roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
+                            roomMemory.labQueue = {
+                                resource: resource,
+                                amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(node.amount, roomResources1), roomResources2), LAB_MINERAL_CAPACITY) / 5), 3000),
+                                children: _.map(node.children, (c) => c.resource),
+                                start: Game.time
+                            };
 
                             _.forEach(node.children, (child) => {
                                 innerFx(child, innerFx);
                             });
-
-                            if (!node.children || node.children.length === 0) {
-                                node.action = "buy";
-                            } else {
-                                buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice)) * 1.2;
-                                Memory.minimumSell[resource] = Math.min(Infinity, buyPrice);
-                                if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
-                                    delete Memory.minimumSell[resource];
-                                }
-                                if (node.buyPrice > buyPrice) {
-                                    let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
-                                        roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
-
-                                    node.amount = Math.min(Math.min(node.amount, roomResources1), roomResources2);
-
-                                    node.action = "create";
-                                    node.buyPrice = buyPrice;
-                                    if (roomResources <= lowest && node.amount > 0) {
-                                        labQueue = node;
-                                        lowest = roomResources;
-                                    }
-                                } else {
-                                    node.action = "buy";
-                                }
-                            }
-                            if (node.amount > 0 && node.action === "buy" && !roomMemory.buyQueue && Cache.credits >= Memory.minimumCredits && Memory.buy) {
-                                roomMemory.buyQueue = {
-                                    resource: resource,
-                                    amount: node.amount,
-                                    price: node.buyPrice,
-                                    start: Game.time
-                                };
-                            }
-                        };
-
-                        fx(mineral, fx);
-                    });
-                    if (labQueue && !roomMemory.labQueue) {
-                        var fx = (node, innerFx) => {
-                            var resource = node.resource;
-                            if (node.amount <= 0) {
-                                return;
-                            }
-
-                            if (node.action === "create") {
-                                let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
-                                    roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
-                                roomMemory.labQueue = {
-                                    resource: resource,
-                                    amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(node.amount, roomResources1), roomResources2), LAB_MINERAL_CAPACITY) / 5), 3000),
-                                    children: _.map(node.children, (c) => c.resource),
-                                    start: Game.time
-                                };
-
-                                _.forEach(node.children, (child) => {
-                                    innerFx(child, innerFx);
-                                });
-                            }
-                        };
-
-                        fx(labQueue, fx);
-                    }
-                });
-
-            }
-        },
-        
-        baseMatrixes: () => {
-            "use strict";
-            
-            if (!Memory.baseMatrixes) {
-                Memory.baseMatrixes = {};
-            }
-            
-            _.forEach(Memory.baseMatrixes, (matrix, roomName) => {
-                var room = Game.rooms[roomName],
-                    tempMatrix, costMatrix, repairableStructuresInRoom;
-                
-                if (!room || room.unobservable || matrix.status === "complete" || Cache.spawnsInRoom(room).length === 0) {
-                    return;
-                }
-                repairableStructuresInRoom = Cache.repairableStructuresInRoom(room);
-                if (!matrix.status) {
-                    costMatrix = new PathFinder.CostMatrix();
-                    _.forEach(_.filter(repairableStructuresInRoom, (s) => !(s.structureType === STRUCTURE_ROAD)), (structure) => {
-                        costMatrix.set(structure.pos.x, structure.pos.y, 255);
-                    });
-                    matrix.tempMatrix = costMatrix.serialize();
-                    matrix.costMatrix = costMatrix.serialize();
-                    matrix.status = "building";
-                    matrix.x = 0;
-                    matrix.y = 0;
-                }
-                if (matrix.status === "building") {
-                    tempMatrix = PathFinder.CostMatrix.deserialize(matrix.tempMatrix);
-                    costMatrix = PathFinder.CostMatrix.deserialize(matrix.costMatrix);
-
-                    for (; matrix.x < 50; matrix.x++) {
-                        for (; matrix.y < 50; matrix.y++) {
-                            if (Game.cpu.getUsed() >= 250) {
-                                matrix.costMatrix = costMatrix.serialize();
-                                return false;
-                            }
-                            
-                            if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, roomName), {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {
-                                roomCallback: () => {
-                                    return tempMatrix;
-                                },
-                                maxOps: 10000,
-                                maxRooms: 1
-                            }).incomplete) {
-                                costMatrix.set(matrix.x, matrix.y, 255);
-                            }
                         }
-                        matrix.y = 0;
-                    }
-                    _.forEach(_.filter(repairableStructuresInRoom, (s) => s.structureType === STRUCTURE_RAMPART), (structure) => {
-                        costMatrix.set(structure.pos.x, structure.pos.y, 0);
-                    });
-                    
-                    delete matrix.tempMatrix;
-                    delete matrix.x;
-                    delete matrix.y;
-                    matrix.costMatrix = costMatrix.serialize();
-                    matrix.status = "complete";
-                }
-            });
-        },
-        
-        deserializeCreeps: () => {
-            "use strict";
-            _.forEach(Game.creeps, (creep) => {
-                if (creep.memory.currentTask) {
-                    switch (creep.memory.currentTask.type) {
-                        case "attack":
-                            Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
-                            break;
-                        case "build":
-                            Cache.creepTasks[creep.name] = TaskBuild.fromObj(creep);
-                            break;
-                        case "claim":
-                            Cache.creepTasks[creep.name] = TaskClaim.fromObj(creep);
-                            break;
-                        case "collectEnergy":
-                            Cache.creepTasks[creep.name] = TaskCollectEnergy.fromObj(creep);
-                            break;
-                        case "collectMinerals":
-                            Cache.creepTasks[creep.name] = TaskCollectMinerals.fromObj(creep);
-                            break;
-                        case "dismantle":
-                            Cache.creepTasks[creep.name] = TaskDismantle.fromObj(creep);
-                            break;
-                        case "fillEnergy":
-                            Cache.creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
-                            break;
-                        case "fillMinerals":
-                            Cache.creepTasks[creep.name] = TaskFillMinerals.fromObj(creep);
-                            break;
-                        case "harvest":
-                            Cache.creepTasks[creep.name] = TaskHarvest.fromObj(creep);
-                            break;
-                        case "heal":
-                            Cache.creepTasks[creep.name] = TaskHeal.fromObj(creep);
-                            break;
-                        case "meleeAttack":
-                            Cache.creepTasks[creep.name] = TaskMeleeAttack.fromObj(creep);
-                            break;
-                        case "mine":
-                            Cache.creepTasks[creep.name] = TaskMine.fromObj(creep);
-                            break;
-                        case "pickupResource":
-                            Cache.creepTasks[creep.name] = TaskPickupResource.fromObj(creep);
-                            break;
-                        case "rally":
-                            Cache.creepTasks[creep.name] = TaskRally.fromObj(creep);
-                            break;
-                        case "rangedAttack":
-                            Cache.creepTasks[creep.name] = TaskRangedAttack.fromObj(creep);
-                            break;
-                        case "repair":
-                            Cache.creepTasks[creep.name] = TaskRepair.fromObj(creep);
-                            break;
-                        case "reserve":
-                            Cache.creepTasks[creep.name] = TaskReserve.fromObj(creep);
-                            break;
-                        case "upgradeController":
-                            Cache.creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);
-                            break;
-                    }
-                }
-            });
-        },
-        
-        deserializeRooms: () => {
-            unobservableRooms = [];
-            _.forEach(Memory.rooms, (roomMemory, name) => {
-                if (roomMemory.roomType) {
-                    switch (roomMemory.roomType.type) {
-                        case "base":
-                            Cache.roomTypes[name] = RoomBase.fromObj(roomMemory);
-                            break;
-                        case "cleanup":
-                            Cache.roomTypes[name] = RoomCleanup.fromObj(roomMemory);
-                            break;
-                        case "mine":
-                            Cache.roomTypes[name] = RoomMine.fromObj(roomMemory);
-                            break;
-                        case "source":
-                            Cache.roomTypes[name] = RoomSource.fromObj(roomMemory);
-                            break;
-                    }
-    
-                    if (!Game.rooms[name]) {
-                        unobservableRooms.push({
-                            name: name,
-                            unobservable: true
-                        });
-                    }
-                }
-            });
-        },
-
-        balanceEnergy: () => {
-            var rooms, energyGoal;
-
-            rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
-            if (rooms.length > 1) {
-                energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
-                _.forEach(rooms, (room, index) => {
-                    var otherRoom = rooms[rooms.length - index - 1],
-                        roomStorageEnergy = room.storage.store[RESOURCE_ENERGY],
-                        otherRoomStorageEnergy = otherRoom.storage.store[RESOURCE_ENERGY],
-                        otherRoomTerminal = otherRoom.terminal,
-                        otherRoomTerminalEnergy = otherRoomTerminal.store[RESOURCE_ENERGY],
-                        transCost;
-                    
-                    if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
-                        return false;
-                    }
-
-                    if (otherRoomTerminalEnergy >= 1000) {
-                        transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoom.name, room.name);
-
-                        otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), room.name);
-                        Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoom.name} to ${room.name}`);
-                    }
-                });
-            }
-        },
-        
-        log: () => {
-            "use strict";
-
-            Cache.log.creeps = _.map(Game.creeps, (c) => {
-                return {
-                    creepId: c.id,
-                    name: c.name,
-                    creepType: c.memory.role,
-                    home: c.memory.home,
-                    army: c.memory.army,
-                    room: c.pos.roomName,
-                    x: c.pos.x,
-                    y: c.pos.y,
-                    spawning: c.spawning,
-                    ttl: c.ticksToLive,
-                    carryCapacity: c.carryCapacity,
-                    carry: c.carry,
-                    hits: c.hits,
-                    hitsMax: c.hitsMax
-                };
-            });
-
-            Cache.log.spawns = _.map(Game.spawns, (s) => {
-                return {
-                    spawnId: s.id,
-                    name: s.name,
-                    room: s.room.name,
-                    spawningName: s.spawning ? s.spawning.name : undefined,
-                    spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
-                    spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
-                };
-            });
-
-            _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
-                var roomName = room.name,
-                    roomMemory = Memory.rooms[roomName],
-                    type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",
-                    repairableStructures, constructionSites, towers, labs, nukers, powerSpawns;
-                if (room.unobservable) {
-                    Cache.log.rooms[roomName] = {
-                        type: type,
-                        supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : undefined,
-                        region: roomMemory ? roomMemory.region : undefined,
-                        unobservable: true,
-                        store: {},
-                        labs: [],
-                        source: [],
-                        creeps: []
-                    };
-                } else {
-                    if (Game.time % 10 === 0) {
-                        repairableStructures = Cache.repairableStructuresInRoom(room);
-                    }
-                    constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
-                    towers = Cache.towersInRoom(room);
-                    labs = Cache.labsInRoom(room);
-                    nukers = Cache.nukersInRoom(room);
-                    powerSpawns = Cache.powerSpawnsInRoom(room);
-
-                    Cache.log.rooms[roomName] = {
-                        type: type,
-                        supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : undefined,
-                        region: roomMemory ? roomMemory.region : undefined,
-                        unobservable: false,
-                        controller: !!room.controller,
-                        store: {},
-                        labs: [],
-                        source: [],
-                        creeps: []
                     };
 
-                    if (Cache.log.rooms[roomName].controller) {
-                        Cache.log.rooms[roomName].rcl = room.controller.level;
-                        if (room.controller.owner) {
-                            Cache.log.rooms[roomName].ownerUsername = room.controller.owner.username;
-                        }
-                        Cache.log.rooms[roomName].progress = room.controller.progress;
-                        Cache.log.rooms[roomName].progressTotal = room.controller.progressTotal;
-                        Cache.log.rooms[roomName].ttd = room.controller.ticksToDowngrade;
-                    }
-
-                    if (room.controller && room.controller.reservation) {
-                        Cache.log.rooms[roomName].reservedUsername = room.controller.reservation.username;
-                        Cache.log.rooms[roomName].tte = room.controller.reservation.ticksToEnd;
-                    }
-                    
-                    if (Game.time % 10 === 0) {
-                        Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits));
-                    } else {
-                        Cache.log.rooms[roomName].lowestWall = Memory.console && Memory.console.rooms && Memory.console.rooms[roomName] && Memory.console.rooms[roomName].lowestWall || null;
-                    }
-
-                    if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
-                        Cache.log.rooms[roomName].energyAvailable = room.energyAvailable;
-                        Cache.log.rooms[roomName].energyCapacityAvailable = room.energyCapacityAvailable;
-                    }
-
-                    Cache.log.rooms[roomName].constructionProgress = _.sum(_.map(constructionSites, (c) => c.progress));
-                    Cache.log.rooms[roomName].constructionProgressTotal = _.sum(_.map(constructionSites, (c) => c.progressTotal));
-
-                    Cache.log.rooms[roomName].towerEnergy = _.sum(_.map(towers, (t) => t.energy));
-                    Cache.log.rooms[roomName].towerEnergyCapacity = _.sum(_.map(towers, (t) => t.energyCapacity));
-
-                    Cache.log.rooms[roomName].labEnergy = _.sum(_.map(labs, (l) => l.energy));
-                    Cache.log.rooms[roomName].labEnergyCapacity = _.sum(_.map(labs, (l) => l.energyCapacity));
-
-                    Cache.log.rooms[roomName].nukerEnergy = _.sum(_.map(nukers, (n) => n.energy));
-                    Cache.log.rooms[roomName].nukerEnergyCapacity = _.sum(_.map(nukers, (n) => n.energyCapacity));
-
-                    Cache.log.rooms[roomName].nukerGhodium = _.sum(_.map(nukers, (n) => n.ghodium));
-                    Cache.log.rooms[roomName].nukerGhodiumCapacity = _.sum(_.map(nukers, (n) => n.ghodiumCapacity));
-
-                    Cache.log.rooms[roomName].powerSpawnEnergy = _.sum(_.map(powerSpawns, (s) => s.energy));
-                    Cache.log.rooms[roomName].powerSpawnEnergyCapacity = _.sum(_.map(powerSpawns, (s) => s.energyCapacity));
-
-                    Cache.log.rooms[roomName].powerSpawnPower = _.sum(_.map(powerSpawns, (s) => s.power));
-                    Cache.log.rooms[roomName].powerSpawnPowerCapacity = _.sum(_.map(powerSpawns, (s) => s.powerCapacity));
-
-                    if (room.storage) {
-                        Cache.log.rooms[roomName].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});
-                    }
-
-                    if (room.terminal) {
-                        Cache.log.rooms[roomName].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
-                    }
-
-                    Cache.log.rooms[roomName].labs = _.map(labs, (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
-
-                    Cache.log.rooms[roomName].labQueue = roomMemory.labQueue;
-                    Cache.log.rooms[roomName].buyQueue = roomMemory.buyQueue;
-
-                    _.forEach(room.find(FIND_SOURCES), (s) => {
-                        Cache.log.rooms[roomName].source.push({
-                            sourceId: s.id,
-                            resource: RESOURCE_ENERGY,
-                            amount: s.energy,
-                            capacity: s.energyCapacity,
-                            ttr: s.ticksToRegeneration
-                        });
-                    });
-
-                    _.forEach(room.find(FIND_MINERALS), (m) => {
-                        Cache.log.rooms[roomName].source.push({
-                            sourceId: m.id,
-                            resource: m.mineralType,
-                            amount: m.mineralAmount,
-                            ttr: m.ticksToRegeneration
-                        });
-                    });
-
-                    Cache.log.hostiles = [].concat.apply([], [Cache.log.hostiles, _.map(Cache.hostilesInRoom(room), (h) => {
-                        return {
-                            creepId: h.id,
-                            ownerUsername: h.owner.username,
-                            room: roomName,
-                            x: h.pos.x,
-                            y: h.pos.y,
-                            ttl: h.ticksToLive,
-                            hits: h.hits,
-                            hitsMax: h.hitsMax
-                        };
-                    })]);
+                    fx(labQueue, fx);
                 }
             });
-        },
+        }
+    }
 
-        rooms: () => {
-            "use strict";
+    static baseMatrixes() {
+        if (!Memory.baseMatrixes) {
+            Memory.baseMatrixes = {};
+        }
+        
+        _.forEach(Memory.baseMatrixes, (matrix, roomName) => {
+            var room = Game.rooms[roomName],
+                tempMatrix, costMatrix, repairableStructuresInRoom;
             
-            var roomOrder = ["base", "source", "mine", "cleanup", ""],
-                memoryRooms = Memory.rooms,
-                roomsToAlwaysRun = ["source", "cleanup"],
-                runRooms = Game.cpu.bucket >= 9800 || Game.time % 2 === 0;
-
-            Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
-            _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]).sort((a, b) => {
-                return roomOrder.indexOf(memoryRooms[a.name] && memoryRooms[a.name].roomType && memoryRooms[a.name].roomType.type || "") - roomOrder.indexOf(memoryRooms[b.name] && memoryRooms[b.name].roomType && memoryRooms[b.name].roomType.type || "");
-            }), (room) => {
-                var roomName = room.name,
-                    roomMemory = memoryRooms[roomName],
-                    roomType = roomMemory.roomType;
-                
-                if (Cache.roomTypes[roomName]) {
-                    if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
-                        Cache.roomTypes[roomName].run(room);
-                    }
-                    if (roomType.type === Cache.roomTypes[roomName].type) {
-                        Cache.roomTypes[roomName].toObj(room);
-                    }
-                }
-                
-                if (Memory.visualizations && !room.unobservable) {
-                    main.drawRoom(room);
-                }
-            });
-        },
-
-        drawRoom: (room) => {
-            var visual = room.visual,
-                x, y, towers, labs, nukers, powerSpawns;
-
-            if (!visual) {
-                visual = new RoomVisual(room.name);
-            }
-
-            if (!visual) {
+            if (!room || room.unobservable || matrix.status === "complete" || Cache.spawnsInRoom(room).length === 0) {
                 return;
             }
-
-            if (room.memory && room.memory.roomType) {
-                visual.text(_.capitalize(room.memory.roomType.type), -0.5, 49.325, {align: "left", font: "0.5 Arial"});
+            repairableStructuresInRoom = Cache.repairableStructuresInRoom(room);
+            if (!matrix.status) {
+                costMatrix = new PathFinder.CostMatrix();
+                _.forEach(_.filter(repairableStructuresInRoom, (s) => !(s.structureType === STRUCTURE_ROAD)), (structure) => {
+                    costMatrix.set(structure.pos.x, structure.pos.y, 255);
+                });
+                matrix.tempMatrix = costMatrix.serialize();
+                matrix.costMatrix = costMatrix.serialize();
+                matrix.status = "building";
+                matrix.x = 0;
+                matrix.y = 0;
             }
+            if (matrix.status === "building") {
+                tempMatrix = PathFinder.CostMatrix.deserialize(matrix.tempMatrix);
+                costMatrix = PathFinder.CostMatrix.deserialize(matrix.costMatrix);
 
-            if (room.controller && room.controller.level) {
-                visual.text(`RCL ${room.controller.level}`, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
-                if (room.controller.progress && room.controller.progressTotal) {
-                    Drawing.progressBar(visual, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
+                for (; matrix.x < 50; matrix.x++) {
+                    for (; matrix.y < 50; matrix.y++) {
+                        if (Game.cpu.getUsed() >= 250) {
+                            matrix.costMatrix = costMatrix.serialize();
+                            return false;
+                        }
+                        
+                        if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, roomName), {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {
+                            roomCallback: () => {
+                                return tempMatrix;
+                            },
+                            maxOps: 10000,
+                            maxRooms: 1
+                        }).incomplete) {
+                            costMatrix.set(matrix.x, matrix.y, 255);
+                        }
+                    }
+                    matrix.y = 0;
+                }
+                _.forEach(_.filter(repairableStructuresInRoom, (s) => s.structureType === STRUCTURE_RAMPART), (structure) => {
+                    costMatrix.set(structure.pos.x, structure.pos.y, 0);
+                });
+                
+                delete matrix.tempMatrix;
+                delete matrix.x;
+                delete matrix.y;
+                matrix.costMatrix = costMatrix.serialize();
+                matrix.status = "complete";
+            }
+        });
+    }
+
+    static deserializeCreeps() {
+        _.forEach(Game.creeps, (creep) => {
+            if (creep.memory.currentTask) {
+                switch (creep.memory.currentTask.type) {
+                    case "attack":
+                        Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
+                        break;
+                    case "build":
+                        Cache.creepTasks[creep.name] = TaskBuild.fromObj(creep);
+                        break;
+                    case "claim":
+                        Cache.creepTasks[creep.name] = TaskClaim.fromObj(creep);
+                        break;
+                    case "collectEnergy":
+                        Cache.creepTasks[creep.name] = TaskCollectEnergy.fromObj(creep);
+                        break;
+                    case "collectMinerals":
+                        Cache.creepTasks[creep.name] = TaskCollectMinerals.fromObj(creep);
+                        break;
+                    case "dismantle":
+                        Cache.creepTasks[creep.name] = TaskDismantle.fromObj(creep);
+                        break;
+                    case "fillEnergy":
+                        Cache.creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
+                        break;
+                    case "fillMinerals":
+                        Cache.creepTasks[creep.name] = TaskFillMinerals.fromObj(creep);
+                        break;
+                    case "harvest":
+                        Cache.creepTasks[creep.name] = TaskHarvest.fromObj(creep);
+                        break;
+                    case "heal":
+                        Cache.creepTasks[creep.name] = TaskHeal.fromObj(creep);
+                        break;
+                    case "meleeAttack":
+                        Cache.creepTasks[creep.name] = TaskMeleeAttack.fromObj(creep);
+                        break;
+                    case "mine":
+                        Cache.creepTasks[creep.name] = TaskMine.fromObj(creep);
+                        break;
+                    case "pickupResource":
+                        Cache.creepTasks[creep.name] = TaskPickupResource.fromObj(creep);
+                        break;
+                    case "rally":
+                        Cache.creepTasks[creep.name] = TaskRally.fromObj(creep);
+                        break;
+                    case "rangedAttack":
+                        Cache.creepTasks[creep.name] = TaskRangedAttack.fromObj(creep);
+                        break;
+                    case "repair":
+                        Cache.creepTasks[creep.name] = TaskRepair.fromObj(creep);
+                        break;
+                    case "reserve":
+                        Cache.creepTasks[creep.name] = TaskReserve.fromObj(creep);
+                        break;
+                    case "upgradeController":
+                        Cache.creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);
+                        break;
                 }
             }
+        });
+    }
 
-            y = 2.125;
-            if (room.energyCapacityAvailable) {
-                y += 0.7;
-                visual.text("Energy", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, room.energyAvailable, room.energyCapacityAvailable, {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+    static deserializeRooms() {
+        unobservableRooms = [];
+        _.forEach(Memory.rooms, (roomMemory, name) => {
+            if (roomMemory.roomType) {
+                switch (roomMemory.roomType.type) {
+                    case "base":
+                        Cache.roomTypes[name] = RoomBase.fromObj(roomMemory);
+                        break;
+                    case "cleanup":
+                        Cache.roomTypes[name] = RoomCleanup.fromObj(roomMemory);
+                        break;
+                    case "mine":
+                        Cache.roomTypes[name] = RoomMine.fromObj(roomMemory);
+                        break;
+                    case "source":
+                        Cache.roomTypes[name] = RoomSource.fromObj(roomMemory);
+                        break;
+                }
+
+                if (!Game.rooms[name]) {
+                    unobservableRooms.push({
+                        name: name,
+                        unobservable: true
+                    });
+                }
             }
+        });
+    }
 
-            towers = Cache.towersInRoom(room);
-            if (towers.length > 0) {
-                y += 0.7;
-                visual.text("Towers", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(towers, (t) => t.energy)), _.sum(_.map(towers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
-            }
+    static balanceEnergy() {
+        var rooms, energyGoal;
 
-            labs = Cache.labsInRoom(room);
-            if (labs.length > 0) {
-                y += 0.7;
-                visual.text("Labs", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(labs, (t) => t.energy)), _.sum(_.map(labs, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
-            }
+        rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
+        if (rooms.length > 1) {
+            energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
+            _.forEach(rooms, (room, index) => {
+                var otherRoom = rooms[rooms.length - index - 1],
+                    roomStorageEnergy = room.storage.store[RESOURCE_ENERGY],
+                    otherRoomStorageEnergy = otherRoom.storage.store[RESOURCE_ENERGY],
+                    otherRoomTerminal = otherRoom.terminal,
+                    otherRoomTerminalEnergy = otherRoomTerminal.store[RESOURCE_ENERGY],
+                    transCost;
+                
+                if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
+                    return false;
+                }
 
-            nukers = Cache.nukersInRoom(room);
-            if (nukers.length > 0) {
-                y += 0.7;
-                visual.text("Nuker", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(nukers, (t) => t.energy)), _.sum(_.map(nukers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(nukers, (t) => t.ghodium)), _.sum(_.map(nukers, (t) => t.ghodiumCapacity)), {background: "#808080", bar: "#ffff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
-            }
+                if (otherRoomTerminalEnergy >= 1000) {
+                    transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoom.name, room.name);
 
-            powerSpawns = Cache.powerSpawnsInRoom(room);
-            if (powerSpawns.length > 0) {
-                y += 0.7;
-                visual.text("Power Spawn", -0.5, y, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.energy)), _.sum(_.map(powerSpawns, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
-                Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.power)), _.sum(_.map(powerSpawns, (t) => t.powerCapacity)), {background: "#808080", bar: "#ff0000", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
-            }
+                    otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), room.name);
+                    Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoom.name} to ${room.name}`);
+                }
+            });
+        }
+    }
 
-            if (room.memory && room.memory.buyQueue) {
-                y += 0.7;
-                visual.text("Buy", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                visual.text(room.memory.buyQueue.amount, 2.5, y, {align: "right", font: "0.5 Arial"});
-                Drawing.resource(visual, 2.8, y - 0.175, 0.5, room.memory.buyQueue.resource, {opacity: 1});
-            }
+    static log() {
+        Cache.log.creeps = _.map(Game.creeps, (c) => {
+            return {
+                creepId: c.id,
+                name: c.name,
+                creepType: c.memory.role,
+                home: c.memory.home,
+                army: c.memory.army,
+                room: c.pos.roomName,
+                x: c.pos.x,
+                y: c.pos.y,
+                spawning: c.spawning,
+                ttl: c.ticksToLive,
+                carryCapacity: c.carryCapacity,
+                carry: c.carry,
+                hits: c.hits,
+                hitsMax: c.hitsMax
+            };
+        });
 
-            if (room.memory && room.memory.labQueue) {
-                y += 0.7;
-                visual.text("Create", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                visual.text(room.memory.labQueue.amount, 2.5, y, {align: "right", font: "0.5 Arial"});
-                Drawing.resource(visual, 2.8, y - 0.175, 0.5, room.memory.labQueue.resource, {opacity: 1});
-            }
+        Cache.log.spawns = _.map(Game.spawns, (s) => {
+            return {
+                spawnId: s.id,
+                name: s.name,
+                room: s.room.name,
+                spawningName: s.spawning ? s.spawning.name : undefined,
+                spawningNeedTime: s.spawning ? s.spawning.needTime : undefined,
+                spawningRemainingTime: s.spawning ? s.spawning.remainingTime : undefined
+            };
+        });
 
-            if (labs.length > 0) {
-                y += 0.7;
-                visual.text("Labs", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                x = 0;
-                _.forEach(labs, (lab) => {
-                    x += 2.5;
-                    if (lab.mineralAmount === 0) {
-                        visual.text("Empty", x, y, {align: "right", font: "0.5 Arial"});
-                    } else {
-                        visual.text(lab.mineralAmount, x, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(visual, x + 0.3, y - 0.175, 0.5, lab.mineralType, {opacity: 1});
-                    }
-                });
-            }
+        _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
+            var roomName = room.name,
+                roomMemory = Memory.rooms[roomName],
+                type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",
+                repairableStructures, constructionSites, towers, labs, nukers, powerSpawns;
+            if (room.unobservable) {
+                Cache.log.rooms[roomName] = {
+                    type: type,
+                    supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : undefined,
+                    region: roomMemory ? roomMemory.region : undefined,
+                    unobservable: true,
+                    store: {},
+                    labs: [],
+                    source: [],
+                    creeps: []
+                };
+            } else {
+                if (Game.time % 10 === 0) {
+                    repairableStructures = Cache.repairableStructuresInRoom(room);
+                }
+                constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
+                towers = Cache.towersInRoom(room);
+                labs = Cache.labsInRoom(room);
+                nukers = Cache.nukersInRoom(room);
+                powerSpawns = Cache.powerSpawnsInRoom(room);
 
-            if (room.storage) {
-                y += 1.4;
-                visual.text("Storage", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                _.forEach(room.storage.store, (amount, resource) => {
-                    if (resource === RESOURCE_ENERGY) {
-                        return;
-                    }
-
-                    y += 0.7;
-                    visual.text(amount, 1, y, {align: "right", font: "0.5 Arial"});
-                    Drawing.resource(visual, 1.3, y - 0.175, 0.5, resource, {opacity: 1});
-                });
-            }
-
-            if (room.terminal) {
-                y += 1.4;
-                visual.text("Terminal", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
-                _.forEach(room.terminal.store, (amount, resource) => {
-                    if (resource === RESOURCE_ENERGY) {
-                        return;
-                    }
-
-                    y += 0.7;
-                    visual.text(amount, 1, y, {align: "right", font: "0.5 Arial"});
-                    Drawing.resource(visual, 1.3, y - 0.175, 0.5, resource, {opacity: 1});
-                });
-            }
-        },
-
-        army: () => {
-            _.forEach(Memory.army, (value, army) => {
-                Cache.log.army[army] = {
-                    directive: value.directive,
-                    scheduled: value.scheduled,
-                    portals: value.portals,
-                    boostRoom: value.boostRoom,
-                    buildRoom: value.buildRoom,
-                    stageRoom: value.stageRoom,
-                    attackRoom: value.attackRoom,
-                    dismantle: value.dismantle.length,
+                Cache.log.rooms[roomName] = {
+                    type: type,
+                    supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : undefined,
+                    region: roomMemory ? roomMemory.region : undefined,
+                    unobservable: false,
+                    controller: !!room.controller,
+                    store: {},
+                    labs: [],
+                    source: [],
                     creeps: []
                 };
 
-                if (Game.rooms[value.attackRoom]) {
-                    Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
-                    Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
-                }
-                Proxy.run("main.army.run", () => Army.run(army));
-            });
-        },
-
-        creeps: () => {
-            _.forEach(Game.creeps, (creep) => {
-                if (creep.spawning || creep.memory.stop) {
-                    return;
-                }
-                if (creep.ticksToLive <= 150 || creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1 || creep.ticksToLive % 100 === 1) {
-                    switch (creep.ticksToLive - 1) {
-                        case 3:
-                            creep.say("R.I.P. and", true);
-                            break;
-                        case 2:
-                            creep.say("Pepperonis", true);
-                            break;
-                        case 1:
-                            creep.say(":(", true);
-                            break;
-                        default:
-                            creep.say(`TTL ${creep.ticksToLive - 1}`);
-                            break;
+                if (Cache.log.rooms[roomName].controller) {
+                    Cache.log.rooms[roomName].rcl = room.controller.level;
+                    if (room.controller.owner) {
+                        Cache.log.rooms[roomName].ownerUsername = room.controller.owner.username;
                     }
-                }
-                if (creep.memory.army && Memory.army[creep.memory.army] && creep.room.name === Memory.army[creep.memory.army].attackRoom) {
-                    creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][Game.time % 35], true);
-                }
-                switch (Game.time % 1000000) {
-                    case 999990:
-                        creep.say("TEN!", true);
-                        break;
-                    case 999991:
-                        creep.say("NINE!", true);
-                        break;
-                    case 999992:
-                        creep.say("EIGHT!", true);
-                        break;
-                    case 999993:
-                        creep.say("SEVEN!", true);
-                        break;
-                    case 999994:
-                        creep.say("SIX!", true);
-                        break;
-                    case 999995:
-                        creep.say("FIVE!", true);
-                        break;
-                    case 999996:
-                        creep.say("FOUR!", true);
-                        break;
-                    case 999997:
-                        creep.say("THREE!", true);
-                        break;
-                    case 999998:
-                        creep.say("TWO!", true);
-                        break;
-                    case 999999:
-                        creep.say("ONE!", true);
-                        break;
-                    case 0:
-                        creep.say("HAPPY NEW", true);
-                        break;
-                    case 1:
-                        creep.say("MILLION!", true);
-                        break;
+                    Cache.log.rooms[roomName].progress = room.controller.progress;
+                    Cache.log.rooms[roomName].progressTotal = room.controller.progressTotal;
+                    Cache.log.rooms[roomName].ttd = room.controller.ticksToDowngrade;
                 }
 
-                if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
-                    if (creep.pos.x === 0) {
-                        switch (Math.floor(Math.random() * 3)) {
-                            case 0:
-                                creep.move(RIGHT);
-                                break;
-                            case 1:
-                                creep.move(TOP_RIGHT);
-                                break;
-                            case 2:
-                                creep.move(BOTTOM_RIGHT);
-                                break;
-                        }
-                    }
-
-                    if (creep.pos.x === 49) {
-                        switch (Math.floor(Math.random() * 3)) {
-                            case 0:
-                                creep.move(LEFT);
-                                break;
-                            case 1:
-                                creep.move(TOP_LEFT);
-                                break;
-                            case 2:
-                                creep.move(BOTTOM_LEFT);
-                                break;
-                        }
-                    }
-
-                    if (creep.pos.y === 0) {
-                        switch (Math.floor(Math.random() * 3)) {
-                            case 0:
-                                creep.move(BOTTOM);
-                                break;
-                            case 1:
-                                creep.move(BOTTOM_RIGHT);
-                                break;
-                            case 2:
-                                creep.move(BOTTOM_LEFT);
-                                break;
-                        }
-                    }
-
-                    if (creep.pos.y === 49) {
-                        switch (Math.floor(Math.random() * 3)) {
-                            case 0:
-                                creep.move(TOP);
-                                break;
-                            case 1:
-                                creep.move(TOP_RIGHT);
-                                break;
-                            case 2:
-                                creep.move(TOP_LEFT);
-                                break;
-                        }
-                    }
-                    Proxy.run("main.creeps.run", () => Cache.creepTasks[creep.name].run(creep));
-                    if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name && (!Cache.creepTasks[creep.name] || !Cache.creepTasks[creep.name].force)) {
-                        delete creep.memory.currentTask;
-                    }
-                    creep.memory.lastRoom = creep.room.name;
-                    if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
-                        Cache.creepTasks[creep.name].toObj(creep);
-                    }
-                    if (creep.carry[RESOURCE_ENERGY] > 0 && creep.getActiveBodyparts(WORK) > 0) {
-                        _.forEach(_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax), (structure) => {
-                            creep.repair(structure);
-                        });
-                    }
-                    if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && (!creep.memory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
-                        creep.suicide();
-                    }
+                if (room.controller && room.controller.reservation) {
+                    Cache.log.rooms[roomName].reservedUsername = room.controller.reservation.username;
+                    Cache.log.rooms[roomName].tte = room.controller.reservation.ticksToEnd;
+                }
+                
+                if (Game.time % 10 === 0) {
+                    Cache.log.rooms[roomName].lowestWall = Math.min.apply(Math, _.map(_.filter(repairableStructures, (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits));
                 } else {
-                    delete creep.memory.currentTask;
-                    if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
-                        creep.suicide();
-                    } else {
-                        creep.say("Idle");
-                    }
+                    Cache.log.rooms[roomName].lowestWall = Memory.console && Memory.console.rooms && Memory.console.rooms[roomName] && Memory.console.rooms[roomName].lowestWall || null;
                 }
-            });
-        },
-        
-        debug: () => {
-            if (Memory.debug) {
-                _.forEach(Game.creeps, (creep) => {
-                    creep.room.visual.text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
-                    creep.room.visual.text(creep.memory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"});
-                    creep.room.visual.text(creep.memory.currentTask ? creep.memory.currentTask.type : "", creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
+
+                if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
+                    Cache.log.rooms[roomName].energyAvailable = room.energyAvailable;
+                    Cache.log.rooms[roomName].energyCapacityAvailable = room.energyCapacityAvailable;
+                }
+
+                Cache.log.rooms[roomName].constructionProgress = _.sum(_.map(constructionSites, (c) => c.progress));
+                Cache.log.rooms[roomName].constructionProgressTotal = _.sum(_.map(constructionSites, (c) => c.progressTotal));
+
+                Cache.log.rooms[roomName].towerEnergy = _.sum(_.map(towers, (t) => t.energy));
+                Cache.log.rooms[roomName].towerEnergyCapacity = _.sum(_.map(towers, (t) => t.energyCapacity));
+
+                Cache.log.rooms[roomName].labEnergy = _.sum(_.map(labs, (l) => l.energy));
+                Cache.log.rooms[roomName].labEnergyCapacity = _.sum(_.map(labs, (l) => l.energyCapacity));
+
+                Cache.log.rooms[roomName].nukerEnergy = _.sum(_.map(nukers, (n) => n.energy));
+                Cache.log.rooms[roomName].nukerEnergyCapacity = _.sum(_.map(nukers, (n) => n.energyCapacity));
+
+                Cache.log.rooms[roomName].nukerGhodium = _.sum(_.map(nukers, (n) => n.ghodium));
+                Cache.log.rooms[roomName].nukerGhodiumCapacity = _.sum(_.map(nukers, (n) => n.ghodiumCapacity));
+
+                Cache.log.rooms[roomName].powerSpawnEnergy = _.sum(_.map(powerSpawns, (s) => s.energy));
+                Cache.log.rooms[roomName].powerSpawnEnergyCapacity = _.sum(_.map(powerSpawns, (s) => s.energyCapacity));
+
+                Cache.log.rooms[roomName].powerSpawnPower = _.sum(_.map(powerSpawns, (s) => s.power));
+                Cache.log.rooms[roomName].powerSpawnPowerCapacity = _.sum(_.map(powerSpawns, (s) => s.powerCapacity));
+
+                if (room.storage) {
+                    Cache.log.rooms[roomName].store.storage = _.map(room.storage.store, (s, k) => {return {resource: k, amount: s};});
+                }
+
+                if (room.terminal) {
+                    Cache.log.rooms[roomName].store.terminal = _.map(room.terminal.store, (s, k) => {return {resource: k, amount: s};});
+                }
+
+                Cache.log.rooms[roomName].labs = _.map(labs, (l) => {return {resource: l.mineralType, amount: l.mineralAmount};});
+
+                Cache.log.rooms[roomName].labQueue = roomMemory.labQueue;
+                Cache.log.rooms[roomName].buyQueue = roomMemory.buyQueue;
+
+                _.forEach(room.find(FIND_SOURCES), (s) => {
+                    Cache.log.rooms[roomName].source.push({
+                        sourceId: s.id,
+                        resource: RESOURCE_ENERGY,
+                        amount: s.energy,
+                        capacity: s.energyCapacity,
+                        ttr: s.ticksToRegeneration
+                    });
                 });
-            }
-        },
 
-        finalize: () => {
-            Cache.log.tick = Game.time;
-            Cache.log.date = new Date();
-            Cache.log.gcl = Game.gcl.level;
-            Cache.log.progress = Game.gcl.progress;
-            Cache.log.progressTotal = Game.gcl.progressTotal;
-            Cache.log.limit = Game.cpu.limit;
-            Cache.log.tickLimit = Game.cpu.tickLimit;
-            Cache.log.bucket = Game.cpu.bucket;
-            Cache.log.credits = Game.market.credits;
-        },
-
-        drawGlobal: () => {
-            var y;
-
-            if (Memory.visualizations) {
-                Cache.globalVisual.text(`GCL ${Game.gcl.level}`, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
-                Drawing.progressBar(Cache.globalVisual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
-                Drawing.progressBar(Cache.globalVisual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
-                Cache.globalVisual.text(`Tick ${Game.time}`, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
-                Cache.globalVisual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
-                Cache.globalVisual.text(`Credits ${Game.market.credits.toFixed(2)}`, -0.5, 0.725, {align: "left", font: "0.5 Arial"});
-                Cache.globalVisual.text(`Creeps ${_.keys(Game.creeps).length}`, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
-                y = 0.725;
-                _.forEach(_.filter(Game.rooms, (r) => !r.unobservable && r.memory.roomType && r.memory.roomType.type === "base"), (room) => {
-                    y += 0.7;
-
-                    Cache.globalVisual.text(room.name, 43.5, y, {align: "right", font: "bold 0.5 Arial"});
-                    if (room.storage) {
-                        Cache.globalVisual.text(room.storage.store[RESOURCE_ENERGY], 45.8, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(Cache.globalVisual, 46.15, y - 0.175, 0.5, RESOURCE_ENERGY, {opacity: 1});
-                    }
-                    if (room.terminal) {
-                        Cache.globalVisual.text(room.terminal.store[RESOURCE_ENERGY], 48.8, y, {align: "right", font: "0.5 Arial"});
-                        Drawing.resource(Cache.globalVisual, 49.15, y - 0.175, 0.5, RESOURCE_ENERGY, {opacity: 1});
-                    }
+                _.forEach(room.find(FIND_MINERALS), (m) => {
+                    Cache.log.rooms[roomName].source.push({
+                        sourceId: m.id,
+                        resource: m.mineralType,
+                        amount: m.mineralAmount,
+                        ttr: m.ticksToRegeneration
+                    });
                 });
+
+                Cache.log.hostiles = [].concat.apply([], [Cache.log.hostiles, _.map(Cache.hostilesInRoom(room), (h) => {
+                    return {
+                        creepId: h.id,
+                        ownerUsername: h.owner.username,
+                        room: roomName,
+                        x: h.pos.x,
+                        y: h.pos.y,
+                        ttl: h.ticksToLive,
+                        hits: h.hits,
+                        hitsMax: h.hitsMax
+                    };
+                })]);
             }
-            Memory.stats.cpu.push(Game.cpu.getUsed());
-            while (Memory.stats.cpu.length > 100) {
-                Memory.stats.cpu.shift();
+        });
+    }
+
+    static rooms() {
+        var roomOrder = ["base", "source", "mine", "cleanup", ""],
+            memoryRooms = Memory.rooms,
+            roomsToAlwaysRun = ["source", "cleanup"],
+            runRooms = Game.cpu.bucket >= 9800 || Game.time % 2 === 0;
+
+        Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
+        _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]).sort((a, b) => {
+            return roomOrder.indexOf(memoryRooms[a.name] && memoryRooms[a.name].roomType && memoryRooms[a.name].roomType.type || "") - roomOrder.indexOf(memoryRooms[b.name] && memoryRooms[b.name].roomType && memoryRooms[b.name].roomType.type || "");
+        }), (room) => {
+            var roomName = room.name,
+                roomMemory = memoryRooms[roomName],
+                roomType = roomMemory.roomType;
+            
+            if (Cache.roomTypes[roomName]) {
+                if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
+                    Cache.roomTypes[roomName].run(room);
+                }
+                if (roomType.type === Cache.roomTypes[roomName].type) {
+                    Cache.roomTypes[roomName].toObj(room);
+                }
             }
-            Memory.stats.bucket.push(Game.cpu.bucket);
-            while (Memory.stats.bucket.length > 100) {
-                Memory.stats.bucket.shift();
+            
+            if (Memory.visualizations && !room.unobservable) {
+                this.drawRoom(room);
             }
-            Memory.stats.gclProgress.push(Game.gcl.progress);
-            while (Memory.stats.gclProgress.length > 100) {
-                Memory.stats.gclProgress.shift();
-            }
-            if (Memory.visualizations) {
-                Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
-            }
-            Cache.log.cpuUsed = Game.cpu.getUsed();
-            Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
-            Memory.console = Cache.log;
-            if (Memory.visualizations) {
-                Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
+        });
+    }
+
+    static drawRoom(room) {
+        var visual = room.visual,
+            x, y, towers, labs, nukers, powerSpawns;
+
+        if (!visual) {
+            visual = new RoomVisual(room.name);
+        }
+
+        if (!visual) {
+            return;
+        }
+
+        if (room.memory && room.memory.roomType) {
+            visual.text(_.capitalize(room.memory.roomType.type), -0.5, 49.325, {align: "left", font: "0.5 Arial"});
+        }
+
+        if (room.controller && room.controller.level) {
+            visual.text(`RCL ${room.controller.level}`, 2.5, 49.325, {align: "left", font: "0.5 Arial"});
+            if (room.controller.progress && room.controller.progressTotal) {
+                Drawing.progressBar(visual, 5.5, 48.9, 20, 0.5, room.controller.progress, room.controller.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
             }
         }
-    };
+
+        y = 2.125;
+        if (room.energyCapacityAvailable) {
+            y += 0.7;
+            visual.text("Energy", -0.5, y, {align: "left", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, room.energyAvailable, room.energyCapacityAvailable, {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+        }
+
+        towers = Cache.towersInRoom(room);
+        if (towers.length > 0) {
+            y += 0.7;
+            visual.text("Towers", -0.5, y, {align: "left", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(towers, (t) => t.energy)), _.sum(_.map(towers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+        }
+
+        labs = Cache.labsInRoom(room);
+        if (labs.length > 0) {
+            y += 0.7;
+            visual.text("Labs", -0.5, y, {align: "left", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(labs, (t) => t.energy)), _.sum(_.map(labs, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+        }
+
+        nukers = Cache.nukersInRoom(room);
+        if (nukers.length > 0) {
+            y += 0.7;
+            visual.text("Nuker", -0.5, y, {align: "left", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(nukers, (t) => t.energy)), _.sum(_.map(nukers, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(nukers, (t) => t.ghodium)), _.sum(_.map(nukers, (t) => t.ghodiumCapacity)), {background: "#808080", bar: "#ffff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+        }
+
+        powerSpawns = Cache.powerSpawnsInRoom(room);
+        if (powerSpawns.length > 0) {
+            y += 0.7;
+            visual.text("Power Spawn", -0.5, y, {align: "left", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 2.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.energy)), _.sum(_.map(powerSpawns, (t) => t.energyCapacity)), {background: "#808080", bar: "#00ff00", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+            Drawing.progressBar(visual, 8.5, y - 0.425, 5, 0.5, _.sum(_.map(powerSpawns, (t) => t.power)), _.sum(_.map(powerSpawns, (t) => t.powerCapacity)), {background: "#808080", bar: "#ff0000", showDetails: false, color: "#ffffff", font: "0.5 Arial"});
+        }
+
+        if (room.memory && room.memory.buyQueue) {
+            y += 0.7;
+            visual.text("Buy", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+            visual.text(room.memory.buyQueue.amount, 2.5, y, {align: "right", font: "0.5 Arial"});
+            Drawing.resource(visual, 2.8, y - 0.175, 0.5, room.memory.buyQueue.resource, {opacity: 1});
+        }
+
+        if (room.memory && room.memory.labQueue) {
+            y += 0.7;
+            visual.text("Create", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+            visual.text(room.memory.labQueue.amount, 2.5, y, {align: "right", font: "0.5 Arial"});
+            Drawing.resource(visual, 2.8, y - 0.175, 0.5, room.memory.labQueue.resource, {opacity: 1});
+        }
+
+        if (labs.length > 0) {
+            y += 0.7;
+            visual.text("Labs", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+            x = 0;
+            _.forEach(labs, (lab) => {
+                x += 2.5;
+                if (lab.mineralAmount === 0) {
+                    visual.text("Empty", x, y, {align: "right", font: "0.5 Arial"});
+                } else {
+                    visual.text(lab.mineralAmount, x, y, {align: "right", font: "0.5 Arial"});
+                    Drawing.resource(visual, x + 0.3, y - 0.175, 0.5, lab.mineralType, {opacity: 1});
+                }
+            });
+        }
+
+        if (room.storage) {
+            y += 1.4;
+            visual.text("Storage", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+            _.forEach(room.storage.store, (amount, resource) => {
+                if (resource === RESOURCE_ENERGY) {
+                    return;
+                }
+
+                y += 0.7;
+                visual.text(amount, 1, y, {align: "right", font: "0.5 Arial"});
+                Drawing.resource(visual, 1.3, y - 0.175, 0.5, resource, {opacity: 1});
+            });
+        }
+
+        if (room.terminal) {
+            y += 1.4;
+            visual.text("Terminal", -0.5, y, {align: "left", font: "bold 0.5 Arial"});
+            _.forEach(room.terminal.store, (amount, resource) => {
+                if (resource === RESOURCE_ENERGY) {
+                    return;
+                }
+
+                y += 0.7;
+                visual.text(amount, 1, y, {align: "right", font: "0.5 Arial"});
+                Drawing.resource(visual, 1.3, y - 0.175, 0.5, resource, {opacity: 1});
+            });
+        }
+    }
+
+    static army() {
+        _.forEach(Memory.army, (value, army) => {
+            Cache.log.army[army] = {
+                directive: value.directive,
+                scheduled: value.scheduled,
+                portals: value.portals,
+                boostRoom: value.boostRoom,
+                buildRoom: value.buildRoom,
+                stageRoom: value.stageRoom,
+                attackRoom: value.attackRoom,
+                dismantle: value.dismantle.length,
+                creeps: []
+            };
+
+            if (Game.rooms[value.attackRoom]) {
+                Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
+                Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
+            }
+            Army.run(army);
+        });
+    }
+
+    static creeps() {
+        _.forEach(Game.creeps, (creep) => {
+            if (creep.spawning || creep.memory.stop) {
+                return;
+            }
+            if (creep.ticksToLive <= 150 || creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1 || creep.ticksToLive % 100 === 1) {
+                switch (creep.ticksToLive - 1) {
+                    case 3:
+                        creep.say("R.I.P. and", true);
+                        break;
+                    case 2:
+                        creep.say("Pepperonis", true);
+                        break;
+                    case 1:
+                        creep.say(":(", true);
+                        break;
+                    default:
+                        creep.say(`TTL ${creep.ticksToLive - 1}`);
+                        break;
+                }
+            }
+            if (creep.memory.army && Memory.army[creep.memory.army] && creep.room.name === Memory.army[creep.memory.army].attackRoom) {
+                creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][Game.time % 35], true);
+            }
+            switch (Game.time % 1000000) {
+                case 999990:
+                    creep.say("TEN!", true);
+                    break;
+                case 999991:
+                    creep.say("NINE!", true);
+                    break;
+                case 999992:
+                    creep.say("EIGHT!", true);
+                    break;
+                case 999993:
+                    creep.say("SEVEN!", true);
+                    break;
+                case 999994:
+                    creep.say("SIX!", true);
+                    break;
+                case 999995:
+                    creep.say("FIVE!", true);
+                    break;
+                case 999996:
+                    creep.say("FOUR!", true);
+                    break;
+                case 999997:
+                    creep.say("THREE!", true);
+                    break;
+                case 999998:
+                    creep.say("TWO!", true);
+                    break;
+                case 999999:
+                    creep.say("ONE!", true);
+                    break;
+                case 0:
+                    creep.say("HAPPY NEW", true);
+                    break;
+                case 1:
+                    creep.say("MILLION!", true);
+                    break;
+            }
+
+            if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
+                if (creep.pos.x === 0) {
+                    switch (Math.floor(Math.random() * 3)) {
+                        case 0:
+                            creep.move(RIGHT);
+                            break;
+                        case 1:
+                            creep.move(TOP_RIGHT);
+                            break;
+                        case 2:
+                            creep.move(BOTTOM_RIGHT);
+                            break;
+                    }
+                }
+
+                if (creep.pos.x === 49) {
+                    switch (Math.floor(Math.random() * 3)) {
+                        case 0:
+                            creep.move(LEFT);
+                            break;
+                        case 1:
+                            creep.move(TOP_LEFT);
+                            break;
+                        case 2:
+                            creep.move(BOTTOM_LEFT);
+                            break;
+                    }
+                }
+
+                if (creep.pos.y === 0) {
+                    switch (Math.floor(Math.random() * 3)) {
+                        case 0:
+                            creep.move(BOTTOM);
+                            break;
+                        case 1:
+                            creep.move(BOTTOM_RIGHT);
+                            break;
+                        case 2:
+                            creep.move(BOTTOM_LEFT);
+                            break;
+                    }
+                }
+
+                if (creep.pos.y === 49) {
+                    switch (Math.floor(Math.random() * 3)) {
+                        case 0:
+                            creep.move(TOP);
+                            break;
+                        case 1:
+                            creep.move(TOP_RIGHT);
+                            break;
+                        case 2:
+                            creep.move(TOP_LEFT);
+                            break;
+                    }
+                }
+                Cache.creepTasks[creep.name].run(creep);
+                if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name && (!Cache.creepTasks[creep.name] || !Cache.creepTasks[creep.name].force)) {
+                    delete creep.memory.currentTask;
+                }
+                creep.memory.lastRoom = creep.room.name;
+                if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
+                    Cache.creepTasks[creep.name].toObj(creep);
+                }
+                if (creep.carry[RESOURCE_ENERGY] > 0 && creep.getActiveBodyparts(WORK) > 0) {
+                    _.forEach(_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax), (structure) => {
+                        creep.repair(structure);
+                    });
+                }
+                if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && (!creep.memory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                    creep.suicide();
+                }
+            } else {
+                delete creep.memory.currentTask;
+                if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                    creep.suicide();
+                } else {
+                    creep.say("Idle");
+                }
+            }
+        });
+    }
+
+    static debug() {
+        _.forEach(Game.creeps, (creep) => {
+            creep.room.visual.text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
+            creep.room.visual.text(creep.memory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"});
+            creep.room.visual.text(creep.memory.currentTask ? creep.memory.currentTask.type : "", creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
+        });
+    }
+
+    static finalize() {
+        Cache.log.tick = Game.time;
+        Cache.log.date = new Date();
+        Cache.log.gcl = Game.gcl.level;
+        Cache.log.progress = Game.gcl.progress;
+        Cache.log.progressTotal = Game.gcl.progressTotal;
+        Cache.log.limit = Game.cpu.limit;
+        Cache.log.tickLimit = Game.cpu.tickLimit;
+        Cache.log.bucket = Game.cpu.bucket;
+        Cache.log.credits = Game.market.credits;
+    }
+
+    static drawGlobal() {
+        var y;
+        Cache.globalVisual.text(`GCL ${Game.gcl.level}`, -0.5, 0.025, {align: "left", font: "0.5 Arial"});
+        Drawing.progressBar(Cache.globalVisual, 2.5, -0.4, 20, 0.5, Game.gcl.progress, Game.gcl.progressTotal, {background: "#808080", bar: "#00ff00", showDetails: true, color: "#ffffff", font: "0.5 Arial"});
+        Drawing.progressBar(Cache.globalVisual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
+        Cache.globalVisual.text(`Tick ${Game.time}`, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
+        Cache.globalVisual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
+        Cache.globalVisual.text(`Credits ${Game.market.credits.toFixed(2)}`, -0.5, 0.725, {align: "left", font: "0.5 Arial"});
+        Cache.globalVisual.text(`Creeps ${_.keys(Game.creeps).length}`, -0.5, 1.425, {align: "left", font: "0.5 Arial"});
+        y = 0.725;
+        _.forEach(_.filter(Game.rooms, (r) => !r.unobservable && r.memory.roomType && r.memory.roomType.type === "base"), (room) => {
+            y += 0.7;
+
+            Cache.globalVisual.text(room.name, 43.5, y, {align: "right", font: "bold 0.5 Arial"});
+            if (room.storage) {
+                Cache.globalVisual.text(room.storage.store[RESOURCE_ENERGY], 45.8, y, {align: "right", font: "0.5 Arial"});
+                Drawing.resource(Cache.globalVisual, 46.15, y - 0.175, 0.5, RESOURCE_ENERGY, {opacity: 1});
+            }
+            if (room.terminal) {
+                Cache.globalVisual.text(room.terminal.store[RESOURCE_ENERGY], 48.8, y, {align: "right", font: "0.5 Arial"});
+                Drawing.resource(Cache.globalVisual, 49.15, y - 0.175, 0.5, RESOURCE_ENERGY, {opacity: 1});
+            }
+        });
+        Memory.stats.cpu.push(Game.cpu.getUsed());
+        while (Memory.stats.cpu.length > 100) {
+            Memory.stats.cpu.shift();
+        }
+        Memory.stats.bucket.push(Game.cpu.bucket);
+        while (Memory.stats.bucket.length > 100) {
+            Memory.stats.bucket.shift();
+        }
+        Memory.stats.gclProgress.push(Game.gcl.progress);
+        while (Memory.stats.gclProgress.length > 100) {
+            Memory.stats.gclProgress.shift();
+        }
+        Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
+        Cache.log.cpuUsed = Game.cpu.getUsed();
+        Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
+        Memory.console = Cache.log;
+        Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
+    }
+}
 if (Memory.profiling) {
-    profiler.registerObject(main, "main");
+    profiler.registerObject(Main, "Main");
     profiler.enable();
 }
 
-module.exports = main;
+module.exports = Main;
 
 return module.exports;
 }
 /********** End of module 0: H:\dev\git\github\screeps\src\main.js **********/
-/********** Start module 1: ..\src\screeps-perf.js **********/
+/********** Start module 1: ..\src\screeps-profiler.js **********/
 __modules[1] = function(module, exports) {
-Array.prototype.filter = function(callback, thisArg) {
-    var results = [];
-    var arr = this;
-    for (var iterator = 0; iterator < arr.length; iterator++) {
-        if (callback.call(thisArg, arr[iterator], iterator, arr)) {
-            results.push(arr[iterator]);
-        }
-    }
-    return results;
-};
-
 Array.prototype.forEach = function(callback, thisArg) {
     var arr = this;
     for (var iterator = 0; iterator < arr.length; iterator++) {
@@ -1377,11 +1348,6 @@ Array.prototype.map = function(callback, thisArg) {
     return returnVal;
 };
 
-return module.exports;
-}
-/********** End of module 1: ..\src\screeps-perf.js **********/
-/********** Start module 2: ..\src\screeps-profiler.js **********/
-__modules[2] = function(module, exports) {
 let usedOnStart = 0;
 let enabled = false;
 let depth = 0;
@@ -1665,19 +1631,19 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 2: ..\src\screeps-profiler.js **********/
-/********** Start module 3: ..\src\army.js **********/
-__modules[3] = function(module, exports) {
-var Cache = __require(4,3),
-    Utilities = __require(11,3),
-    RoleArmyDismantler = __require(12,3),
-    RoleArmyHealer = __require(13,3),
-    RoleArmyMelee = __require(14,3),
-    RoleArmyRanged = __require(15,3),
-    TaskHeal = __require(48,3),
-    TaskMeleeAttack = __require(49,3),
-    TaskRally = __require(52,3),
-    TaskRangedAttack = __require(53,3);
+/********** End of module 1: ..\src\screeps-profiler.js **********/
+/********** Start module 2: ..\src\army.js **********/
+__modules[2] = function(module, exports) {
+var Cache = __require(3,2),
+    Utilities = __require(10,2),
+    RoleArmyDismantler = __require(11,2),
+    RoleArmyHealer = __require(12,2),
+    RoleArmyMelee = __require(13,2),
+    RoleArmyRanged = __require(14,2),
+    TaskHeal = __require(47,2),
+    TaskMeleeAttack = __require(48,2),
+    TaskRally = __require(51,2),
+    TaskRangedAttack = __require(52,2);
 
 class Army {
     static run(name) {
@@ -1808,15 +1774,15 @@ class Army {
 }
 
 if (Memory.profiling) {
-    __require(2,3).registerObject(Army, "Army");
+    __require(1,2).registerObject(Army, "Army");
 }
 module.exports = Army;
 
 return module.exports;
 }
-/********** End of module 3: ..\src\army.js **********/
-/********** Start module 4: ..\src\cache.js **********/
-__modules[4] = function(module, exports) {
+/********** End of module 2: ..\src\army.js **********/
+/********** Start module 3: ..\src\cache.js **********/
+__modules[3] = function(module, exports) {
 var spawnsInRoom = {},
     powerSpawnsInRoom = {},
     extensionsInRoom = {},
@@ -2008,16 +1974,16 @@ class Cache {
 }
 
 if (Memory.profiling) {
-    __require(2,4).registerObject(Cache, "Cache");
+    __require(1,3).registerObject(Cache, "Cache");
 }
 module.exports = Cache;
 
 return module.exports;
 }
-/********** End of module 4: ..\src\cache.js **********/
-/********** Start module 5: ..\src\commands.js **********/
-__modules[5] = function(module, exports) {
-var Cache = __require(4,5);
+/********** End of module 3: ..\src\cache.js **********/
+/********** Start module 4: ..\src\commands.js **********/
+__modules[4] = function(module, exports) {
+var Cache = __require(3,4);
 
 class Commands {
     static setRoomType(name, options) {
@@ -2160,15 +2126,15 @@ class Commands {
 }
 
 if (Memory.profiling) {
-    __require(2,5).registerObject(Commands, "Commands");
+    __require(1,4).registerObject(Commands, "Commands");
 }
 module.exports = Commands;
 
 return module.exports;
 }
-/********** End of module 5: ..\src\commands.js **********/
-/********** Start module 6: ..\src\drawing.js **********/
-__modules[6] = function(module, exports) {
+/********** End of module 4: ..\src\commands.js **********/
+/********** Start module 5: ..\src\drawing.js **********/
+__modules[5] = function(module, exports) {
 class Drawing {
     static progressBar(visual, x, y, w, h, value, max, options) {
         if (options.showMax === undefined) {
@@ -2415,17 +2381,17 @@ class Drawing {
 }
 
 if (Memory.profiling) {
-    __require(2,6).registerObject(Drawing, "Drawing");
+    __require(1,5).registerObject(Drawing, "Drawing");
 }
 module.exports = Drawing;
 
 return module.exports;
 }
-/********** End of module 6: ..\src\drawing.js **********/
-/********** Start module 7: ..\src\market.js **********/
-__modules[7] = function(module, exports) {
-var Cache = __require(4,7),
-    Utilities = __require(11,7);
+/********** End of module 5: ..\src\drawing.js **********/
+/********** Start module 6: ..\src\market.js **********/
+__modules[6] = function(module, exports) {
+var Cache = __require(3,6),
+    Utilities = __require(10,6);
 
 class Market {
     static getAllOrders() {
@@ -2482,15 +2448,15 @@ class Market {
 }
 
 if (Memory.profiling) {
-    __require(2,7).registerObject(Market, "Market");
+    __require(1,6).registerObject(Market, "Market");
 }
 module.exports = Market;
 
 return module.exports;
 }
-/********** End of module 7: ..\src\market.js **********/
-/********** Start module 8: ..\src\minerals.js **********/
-__modules[8] = function(module, exports) {
+/********** End of module 6: ..\src\market.js **********/
+/********** Start module 7: ..\src\minerals.js **********/
+__modules[7] = function(module, exports) {
 var Minerals = {};
 
 Minerals[RESOURCE_HYDROGEN] = [];
@@ -2539,14 +2505,14 @@ module.exports = Minerals;
 
 return module.exports;
 }
-/********** End of module 8: ..\src\minerals.js **********/
-/********** Start module 9: ..\src\proxy.js **********/
-__modules[9] = function(module, exports) {
+/********** End of module 7: ..\src\minerals.js **********/
+/********** Start module 8: ..\src\proxy.js **********/
+__modules[8] = function(module, exports) {
 /**
  * A way to proxy calls so the profiler picks them up.
  */
 
-var Profiler = __require(2,9);
+var Profiler = __require(1,8);
 
 class Proxy {
     static run(name, fx) {
@@ -2561,9 +2527,9 @@ module.exports = Proxy;
 
 return module.exports;
 }
-/********** End of module 9: ..\src\proxy.js **********/
-/********** Start module 10: ..\src\segment.js **********/
-__modules[10] = function(module, exports) {
+/********** End of module 8: ..\src\proxy.js **********/
+/********** Start module 9: ..\src\segment.js **********/
+__modules[9] = function(module, exports) {
 var memory = [];
 
 class Segment {
@@ -2597,16 +2563,16 @@ class Segment {
 }
 
 if (Memory.profiling) {
-    __require(2,10).registerObject(Segment, "Segment");
+    __require(1,9).registerObject(Segment, "Segment");
 }
 module.exports = Segment;
 
 return module.exports;
 }
-/********** End of module 10: ..\src\segment.js **********/
-/********** Start module 11: ..\src\utilities.js **********/
-__modules[11] = function(module, exports) {
-var Cache = __require(4,11);
+/********** End of module 9: ..\src\segment.js **********/
+/********** Start module 10: ..\src\utilities.js **********/
+__modules[10] = function(module, exports) {
+var Cache = __require(3,10);
 
 class Utilities {
     static nest(seq, keys) {
@@ -2850,19 +2816,19 @@ class Utilities {
 }
 
 if (Memory.profiling) {
-    __require(2,11).registerObject(Utilities, "Utilities");
+    __require(1,10).registerObject(Utilities, "Utilities");
 }
 module.exports = Utilities;
 
 return module.exports;
 }
-/********** End of module 11: ..\src\utilities.js **********/
-/********** Start module 12: ..\src\role.armyDismantler.js **********/
-__modules[12] = function(module, exports) {
-var Cache = __require(4,12),
-    Utilities = __require(11,12),
-    TaskDismantle = __require(44,12),
-    TaskRally = __require(52,12);
+/********** End of module 10: ..\src\utilities.js **********/
+/********** Start module 11: ..\src\role.armyDismantler.js **********/
+__modules[11] = function(module, exports) {
+var Cache = __require(3,11),
+    Utilities = __require(10,11),
+    TaskDismantle = __require(43,11),
+    TaskRally = __require(51,11);
 
 class Dismantler {
     static checkSpawn(armyName, portals) {
@@ -3117,19 +3083,19 @@ class Dismantler {
 }
 
 if (Memory.profiling) {
-    __require(2,12).registerObject(Dismantler, "ArmyDismantler");
+    __require(1,11).registerObject(Dismantler, "ArmyDismantler");
 }
 module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 12: ..\src\role.armyDismantler.js **********/
-/********** Start module 13: ..\src\role.armyHealer.js **********/
-__modules[13] = function(module, exports) {
-var Cache = __require(4,13),
-    Utilities = __require(11,13),
-    TaskHeal = __require(48,13),
-    TaskRally = __require(52,13);
+/********** End of module 11: ..\src\role.armyDismantler.js **********/
+/********** Start module 12: ..\src\role.armyHealer.js **********/
+__modules[12] = function(module, exports) {
+var Cache = __require(3,12),
+    Utilities = __require(10,12),
+    TaskHeal = __require(47,12),
+    TaskRally = __require(51,12);
 
 class Healer {
     static checkSpawn(armyName, portals) {
@@ -3396,18 +3362,18 @@ class Healer {
 }
 
 if (Memory.profiling) {
-    __require(2,13).registerObject(Healer, "ArmyHealer");
+    __require(1,12).registerObject(Healer, "ArmyHealer");
 }
 module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 13: ..\src\role.armyHealer.js **********/
-/********** Start module 14: ..\src\role.armyMelee.js **********/
-__modules[14] = function(module, exports) {
-var Cache = __require(4,14),
-    Utilities = __require(11,14),
-    TaskRally = __require(52,14);
+/********** End of module 12: ..\src\role.armyHealer.js **********/
+/********** Start module 13: ..\src\role.armyMelee.js **********/
+__modules[13] = function(module, exports) {
+var Cache = __require(3,13),
+    Utilities = __require(10,13),
+    TaskRally = __require(51,13);
 
 class Melee {
     static checkSpawn(armyName, portals) {
@@ -3679,18 +3645,18 @@ class Melee {
 }
 
 if (Memory.profiling) {
-    __require(2,14).registerObject(Melee, "ArmyMelee");
+    __require(1,13).registerObject(Melee, "ArmyMelee");
 }
 module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 14: ..\src\role.armyMelee.js **********/
-/********** Start module 15: ..\src\role.armyRanged.js **********/
-__modules[15] = function(module, exports) {
-var Cache = __require(4,15),
-    Utilities = __require(11,15),
-    TaskRally = __require(52,15);
+/********** End of module 13: ..\src\role.armyMelee.js **********/
+/********** Start module 14: ..\src\role.armyRanged.js **********/
+__modules[14] = function(module, exports) {
+var Cache = __require(3,14),
+    Utilities = __require(10,14),
+    TaskRally = __require(51,14);
 
 class Ranged {
     static checkSpawn(armyName, portals) {
@@ -3961,20 +3927,20 @@ class Ranged {
 }
 
 if (Memory.profiling) {
-    __require(2,15).registerObject(Ranged, "ArmyRanged");
+    __require(1,14).registerObject(Ranged, "ArmyRanged");
 }
 module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 15: ..\src\role.armyRanged.js **********/
-/********** Start module 16: ..\src\role.claimer.js **********/
-__modules[16] = function(module, exports) {
-var Cache = __require(4,16),
-    Commands = __require(5,16),
-    Utilities = __require(11,16),
-    TaskRally = __require(52,16),
-    TaskClaim = __require(41,16);
+/********** End of module 14: ..\src\role.armyRanged.js **********/
+/********** Start module 15: ..\src\role.claimer.js **********/
+__modules[15] = function(module, exports) {
+var Cache = __require(3,15),
+    Commands = __require(4,15),
+    Utilities = __require(10,15),
+    TaskRally = __require(51,15),
+    TaskClaim = __require(40,15);
 
 class Claimer {
     static checkSpawn(room) {
@@ -4065,20 +4031,20 @@ class Claimer {
 }
 
 if (Memory.profiling) {
-    __require(2,16).registerObject(Claimer, "RoleClaimer");
+    __require(1,15).registerObject(Claimer, "RoleClaimer");
 }
 module.exports = Claimer;
 
 return module.exports;
 }
-/********** End of module 16: ..\src\role.claimer.js **********/
-/********** Start module 17: ..\src\role.collector.js **********/
-__modules[17] = function(module, exports) {
-var Cache = __require(4,17),
-    Utilities = __require(11,17),
-    TaskHarvest = __require(47,17),
-    TaskPickupResource = __require(51,17),
-    TaskRally = __require(52,17);
+/********** End of module 15: ..\src\role.claimer.js **********/
+/********** Start module 16: ..\src\role.collector.js **********/
+__modules[16] = function(module, exports) {
+var Cache = __require(3,16),
+    Utilities = __require(10,16),
+    TaskHarvest = __require(46,16),
+    TaskPickupResource = __require(50,16),
+    TaskRally = __require(51,16);
 
 class Collector {
     static checkSpawn(room) {
@@ -4387,20 +4353,20 @@ class Collector {
 }
 
 if (Memory.profiling) {
-    __require(2,17).registerObject(Collector, "RoleCollector");
+    __require(1,16).registerObject(Collector, "RoleCollector");
 }
 module.exports = Collector;
 
 return module.exports;
 }
-/********** End of module 17: ..\src\role.collector.js **********/
-/********** Start module 18: ..\src\role.converter.js **********/
-__modules[18] = function(module, exports) {
-var Cache = __require(4,18),
-    Commands = __require(5,18),
-    Utilities = __require(11,18),
-    TaskRally = __require(52,18),
-    TaskAttack = __require(39,18);
+/********** End of module 16: ..\src\role.collector.js **********/
+/********** Start module 17: ..\src\role.converter.js **********/
+__modules[17] = function(module, exports) {
+var Cache = __require(3,17),
+    Commands = __require(4,17),
+    Utilities = __require(10,17),
+    TaskRally = __require(51,17),
+    TaskAttack = __require(38,17);
 
 class Converter {
     static checkSpawn(room) {
@@ -4504,19 +4470,19 @@ class Converter {
 }
 
 if (Memory.profiling) {
-    __require(2,18).registerObject(Converter, "RoleConverter");
+    __require(1,17).registerObject(Converter, "RoleConverter");
 }
 module.exports = Converter;
 
 return module.exports;
 }
-/********** End of module 18: ..\src\role.converter.js **********/
-/********** Start module 19: ..\src\role.defender.js **********/
-__modules[19] = function(module, exports) {
-var Cache = __require(4,19),
-    Utilities = __require(11,19),
-    TaskRally = __require(52,19),
-    TaskMeleeAttack = __require(49,19);
+/********** End of module 17: ..\src\role.converter.js **********/
+/********** Start module 18: ..\src\role.defender.js **********/
+__modules[18] = function(module, exports) {
+var Cache = __require(3,18),
+    Utilities = __require(10,18),
+    TaskRally = __require(51,18),
+    TaskMeleeAttack = __require(48,18);
 
 class Defender {
     static checkQuadrant(pos, quadrant) {
@@ -4611,21 +4577,21 @@ class Defender {
 }
 
 if (Memory.profiling) {
-    __require(2,19).registerObject(Defender, "RoleDefender");
+    __require(1,18).registerObject(Defender, "RoleDefender");
 }
 module.exports = Defender;
 
 return module.exports;
 }
-/********** End of module 19: ..\src\role.defender.js **********/
-/********** Start module 20: ..\src\role.dismantler.js **********/
-__modules[20] = function(module, exports) {
-var Cache = __require(4,20),
-    Utilities = __require(11,20),
-    TaskBuild = __require(40,20),
-    TaskPickupResource = __require(51,20),
-    TaskRally = __require(52,20),
-    TaskRepair = __require(54,20);
+/********** End of module 18: ..\src\role.defender.js **********/
+/********** Start module 19: ..\src\role.dismantler.js **********/
+__modules[19] = function(module, exports) {
+var Cache = __require(3,19),
+    Utilities = __require(10,19),
+    TaskBuild = __require(39,19),
+    TaskPickupResource = __require(50,19),
+    TaskRally = __require(51,19),
+    TaskRepair = __require(53,19);
 
 class Dismantler {
     static checkSpawn(room, supportRoom) {
@@ -4838,19 +4804,19 @@ class Dismantler {
 }
 
 if (Memory.profiling) {
-    __require(2,20).registerObject(Dismantler, "RoleDismantler");
+    __require(1,19).registerObject(Dismantler, "RoleDismantler");
 }
 module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 20: ..\src\role.dismantler.js **********/
-/********** Start module 21: ..\src\role.healer.js **********/
-__modules[21] = function(module, exports) {
-var Cache = __require(4,21),
-    Utilities = __require(11,21),
-    TaskHeal = __require(48,21),
-    TaskRally = __require(52,21);
+/********** End of module 19: ..\src\role.dismantler.js **********/
+/********** Start module 20: ..\src\role.healer.js **********/
+__modules[20] = function(module, exports) {
+var Cache = __require(3,20),
+    Utilities = __require(10,20),
+    TaskHeal = __require(47,20),
+    TaskRally = __require(51,20);
 
 class Healer {
     static checkSpawn(room) {
@@ -4946,19 +4912,19 @@ class Healer {
 }
 
 if (Memory.profiling) {
-    __require(2,21).registerObject(Healer, "RoleHealer");
+    __require(1,20).registerObject(Healer, "RoleHealer");
 }
 module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 21: ..\src\role.healer.js **********/
-/********** Start module 22: ..\src\role.miner.js **********/
-__modules[22] = function(module, exports) {
-var Cache = __require(4,22),
-    Utilities = __require(11,22),
-    TaskMine = __require(50,22),
-    TaskRally = __require(52,22);
+/********** End of module 20: ..\src\role.healer.js **********/
+/********** Start module 21: ..\src\role.miner.js **********/
+__modules[21] = function(module, exports) {
+var Cache = __require(3,21),
+    Utilities = __require(10,21),
+    TaskMine = __require(49,21),
+    TaskRally = __require(51,21);
 
 class Miner {
     static checkSpawn(room) {
@@ -5078,22 +5044,22 @@ class Miner {
 }
 
 if (Memory.profiling) {
-    __require(2,22).registerObject(Miner, "RoleMiner");
+    __require(1,21).registerObject(Miner, "RoleMiner");
 }
 module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 22: ..\src\role.miner.js **********/
-/********** Start module 23: ..\src\role.remoteBuilder.js **********/
-__modules[23] = function(module, exports) {
-var Cache = __require(4,23),
-    Utilities = __require(11,23),
-    TaskBuild = __require(40,23),
-    TaskHarvest = __require(47,23),
-    TaskPickupResource = __require(51,23),
-    TaskRally = __require(52,23),
-    TaskRepair = __require(54,23);
+/********** End of module 21: ..\src\role.miner.js **********/
+/********** Start module 22: ..\src\role.remoteBuilder.js **********/
+__modules[22] = function(module, exports) {
+var Cache = __require(3,22),
+    Utilities = __require(10,22),
+    TaskBuild = __require(39,22),
+    TaskHarvest = __require(46,22),
+    TaskPickupResource = __require(50,22),
+    TaskRally = __require(51,22),
+    TaskRepair = __require(53,22);
 
 class Builder {
     static checkSpawn(room) {
@@ -5275,19 +5241,19 @@ class Builder {
 }
 
 if (Memory.profiling) {
-    __require(2,23).registerObject(Builder, "RoleRemoteBuilder");
+    __require(1,22).registerObject(Builder, "RoleRemoteBuilder");
 }
 module.exports = Builder;
 
 return module.exports;
 }
-/********** End of module 23: ..\src\role.remoteBuilder.js **********/
-/********** Start module 24: ..\src\role.remoteCollector.js **********/
-__modules[24] = function(module, exports) {
-var Cache = __require(4,24),
-    Utilities = __require(11,24),
-    TaskPickupResource = __require(51,24),
-    TaskRally = __require(52,24);
+/********** End of module 22: ..\src\role.remoteBuilder.js **********/
+/********** Start module 23: ..\src\role.remoteCollector.js **********/
+__modules[23] = function(module, exports) {
+var Cache = __require(3,23),
+    Utilities = __require(10,23),
+    TaskPickupResource = __require(50,23),
+    TaskRally = __require(51,23);
 
 class RemoteCollector {
     static checkSpawn(room, supportRoom, max) {
@@ -5497,20 +5463,20 @@ class RemoteCollector {
 }
 
 if (Memory.profiling) {
-    __require(2,24).registerObject(RemoteCollector, "RoleRemoteCollector");
+    __require(1,23).registerObject(RemoteCollector, "RoleRemoteCollector");
 }
 module.exports = RemoteCollector;
 
 return module.exports;
 }
-/********** End of module 24: ..\src\role.remoteCollector.js **********/
-/********** Start module 25: ..\src\role.remoteDismantler.js **********/
-__modules[25] = function(module, exports) {
-var Cache = __require(4,25),
-    Utilities = __require(11,25),
-    TaskBuild = __require(40,25),
-    TaskPickupResource = __require(51,25),
-    TaskRally = __require(52,25);
+/********** End of module 23: ..\src\role.remoteCollector.js **********/
+/********** Start module 24: ..\src\role.remoteDismantler.js **********/
+__modules[24] = function(module, exports) {
+var Cache = __require(3,24),
+    Utilities = __require(10,24),
+    TaskBuild = __require(39,24),
+    TaskPickupResource = __require(50,24),
+    TaskRally = __require(51,24);
 
 class RemoteDismantler {
     static checkSpawn(room, supportRoom, max) {
@@ -5615,19 +5581,19 @@ class RemoteDismantler {
 }
 
 if (Memory.profiling) {
-    __require(2,25).registerObject(RemoteDismantler, "RoleRemoteDismantler");
+    __require(1,24).registerObject(RemoteDismantler, "RoleRemoteDismantler");
 }
 module.exports = RemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 25: ..\src\role.remoteDismantler.js **********/
-/********** Start module 26: ..\src\role.remoteMiner.js **********/
-__modules[26] = function(module, exports) {
-var Cache = __require(4,26),
-    Utilities = __require(11,26),
-    TaskMine = __require(50,26),
-    TaskRally = __require(52,26);
+/********** End of module 24: ..\src\role.remoteDismantler.js **********/
+/********** Start module 25: ..\src\role.remoteMiner.js **********/
+__modules[25] = function(module, exports) {
+var Cache = __require(3,25),
+    Utilities = __require(10,25),
+    TaskMine = __require(49,25),
+    TaskRally = __require(51,25);
 
 class Miner {
     static checkSpawn(room) {
@@ -5760,20 +5726,20 @@ class Miner {
 }
 
 if (Memory.profiling) {
-    __require(2,26).registerObject(Miner, "RoleRemoteMiner");
+    __require(1,25).registerObject(Miner, "RoleRemoteMiner");
 }
 module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 26: ..\src\role.remoteMiner.js **********/
-/********** Start module 27: ..\src\role.remoteReserver.js **********/
-__modules[27] = function(module, exports) {
-var Cache = __require(4,27),
-    Commands = __require(5,27),
-    Utilities = __require(11,27),
-    TaskRally = __require(52,27),
-    TaskReserve = __require(55,27);
+/********** End of module 25: ..\src\role.remoteMiner.js **********/
+/********** Start module 26: ..\src\role.remoteReserver.js **********/
+__modules[26] = function(module, exports) {
+var Cache = __require(3,26),
+    Commands = __require(4,26),
+    Utilities = __require(10,26),
+    TaskRally = __require(51,26),
+    TaskReserve = __require(54,26);
 
 class Reserver {
     static checkSpawn(room) {
@@ -5897,21 +5863,21 @@ class Reserver {
 }
 
 if (Memory.profiling) {
-    __require(2,27).registerObject(Reserver, "RoleRemoteReserver");
+    __require(1,26).registerObject(Reserver, "RoleRemoteReserver");
 }
 module.exports = Reserver;
 
 return module.exports;
 }
-/********** End of module 27: ..\src\role.remoteReserver.js **********/
-/********** Start module 28: ..\src\role.remoteStorer.js **********/
-__modules[28] = function(module, exports) {
-var Cache = __require(4,28),
-    Utilities = __require(11,28),
-    TaskCollectEnergy = __require(42,28),
-    TaskCollectMinerals = __require(43,28),
-    TaskPickupResource = __require(51,28),
-    TaskRally = __require(52,28);
+/********** End of module 26: ..\src\role.remoteReserver.js **********/
+/********** Start module 27: ..\src\role.remoteStorer.js **********/
+__modules[27] = function(module, exports) {
+var Cache = __require(3,27),
+    Utilities = __require(10,27),
+    TaskCollectEnergy = __require(41,27),
+    TaskCollectMinerals = __require(42,27),
+    TaskPickupResource = __require(50,27),
+    TaskRally = __require(51,27);
 
 class Storer {
     static checkSpawn(room) {
@@ -6141,23 +6107,23 @@ class Storer {
 }
 
 if (Memory.profiling) {
-    __require(2,28).registerObject(Storer, "RoleRemoteStorer");
+    __require(1,27).registerObject(Storer, "RoleRemoteStorer");
 }
 module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 28: ..\src\role.remoteStorer.js **********/
-/********** Start module 29: ..\src\role.remoteWorker.js **********/
-__modules[29] = function(module, exports) {
-var Cache = __require(4,29),
-    Utilities = __require(11,29),
-    TaskBuild = __require(40,29),
-    TaskCollectEnergy = __require(42,29),
-    TaskHarvest = __require(47,29),
-    TaskPickupResource = __require(51,29),
-    TaskRally = __require(52,29),
-    TaskRepair = __require(54,29);
+/********** End of module 27: ..\src\role.remoteStorer.js **********/
+/********** Start module 28: ..\src\role.remoteWorker.js **********/
+__modules[28] = function(module, exports) {
+var Cache = __require(3,28),
+    Utilities = __require(10,28),
+    TaskBuild = __require(39,28),
+    TaskCollectEnergy = __require(41,28),
+    TaskHarvest = __require(46,28),
+    TaskPickupResource = __require(50,28),
+    TaskRally = __require(51,28),
+    TaskRepair = __require(53,28);
 
 class Worker {
     static checkSpawn(room) {
@@ -6442,19 +6408,19 @@ class Worker {
 }
 
 if (Memory.profiling) {
-    __require(2,29).registerObject(Worker, "RoleRemoteWorker");
+    __require(1,28).registerObject(Worker, "RoleRemoteWorker");
 }
 module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 29: ..\src\role.remoteWorker.js **********/
-/********** Start module 30: ..\src\role.scientist.js **********/
-__modules[30] = function(module, exports) {
-var Cache = __require(4,30),
-    Utilities = __require(11,30),
-    TaskPickupResource = __require(51,30),
-    TaskRally = __require(52,30);
+/********** End of module 28: ..\src\role.remoteWorker.js **********/
+/********** Start module 29: ..\src\role.scientist.js **********/
+__modules[29] = function(module, exports) {
+var Cache = __require(3,29),
+    Utilities = __require(10,29),
+    TaskPickupResource = __require(50,29),
+    TaskRally = __require(51,29);
 
 class Scientist {
     static checkSpawn(room) {
@@ -6860,18 +6826,18 @@ class Scientist {
 }
 
 if (Memory.profiling) {
-    __require(2,30).registerObject(Scientist, "RoleScientist");
+    __require(1,29).registerObject(Scientist, "RoleScientist");
 }
 module.exports = Scientist;
 
 return module.exports;
 }
-/********** End of module 30: ..\src\role.scientist.js **********/
-/********** Start module 31: ..\src\role.storer.js **********/
-__modules[31] = function(module, exports) {
-var Cache = __require(4,31),
-    Utilities = __require(11,31),
-    TaskRally = __require(52,31);
+/********** End of module 29: ..\src\role.scientist.js **********/
+/********** Start module 30: ..\src\role.storer.js **********/
+__modules[30] = function(module, exports) {
+var Cache = __require(3,30),
+    Utilities = __require(10,30),
+    TaskRally = __require(51,30);
 
 class Storer {
     static checkSpawn(room) {
@@ -7160,16 +7126,16 @@ class Storer {
 }
 
 if (Memory.profiling) {
-    __require(2,31).registerObject(Storer, "RoleStorer");
+    __require(1,30).registerObject(Storer, "RoleStorer");
 }
 module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 31: ..\src\role.storer.js **********/
-/********** Start module 32: ..\src\role.tower.js **********/
-__modules[32] = function(module, exports) {
-var Cache = __require(4,32);
+/********** End of module 30: ..\src\role.storer.js **********/
+/********** Start module 31: ..\src\role.tower.js **********/
+__modules[31] = function(module, exports) {
+var Cache = __require(3,31);
 
 class Tower {
     static assignTasks(room, tasks) {
@@ -7195,21 +7161,21 @@ class Tower {
 }
 
 if (Memory.profiling) {
-    __require(2,32).registerObject(Tower, "RoleTower");
+    __require(1,31).registerObject(Tower, "RoleTower");
 }
 module.exports = Tower;
 
 return module.exports;
 }
-/********** End of module 32: ..\src\role.tower.js **********/
-/********** Start module 33: ..\src\role.upgrader.js **********/
-__modules[33] = function(module, exports) {
-var Cache = __require(4,33),
-    Utilities = __require(11,33),
-    TaskCollectEnergy = __require(42,33),
-    TaskHarvest = __require(47,33),
-    TaskPickupResource = __require(51,33),
-    TaskRally = __require(52,33);
+/********** End of module 31: ..\src\role.tower.js **********/
+/********** Start module 32: ..\src\role.upgrader.js **********/
+__modules[32] = function(module, exports) {
+var Cache = __require(3,32),
+    Utilities = __require(10,32),
+    TaskCollectEnergy = __require(41,32),
+    TaskHarvest = __require(46,32),
+    TaskPickupResource = __require(50,32),
+    TaskRally = __require(51,32);
 
 class Upgrader {
     static checkSpawn(room) {
@@ -7468,20 +7434,20 @@ class Upgrader {
 }
 
 if (Memory.profiling) {
-    __require(2,33).registerObject(Upgrader, "RoleUpgrader");
+    __require(1,32).registerObject(Upgrader, "RoleUpgrader");
 }
 module.exports = Upgrader;
 
 return module.exports;
 }
-/********** End of module 33: ..\src\role.upgrader.js **********/
-/********** Start module 34: ..\src\role.worker.js **********/
-__modules[34] = function(module, exports) {
-var Cache = __require(4,34),
-    Utilities = __require(11,34),
-    TaskHarvest = __require(47,34),
-    TaskPickupResource = __require(51,34),
-    TaskRally = __require(52,34);
+/********** End of module 32: ..\src\role.upgrader.js **********/
+/********** Start module 33: ..\src\role.worker.js **********/
+__modules[33] = function(module, exports) {
+var Cache = __require(3,33),
+    Utilities = __require(10,33),
+    TaskHarvest = __require(46,33),
+    TaskPickupResource = __require(50,33),
+    TaskRally = __require(51,33);
 
 class Worker {
     static checkSpawn(room, canSpawn) {
@@ -7899,40 +7865,40 @@ class Worker {
 }
 
 if (Memory.profiling) {
-    __require(2,34).registerObject(Worker, "RoleWorker");
+    __require(1,33).registerObject(Worker, "RoleWorker");
 }
 module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 34: ..\src\role.worker.js **********/
-/********** Start module 35: ..\src\room.base.js **********/
-__modules[35] = function(module, exports) {
-var Cache = __require(4,35),
-    Commands = __require(5,35),
-    Market = __require(7,35),
-    Minerals = __require(8,35),
-    Utilities = __require(11,35),
-    RoleClaimer = __require(16,35),
-    RoleCollector = __require(17,35),
-    RoleConverter = __require(18,35),
-    RoleDismantler = __require(20,35),
-    RoleMiner = __require(22,35),
-    RoleScientist = __require(30,35),
-    RoleStorer = __require(31,35),
-    RoleTower = __require(32,35),
-    RoleUpgrader = __require(33,35),
-    RoleWorker = __require(34,35),
-    TaskBuild = __require(40,35),
-    TaskCollectEnergy = __require(42,35),
-    TaskCollectMinerals = __require(43,35),
-    TaskDismantle = __require(44,35),
-    TaskFillEnergy = __require(45,35),
-    TaskFillMinerals = __require(46,35),
-    TaskHeal = __require(48,35),
-    TaskRangedAttack = __require(53,35),
-    TaskRepair = __require(54,35),
-    TaskUpgradeController = __require(56,35);
+/********** End of module 33: ..\src\role.worker.js **********/
+/********** Start module 34: ..\src\room.base.js **********/
+__modules[34] = function(module, exports) {
+var Cache = __require(3,34),
+    Commands = __require(4,34),
+    Market = __require(6,34),
+    Minerals = __require(7,34),
+    Utilities = __require(10,34),
+    RoleClaimer = __require(15,34),
+    RoleCollector = __require(16,34),
+    RoleConverter = __require(17,34),
+    RoleDismantler = __require(19,34),
+    RoleMiner = __require(21,34),
+    RoleScientist = __require(29,34),
+    RoleStorer = __require(30,34),
+    RoleTower = __require(31,34),
+    RoleUpgrader = __require(32,34),
+    RoleWorker = __require(33,34),
+    TaskBuild = __require(39,34),
+    TaskCollectEnergy = __require(41,34),
+    TaskCollectMinerals = __require(42,34),
+    TaskDismantle = __require(43,34),
+    TaskFillEnergy = __require(44,34),
+    TaskFillMinerals = __require(45,34),
+    TaskHeal = __require(47,34),
+    TaskRangedAttack = __require(52,34),
+    TaskRepair = __require(53,34),
+    TaskUpgradeController = __require(55,34);
 
 class Base {
     constructor() {
@@ -8661,26 +8627,26 @@ class Base {
 }
 
 if (Memory.profiling) {
-    __require(2,35).registerObject(Base, "RoomBase");
+    __require(1,34).registerObject(Base, "RoomBase");
 }
 module.exports = Base;
 
 return module.exports;
 }
-/********** End of module 35: ..\src\room.base.js **********/
-/********** Start module 36: ..\src\room.cleanup.js **********/
-__modules[36] = function(module, exports) {
-var Cache = __require(4,36),
-    Commands = __require(5,36),
-    Utilities = __require(11,36),
-    RoleRemoteDismantler = __require(25,36),
-    RoleRemoteCollector = __require(24,36),
-    TaskCollectEnergy = __require(42,36),
-    TaskCollectMinerals = __require(43,36),
-    TaskDismantle = __require(44,36),
-    TaskFillEnergy = __require(45,36),
-    TaskFillMinerals = __require(46,36),
-    TaskPickupResource = __require(51,36);
+/********** End of module 34: ..\src\room.base.js **********/
+/********** Start module 35: ..\src\room.cleanup.js **********/
+__modules[35] = function(module, exports) {
+var Cache = __require(3,35),
+    Commands = __require(4,35),
+    Utilities = __require(10,35),
+    RoleRemoteDismantler = __require(24,35),
+    RoleRemoteCollector = __require(23,35),
+    TaskCollectEnergy = __require(41,35),
+    TaskCollectMinerals = __require(42,35),
+    TaskDismantle = __require(43,35),
+    TaskFillEnergy = __require(44,35),
+    TaskFillMinerals = __require(45,35),
+    TaskPickupResource = __require(50,35);
 
 class Cleanup {
     constructor(supportRoom) {
@@ -8780,33 +8746,31 @@ class Cleanup {
 }
 
 if (Memory.profiling) {
-    __require(2,36).registerObject(Cleanup, "RoomCleanup");
+    __require(1,35).registerObject(Cleanup, "RoomCleanup");
 }
 module.exports = Cleanup;
 
 return module.exports;
 }
-/********** End of module 36: ..\src\room.cleanup.js **********/
-/********** Start module 37: ..\src\room.mine.js **********/
-__modules[37] = function(module, exports) {
-var Cache = __require(4,37),
-    Commands = __require(5,37),
-    Utilities = __require(11,37),
-    RoleDismantler = __require(20,37),
-    RoleRemoteBuilder = __require(23,37),
-    RoleRemoteMiner = __require(26,37),
-    RoleRemoteReserver = __require(27,37),
-    RoleRemoteStorer = __require(28,37),
-    RoleRemoteWorker = __require(29,37),
-    TaskBuild = __require(40,37),
-    TaskDismantle = __require(44,37),
-    TaskFillEnergy = __require(45,37),
-    TaskFillMinerals = __require(46,37);
+/********** End of module 35: ..\src\room.cleanup.js **********/
+/********** Start module 36: ..\src\room.mine.js **********/
+__modules[36] = function(module, exports) {
+var Cache = __require(3,36),
+    Commands = __require(4,36),
+    Utilities = __require(10,36),
+    RoleDismantler = __require(19,36),
+    RoleRemoteBuilder = __require(22,36),
+    RoleRemoteMiner = __require(25,36),
+    RoleRemoteReserver = __require(26,36),
+    RoleRemoteStorer = __require(27,36),
+    RoleRemoteWorker = __require(28,36),
+    TaskBuild = __require(39,36),
+    TaskDismantle = __require(43,36),
+    TaskFillEnergy = __require(44,36),
+    TaskFillMinerals = __require(45,36);
 
 class Mine {
     constructor(supportRoom, stage) {
-        "use strict";
-        
         this.type = "mine";
         this.supportRoom = supportRoom;
         this.stage = stage || 1;
@@ -9094,30 +9058,30 @@ class Mine {
 }
 
 if (Memory.profiling) {
-    __require(2,37).registerObject(Mine, "RoomMine");
+    __require(1,36).registerObject(Mine, "RoomMine");
 }
 module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 37: ..\src\room.mine.js **********/
-/********** Start module 38: ..\src\room.source.js **********/
-__modules[38] = function(module, exports) {
-var Cache = __require(4,38),
-    Commands = __require(5,38),
-    Utilities = __require(11,38),
-    RoleDefender = __require(19,38),
-    RoleDismantler = __require(20,38),
-    RoleHealer = __require(21,38),
-    RoleRemoteBuilder = __require(23,38),
-    RoleRemoteCollector = __require(24,38),
-    RoleRemoteMiner = __require(26,38),
-    RoleRemoteStorer = __require(28,38),
-    RoleRemoteWorker = __require(29,38),
-    TaskBuild = __require(40,38),
-    TaskDismantle = __require(44,38),
-    TaskFillEnergy = __require(45,38),
-    TaskFillMinerals = __require(46,38);
+/********** End of module 36: ..\src\room.mine.js **********/
+/********** Start module 37: ..\src\room.source.js **********/
+__modules[37] = function(module, exports) {
+var Cache = __require(3,37),
+    Commands = __require(4,37),
+    Utilities = __require(10,37),
+    RoleDefender = __require(18,37),
+    RoleDismantler = __require(19,37),
+    RoleHealer = __require(20,37),
+    RoleRemoteBuilder = __require(22,37),
+    RoleRemoteCollector = __require(23,37),
+    RoleRemoteMiner = __require(25,37),
+    RoleRemoteStorer = __require(27,37),
+    RoleRemoteWorker = __require(28,37),
+    TaskBuild = __require(39,37),
+    TaskDismantle = __require(43,37),
+    TaskFillEnergy = __require(44,37),
+    TaskFillMinerals = __require(45,37);
 
 class Source {
     constructor(supportRoom, stage) {
@@ -9385,17 +9349,17 @@ class Source {
 }
 
 if (Memory.profiling) {
-    __require(2,38).registerObject(Source, "RoomSource");
+    __require(1,37).registerObject(Source, "RoomSource");
 }
 module.exports = Source;
 
 return module.exports;
 }
-/********** End of module 38: ..\src\room.source.js **********/
-/********** Start module 39: ..\src\task.attack.js **********/
-__modules[39] = function(module, exports) {
-var Cache = __require(4,39),
-    Pathing = __require(57,39);
+/********** End of module 37: ..\src\room.source.js **********/
+/********** Start module 38: ..\src\task.attack.js **********/
+__modules[38] = function(module, exports) {
+var Cache = __require(3,38),
+    Pathing = __require(56,38);
 
 class Attack {
     constructor() {
@@ -9445,17 +9409,17 @@ class Attack {
 }
 
 if (Memory.profiling) {
-    __require(2,39).registerObject(Attack, "TaskAttack");
+    __require(1,38).registerObject(Attack, "TaskAttack");
 }
 module.exports = Attack;
 
 return module.exports;
 }
-/********** End of module 39: ..\src\task.attack.js **********/
-/********** Start module 40: ..\src\task.build.js **********/
-__modules[40] = function(module, exports) {
-var Cache = __require(4,40),
-    Pathing = __require(57,40);
+/********** End of module 38: ..\src\task.attack.js **********/
+/********** Start module 39: ..\src\task.build.js **********/
+__modules[39] = function(module, exports) {
+var Cache = __require(3,39),
+    Pathing = __require(56,39);
 
 class Build {
     constructor(id) {
@@ -9515,17 +9479,17 @@ class Build {
 }
 
 if (Memory.profiling) {
-    __require(2,40).registerObject(Build, "TaskBuild");
+    __require(1,39).registerObject(Build, "TaskBuild");
 }
 module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 40: ..\src\task.build.js **********/
-/********** Start module 41: ..\src\task.claim.js **********/
-__modules[41] = function(module, exports) {
-var Cache = __require(4,41),
-    Pathing = __require(57,41);
+/********** End of module 39: ..\src\task.build.js **********/
+/********** Start module 40: ..\src\task.claim.js **********/
+__modules[40] = function(module, exports) {
+var Cache = __require(3,40),
+    Pathing = __require(56,40);
 
 class Claim {
     constructor() {
@@ -9575,17 +9539,17 @@ class Claim {
 }
 
 if (Memory.profiling) {
-    __require(2,41).registerObject(Claim, "TaskClaim");
+    __require(1,40).registerObject(Claim, "TaskClaim");
 }
 module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 41: ..\src\task.claim.js **********/
-/********** Start module 42: ..\src\task.collectEnergy.js **********/
-__modules[42] = function(module, exports) {
-var Cache = __require(4,42),
-    Pathing = __require(57,42);
+/********** End of module 40: ..\src\task.claim.js **********/
+/********** Start module 41: ..\src\task.collectEnergy.js **********/
+__modules[41] = function(module, exports) {
+var Cache = __require(3,41),
+    Pathing = __require(56,41);
 
 class CollectEnergy {
     constructor(id) {
@@ -9686,18 +9650,18 @@ class CollectEnergy {
 }
 
 if (Memory.profiling) {
-    __require(2,42).registerObject(CollectEnergy, "TaskCollectEnergy");
+    __require(1,41).registerObject(CollectEnergy, "TaskCollectEnergy");
 }
 module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 42: ..\src\task.collectEnergy.js **********/
-/********** Start module 43: ..\src\task.collectMinerals.js **********/
-__modules[43] = function(module, exports) {
-var Cache = __require(4,43),
-    Pathing = __require(57,43),
-    Utilities = __require(11,43);
+/********** End of module 41: ..\src\task.collectEnergy.js **********/
+/********** Start module 42: ..\src\task.collectMinerals.js **********/
+__modules[42] = function(module, exports) {
+var Cache = __require(3,42),
+    Pathing = __require(56,42),
+    Utilities = __require(10,42);
 
 class CollectMinerals {
     constructor(id, resource, amount) {
@@ -9933,17 +9897,17 @@ class CollectMinerals {
 }
 
 if (Memory.profiling) {
-    __require(2,43).registerObject(CollectMinerals, "TaskCollectMinerals");
+    __require(1,42).registerObject(CollectMinerals, "TaskCollectMinerals");
 }
 module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 43: ..\src\task.collectMinerals.js **********/
-/********** Start module 44: ..\src\task.dismantle.js **********/
-__modules[44] = function(module, exports) {
-var Cache = __require(4,44),
-    Pathing = __require(57,44);
+/********** End of module 42: ..\src\task.collectMinerals.js **********/
+/********** Start module 43: ..\src\task.dismantle.js **********/
+__modules[43] = function(module, exports) {
+var Cache = __require(3,43),
+    Pathing = __require(56,43);
 
 class Dismantle {
     constructor(id) {
@@ -10003,18 +9967,18 @@ class Dismantle {
 }
 
 if (Memory.profiling) {
-    __require(2,44).registerObject(Dismantle, "TaskDismantle");
+    __require(1,43).registerObject(Dismantle, "TaskDismantle");
 }
 module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 44: ..\src\task.dismantle.js **********/
-/********** Start module 45: ..\src\task.fillEnergy.js **********/
-__modules[45] = function(module, exports) {
-var Cache = __require(4,45),
-    Pathing = __require(57,45),
-    Utilities = __require(11,45);
+/********** End of module 43: ..\src\task.dismantle.js **********/
+/********** Start module 44: ..\src\task.fillEnergy.js **********/
+__modules[44] = function(module, exports) {
+var Cache = __require(3,44),
+    Pathing = __require(56,44),
+    Utilities = __require(10,44);
 
 class FillEnergy {
     constructor(id) {
@@ -10155,18 +10119,18 @@ class FillEnergy {
 }
 
 if (Memory.profiling) {
-    __require(2,45).registerObject(FillEnergy, "TaskFillEnergy");
+    __require(1,44).registerObject(FillEnergy, "TaskFillEnergy");
 }
 module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 45: ..\src\task.fillEnergy.js **********/
-/********** Start module 46: ..\src\task.fillMinerals.js **********/
-__modules[46] = function(module, exports) {
-var Cache = __require(4,46),
-    Pathing = __require(57,46),
-    Utilities = __require(11,46);
+/********** End of module 44: ..\src\task.fillEnergy.js **********/
+/********** Start module 45: ..\src\task.fillMinerals.js **********/
+__modules[45] = function(module, exports) {
+var Cache = __require(3,45),
+    Pathing = __require(56,45),
+    Utilities = __require(10,45);
 
 class FillMinerals {
     constructor(id, resources) {
@@ -10360,17 +10324,17 @@ class FillMinerals {
 }
 
 if (Memory.profiling) {
-    __require(2,46).registerObject(FillMinerals, "TaskFillMinerals");
+    __require(1,45).registerObject(FillMinerals, "TaskFillMinerals");
 }
 module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 46: ..\src\task.fillMinerals.js **********/
-/********** Start module 47: ..\src\task.harvest.js **********/
-__modules[47] = function(module, exports) {
-var Cache = __require(4,47),
-    Pathing = __require(57,47);
+/********** End of module 45: ..\src\task.fillMinerals.js **********/
+/********** Start module 46: ..\src\task.harvest.js **********/
+__modules[46] = function(module, exports) {
+var Cache = __require(3,46),
+    Pathing = __require(56,46);
 
 class Harvest {
     constructor(failIn, source) {
@@ -10438,17 +10402,17 @@ class Harvest {
 }
 
 if (Memory.profiling) {
-    __require(2,47).registerObject(Harvest, "TaskHarvest");
+    __require(1,46).registerObject(Harvest, "TaskHarvest");
 }
 module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 47: ..\src\task.harvest.js **********/
-/********** Start module 48: ..\src\task.heal.js **********/
-__modules[48] = function(module, exports) {
-var Cache = __require(4,48),
-    Pathing = __require(57,48);
+/********** End of module 46: ..\src\task.harvest.js **********/
+/********** Start module 47: ..\src\task.heal.js **********/
+__modules[47] = function(module, exports) {
+var Cache = __require(3,47),
+    Pathing = __require(56,47);
 
 class Heal {
     constructor(id) {
@@ -10517,17 +10481,17 @@ class Heal {
 }
 
 if (Memory.profiling) {
-    __require(2,48).registerObject(Heal, "TaskHeal");
+    __require(1,47).registerObject(Heal, "TaskHeal");
 }
 module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 48: ..\src\task.heal.js **********/
-/********** Start module 49: ..\src\task.meleeAttack.js **********/
-__modules[49] = function(module, exports) {
-var Cache = __require(4,49),
-    Pathing = __require(57,49);
+/********** End of module 47: ..\src\task.heal.js **********/
+/********** Start module 48: ..\src\task.meleeAttack.js **********/
+__modules[48] = function(module, exports) {
+var Cache = __require(3,48),
+    Pathing = __require(56,48);
 
 class Melee {
     constructor(id) {
@@ -10593,18 +10557,18 @@ class Melee {
 }
 
 if (Memory.profiling) {
-    __require(2,49).registerObject(Melee, "TaskMeleeAttack");
+    __require(1,48).registerObject(Melee, "TaskMeleeAttack");
 }
 module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 49: ..\src\task.meleeAttack.js **********/
-/********** Start module 50: ..\src\task.mine.js **********/
-__modules[50] = function(module, exports) {
-var Cache = __require(4,50),
-    Pathing = __require(57,50),
-    Utilities = __require(11,50);
+/********** End of module 48: ..\src\task.meleeAttack.js **********/
+/********** Start module 49: ..\src\task.mine.js **********/
+__modules[49] = function(module, exports) {
+var Cache = __require(3,49),
+    Pathing = __require(56,49),
+    Utilities = __require(10,49);
 
 class Mine {
     constructor(id) {
@@ -10685,18 +10649,18 @@ class Mine {
 }
 
 if (Memory.profiling) {
-    __require(2,50).registerObject(Mine, "TaskMine");
+    __require(1,49).registerObject(Mine, "TaskMine");
 }
 module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 50: ..\src\task.mine.js **********/
-/********** Start module 51: ..\src\task.pickupResource.js **********/
-__modules[51] = function(module, exports) {
-var Cache = __require(4,51),
-    TaskCollectEnergy = __require(42,51),
-    Pathing = __require(57,51);
+/********** End of module 49: ..\src\task.mine.js **********/
+/********** Start module 50: ..\src\task.pickupResource.js **********/
+__modules[50] = function(module, exports) {
+var Cache = __require(3,50),
+    TaskCollectEnergy = __require(41,50),
+    Pathing = __require(56,50);
 
 class Pickup {
     constructor(id) {
@@ -10761,17 +10725,17 @@ class Pickup {
 }
 
 if (Memory.profiling) {
-    __require(2,51).registerObject(Pickup, "TaskPickupResource");
+    __require(1,50).registerObject(Pickup, "TaskPickupResource");
 }
 module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 51: ..\src\task.pickupResource.js **********/
-/********** Start module 52: ..\src\task.rally.js **********/
-__modules[52] = function(module, exports) {
-var Cache = __require(4,52),
-    Pathing = __require(57,52);
+/********** End of module 50: ..\src\task.pickupResource.js **********/
+/********** Start module 51: ..\src\task.rally.js **********/
+__modules[51] = function(module, exports) {
+var Cache = __require(3,51),
+    Pathing = __require(56,51);
 
 class Rally {
     constructor(id, creep) {
@@ -10879,17 +10843,17 @@ class Rally {
 }
 
 if (Memory.profiling) {
-    __require(2,52).registerObject(Rally, "TaskRally");
+    __require(1,51).registerObject(Rally, "TaskRally");
 }
 module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 52: ..\src\task.rally.js **********/
-/********** Start module 53: ..\src\task.rangedAttack.js **********/
-__modules[53] = function(module, exports) {
-var Cache = __require(4,53),
-    Pathing = __require(57,53);
+/********** End of module 51: ..\src\task.rally.js **********/
+/********** Start module 52: ..\src\task.rangedAttack.js **********/
+__modules[52] = function(module, exports) {
+var Cache = __require(3,52),
+    Pathing = __require(56,52);
 
 class Ranged {
     constructor(id) {
@@ -10964,17 +10928,17 @@ class Ranged {
 }
 
 if (Memory.profiling) {
-    __require(2,53).registerObject(Ranged, "TaskRangedAttack");
+    __require(1,52).registerObject(Ranged, "TaskRangedAttack");
 }
 module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 53: ..\src\task.rangedAttack.js **********/
-/********** Start module 54: ..\src\task.repair.js **********/
-__modules[54] = function(module, exports) {
-var Cache = __require(4,54),
-    Pathing = __require(57,54);
+/********** End of module 52: ..\src\task.rangedAttack.js **********/
+/********** Start module 53: ..\src\task.repair.js **********/
+__modules[53] = function(module, exports) {
+var Cache = __require(3,53),
+    Pathing = __require(56,53);
 
 class Repair {
     constructor(id) {
@@ -11045,17 +11009,17 @@ class Repair {
 }
 
 if (Memory.profiling) {
-    __require(2,54).registerObject(Repair, "TaskRepair");
+    __require(1,53).registerObject(Repair, "TaskRepair");
 }
 module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 54: ..\src\task.repair.js **********/
-/********** Start module 55: ..\src\task.reserve.js **********/
-__modules[55] = function(module, exports) {
-var Cache = __require(4,55),
-    Pathing = __require(57,55);
+/********** End of module 53: ..\src\task.repair.js **********/
+/********** Start module 54: ..\src\task.reserve.js **********/
+__modules[54] = function(module, exports) {
+var Cache = __require(3,54),
+    Pathing = __require(56,54);
 
 class Reserve {
     constructor(id) {
@@ -11116,18 +11080,18 @@ class Reserve {
 }
 
 if (Memory.profiling) {
-    __require(2,55).registerObject(Reserve, "TaskReserve");
+    __require(1,54).registerObject(Reserve, "TaskReserve");
 }
 module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 55: ..\src\task.reserve.js **********/
-/********** Start module 56: ..\src\task.upgradeController.js **********/
-__modules[56] = function(module, exports) {
-var Cache = __require(4,56),
-    Pathing = __require(57,56),
-    Utilities = __require(11,56);
+/********** End of module 54: ..\src\task.reserve.js **********/
+/********** Start module 55: ..\src\task.upgradeController.js **********/
+__modules[55] = function(module, exports) {
+var Cache = __require(3,55),
+    Pathing = __require(56,55),
+    Utilities = __require(10,55);
 
 class Upgrade {
     constructor(room) {
@@ -11230,15 +11194,15 @@ class Upgrade {
 }
 
 if (Memory.profiling) {
-    __require(2,56).registerObject(Upgrade, "TaskUpgradeController");
+    __require(1,55).registerObject(Upgrade, "TaskUpgradeController");
 }
 module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 56: ..\src\task.upgradeController.js **********/
-/********** Start module 57: ..\src\pathing.js **********/
-__modules[57] = function(module, exports) {
+/********** End of module 55: ..\src\task.upgradeController.js **********/
+/********** Start module 56: ..\src\pathing.js **********/
+__modules[56] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
     2: {dx: 1, dy: -1},
@@ -11250,267 +11214,260 @@ const direction = {
     8: {dx: -1, dy: -1}
 };
 
-var Cache = __require(4,57),
-    Segment = __require(10,57),
-    Pathing = {
-        moveTo: (creep, pos, range) => {
-            creep.memory._pathing = Pathing.move(creep, pos, range);
-        },
+var Cache = __require(3,56),
+    Segment = __require(9,56);
 
-        move: (creep, pos, range) => {
-            "use strict";
+class Pathing {
+    static moveTo(creep, pos, range) {
+        var pathing = creep.memory._pathing,
+            restartOn = [],
+            creepPos = creep.pos,
+            creepX = creepPos.x,
+            creepY = creepPos.y,
+            creepRoom = creepPos.roomName,
+            tick = Game.time,
+            posX, posY, posRoom, wasStationary, firstPos, multiplier, path, key;
 
-            var pathing = creep.memory._pathing,
-                restartOn = [],
-                creepPos = creep.pos,
-                creepX = creepPos.x,
-                creepY = creepPos.y,
-                creepRoom = creepPos.roomName,
-                tick = Game.time,
-                posX, posY, posRoom, wasStationary, firstPos, multiplier, path, key;
+        if (pos instanceof RoomObject) {
+            pos = pos.pos;
+        }
+        
+        posX = pos.x;
+        posY = pos.y;
+        posRoom = pos.roomName;
+        if (!range) {
+            range = 0;
+        }
+        if (creepPos.getRangeTo(pos) <= range) {
+            return undefined;
+        }
 
-            if (pos instanceof RoomObject) {
-                pos = pos.pos;
+        if (pathing) {
+            if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
+                pathing = undefined;
             }
+        }
+        if (pathing && pathing.restartOn && pathing.restartOn.indexOf(creepRoom) !== -1) {
+            delete pathing.path;
+            delete pathing.restartOn;
+        }
+        if (pathing) {
+            wasStationary = (creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room) || ((Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room);
             
-            posX = pos.x;
-            posY = pos.y;
-            posRoom = pos.roomName;
-            if (!range) {
-                range = 0;
-            }
-            if (creepPos.getRangeTo(pos) <= range) {
-                return undefined;
-            }
+            pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
 
-            if (pathing) {
-                if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
-                    pathing = undefined;
+            if (pathing.stationary >= 2) {
+                if (pathing.path && pathing.path.length > 0) {
+                    let dir = direction[+pathing.path[0]];
+                    
+                    firstPos = {
+                        x: creepX + dir.dx,
+                        y: creepY + dir.dy,
+                        room: creepRoom,
+                        blockedUntil: tick + 12
+                    };
+
+                    if (firstPos.x !== creepX || firstPos.y !== creepY) {
+                        if (!pathing.blocked) {
+                            pathing.blocked = [];
+                        }
+                        pathing.blocked.push(firstPos);
+                    }
                 }
-            }
-            if (pathing && pathing.restartOn && pathing.restartOn.indexOf(creepRoom) !== -1) {
                 delete pathing.path;
                 delete pathing.restartOn;
+            } else if (pathing.path && !wasStationary) {
+                if (pathing.path.length === 1) {
+                    pathing = undefined;
+                } else {
+                    pathing.start = {
+                        x: creepX,
+                        y: creepY,
+                        room: creepRoom
+                    };
+                    pathing.path = pathing.path.substring(1);
+                }
             }
-            if (pathing) {
-                wasStationary = (creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room) || ((Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room);
-                
-                pathing.stationary = (wasStationary) ? pathing.stationary + 1 : 0;
+        }
+        if (!pathing || !pathing.path) {
+            let moveParts = creep.getActiveBodyparts(MOVE),
+                paths = new Segment(4);
+            multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - moveParts) / moveParts;
+            if (pathing && pathing.blocked) {
+                _.remove(pathing.blocked, (b) => b.blockedUntil <= tick);
+            }
 
-                if (pathing.stationary >= 2) {
-                    if (pathing.path && pathing.path.length > 0) {
-                        let dir = direction[+pathing.path[0]];
-                        
-                        firstPos = {
-                            x: creepX + dir.dx,
-                            y: creepY + dir.dy,
-                            room: creepRoom,
-                            blockedUntil: tick + 12
-                        };
+            key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`;
 
-                        if (firstPos.x !== creepX || firstPos.y !== creepY) {
-                            if (!pathing.blocked) {
-                                pathing.blocked = [];
-                            }
-                            pathing.blocked.push(firstPos);
-                        }
-                    }
-                    delete pathing.path;
-                    delete pathing.restartOn;
-                } else if (pathing.path && !wasStationary) {
-                    if (pathing.path.length === 1) {
-                        pathing = undefined;
-                    } else {
-                        pathing.start = {
+            if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
+                if (pathing) {
+                    pathing.path = Memory.paths[key][0];
+                    pathing.restartOn = Memory.paths[key][1];
+                } else {
+                    pathing = {
+                        start: {
                             x: creepX,
                             y: creepY,
                             room: creepRoom
-                        };
-                        pathing.path = pathing.path.substring(1);
-                    }
+                        },
+                        dest: {
+                            x: posX,
+                            y: posY,
+                            room: posRoom
+                        },
+                        path: Memory.paths[key][0],
+                        stationary: 0,
+                        blocked: [],
+                        restartOn: Memory.paths[key][1]
+                    };
                 }
-            }
-            if (!pathing || !pathing.path) {
-                let moveParts = creep.getActiveBodyparts(MOVE),
-                    paths = new Segment(4);
-                multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - moveParts) / moveParts;
-                if (pathing && pathing.blocked) {
-                    _.remove(pathing.blocked, (b) => b.blockedUntil <= tick);
-                }
+                Memory.paths[key][3] = tick;
+            } else {
+                path = PathFinder.search(creepPos, {pos: pos, range: range}, {
+                    plainCost: Math.ceil(1 * multiplier),
+                    swampCost: Math.ceil(5 * multiplier),
+                    maxOps: creepRoom === posRoom ? 2000 : 100000,
+                    roomCallback: (roomName) => {
+                        var room = Game.rooms[roomName],
+                            matrix;
+                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army")))) {
+                            return false;
+                        }
 
-                key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`;
+                        if (!room) {
+                            restartOn.push(roomName);
+                            return;
+                        }
 
-                if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
-                    if (pathing) {
-                        pathing.path = Memory.paths[key][0];
-                        pathing.restartOn = Memory.paths[key][1];
-                    } else {
-                        pathing = {
-                            start: {
-                                x: creepX,
-                                y: creepY,
-                                room: creepRoom
-                            },
-                            dest: {
-                                x: posX,
-                                y: posY,
-                                room: posRoom
-                            },
-                            path: Memory.paths[key][0],
-                            stationary: 0,
-                            blocked: [],
-                            restartOn: Memory.paths[key][1]
-                        };
+                        matrix = Cache.getCostMatrix(room);
+
+                        if (pathing && roomName === creepRoom) {
+                            _.forEach(pathing.blocked, (blocked) => {
+                                if (roomName === blocked.room && tick < blocked.blockedUntil) {
+                                    matrix.set(blocked.x, blocked.y, 255);
+                                }
+                            });
+                        }
+
+                        return matrix;
                     }
-                    Memory.paths[key][3] = tick;
+                });
+
+                if (!path.path || path.path.length === 0) {
+                    return undefined;
+                }
+                if (pathing) {
+                    pathing.path = this.serializePath(creepPos, path.path);
+                    pathing.restartOn = restartOn;
                 } else {
-                    path = PathFinder.search(creepPos, {pos: pos, range: range}, {
-                        plainCost: Math.ceil(1 * multiplier),
-                        swampCost: Math.ceil(5 * multiplier),
-                        maxOps: creepRoom === posRoom ? 2000 : 100000,
-                        roomCallback: (roomName) => {
-                            var room = Game.rooms[roomName],
-                                matrix;
-                            if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || (creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army")))) {
-                                return false;
-                            }
-
-                            if (!room) {
-                                restartOn.push(roomName);
-                                return;
-                            }
-
-                            matrix = Cache.getCostMatrix(room);
-
-                            if (pathing && roomName === creepRoom) {
-                                _.forEach(pathing.blocked, (blocked) => {
-                                    if (roomName === blocked.room && tick < blocked.blockedUntil) {
-                                        matrix.set(blocked.x, blocked.y, 255);
-                                    }
-                                });
-                            }
-
-                            return matrix;
-                        }
-                    });
-
-                    if (!path.path || path.path.length === 0) {
-                        return undefined;
+                    pathing = {
+                        start: {
+                            x: creepX,
+                            y: creepY,
+                            room: creepRoom
+                        },
+                        dest: {
+                            x: posX,
+                            y: posY,
+                            room: posRoom
+                        },
+                        path: this.serializePath(creepPos, path.path),
+                        stationary: 0,
+                        blocked: [],
+                        restartOn: restartOn
+                    };
+                }
+                if (pathing.blocked.length === 0 && pathing.path.length > 10) {
+                    Memory.paths[key] = [pathing.path, [], tick, tick];
+                    if (restartOn && restartOn.length > 0) {
+                        Memory.paths[key][1] = restartOn;
                     }
-                    if (pathing) {
-                        pathing.path = Pathing.serializePath(creepPos, path.path);
-                        pathing.restartOn = restartOn;
-                    } else {
-                        pathing = {
-                            start: {
-                                x: creepX,
-                                y: creepY,
-                                room: creepRoom
-                            },
-                            dest: {
-                                x: posX,
-                                y: posY,
-                                room: posRoom
-                            },
-                            path: Pathing.serializePath(creepPos, path.path),
-                            stationary: 0,
-                            blocked: [],
-                            restartOn: restartOn
-                        };
+                    /*
+                    paths.memory[key] = [pathing.path, [], tick, tick];
+                    if (restartOn && restartOn.length > 0) {
+                        paths.memory[key][1] = restartOn;
                     }
-                    if (pathing.blocked.length === 0 && pathing.path.length > 10) {
-                        Memory.paths[key] = [pathing.path, [], tick, tick];
-                        if (restartOn && restartOn.length > 0) {
-                            Memory.paths[key][1] = restartOn;
-                        }
-                        /*
-                        paths.memory[key] = [pathing.path, [], tick, tick];
-                        if (restartOn && restartOn.length > 0) {
-                            paths.memory[key][1] = restartOn;
-                        }
-                        */
-                    }
+                    */
                 }
             }
-            if (creep.move(+pathing.path[0]) !== OK) {
-                pathing.stationary -= 1;
-            }
-
-            return pathing;
-        },
-
-        serializePath: (start, path) => {
-            "use strict";
-
-            return _.map(path, (pos, index) => {
-                var startPos;
-
-                if (index === 0) {
-                    startPos = start;
-                } else {
-                    startPos = path[index - 1];
-                }
-
-                switch (pos.x - startPos.x) {
-                    case 0:
-                    case -49:
-                    case 49:
-                        switch (pos.y - startPos.y) {
-                            case 0:
-                            case -49:
-                            case 49:
-                                return "";
-                            case 1:
-                            case -48:
-                                return BOTTOM.toString();
-                            case -1:
-                            case 48:
-                                return TOP.toString();
-                        }
-                        break;
-                    case 1:
-                    case -48:
-                        switch (pos.y - startPos.y) {
-                            case 0:
-                            case -49:
-                            case 49:
-                                return RIGHT.toString();
-                            case 1:
-                            case -48:
-                                return BOTTOM_RIGHT.toString();
-                            case -1:
-                            case 48:
-                                return TOP_RIGHT.toString();
-                        }
-                        break;
-                    case -1:
-                    case 48:
-                        switch (pos.y - startPos.y) {
-                            case 0:
-                            case -49:
-                            case 49:
-                                return LEFT.toString();
-                            case 1:
-                            case -48:
-                                return BOTTOM_LEFT.toString();
-                            case -1:
-                            case 48:
-                                return TOP_LEFT.toString();
-                        }
-                        break;
-                }
-            }).join("");
         }
-    };
+        if (creep.move(+pathing.path[0]) !== OK) {
+            pathing.stationary -= 1;
+        }
+
+        return pathing;
+    }
+
+    static serializePath(start, path) {
+        return _.map(path, (pos, index) => {
+            var startPos;
+
+            if (index === 0) {
+                startPos = start;
+            } else {
+                startPos = path[index - 1];
+            }
+
+            switch (pos.x - startPos.x) {
+                case 0:
+                case -49:
+                case 49:
+                    switch (pos.y - startPos.y) {
+                        case 0:
+                        case -49:
+                        case 49:
+                            return "";
+                        case 1:
+                        case -48:
+                            return BOTTOM.toString();
+                        case -1:
+                        case 48:
+                            return TOP.toString();
+                    }
+                    break;
+                case 1:
+                case -48:
+                    switch (pos.y - startPos.y) {
+                        case 0:
+                        case -49:
+                        case 49:
+                            return RIGHT.toString();
+                        case 1:
+                        case -48:
+                            return BOTTOM_RIGHT.toString();
+                        case -1:
+                        case 48:
+                            return TOP_RIGHT.toString();
+                    }
+                    break;
+                case -1:
+                case 48:
+                    switch (pos.y - startPos.y) {
+                        case 0:
+                        case -49:
+                        case 49:
+                            return LEFT.toString();
+                        case 1:
+                        case -48:
+                            return BOTTOM_LEFT.toString();
+                        case -1:
+                        case 48:
+                            return TOP_LEFT.toString();
+                    }
+                    break;
+            }
+        }).join("");
+    }
+}
 
 if (Memory.profiling) {
-    __require(2,57).registerObject(Pathing, "Pathing");
+    __require(1,56).registerObject(Pathing, "Pathing");
 }
 module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 57: ..\src\pathing.js **********/
+/********** End of module 56: ..\src\pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

@@ -4,7 +4,7 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskAttack = require("task.attack");
 
-class Convertor {
+class Converter {
     static checkSpawn(room) {
         var converter = Memory.maxCreeps.converter,
             roomName = room.name,

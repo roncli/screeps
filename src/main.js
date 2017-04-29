@@ -192,7 +192,6 @@ class Main {
                 log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
-
         };
 
         if (Memory.profiling) {
@@ -1310,6 +1309,7 @@ class Main {
         Cache.log.tickLimit = Game.cpu.tickLimit;
         Cache.log.bucket = Game.cpu.bucket;
         Cache.log.credits = Game.market.credits;
+        Cache.log.cpuUsed = Game.cpu.getUsed();
         Memory.console = Cache.log;
     }
 

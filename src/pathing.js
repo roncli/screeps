@@ -38,7 +38,7 @@ class Pathing {
 
         // If creep is at the position, we're done.
         if (creepPos.getRangeTo(pos) <= range) {
-            return undefined;
+            return;
         }
 
         if (pathing) {
@@ -172,7 +172,7 @@ class Pathing {
 
                 if (!path.path || path.path.length === 0) {
                     // There is no path, just return.
-                    return undefined;
+                    return;
                 }
 
                 // Serialize the path.
@@ -220,7 +220,7 @@ class Pathing {
             pathing.stationary -= 1;
         }
 
-        return pathing;
+        creep.memory._pathing = pathing;
     }
 
     static serializePath(start, path) {

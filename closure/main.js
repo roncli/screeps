@@ -11239,7 +11239,7 @@ class Pathing {
             range = 0;
         }
         if (creepPos.getRangeTo(pos) <= range) {
-            return undefined;
+            return;
         }
 
         if (pathing) {
@@ -11354,7 +11354,7 @@ class Pathing {
                 });
 
                 if (!path.path || path.path.length === 0) {
-                    return undefined;
+                    return;
                 }
                 if (pathing) {
                     pathing.path = this.serializePath(creepPos, path.path);
@@ -11395,7 +11395,7 @@ class Pathing {
             pathing.stationary -= 1;
         }
 
-        return pathing;
+        creep.memory._pathing = pathing;
     }
 
     static serializePath(start, path) {

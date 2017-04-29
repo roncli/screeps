@@ -184,6 +184,16 @@ class Main {
                 lastCpu = thisCpu;
             }
 
+            if (Memory.log) {
+                this.log();
+
+                if (Memory.logCpu) {
+                    thisCpu = Game.cpu.getUsed();
+                    log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
+                    lastCpu = thisCpu;
+                }
+            }
+
             this.rooms();
 
             if (Memory.logCpu) {
@@ -214,16 +224,6 @@ class Main {
                 if (Memory.logCpu) {
                     thisCpu = Game.cpu.getUsed();
                     log += `${log.length > 0 ? " - " : ""}debug took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
-            }
-
-            if (Memory.log) {
-                this.log();
-
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
             }
@@ -1664,7 +1664,7 @@ class Army {
         }
         
         if (army.boostRoom) {
-            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store
+            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store;
         }
         if (allCreepsInArmy.length === 0 && army.success) {
             delete Memory.army[name];

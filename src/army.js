@@ -30,7 +30,7 @@ class Army {
         }
         
         if (army.boostRoom) {
-            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store
+            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store;
         }
 
         // Delete the army if we're successful.

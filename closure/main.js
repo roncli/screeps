@@ -11244,7 +11244,7 @@ class Pathing {
 
         if (pathing) {
             if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
-                pathing = undefined;
+                delete creep.memory._pathing;
             }
         }
         if (pathing && pathing.restartOn && pathing.restartOn.indexOf(creepRoom) !== -1) {
@@ -11278,7 +11278,7 @@ class Pathing {
                 delete pathing.restartOn;
             } else if (pathing.path && !wasStationary) {
                 if (pathing.path.length === 1) {
-                    pathing = undefined;
+                    delete creep.memory._pathing;
                 } else {
                     pathing.start = {
                         x: creepX,

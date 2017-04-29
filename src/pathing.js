@@ -44,7 +44,7 @@ class Pathing {
         if (pathing) {
             // If the position doesn't match where we're going, nuke pathing.
             if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
-                pathing = undefined;
+                delete creep.memory._pathing;
             }
         }
 
@@ -84,7 +84,7 @@ class Pathing {
                 // We were successful moving last turn, update accordingly.
                 if (pathing.path.length === 1) {
                     // We've reached the end of the path.
-                    pathing = undefined;
+                    delete creep.memory._pathing;
                 } else {
                     // Update start position and remaining path.
                     pathing.start = {

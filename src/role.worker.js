@@ -25,7 +25,7 @@ class Worker {
         }
 
         // Output worker count in the report.
-        if (Memory.log && (workers.length > 0 || max > 0)) {
+        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "worker",
                 count: workers.length,

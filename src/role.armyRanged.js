@@ -12,7 +12,7 @@ class Ranged {
         }
 
         // Output ranged attacker count in the report.
-        if (Memory.log && max > 0) {
+        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
                 role: "armyRanged",
                 count: count,

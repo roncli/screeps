@@ -42,7 +42,7 @@ class Miner {
         });
 
         // Output miner count in the report.
-        if (Memory.log && (miners.length > 0 || max > 0)) {
+        if (Memory.log && (miners.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "miner",
                 count: miners.length,

@@ -50,7 +50,7 @@ class Collector {
         });
 
         // Output collector count in the report.
-        if (Memory.log && (collectors.length > 0 || max > 0)) {
+        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "collector",
                 count: collectors.length,

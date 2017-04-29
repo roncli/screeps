@@ -24,7 +24,7 @@ class Scientist {
         }
 
         // Output scientist count in the report.
-        if (Memory.log && (scientists.length > 0 || max > 0)) {
+        if (Memory.log && (scientists.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[room.name].creeps.push({
                 role: "scientist",
                 count: scientists.length,

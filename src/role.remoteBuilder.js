@@ -24,7 +24,7 @@ class Builder {
         }
 
         // Output remote builder count in the report.
-        if (Memory.log && (num > 0 || max > 0)) {
+        if (Memory.log && (num > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteBuilder",
                 count: num,

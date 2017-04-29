@@ -2838,7 +2838,7 @@ class Dismantler {
         if (count < max) {
             Dismantler.spawn(armyName, portals);
         }
-        if (Memory.log && max > 0) {
+        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
                 role: "armyDismantler",
                 count: count,
@@ -3105,7 +3105,7 @@ class Healer {
         if (count < max) {
             Healer.spawn(armyName, portals);
         }
-        if (Memory.log && max > 0) {
+        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
                 role: "armyHealer",
                 count: count,
@@ -3383,7 +3383,7 @@ class Melee {
         if (count < max) {
             Melee.spawn(armyName, portals);
         }
-        if (Memory.log && max > 0) {
+        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
                 role: "armyMelee",
                 count: count,
@@ -3666,7 +3666,7 @@ class Ranged {
         if (count < max) {
             Ranged.spawn(armyName, portals);
         }
-        if (Memory.log && max > 0) {
+        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
                 role: "armyRanged",
                 count: count,
@@ -3961,7 +3961,7 @@ class Claimer {
                 }
             });
         }
-        if (Memory.log && (claimers.length > 0 || max > 0)) {
+        if (Memory.log && (claimers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "claimer",
                 count: claimers.length,
@@ -4076,7 +4076,7 @@ class Collector {
                 Collector.spawn(room, sourceId);
             }
         });
-        if (Memory.log && (collectors.length > 0 || max > 0)) {
+        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "collector",
                 count: collectors.length,
@@ -4387,7 +4387,7 @@ class Converter {
                 }
             });
         }
-        if (Memory.log && (converters.length > 0 || max > 0)) {
+        if (Memory.log && (converters.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "converter",
                 count: converters.length,
@@ -4506,7 +4506,7 @@ class Defender {
         if (_.filter(defenders, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
             Defender.spawn(room, supportRoom);
         }
-        if (Memory.log && (defenders.length > 0 || max > 0)) {
+        if (Memory.log && (defenders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "defender",
                 count: defenders.length,
@@ -4608,7 +4608,7 @@ class Dismantler {
         if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
             Dismantler.spawn(room, supportRoom);
         }
-        if (Memory.log && (dismantlers.length > 0 || max > 0)) {
+        if (Memory.log && (dismantlers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "dismantler",
                 count: dismantlers.length,
@@ -4827,7 +4827,7 @@ class Healer {
         if (_.filter(healers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
             Healer.spawn(room, supportRoom);
         }
-        if (Memory.log && (healers.length > 0 || max > 0)) {
+        if (Memory.log && (healers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "healer",
                 count: healers.length,
@@ -4955,7 +4955,7 @@ class Miner {
                 Miner.spawn(room, containerId);
             }
         });
-        if (Memory.log && (miners.length > 0 || max > 0)) {
+        if (Memory.log && (miners.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "miner",
                 count: miners.length,
@@ -5073,7 +5073,7 @@ class Builder {
         if ((num = (Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || []).length) < max) {
             Builder.spawn(room, supportRoom);
         }
-        if (Memory.log && (num > 0 || max > 0)) {
+        if (Memory.log && (num > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteBuilder",
                 count: num,
@@ -5275,7 +5275,7 @@ class RemoteCollector {
             RemoteCollector.spawn(room, supportRoom);
         }
 
-        if (Memory.log && (collectors.length > 0 || max > 0)) {
+        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteCollector",
                 count: collectors.length,
@@ -5492,7 +5492,7 @@ class RemoteDismantler {
         if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
             RemoteDismantler.spawn(room, supportRoom);
         }
-        if (Memory.log && (dismantlers.length > 0 || max > 0)) {
+        if (Memory.log && (dismantlers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteDismantler",
                 count: dismantlers.length,
@@ -5633,7 +5633,7 @@ class Miner {
                 Miner.spawn(room, supportRoom, containerId);
             }
         });
-        if (Memory.log && (miners.length > 0 || max > 0)) {
+        if (Memory.log && (miners.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteMiner",
                 count: miners.length,
@@ -5777,7 +5777,7 @@ class Reserver {
         if (count < max) {
             Reserver.spawn(room, supportRoom);
         }
-        if (Memory.log && (reservers.length > 0 || max > 0)) {
+        if (Memory.log && (reservers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteReserver",
                 count: reservers.length,
@@ -5916,7 +5916,7 @@ class Storer {
             }
         });
 
-        if (Memory.log && (storers.length > 0 || max > 0)) {
+        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteStorer",
                 count: storers.length,
@@ -6150,7 +6150,7 @@ class Worker {
             }
             return false;
         });
-        if (Memory.log && (workers.length > 0 || max > 0)) {
+        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "remoteWorker",
                 count: workers.length,
@@ -6437,7 +6437,7 @@ class Scientist {
         if (count < max) {
             Scientist.spawn(room);
         }
-        if (Memory.log && (scientists.length > 0 || max > 0)) {
+        if (Memory.log && (scientists.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[room.name].creeps.push({
                 role: "scientist",
                 count: scientists.length,
@@ -6880,11 +6880,11 @@ class Storer {
                 length += lengthToStorage[container.id];
             }
         });
-        max += Math.ceil(2 * length / (controller && controller.level == 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
+        max += Math.ceil(2 * length / (controller && controller.level === 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
         if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
             Storer.spawn(room);
         }
-        if (Memory.log && (storers.length > 0 || max > 0)) {
+        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "storer",
                 count: storers.length,
@@ -7204,7 +7204,7 @@ class Upgrader {
         if (count < max || (controller && controller.level < 8 && storage && storageEnergy > 900000)) {
             Upgrader.spawn(room);
         }
-        if (Memory.log && (upgraders.length > 0 || max > 0)) {
+        if (Memory.log && (upgraders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "upgrader",
                 count: upgraders.length,
@@ -7464,7 +7464,7 @@ class Worker {
         if (count < max) {
             Worker.spawn(room);
         }
-        if (Memory.log && (workers.length > 0 || max > 0)) {
+        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "worker",
                 count: workers.length,

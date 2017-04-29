@@ -51,13 +51,13 @@ class Storer {
         });
 
         // If we don't have a storer for each container, spawn one.
-        max += Math.ceil(2 * length / (controller && controller.level == 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
+        max += Math.ceil(2 * length / (controller && controller.level === 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
         if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
             Storer.spawn(room);
         }
 
         // Output storer count in the report.
-        if (Memory.log && (storers.length > 0 || max > 0)) {
+        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "storer",
                 count: storers.length,

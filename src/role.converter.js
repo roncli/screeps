@@ -27,7 +27,7 @@ class Converter {
         }
 
         // Output converter count in the report.
-        if (Memory.log && (converters.length > 0 || max > 0)) {
+        if (Memory.log && (converters.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
             Cache.log.rooms[roomName].creeps.push({
                 role: "converter",
                 count: converters.length,

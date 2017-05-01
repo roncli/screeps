@@ -123,6 +123,14 @@ class Main {
                 lastCpu = thisCpu;
             }
 
+            this.deserializeArmies();
+
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}deserializeArmies took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
+
             this.balanceEnergy();
 
             if (Memory.logCpu) {
@@ -728,16 +736,16 @@ class Main {
             if (roomMemory.roomType) {
                 switch (roomMemory.roomType.type) {
                     case "base":
-                        Cache.roomTypes[name] = RoomBase.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomBase.fromObj(roomMemory);
                         break;
                     case "cleanup":
-                        Cache.roomTypes[name] = RoomCleanup.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomCleanup.fromObj(roomMemory);
                         break;
                     case "mine":
-                        Cache.roomTypes[name] = RoomMine.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomMine.fromObj(roomMemory);
                         break;
                     case "source":
-                        Cache.roomTypes[name] = RoomSource.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomSource.fromObj(roomMemory);
                         break;
                 }
 
@@ -748,6 +756,12 @@ class Main {
                     });
                 }
             }
+        });
+    }
+
+    static deserializeArmies() {
+        _.forEach(Memory.army, (army, armyName) => {
+            Cache.armyTypes[armyName] = Army.fromObj(army);
         });
     }
 
@@ -962,13 +976,13 @@ class Main {
                 roomMemory = memoryRooms[roomName],
                 roomType = roomMemory.roomType;
             
-            if (Cache.roomTypes[roomName]) {
+            if (Cache.rooms[roomName]) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                     // Run rooms.
-                    Cache.roomTypes[roomName].run(room);
+                    Cache.rooms[roomName].run(room);
                 }
-                if (roomType.type === Cache.roomTypes[roomName].type) {
-                    Cache.roomTypes[roomName].toObj(room);
+                if (roomType.type === Cache.rooms[roomName].type) {
+                    Cache.rooms[roomName].toObj(room);
                 }
             }
             

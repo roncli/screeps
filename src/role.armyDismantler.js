@@ -4,12 +4,12 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Dismantler {
-    static checkSpawn(armyName, portals) {
+    static checkSpawn(armyName) {
         var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
             max = Memory.army[armyName].dismantler.maxCreeps;
 
         if (count < max) {
-            Dismantler.spawn(armyName, portals);
+            Dismantler.spawn(armyName);
         }
 
         // Output dismantler count in the report.
@@ -22,8 +22,8 @@ class Dismantler {
         }        
     }
 
-    static spawn(armyName, portals) {
-        var army = Memory.army[armyName],
+    static spawn(armyName) {
+        var army = Memory.army[name],
             dismantlerUnits = army.dismantler.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -60,7 +60,7 @@ class Dismantler {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyDismantler-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyDismantler-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {

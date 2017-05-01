@@ -10,7 +10,11 @@ var Cache = require("cache"),
     TaskRangedAttack = require("task.rangedAttack");
 
 class Army {
-    static run(name) {
+    constructor() {
+
+    }
+
+    run(name) {
         var army = Memory.army[name],
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
             armyAttackRoom = Game.rooms[army.attackRoom],
@@ -97,10 +101,10 @@ class Army {
 
         // Check spawns if we're building.
         if (army.directive === "building" || army.reinforce) {
-            RoleArmyDismantler.checkSpawn(name, army.portals);
-            RoleArmyHealer.checkSpawn(name, army.portals);
-            RoleArmyMelee.checkSpawn(name, army.portals);
-            RoleArmyRanged.checkSpawn(name, army.portals);
+            RoleArmyDismantler.checkSpawn(name);
+            RoleArmyHealer.checkSpawn(name);
+            RoleArmyMelee.checkSpawn(name);
+            RoleArmyRanged.checkSpawn(name);
         }
 
         // Assign escorts.
@@ -152,6 +156,14 @@ class Army {
         RoleArmyHealer.assignTasks(name, army.directive, tasks);
         RoleArmyMelee.assignTasks(name, army.directive, tasks);
         RoleArmyRanged.assignTasks(name, army.directive, tasks);
+    }
+
+    toObj() {
+        
+    }
+
+    static fromObj(army) {
+        return new Army(army);
     }
 }
 

@@ -36,7 +36,8 @@ class Cache {
         resourcesInRoom = {};
         costMatricies = {};
         this.creepTasks = {};
-        this.roomTypes = {};
+        this.rooms = {};
+        this.armies = {};
         this.spawning = {};
         this.minerals = {};
 

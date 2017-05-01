@@ -4,12 +4,12 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Healer {
-    static checkSpawn(armyName, portals) {
+    static checkSpawn(armyName) {
         var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
             max = Memory.army[armyName].healer.maxCreeps;
 
         if (count < max) {
-            Healer.spawn(armyName, portals);
+            Healer.spawn(armyName);
         }
 
         // Output healer count in the report.
@@ -22,7 +22,7 @@ class Healer {
         }        
     }
 
-    static spawn(armyName, portals) {
+    static spawn(armyName) {
         var army = Memory.army[armyName],
             healerUnits = army.healer.units,
             body = [],
@@ -62,7 +62,7 @@ class Healer {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {

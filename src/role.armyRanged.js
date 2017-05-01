@@ -3,12 +3,12 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Ranged {
-    static checkSpawn(armyName, portals) {
+    static checkSpawn(armyName) {
         var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
             max = Memory.army[armyName].ranged.maxCreeps;
 
         if (count < max) {
-            Ranged.spawn(armyName, portals);
+            Ranged.spawn(armyName);
         }
 
         // Output ranged attacker count in the report.
@@ -21,7 +21,7 @@ class Ranged {
         }        
     }
 
-    static spawn(armyName, portals) {
+    static spawn(armyName) {
         var army = Memory.army[armyName],
             rangedUnits = army.ranged.units,
             body = [],
@@ -59,7 +59,7 @@ class Ranged {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyRanged-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyRanged-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {
@@ -111,6 +111,7 @@ class Ranged {
                 }
 
                 // Rally to army's building location.
+                task = new TaskRally(army.buildRoom);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {

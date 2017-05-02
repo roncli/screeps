@@ -761,7 +761,7 @@ class Main {
 
     static deserializeArmies() {
         _.forEach(Memory.army, (army, armyName) => {
-            Cache.armyTypes[armyName] = Army.fromObj(army);
+            Cache.armies[armyName] = Army.fromObj(army);
         });
     }
 
@@ -812,6 +812,26 @@ class Main {
                 hits: c.hits,
                 hitsMax: c.hitsMax
             };
+        });
+
+        _.forEach(Cache.armies, (army) => {
+            // Log army data.
+            Cache.log.army[army.name] = {
+                directive: army.directive,
+                scheduled: army.scheduled,
+                portals: army.portals,
+                boostRoom: army.boostRoom,
+                buildRoom: army.buildRoom,
+                stageRoom: army.stageRoom,
+                attackRoom: army.attackRoom,
+                dismantle: army.dismantle.length,
+                creeps: []
+            };
+
+            if (Game.rooms[army.attackRoom]) {
+                Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
+                Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
+            }
         });
 
         Cache.log.spawns = _.map(Game.spawns, (s) => {
@@ -1112,27 +1132,11 @@ class Main {
 
     static army() {
         // Loop through each army and run it.
-        _.forEach(Memory.army, (value, army) => {
-            // Log army data.
-            Cache.log.army[army] = {
-                directive: value.directive,
-                scheduled: value.scheduled,
-                portals: value.portals,
-                boostRoom: value.boostRoom,
-                buildRoom: value.buildRoom,
-                stageRoom: value.stageRoom,
-                attackRoom: value.attackRoom,
-                dismantle: value.dismantle.length,
-                creeps: []
-            };
-
-            if (Game.rooms[value.attackRoom]) {
-                Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
-                Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
-            }
-
-            // Run army.
+        _.forEach(Cache.armies, (army) => {
+            // Run army, then serialize it.
             Army.run(army);
+
+            army.toObj();
         });
     }
 

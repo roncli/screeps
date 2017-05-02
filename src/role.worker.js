@@ -17,8 +17,8 @@ class Worker {
         }
 
         // If we have less than max workers, spawn a worker.
-        count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= ((storage && storage.my) ? 150 : 300)).length;
-        max = canSpawn ? (storage && storage.my) ? 1 : 2 : 0;
+        count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length;
+        max = canSpawn ? storage && storage.my ? 1 : 2 : 0;
 
         if (count < max) {
             Worker.spawn(room);

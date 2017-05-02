@@ -71,7 +71,7 @@ class Claimer {
             var task = TaskRally.getClaimerTask(creep);
             if (task.canAssign(creep)) {
                 assigned.push(creep.name);
-            };
+            }
         });
 
         _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -87,7 +87,7 @@ class Claimer {
             if (task.canAssign(creep)) {
                 creep.say("Claiming");
                 assigned.push(creep.name);
-            };
+            }
         });
 
         _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);

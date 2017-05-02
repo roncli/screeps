@@ -4,12 +4,13 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Dismantler {
-    static checkSpawn(armyName) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].dismantler.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.dismantler.maxCreeps;
 
         if (count < max) {
-            Dismantler.spawn(armyName);
+            Dismantler.spawn(army);
         }
 
         // Output dismantler count in the report.
@@ -22,8 +23,8 @@ class Dismantler {
         }        
     }
 
-    static spawn(armyName) {
-        var army = Memory.army[name],
+    static spawn(army) {
+        var armyName = army.name,
             dismantlerUnits = army.dismantler.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -86,17 +87,19 @@ class Dismantler {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
-            assigned = [],
-            army = Memory.army[armyName],
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
             attackRoom = Game.rooms[attackRoomName],
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
+            assigned = [],
             task, structures, healers;
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 // If not yet boosted, go get boosts.
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
@@ -113,7 +116,7 @@ class Dismantler {
                 }
 
                 // Rally to army's building location.
-                task = new TaskRally(army.buildRoom);
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -127,7 +130,7 @@ class Dismantler {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -274,8 +277,8 @@ class Dismantler {
                 });
 
                 // Rally to army's attack location.
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }

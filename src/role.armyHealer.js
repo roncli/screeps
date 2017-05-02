@@ -4,12 +4,13 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Healer {
-    static checkSpawn(armyName) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].healer.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.healer.maxCreeps;
 
         if (count < max) {
-            Healer.spawn(armyName);
+            Healer.spawn(army);
         }
 
         // Output healer count in the report.
@@ -22,8 +23,8 @@ class Healer {
         }        
     }
 
-    static spawn(armyName) {
-        var army = Memory.army[armyName],
+    static spawn(army) {
+        var armyName = army.name,
             healerUnits = army.healer.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -88,12 +89,15 @@ class Healer {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var assigned = [],
-            army = Memory.army[armyName],
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
+            attackRoom = Game.rooms[attackRoomName],
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
+            assigned = [],
             creepsWithNoTask, task;
 
         // Assign tasks for escorts.
@@ -112,7 +116,7 @@ class Healer {
 
         creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 // If not yet boosted, go get boosts.
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
@@ -129,7 +133,7 @@ class Healer {
                 }
 
                 // Rally to army's building location.
-                task = new TaskRally(army.buildRoom);
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -143,7 +147,7 @@ class Healer {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -193,7 +197,7 @@ class Healer {
                 });
 
                 // Rally to near dismantle location.
-                if (Game.rooms[attackRoomName] && dismantle.length > 0) {
+                if (attackRoom && dismantle.length > 0) {
                     task = new TaskRally(dismantle[0]);
                     task.range = 3;
                     _.forEach(creepsWithNoTask, (creep) => {
@@ -254,8 +258,8 @@ class Healer {
 
                 // Heal hurt creeps in the room.
                 
-                if (Game.rooms[attackRoomName] && !Game.rooms[attackRoomName].unobservable) {
-                    _.forEach(TaskHeal.getTasks(Game.rooms[attackRoomName]), (task) => {
+                if (attackRoom && !attackRoom.unobservable) {
+                    _.forEach(TaskHeal.getTasks(attackRoom), (task) => {
                         _.forEach(creepsWithNoTask, (creep) => {
                             if (task.canAssign(creep)) {
                                 creep.say("Heal");
@@ -289,8 +293,8 @@ class Healer {
                 });
 
                 // Rally to army's attack location.
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }

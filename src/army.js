@@ -10,110 +10,114 @@ var Cache = require("cache"),
     TaskRangedAttack = require("task.rangedAttack");
 
 class Army {
-    constructor() {
+    constructor(name, settings) {
+        Memory.army[name] = settings;
+        _.assign(this, settings);
 
+        this.name = name;
+        this.army = Memory.army[name];
     }
 
-    run(name) {
-        var army = Memory.army[name],
+    run() {
+        var name = this.name,
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
-            armyAttackRoom = Game.rooms[army.attackRoom],
-            armyDismantlers = army.dismantler,
-            armyHealers = army.healer,
-            armyMelees = army.melee,
-            armyRangeds = army.ranged,
+            attackRoom = Game.rooms[this.attackRoom],
+            dismantler = this.dismantler,
+            healer = this.healer,
+            melee = this.melee,
+            ranged = this.ranged,
             boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
 
         // Bail if scheduled for the future.
-        if (army.scheduled && army.scheduled > Game.time) {
+        if (this.scheduled && this.scheduled > Game.time) {
             return;
         }
         
-        if (armyAttackRoom) {
-            hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+        if (attackRoom) {
+            hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
         }
         
-        if (army.boostRoom) {
-            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store;
+        if (this.boostRoom) {
+            boostRoomStorageStore = Game.rooms[this.boostRoom].storage.store;
         }
 
         // Delete the army if we're successful.
-        if (allCreepsInArmy.length === 0 && army.success) {
-            delete Memory.army[name];
+        if (allCreepsInArmy.length === 0 && this.success) {
+            this.delete = true;
             return;
         }
 
         // Reset army if we have no creeps.
-        if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
+        if (this.directive !== "preparing" && this.directive !== "building" && allCreepsInArmy.length === 0 && !this.success) {
             Game.notify(`Army ${name} operation failed, restarting.`);
-            army.directive = "preparing";
+            this.directive = "preparing";
         }
 
         // If the attack room is in safe mode, activate backup plan, if any.
-        if (army.safeMode && armyAttackRoom && armyAttackRoom.controller && armyAttackRoom.controller.safeMode) {
-            army.directive = "staging";
-            army.stageRoom = army.safeMode.stageRoom;
-            army.attackRoom = army.safeMode.attackRoom;
-            army.dismantle = army.safeMode.dismantle;
-            army.safeMode = army.safeMode.safeMode;
+        if (this.safeMode && attackRoom && attackRoom.controller && attackRoom.controller.safeMode) {
+            this.directive = "staging";
+            this.stageRoom = this.safeMode.stageRoom;
+            this.attackRoom = this.safeMode.attackRoom;
+            this.dismantle = this.safeMode.dismantle;
+            this.safeMode = this.safeMode.safeMode;
         }
 
         // Determine conditions for next stage or success.
-        switch (army.directive) {
+        switch (this.directive) {
             case "preparing":
-                if (!army.boostRoom) {
-                    army.directive = "building";
+                if (!this.boostRoom) {
+                    this.directive = "building";
                 } else if (
-                    (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (armyDismantlers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps + armyHealers.maxCreeps) &&
-                    (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * armyDismantlers.units * armyDismantlers.maxCreeps &&
-                    (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * armyHealers.units * armyHealers.maxCreeps
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * dismantler.units * dismantler.maxCreeps &&
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * healer.units * healer.maxCreeps
                 ) {
-                    army.directive = "building";
+                    this.directive = "building";
                 }
                 break;
             case "building":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === army.buildRoom).length >= armyDismantlers.maxCreeps + armyHealers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps) {
-                    army.directive = "staging";
+                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === this.buildRoom).length >= dismantler.maxCreeps + healer.maxCreeps + melee.maxCreeps + ranged.maxCreeps) {
+                    this.directive = "staging";
                 }
                 break;
             case "staging":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.stageRoom).length === 0) {
-                    army.directive = "dismantle";
+                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
+                    this.directive = "dismantle";
                 }
                 break;
             case "dismantle":
-                if (armyAttackRoom) {
-                    army.dismantle = _.filter(army.dismantle, (d) => Game.getObjectById(d));
+                if (attackRoom) {
+                    this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
 
-                    if (army.dismantle.length === 0) {
-                        army.directive = "attack";
+                    if (this.dismantle.length === 0) {
+                        this.directive = "attack";
                     }
                 }
                 break;
             case "attack":
-                if (armyAttackRoom) {
-                    if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
-                        army.success = true;
+                if (attackRoom) {
+                    if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
+                        this.success = true;
                     }
                 }
                 break;
         }
 
         // Check spawns if we're building.
-        if (army.directive === "building" || army.reinforce) {
-            RoleArmyDismantler.checkSpawn(name);
-            RoleArmyHealer.checkSpawn(name);
-            RoleArmyMelee.checkSpawn(name);
-            RoleArmyRanged.checkSpawn(name);
+        if (this.directive === "building" || this.reinforce) {
+            RoleArmyDismantler.checkSpawn(this);
+            RoleArmyHealer.checkSpawn(this);
+            RoleArmyMelee.checkSpawn(this);
+            RoleArmyRanged.checkSpawn(this);
         }
 
         // Assign escorts.
-        if (armyDismantlers.escort || armyMelees.escort || armyRangeds.escort) {
+        if (dismantler.escort || melee.escort || ranged.escort) {
             _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
                 var escort = [].concat.apply([], [
-                    armyDismantlers.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                    armyMelees.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                    armyRangeds.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
+                    dismantler.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                    melee.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                    ranged.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
                 ])[0];
 
                 if (escort) {
@@ -130,20 +134,20 @@ class Army {
             melee: { tasks: [] },
             ranged: { tasks: [] },
             heal: {
-                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => (b.hitsMax - b.hits) - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
+                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => b.hitsMax - b.hits - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
             },
             rally: { tasks: [] }
         };
 
-        if (armyAttackRoom) {
-            switch (army.directive) {
+        if (attackRoom) {
+            switch (this.directive) {
                 case "dismantle":
-                    hostiles = _.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
+                    hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
                     tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
                     tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
                     break;
                 case "attack":
-                    hostiles = Cache.hostilesInRoom(armyAttackRoom);
+                    hostiles = Cache.hostilesInRoom(attackRoom);
                     tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
                     tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
                     tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
@@ -152,14 +156,35 @@ class Army {
         }
 
         // Assign tasks.
-        RoleArmyDismantler.assignTasks(name, army.directive, tasks);
-        RoleArmyHealer.assignTasks(name, army.directive, tasks);
-        RoleArmyMelee.assignTasks(name, army.directive, tasks);
-        RoleArmyRanged.assignTasks(name, army.directive, tasks);
+        RoleArmyDismantler.assignTasks(this, tasks);
+        RoleArmyHealer.assignTasks(this, tasks);
+        RoleArmyMelee.assignTasks(this, tasks);
+        RoleArmyRanged.assignTasks(this, tasks);
     }
 
     toObj() {
-        
+        if (this.delete) {
+            delete Memory.army[this.name];
+        } else {
+            Memory.army[this.name] = {
+                attackRoom: this.attackRoom,
+                boostRoom: this.success,
+                buildRoom: this.buildRoom,
+                directive: this.directive,
+                dismantle: this.dismantle,
+                dismantler: this.dismantler,
+                healer: this.healer,
+                melee: this.melee,
+                ranged: this.ranged,
+                region: this.region,
+                reinforce: this.reinforce,
+                restPosition: this.restPosition,
+                safeMode: this.safeMode,
+                scheduled: this.scheduled,
+                stageRoom: this.stageRoom,
+                success: this.success
+            };
+        }
     }
 
     static fromObj(army) {

@@ -14,7 +14,7 @@ class RemoteCollector {
         }
 
         if (!max) {
-            max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1;
+            max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? supportRoom.controller ? supportRoom.controller.level : 3 : 1;
         }
 
         // If there are no spawns in the support room, ignore the room.

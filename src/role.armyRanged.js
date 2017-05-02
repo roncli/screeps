@@ -3,9 +3,10 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Ranged {
-    static checkSpawn(armyName) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].ranged.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.ranged.maxCreeps;
 
         if (count < max) {
             Ranged.spawn(armyName);
@@ -21,8 +22,8 @@ class Ranged {
         }        
     }
 
-    static spawn(armyName) {
-        var army = Memory.army[armyName],
+    static spawn(army) {
+        var armyName = army.name,
             rangedUnits = army.ranged.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -85,16 +86,19 @@ class Ranged {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || []), (c) => !c.spawning),
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || []), (c) => !c.spawning),
             assigned = [],
             army = Memory.army[armyName],
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
             task, healers;
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 // If not yet boosted, go get boosts.
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
@@ -111,7 +115,7 @@ class Ranged {
                 }
 
                 // Rally to army's building location.
-                task = new TaskRally(army.buildRoom);
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -125,7 +129,7 @@ class Ranged {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -292,8 +296,8 @@ class Ranged {
                 });
 
                 // Rally to army's attack location.
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }

@@ -33,7 +33,7 @@ class Upgrader {
             max = 1;
         }
 
-        if (count < max || (controller && controller.level < 8 && storage && storageEnergy > 900000)) {
+        if (count < max || controller && controller.level < 8 && storage && storageEnergy > 900000) {
             Upgrader.spawn(room);
         }
 
@@ -138,7 +138,7 @@ class Upgrader {
             }
         }
 
-        if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && (Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {
+        if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0) >= 30 * workCount) {
             canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
         }
 
@@ -158,7 +158,7 @@ class Upgrader {
         if (typeof name !== "number" && canBoost) {
             // Set the lab to be in use.
             labToBoostWith.creepToBoost = name;
-            labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_GHODIUM_ACID : ((storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE);
+            labToBoostWith.resource = storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount ? RESOURCE_CATALYZED_GHODIUM_ACID : storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE;
             labToBoostWith.amount = 30 * workCount;
             supportRoom.memory.labsInUse.push(labToBoostWith);
 
@@ -173,7 +173,7 @@ class Upgrader {
 
     static assignTasks(room, tasks) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             assigned = [],
             controller = room.controller;
 

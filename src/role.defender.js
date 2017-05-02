@@ -98,7 +98,7 @@ class Defender {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
                 var task = new TaskRally(keeper.id, creep);
                 task.range = 1;
-                return !(task).canAssign(creep);
+                return !task.canAssign(creep);
             });
 
             if (creep.memory.currentTask) {

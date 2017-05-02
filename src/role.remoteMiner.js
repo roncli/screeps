@@ -42,7 +42,7 @@ class Miner {
             source = Game.getObjectById(Memory.containerSource[containerId]);
 
             // If this container is for a mineral, check to make sure it has resources, and we are allowed to mine it.
-            if (source instanceof Mineral && (source.mineralAmount === 0 || (room.controller && (!room.controller.my || room.controller.level < 6)))) {
+            if (source instanceof Mineral && (source.mineralAmount === 0 || room.controller && (!room.controller.my || room.controller.level < 6))) {
                 return;
             }
 
@@ -65,7 +65,7 @@ class Miner {
     }
 
     static spawn(room, supportRoom, id) {
-        var body = (room.memory && room.memory.roomType && room.memory.roomType.type === "source") || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
+        var body = room.memory && room.memory.roomType && room.memory.roomType.type === "source" || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
             roomName = room.name,
             supportRoomName = supportRoom.name,
             energy, units, remainder, count, spawnToUse, name;

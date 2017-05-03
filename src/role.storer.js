@@ -8,7 +8,7 @@ class Storer {
             roomName = room.name,
             length = 0,
             max = 0,
-            controller, army, storers, sources, lengthToStorage;
+            controller, army, storers, lengthToStorage;
         
         // If there are no spawns, containers, or storages in the room, ignore the room.
         if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage || !room.storage.my) {

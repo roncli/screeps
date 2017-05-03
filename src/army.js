@@ -11,7 +11,9 @@ var Cache = require("cache"),
 
 class Army {
     constructor(name, settings) {
-        Memory.army[name] = settings;
+        if (!Memory.army[name]) {
+            Memory.army[name] = settings;
+        }
         _.assign(this, settings);
 
         this.name = name;
@@ -188,7 +190,7 @@ class Army {
     }
 
     static fromObj(army) {
-        return new Army(army);
+        return new Army(army.name, army);
     }
 }
 

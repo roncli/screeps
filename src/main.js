@@ -531,7 +531,7 @@ class Main {
                             if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
                                 delete Memory.minimumSell[resource];
                             }
-                            if (node.buyPrice > buyPrice) {
+                            if (node.buyPrice > buyPrice || !Memory.buy) {
                                 // Ensure we have the necessary minerals.
                                 let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
                                     roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;

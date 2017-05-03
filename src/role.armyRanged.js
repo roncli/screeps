@@ -90,7 +90,6 @@ class Ranged {
         var armyName = army.name,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || []), (c) => !c.spawning),
             assigned = [],
-            army = Memory.army[armyName],
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
             buildRoomName = army.buildRoom,

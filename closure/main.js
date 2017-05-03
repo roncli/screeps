@@ -176,6 +176,14 @@ class Main {
                 lastCpu = thisCpu;
             }
 
+            this.deserializeArmies();
+
+            if (Memory.logCpu) {
+                thisCpu = Game.cpu.getUsed();
+                log += `${log.length > 0 ? " - " : ""}deserializeArmies took ${(thisCpu - lastCpu).toFixed(2)}`;
+                lastCpu = thisCpu;
+            }
+
             this.balanceEnergy();
 
             if (Memory.logCpu) {
@@ -541,7 +549,7 @@ class Main {
                             if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
                                 delete Memory.minimumSell[resource];
                             }
-                            if (node.buyPrice > buyPrice) {
+                            if (node.buyPrice > buyPrice || !Memory.buy) {
                                 let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
                                     roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
 
@@ -727,16 +735,16 @@ class Main {
             if (roomMemory.roomType) {
                 switch (roomMemory.roomType.type) {
                     case "base":
-                        Cache.roomTypes[name] = RoomBase.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomBase.fromObj(roomMemory);
                         break;
                     case "cleanup":
-                        Cache.roomTypes[name] = RoomCleanup.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomCleanup.fromObj(roomMemory);
                         break;
                     case "mine":
-                        Cache.roomTypes[name] = RoomMine.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomMine.fromObj(roomMemory);
                         break;
                     case "source":
-                        Cache.roomTypes[name] = RoomSource.fromObj(roomMemory);
+                        Cache.rooms[name] = RoomSource.fromObj(roomMemory);
                         break;
                 }
 
@@ -747,6 +755,12 @@ class Main {
                     });
                 }
             }
+        });
+    }
+
+    static deserializeArmies() {
+        _.forEach(Memory.army, (army, armyName) => {
+            Cache.armies[armyName] = Army.fromObj(armyName, army);
         });
     }
 
@@ -796,6 +810,25 @@ class Main {
                 hits: c.hits,
                 hitsMax: c.hitsMax
             };
+        });
+
+        _.forEach(Cache.armies, (army) => {
+            Cache.log.army[army.name] = {
+                directive: army.directive,
+                scheduled: army.scheduled,
+                portals: army.portals,
+                boostRoom: army.boostRoom,
+                buildRoom: army.buildRoom,
+                stageRoom: army.stageRoom,
+                attackRoom: army.attackRoom,
+                dismantle: army.dismantle.length,
+                creeps: []
+            };
+
+            if (Game.rooms[army.attackRoom]) {
+                Cache.log.army[army.name].structures = _.filter(Game.rooms[army.attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
+                Cache.log.army[army.name].constructionSites = Game.rooms[army.attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
+            }
         });
 
         Cache.log.spawns = _.map(Game.spawns, (s) => {
@@ -956,12 +989,12 @@ class Main {
                 roomMemory = memoryRooms[roomName],
                 roomType = roomMemory.roomType;
             
-            if (Cache.roomTypes[roomName]) {
+            if (Cache.rooms[roomName]) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
-                    Cache.roomTypes[roomName].run(room);
+                    Cache.rooms[roomName].run(room);
                 }
-                if (roomType.type === Cache.roomTypes[roomName].type) {
-                    Cache.roomTypes[roomName].toObj(room);
+                if (roomType.type === Cache.rooms[roomName].type) {
+                    Cache.rooms[roomName].toObj(room);
                 }
             }
             
@@ -1090,24 +1123,10 @@ class Main {
     }
 
     static army() {
-        _.forEach(Memory.army, (value, army) => {
-            Cache.log.army[army] = {
-                directive: value.directive,
-                scheduled: value.scheduled,
-                portals: value.portals,
-                boostRoom: value.boostRoom,
-                buildRoom: value.buildRoom,
-                stageRoom: value.stageRoom,
-                attackRoom: value.attackRoom,
-                dismantle: value.dismantle.length,
-                creeps: []
-            };
+        _.forEach(Cache.armies, (army) => {
+            army.run();
 
-            if (Game.rooms[value.attackRoom]) {
-                Cache.log.army[army].structures = _.filter(Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
-                Cache.log.army[army].constructionSites = Game.rooms[Memory.army[army].attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
-            }
-            Army.run(army);
+            army.toObj();
         });
     }
 
@@ -1132,7 +1151,7 @@ class Main {
                         break;
                 }
             }
-            if (creep.memory.army && Memory.army[creep.memory.army] && creep.room.name === Memory.army[creep.memory.army].attackRoom) {
+            if (creep.memory.army && Cache.armies[creep.memory.army] && creep.room.name === Cache.armies[creep.memory.army].attackRoom) {
                 creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][Game.time % 35], true);
             }
             switch (Game.time % 1000000) {
@@ -1372,7 +1391,7 @@ function setupProfiler() {
         const filter = Memory.profiler.filter;
         const startsWith = Memory.profiler.startsWith;
         let duration = false;
-        if (!!Memory.profiler.disableTick) {
+        if (Memory.profiler.disableTick) {
           duration = Memory.profiler.disableTick - Memory.profiler.enabledTick + 1;
         }
         const type = Memory.profiler.type;
@@ -1380,7 +1399,7 @@ function setupProfiler() {
       }
     },
     reset: resetMemory,
-    output: Profiler.output,
+    output: Profiler.output
   };
 
   overloadCPUCalc();
@@ -1397,7 +1416,7 @@ function setupMemory(profileType, duration, filter, startsWith) {
       disableTick,
       type: profileType,
       filter,
-      startsWith,
+      startsWith
     };
   }
 }
@@ -1425,13 +1444,13 @@ function getStartsWith() {
 
 const functionBlackList = [
   'getUsed', // Let's avoid wrapping this... may lead to recursion issues and should be inexpensive.
-  'constructor', // es6 class constructors need to be called with `new`
+  'constructor' // es6 class constructors need to be called with `new`
 ];
 
 function wrapFunction(name, originalFunction) {
   return function wrappedFunction() {
     if (Profiler.isProfiling()) {
-      const nameMatchesFilter = Memory.profiler.startsWith ? name.startsWith(getFilter()) : (name === getFilter());
+      const nameMatchesFilter = Memory.profiler.startsWith ? name.startsWith(getFilter()) : name === getFilter();
       const start = Game.cpu.getUsed();
       if (nameMatchesFilter) {
         depth++;
@@ -1501,7 +1520,7 @@ const Profiler = {
   },
 
   output(numresults) {
-    const displayresults = !!numresults ? numresults : 20;
+    const displayresults = numresults ? numresults : 20;
     if (!Memory.profiler || !Memory.profiler.enabledTick) {
       return 'Profiler not active.';
     }
@@ -1511,7 +1530,7 @@ const Profiler = {
     const footer = [
       `Avg: ${(Memory.profiler.totalTime / elapsedTicks).toFixed(2)}`,
       `Total: ${Memory.profiler.totalTime.toFixed(2)}`,
-      `Ticks: ${elapsedTicks}`,
+      `Ticks: ${elapsedTicks}`
     ].join('\t');
     return [].concat(header, Profiler.lines().slice(0, displayresults), footer).join('\n');
   },
@@ -1523,7 +1542,7 @@ const Profiler = {
         name: functionName,
         calls: functionCalls.calls,
         totalTime: functionCalls.time,
-        averageTime: functionCalls.time / functionCalls.calls,
+        averageTime: functionCalls.time / functionCalls.calls
       };
     }).sort((val1, val2) => {
       return val2.totalTime - val1.totalTime;
@@ -1534,7 +1553,7 @@ const Profiler = {
         data.calls,
         data.totalTime.toFixed(1),
         data.averageTime.toFixed(3),
-        data.name,
+        data.name
       ].join('\t\t');
     });
 
@@ -1549,14 +1568,14 @@ const Profiler = {
     { name: 'Creep', val: Creep },
     { name: 'RoomPosition', val: RoomPosition },
     { name: 'Source', val: Source },
-    { name: 'Flag', val: Flag },
+    { name: 'Flag', val: Flag }
   ],
 
   record(functionName, time) {
     if (!Memory.profiler.map[functionName]) {
       Memory.profiler.map[functionName] = {
         time: 0,
-        calls: 0,
+        calls: 0
       };
     }
     Memory.profiler.map[functionName].calls++;
@@ -1594,12 +1613,12 @@ const Profiler = {
     const streaming = Profiler.type() === 'stream';
     const profiling = Profiler.type() === 'profile';
     const onEndingTick = Memory.profiler.disableTick === Game.time;
-    return streaming || (profiling && onEndingTick);
+    return streaming || profiling && onEndingTick;
   },
 
   shouldEmail() {
     return Profiler.type() === 'email' && Memory.profiler.disableTick === Game.time;
-  },
+  }
 };
 
 module.exports = {
@@ -1627,7 +1646,7 @@ module.exports = {
 
   registerObject: profileObjectFunctions,
   registerFN: profileFunction,
-  registerClass: profileObjectFunctions,
+  registerClass: profileObjectFunctions
 };
 return module.exports;
 }
@@ -1646,92 +1665,102 @@ var Cache = __require(3,2),
     TaskRangedAttack = __require(52,2);
 
 class Army {
-    static run(name) {
-        var army = Memory.army[name],
+    constructor(name, settings) {
+        if (!Memory.army[name]) {
+            Memory.army[name] = settings;
+        }
+        _.assign(this, settings);
+
+        this.name = name;
+        this.army = Memory.army[name];
+    }
+
+    run() {
+        var name = this.name,
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
-            armyAttackRoom = Game.rooms[army.attackRoom],
-            armyDismantlers = army.dismantler,
-            armyHealers = army.healer,
-            armyMelees = army.melee,
-            armyRangeds = army.ranged,
+            attackRoom = Game.rooms[this.attackRoom],
+            dismantler = this.dismantler,
+            healer = this.healer,
+            melee = this.melee,
+            ranged = this.ranged,
             boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
-        if (army.scheduled && army.scheduled > Game.time) {
+        if (this.scheduled && this.scheduled > Game.time) {
             return;
         }
         
-        if (armyAttackRoom) {
-            hostileConstructionSites = armyAttackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+        if (attackRoom) {
+            hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
         }
         
-        if (army.boostRoom) {
-            boostRoomStorageStore = Game.rooms[army.boostRoom].storage.store;
+        if (this.boostRoom) {
+            boostRoomStorageStore = Game.rooms[this.boostRoom].storage.store;
         }
-        if (allCreepsInArmy.length === 0 && army.success) {
-            delete Memory.army[name];
+        if (allCreepsInArmy.length === 0 && this.success) {
+            this.delete = true;
             return;
         }
-        if (army.directive !== "preparing" && army.directive !== "building" && allCreepsInArmy.length === 0 && !army.success) {
+        if (this.directive !== "preparing" && this.directive !== "building" && allCreepsInArmy.length === 0 && !this.success) {
             Game.notify(`Army ${name} operation failed, restarting.`);
-            army.directive = "preparing";
+            this.directive = "preparing";
         }
-        if (army.safeMode && armyAttackRoom && armyAttackRoom.controller && armyAttackRoom.controller.safeMode) {
-            army.directive = "staging";
-            army.stageRoom = army.safeMode.stageRoom;
-            army.attackRoom = army.safeMode.attackRoom;
-            army.dismantle = army.safeMode.dismantle;
-            army.safeMode = army.safeMode.safeMode;
+        if (this.safeMode && attackRoom && attackRoom.controller && attackRoom.controller.safeMode) {
+            this.directive = "staging";
+            this.stageRoom = this.safeMode.stageRoom;
+            this.attackRoom = this.safeMode.attackRoom;
+            this.dismantle = this.safeMode.dismantle;
+            this.safeMode = this.safeMode.safeMode;
         }
-        switch (army.directive) {
+        switch (this.directive) {
             case "preparing":
-                if (!army.boostRoom) {
-                    army.directive = "building";
+                if (!this.boostRoom) {
+                    this.directive = "building";
                 } else if (
-                    (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (armyDismantlers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps + armyHealers.maxCreeps) &&
-                    (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * armyDismantlers.units * armyDismantlers.maxCreeps &&
-                    (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * armyHealers.units * armyHealers.maxCreeps
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * dismantler.units * dismantler.maxCreeps &&
+                    (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * healer.units * healer.maxCreeps
                 ) {
-                    army.directive = "building";
+                    this.directive = "building";
                 }
                 break;
             case "building":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === army.buildRoom).length >= armyDismantlers.maxCreeps + armyHealers.maxCreeps + armyMelees.maxCreeps + armyRangeds.maxCreeps) {
-                    army.directive = "staging";
+                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === this.buildRoom).length >= dismantler.maxCreeps + healer.maxCreeps + melee.maxCreeps + ranged.maxCreeps) {
+                    this.directive = "staging";
                 }
                 break;
             case "staging":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== army.stageRoom).length === 0) {
-                    army.directive = "dismantle";
+                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
+                    this.directive = "dismantle";
                 }
                 break;
             case "dismantle":
-                if (armyAttackRoom) {
-                    army.dismantle = _.filter(army.dismantle, (d) => Game.getObjectById(d));
+                if (attackRoom) {
+                    this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
 
-                    if (army.dismantle.length === 0) {
-                        army.directive = "attack";
+                    if (this.dismantle.length === 0) {
+                        this.directive = "attack";
                     }
                 }
                 break;
             case "attack":
-                if (armyAttackRoom) {
-                    if (!army.reinforce && _.filter(armyAttackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
-                        army.success = true;
+                if (attackRoom) {
+                    if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
+                        this.success = true;
                     }
                 }
                 break;
         }
-        if (army.directive === "building" || army.reinforce) {
-            RoleArmyDismantler.checkSpawn(name, army.portals);
-            RoleArmyHealer.checkSpawn(name, army.portals);
-            RoleArmyMelee.checkSpawn(name, army.portals);
-            RoleArmyRanged.checkSpawn(name, army.portals);
+        if (this.directive === "building" || this.reinforce) {
+            RoleArmyDismantler.checkSpawn(this);
+            RoleArmyHealer.checkSpawn(this);
+            RoleArmyMelee.checkSpawn(this);
+            RoleArmyRanged.checkSpawn(this);
         }
-        if (armyDismantlers.escort || armyMelees.escort || armyRangeds.escort) {
+        if (dismantler.escort || melee.escort || ranged.escort) {
             _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
                 var escort = [].concat.apply([], [
-                    armyDismantlers.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                    armyMelees.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                    armyRangeds.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
+                    dismantler.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                    melee.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
+                    ranged.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
                 ])[0];
 
                 if (escort) {
@@ -1746,30 +1775,59 @@ class Army {
             melee: { tasks: [] },
             ranged: { tasks: [] },
             heal: {
-                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => (b.hitsMax - b.hits) - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
+                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => b.hitsMax - b.hits - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
             },
             rally: { tasks: [] }
         };
 
-        if (armyAttackRoom) {
-            switch (army.directive) {
+        if (attackRoom) {
+            switch (this.directive) {
                 case "dismantle":
-                    hostiles = _.filter(Cache.hostilesInRoom(armyAttackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
+                    hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
                     tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
                     tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
                     break;
                 case "attack":
-                    hostiles = Cache.hostilesInRoom(armyAttackRoom);
+                    hostiles = Cache.hostilesInRoom(attackRoom);
                     tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
                     tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
                     tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
                     break;
             }
         }
-        RoleArmyDismantler.assignTasks(name, army.directive, tasks);
-        RoleArmyHealer.assignTasks(name, army.directive, tasks);
-        RoleArmyMelee.assignTasks(name, army.directive, tasks);
-        RoleArmyRanged.assignTasks(name, army.directive, tasks);
+        RoleArmyDismantler.assignTasks(this, tasks);
+        RoleArmyHealer.assignTasks(this, tasks);
+        RoleArmyMelee.assignTasks(this, tasks);
+        RoleArmyRanged.assignTasks(this, tasks);
+    }
+
+    toObj() {
+        if (this.delete) {
+            delete Memory.army[this.name];
+        } else {
+            Memory.army[this.name] = {
+                attackRoom: this.attackRoom,
+                boostRoom: this.boostRoom,
+                buildRoom: this.buildRoom,
+                directive: this.directive,
+                dismantle: this.dismantle,
+                dismantler: this.dismantler,
+                healer: this.healer,
+                melee: this.melee,
+                ranged: this.ranged,
+                region: this.region,
+                reinforce: this.reinforce,
+                restPosition: this.restPosition,
+                safeMode: this.safeMode,
+                scheduled: this.scheduled,
+                stageRoom: this.stageRoom,
+                success: this.success
+            };
+        }
+    }
+
+    static fromObj(armyName, army) {
+        return new Army(armyName, army);
     }
 }
 
@@ -1821,7 +1879,8 @@ class Cache {
         resourcesInRoom = {};
         costMatricies = {};
         this.creepTasks = {};
-        this.roomTypes = {};
+        this.rooms = {};
+        this.armies = {};
         this.spawning = {};
         this.minerals = {};
 
@@ -2831,12 +2890,13 @@ var Cache = __require(3,11),
     TaskRally = __require(51,11);
 
 class Dismantler {
-    static checkSpawn(armyName, portals) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].dismantler.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.dismantler.maxCreeps;
 
         if (count < max) {
-            Dismantler.spawn(armyName, portals);
+            Dismantler.spawn(army);
         }
         if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
@@ -2847,8 +2907,8 @@ class Dismantler {
         }        
     }
 
-    static spawn(armyName, portals) {
-        var army = Memory.army[armyName],
+    static spawn(army) {
+        var armyName = army.name,
             dismantlerUnits = army.dismantler.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -2879,7 +2939,7 @@ class Dismantler {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyDismantler-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyDismantler-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {
@@ -2902,17 +2962,19 @@ class Dismantler {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
-            assigned = [],
-            army = Memory.army[armyName],
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
             attackRoom = Game.rooms[attackRoomName],
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
+            assigned = [],
             task, structures, healers;
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
                     var task = new TaskRally(creep.memory.labs[0]);
@@ -2926,7 +2988,7 @@ class Dismantler {
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
-                task = new TaskRally(army.buildRoom);
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -2940,7 +3002,7 @@ class Dismantler {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -3068,8 +3130,8 @@ class Dismantler {
                         return;
                     }
                 });
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }
@@ -3098,12 +3160,13 @@ var Cache = __require(3,12),
     TaskRally = __require(51,12);
 
 class Healer {
-    static checkSpawn(armyName, portals) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].healer.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.healer.maxCreeps;
 
         if (count < max) {
-            Healer.spawn(armyName, portals);
+            Healer.spawn(army);
         }
         if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
@@ -3114,8 +3177,8 @@ class Healer {
         }        
     }
 
-    static spawn(armyName, portals) {
-        var army = Memory.army[armyName],
+    static spawn(army) {
+        var armyName = army.name,
             healerUnits = army.healer.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -3148,7 +3211,7 @@ class Healer {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {
@@ -3171,12 +3234,15 @@ class Healer {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var assigned = [],
-            army = Memory.army[armyName],
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
+            attackRoom = Game.rooms[attackRoomName],
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
+            assigned = [],
             creepsWithNoTask, task;
         _.forEach(_.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => !c.spawning && c.memory.escorting), (creep) => {
             if (!Game.getObjectById(creep.memory.escorting)) {
@@ -3190,7 +3256,7 @@ class Healer {
 
         creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
                     var task = new TaskRally(creep.memory.labs[0]);
@@ -3204,7 +3270,7 @@ class Healer {
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
-                task = new TaskRally(army.buildRoom);
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -3218,7 +3284,7 @@ class Healer {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -3262,7 +3328,7 @@ class Healer {
                         return;
                     }
                 });
-                if (Game.rooms[attackRoomName] && dismantle.length > 0) {
+                if (attackRoom && dismantle.length > 0) {
                     task = new TaskRally(dismantle[0]);
                     task.range = 3;
                     _.forEach(creepsWithNoTask, (creep) => {
@@ -3316,8 +3382,8 @@ class Healer {
                     }
                 });
                 
-                if (Game.rooms[attackRoomName] && !Game.rooms[attackRoomName].unobservable) {
-                    _.forEach(TaskHeal.getTasks(Game.rooms[attackRoomName]), (task) => {
+                if (attackRoom && !attackRoom.unobservable) {
+                    _.forEach(TaskHeal.getTasks(attackRoom), (task) => {
                         _.forEach(creepsWithNoTask, (creep) => {
                             if (task.canAssign(creep)) {
                                 creep.say("Heal");
@@ -3347,8 +3413,8 @@ class Healer {
                         return;
                     }
                 });
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }
@@ -3376,12 +3442,13 @@ var Cache = __require(3,13),
     TaskRally = __require(51,13);
 
 class Melee {
-    static checkSpawn(armyName, portals) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].melee.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.melee.maxCreeps;
 
         if (count < max) {
-            Melee.spawn(armyName, portals);
+            Melee.spawn(army);
         }
         if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
@@ -3392,8 +3459,8 @@ class Melee {
         }
     }
 
-    static spawn(armyName, portals) {
-        var army = Memory.army[armyName],
+    static spawn(army) {
+        var armyName = army.name,
             meleeUnits = army.melee.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -3424,7 +3491,7 @@ class Melee {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyMelee-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyMelee", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyMelee-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyMelee", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {
@@ -3447,16 +3514,18 @@ class Melee {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || []), (c) => !c.spawning),
-            assigned = [],
-            army = Memory.army[armyName],
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || []), (c) => !c.spawning),
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
+            assigned = [],
             task, healers;
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
                     var task = new TaskRally(creep.memory.labs[0]);
@@ -3470,7 +3539,7 @@ class Melee {
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
-                task = new TaskRally(army.buildRoom);
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -3484,7 +3553,7 @@ class Melee {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -3630,8 +3699,8 @@ class Melee {
                         return;
                     }
                 });
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }
@@ -3659,12 +3728,13 @@ var Cache = __require(3,14),
     TaskRally = __require(51,14);
 
 class Ranged {
-    static checkSpawn(armyName, portals) {
-        var count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = Memory.army[armyName].ranged.maxCreeps;
+    static checkSpawn(army) {
+        var armyName = army.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            max = army.ranged.maxCreeps;
 
         if (count < max) {
-            Ranged.spawn(armyName, portals);
+            Ranged.spawn(armyName);
         }
         if (Memory.log && max > 0 && Cache.log.army[armyName]) {
             Cache.log.army[armyName].creeps.push({
@@ -3675,8 +3745,8 @@ class Ranged {
         }        
     }
 
-    static spawn(armyName, portals) {
-        var army = Memory.army[armyName],
+    static spawn(army) {
+        var armyName = army.name,
             rangedUnits = army.ranged.units,
             body = [],
             boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
@@ -3707,7 +3777,7 @@ class Ranged {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `armyRanged-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: portals});
+        name = spawnToUse.createCreep(body, `armyRanged-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {
@@ -3730,16 +3800,18 @@ class Ranged {
         return typeof name !== "number";
     }
 
-    static assignTasks(armyName, directive, tasks) {
-        var creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || []), (c) => !c.spawning),
+    static assignTasks(army, tasks) {
+        var armyName = army.name,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || []), (c) => !c.spawning),
             assigned = [],
-            army = Memory.army[armyName],
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
+            buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
+            restPosition = army.restPosition,
             task, healers;
 
-        switch (directive) {
+        switch (army.directive) {
             case "building":
                 _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
                     var task = new TaskRally(creep.memory.labs[0]);
@@ -3753,6 +3825,7 @@ class Ranged {
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
+                task = new TaskRally(buildRoomName);
                 _.forEach(creepsWithNoTask, (creep) => {
                     creep.say("Building");
                     if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
@@ -3766,7 +3839,7 @@ class Ranged {
                             task = new TaskRally(creep.memory.portals[0]);
                         }
                     } else {
-                        task = new TaskRally(army.buildRoom);
+                        task = new TaskRally(buildRoomName);
                     }
                     task.canAssign(creep);
                 });
@@ -3912,8 +3985,8 @@ class Ranged {
                         return;
                     }
                 });
-                if (army.restPosition) {
-                    task = new TaskRally(new RoomPosition(army.restPosition.x, army.restPosition.y, army.restPosition.room));
+                if (restPosition) {
+                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
                 } else {
                     task = new TaskRally(attackRoomName);
                 }
@@ -3999,7 +4072,7 @@ class Claimer {
             var task = TaskRally.getClaimerTask(creep);
             if (task.canAssign(creep)) {
                 assigned.push(creep.name);
-            };
+            }
         });
 
         _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -4013,7 +4086,7 @@ class Claimer {
             if (task.canAssign(creep)) {
                 creep.say("Claiming");
                 assigned.push(creep.name);
-            };
+            }
         });
 
         _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
@@ -4132,7 +4205,7 @@ class Collector {
 
     static assignTasks(room, tasks) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].collector || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].collector || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
             assigned = [];
 
@@ -4162,7 +4235,7 @@ class Collector {
             }
             
             _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (energyMissing > 0) {
                     if (task.canAssign(creep)) {
                         creep.say("Extension");
@@ -4179,7 +4252,7 @@ class Collector {
             return;
         }
         _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -4200,7 +4273,7 @@ class Collector {
             return;
         }
         _.forEach(tasks.fillEnergy.towerTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -4238,7 +4311,7 @@ class Collector {
             return;
         }
         _.forEach(tasks.build.tasks, (task) => {
-            var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(Cache.creeps[task.constructionSite.room.name] && Cache.creeps[task.constructionSite.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(Cache.creeps[task.constructionSite.room.name] && Cache.creeps[task.constructionSite.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (progressMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
                     if (task.canAssign(creep)) {
@@ -4564,7 +4637,7 @@ class Defender {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
                 var task = new TaskRally(keeper.id, creep);
                 task.range = 1;
-                return !(task).canAssign(creep);
+                return !task.canAssign(creep);
             });
 
             if (creep.memory.currentTask) {
@@ -4665,7 +4738,7 @@ class Dismantler {
 
     static assignTasks(room, tasks) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             assigned = [];
 
         if (creepsWithNoTask.length === 0) {
@@ -4707,7 +4780,7 @@ class Dismantler {
             return;
         }
         _.forEach([].concat.apply([], [tasks.fillEnergy.storageTasks, tasks.fillEnergy.containerTasks]), (task) => {
-            var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) !== -1 && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) !== -1 && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -5266,7 +5339,7 @@ class RemoteCollector {
         }
 
         if (!max) {
-            max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1;
+            max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? supportRoom.controller ? supportRoom.controller.level : 3 : 1;
         }
         if (Cache.spawnsInRoom(supportRoom).length === 0) {
             return;
@@ -5533,7 +5606,7 @@ class RemoteDismantler {
 
     static assignTasks(room, tasks) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             assigned = [];
 
         if (creepsWithNoTask.length === 0) {
@@ -5624,7 +5697,7 @@ class Miner {
             }
 
             source = Game.getObjectById(Memory.containerSource[containerId]);
-            if (source instanceof Mineral && (source.mineralAmount === 0 || (room.controller && (!room.controller.my || room.controller.level < 6)))) {
+            if (source instanceof Mineral && (source.mineralAmount === 0 || room.controller && (!room.controller.my || room.controller.level < 6))) {
                 return;
             }
 
@@ -5643,7 +5716,7 @@ class Miner {
     }
 
     static spawn(room, supportRoom, id) {
-        var body = (room.memory && room.memory.roomType && room.memory.roomType.type === "source") || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
+        var body = room.memory && room.memory.roomType && room.memory.roomType.type === "source" || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
             roomName = room.name,
             supportRoomName = supportRoom.name,
             energy, units, remainder, count, spawnToUse, name;
@@ -5973,7 +6046,7 @@ class Storer {
         }
         _.forEach(creepsWithNoTask, (creep) => {
             _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                if (_.sum(Cache.creeps[room.name] && Cache.creeps[room.name].all || [], (c) => (c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id) ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
+                if (_.sum(Cache.creeps[room.name] && Cache.creeps[room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
                     return;
                 }
                 if (task.canAssign(creep)) {
@@ -6485,7 +6558,7 @@ class Scientist {
 
     static assignTasks(room, tasks) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].scientist || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].scientist || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
             assigned = [];
 
@@ -6493,7 +6566,7 @@ class Scientist {
             return;
         }
         _.forEach(tasks.fillEnergy.towerTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -6603,7 +6676,7 @@ class Scientist {
             return;
         }
         _.forEach(tasks.fillEnergy.labTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -6638,7 +6711,7 @@ class Scientist {
             return;
         }
         _.forEach(tasks.fillEnergy.nukerTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -6659,7 +6732,7 @@ class Scientist {
             return;
         }
         _.forEach(tasks.fillEnergy.powerSpawnTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -6685,7 +6758,7 @@ class Scientist {
             }
             
             _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (energyMissing > 0) {
                     if (task.canAssign(creep)) {
                         creep.say("Extension");
@@ -6702,7 +6775,7 @@ class Scientist {
             return;
         }
         _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0)
+            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
             if (energyMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
                     if (task.canAssign(creep)) {
@@ -6845,7 +6918,7 @@ class Storer {
             roomName = room.name,
             length = 0,
             max = 0,
-            controller, army, storers, sources, lengthToStorage;
+            controller, army, storers, lengthToStorage;
         if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage || !room.storage.my) {
             return;
         }
@@ -7201,7 +7274,7 @@ class Upgrader {
             max = 1;
         }
 
-        if (count < max || (controller && controller.level < 8 && storage && storageEnergy > 900000)) {
+        if (count < max || controller && controller.level < 8 && storage && storageEnergy > 900000) {
             Upgrader.spawn(room);
         }
         if (Memory.log && (upgraders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
@@ -7292,7 +7365,7 @@ class Upgrader {
             }
         }
 
-        if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && (Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0)) >= 30 * workCount) {
+        if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0) >= 30 * workCount) {
             canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
         }
         if (Cache.labsInRoom(supportRoom).length < 3) {
@@ -7309,7 +7382,7 @@ class Upgrader {
 
         if (typeof name !== "number" && canBoost) {
             labToBoostWith.creepToBoost = name;
-            labToBoostWith.resource = (storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_CATALYZED_GHODIUM_ACID : ((storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount) ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE);
+            labToBoostWith.resource = storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount ? RESOURCE_CATALYZED_GHODIUM_ACID : storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE;
             labToBoostWith.amount = 30 * workCount;
             supportRoom.memory.labsInUse.push(labToBoostWith);
             _.forEach(_.filter(Cache.creeps[supportRoomName] && Cache.creeps[supportRoomName].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
@@ -7322,7 +7395,7 @@ class Upgrader {
 
     static assignTasks(room, tasks) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []), (c) => _.sum(c.carry) > 0 || (!c.spawning && c.ticksToLive > 150)),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             assigned = [],
             controller = room.controller;
 
@@ -7458,8 +7531,8 @@ class Worker {
         if (room.find(FIND_SOURCES).length === 0) {
             return;
         }
-        count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= ((storage && storage.my) ? 150 : 300)).length;
-        max = canSpawn ? (storage && storage.my) ? 1 : 2 : 0;
+        count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length;
+        max = canSpawn ? storage && storage.my ? 1 : 2 : 0;
 
         if (count < max) {
             Worker.spawn(room);

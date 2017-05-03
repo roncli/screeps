@@ -170,7 +170,7 @@ class Army {
         } else {
             Memory.army[this.name] = {
                 attackRoom: this.attackRoom,
-                boostRoom: this.success,
+                boostRoom: this.boostRoom,
                 buildRoom: this.buildRoom,
                 directive: this.directive,
                 dismantle: this.dismantle,

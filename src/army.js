@@ -10,7 +10,45 @@ var Cache = require("cache"),
     TaskRangedAttack = require("task.rangedAttack");
 
 class Army {
+    /**
+     * Create an army.
+     * 
+     * @param {string} name The name of the army.
+     * @param {Object} settings The settings for the army.
+     * @param {string} settings.attackRoom The room to attack.
+     * @param {string} [settings.boostRoom] The room to obtain boosts from.
+     * @param {string} [settings.directive] The army's standing orders.  Defaults to "preparing".
+     * @param {string[]} [settings.dismantle] An array of object IDs that the army should dismantle during the dismantle directive.
+     * @param {Object} settings.dismantler The dismantler creeps for the army.
+     * @param {bool} [settings.dismantler.escort] Assigns a healer to this creep.
+     * @param {number} settings.dismantler.maxCreeps The number of dismantler creeps in the army.
+     * @param {number} settings.dismantler.units The number of WORK parts on each dismantler creep.  Max 20.
+     * @param {Object} settings.healer The healer creeps for the army.
+     * @param {number} settings.healer.maxCreeps The number of healer creeps in the army.
+     * @param {number} settings.healer.units The number of HEAL parts on each healer creep.  Max 20.
+     * @param {Object} settings.melee The melee creeps for the army.
+     * @param {bool} [settings.melee.escort] Assigns a healer to this creep.
+     * @param {number} settings.melee.maxCreeps The number of melee creeps in the army.
+     * @param {number} settings.melee.units The number of ATTACK parts on each melee creep.  Max 20.
+     * @param {string[]} [settings.portals] An array of room names with portals in them that the creep should take.
+     * @param {Object} settings.ranged The ranged creeps for the army.
+     * @param {bool} [settings.ranged.escort] Assigns a healer to this creep.
+     * @param {number} settings.ranged.maxCreeps The number of ranged creeps in the army.
+     * @param {number} settings.ranged.units The number of RANGED_ATTACK parts on each ranged creep.  Max 20.
+     * @param {string} settings.region The region the creeps should spawn from.
+     * @param {bool} settings.reinforce Reinforces the army as it loses creeps.
+     * @param {Object} [settings.restPosition] The position the army should rest at when it has nothing to do.
+     * @param {string} settings.restPosition.room The room to rest in.
+     * @param {number} settings.restPosition.x The X coordinate to rest at.
+     * @param {number} settings.restPosition.y The Y coordinate to rest at.
+     * @param {Object} [settings.safeMode] The settings to use when the assigned attack room goes into safe mode.
+     * @param {number} [settings.scheduled] The Game.time value at which to begin producing the army.
+     * @param {string} settings.stageRoom The room to move to once building is complete.
+     * @param {success} [settings.success] Whether this army has succeeded.  Armies that aren't reinforced will be removed from memory once the last creep dies.
+     */
     constructor(name, settings) {
+        settings = _.extend(settings, {directive: "preparing"});
+
         if (!Memory.army[name]) {
             Memory.army[name] = settings;
         }
@@ -23,6 +61,7 @@ class Army {
     run() {
         var name = this.name,
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
+            boostRoomName = this.boostRoom,
             attackRoom = Game.rooms[this.attackRoom],
             dismantler = this.dismantler,
             healer = this.healer,
@@ -35,12 +74,8 @@ class Army {
             return;
         }
         
-        if (attackRoom) {
-            hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
-        }
-        
-        if (this.boostRoom) {
-            boostRoomStorageStore = Game.rooms[this.boostRoom].storage.store;
+        if (boostRoomName) {
+            boostRoomStorageStore = Game.rooms[boostRoomName].storage.store;
         }
 
         // Delete the army if we're successful.
@@ -67,7 +102,7 @@ class Army {
         // Determine conditions for next stage or success.
         switch (this.directive) {
             case "preparing":
-                if (!this.boostRoom) {
+                if (!boostRoomName || !boostRoomStorageStore) {
                     this.directive = "building";
                 } else if (
                     (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&
@@ -88,7 +123,9 @@ class Army {
                 }
                 break;
             case "dismantle":
-                if (attackRoom) {
+                if (!this.dismantle) {
+                    this.directive = "attack";
+                } else if (attackRoom) {
                     this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
 
                     if (this.dismantle.length === 0) {
@@ -98,6 +135,8 @@ class Army {
                 break;
             case "attack":
                 if (attackRoom) {
+                    hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+
                     if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
                         this.success = true;
                     }
@@ -152,7 +191,9 @@ class Army {
                     hostiles = Cache.hostilesInRoom(attackRoom);
                     tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
                     tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
-                    tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
+                    if (hostileConstructionSites) {
+                        tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
+                    }
                     break;
             }
         }

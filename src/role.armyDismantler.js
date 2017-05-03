@@ -190,7 +190,7 @@ class Dismantler {
                 }
 
                 // Dismantle a dismantle location if it can be seen.
-                if (attackRoom && dismantle.length > 0) {
+                if (attackRoom && dismantle && dismantle.length > 0) {
                     task = new TaskDismantle(dismantle[0]);
                     _.forEach(creepsWithNoTask, (creep) => {
                         if (task.canAssign(creep)) {

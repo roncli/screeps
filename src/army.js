@@ -189,8 +189,8 @@ class Army {
         }
     }
 
-    static fromObj(army) {
-        return new Army(army.name, army);
+    static fromObj(armyName, army) {
+        return new Army(armyName, army);
     }
 }
 

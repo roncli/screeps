@@ -761,7 +761,7 @@ class Main {
 
     static deserializeArmies() {
         _.forEach(Memory.army, (army, armyName) => {
-            Cache.armies[armyName] = Army.fromObj(army);
+            Cache.armies[armyName] = Army.fromObj(armyName, army);
         });
     }
 

@@ -1134,7 +1134,7 @@ class Main {
         // Loop through each army and run it.
         _.forEach(Cache.armies, (army) => {
             // Run army, then serialize it.
-            Army.run(army);
+            army.run();
 
             army.toObj();
         });

@@ -829,8 +829,8 @@ class Main {
             };
 
             if (Game.rooms[army.attackRoom]) {
-                Cache.log.army[army].structures = _.filter(Game.rooms[army.attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
-                Cache.log.army[army].constructionSites = Game.rooms[army.attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
+                Cache.log.army[army.name].structures = _.filter(Game.rooms[army.attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length;
+                Cache.log.army[army.name].constructionSites = Game.rooms[army.attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES).length;
             }
         });
 

@@ -134,10 +134,10 @@ class Army {
 
         // Check spawns if we're building or reinforcing.
         if (this.directive === "building" || this.reinforce) {
-            this.checkSpawn("armyDismantler", dismantler.maxCreeps, RoleArmyDismantler.spawn.bind(RoleArmyDismantler, this));
-            this.checkSpawn("armyHealer", healer.maxCreeps, RoleArmyHealer.spawn.bind(RoleArmyHealer, this));
-            this.checkSpawn("armyMelee", melee.maxCreeps, RoleArmyMelee.spawn.bind(RoleArmyMelee, this));
-            this.checkSpawn("armyRanged", ranged.maxCreeps, RoleArmyRanged.spawn.bind(RoleArmyRanged, this));
+            this.checkSpawn("armyDismantler", dismantler.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyDismantler));
+            this.checkSpawn("armyHealer", healer.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyHealer));
+            this.checkSpawn("armyMelee", melee.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyMelee));
+            this.checkSpawn("armyRanged", ranged.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyRanged));
         }
 
         // Assign escorts.
@@ -220,6 +220,56 @@ class Army {
                 max: max
             });
         }
+    }
+
+    /**
+     * Spawn a creep for this army from within the region.
+     * @param {class} Role The class of the role to create the creep for.
+     */
+    spawnFromRegion(Role) {
+        var settings = Role.spawnSettings(this),
+            spawns = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(settings.body) && s.room.memory.region === this.region),
+            boostRoom, labsInUse, labsToBoostWith, name;
+
+        // Fail if we cannot fulfill the spawn request.
+        if (spawns.length === 0) {
+            return false;
+        }
+
+        // Fail if we're supposed to boost, but can't.
+        if (this.boostRoom) {
+            boostRoom = Game.rooms[this.boostRoom];
+            labsInUse = boostRoom.memory.labsInUse;
+            if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length))) {
+                return false;
+            }
+        }
+
+        // Create the creep from the first listed spawn that is available.
+        name = spawns[0].createCreep(settings.body, `${settings.name}-${this.name}-${Game.time.toFixed(0).substring(4)}`, {role: settings.name, army: this.name, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: this.portals});
+        Cache.spawning[spawns[0].id] = typeof name !== "number";
+
+        if (typeof name !== "number" && boostRoom) {
+            // Set the labs to be in use.
+            let labIndex = 0;
+            _.forEach(settings.boosts, (amount, compound) => {
+                labsToBoostWith[labIndex].creepToBoost = name;
+                labsToBoostWith[labIndex].resource = compound;
+                labsToBoostWith[labIndex].amount = 30 * amount;
+                labsInUse.push(labsToBoostWith[labIndex]);
+
+                labIndex++;
+            });
+
+            // If anything is coming to fill the labs, stop them.
+            if (Cache.creeps[boostRoom.name]) {
+                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
+                    delete creep.memory.currentTask;
+                });
+            }
+        }
+
+        return typeof name !== "number";
     }
 
     /**

@@ -4,70 +4,27 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Healer {
-    static spawn(army) {
-        var armyName = army.name,
-            healerUnits = army.healer.units,
-            body = [],
-            boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
-            
-        if (army.boostRoom) {
-            boostRoom = Game.rooms[army.boostRoom];
-            labsInUse = boostRoom.memory.labsInUse;
-        }
+    static spawnSettings(army) {
+        var units = army.healer.units,
+            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
-        // Fail if all the spawns are busy.
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Create the body of the army.
-        for (count = 0; count < 5; count++) {
-            body.push(TOUGH);
-        }
-        
-        for (count = 0; count < healerUnits - 1; count++) {
-            body.push(HEAL);
-        }
-
-        for (count = 0; count < healerUnits + 5; count++) {
-            body.push(MOVE);
-        }
-        
+        body.push(...Array(units - 1).fill(HEAL));
+        body.push(...Array(units + 5).fill(MOVE));
         body.push(HEAL);
 
-        if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, 2))) {
-            return false;
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === army.region)[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && boostRoom) {
-            // Set the labs to be in use.
-            labsToBoostWith[0].creepToBoost = name;
-            labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
-            labsToBoostWith[0].amount = 30 * 5;
-            labsInUse.push(labsToBoostWith[0]);
-
-            labsToBoostWith[1].creepToBoost = name;
-            labsToBoostWith[1].resource = RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE;
-            labsToBoostWith[1].amount = 30 * healerUnits;
-            labsInUse.push(labsToBoostWith[1]);
-
-            // If anything is coming to fill the labs, stop them.
-            if (Cache.creeps[boostRoom.name]) {
-                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
-                    delete creep.memory.currentTask;
-                });
+        if (army.boostRoom) {
+            boosts = {
+                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
+                RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE: units
             }
         }
 
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            name: "armyHealer"
+        };
     }
 
     static assignTasks(army, tasks) {

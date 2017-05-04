@@ -20,7 +20,9 @@ class Army {
      */
     constructor(name, settings) {
         // Default settings.
-        settings = _.extend(settings, {directive: "preparing"});
+        if (!settings.directive) {
+            settings.directive = "preparing";
+        }
 
         // Assign settings to memory if the memory doesn't exist.
         if (!Memory.army[name]) {

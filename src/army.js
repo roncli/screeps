@@ -132,10 +132,10 @@ class Army {
 
         // Check spawns if we're building or reinforcing.
         if (this.directive === "building" || this.reinforce) {
-            this.checkSpawn("armyDismantler", dismantler.maxCreeps).then(RoleArmyDismantler.spawn.bind(RoleArmyDismantler, this));
-            this.checkSpawn("armyHealer", healer.maxCreeps).then(RoleArmyHealer.spawn.bind(RoleArmyHealer, this));
-            this.checkSpawn("armyMelee", melee.maxCreeps).then(RoleArmyMelee.spawn.bind(RoleArmyMelee, this));
-            this.checkSpawn("armyRanged", ranged.maxCreeps).then(RoleArmyRanged.spawn.bind(RoleArmyRanged, this));
+            this.checkSpawn("armyDismantler", dismantler.maxCreeps, RoleArmyDismantler.spawn.bind(RoleArmyDismantler, this));
+            this.checkSpawn("armyHealer", healer.maxCreeps, RoleArmyHealer.spawn.bind(RoleArmyHealer, this));
+            this.checkSpawn("armyMelee", melee.maxCreeps, RoleArmyMelee.spawn.bind(RoleArmyMelee, this));
+            this.checkSpawn("armyRanged", ranged.maxCreeps, RoleArmyRanged.spawn.bind(RoleArmyRanged, this));
         }
 
         // Assign escorts.
@@ -198,25 +198,26 @@ class Army {
      * Checks whether we should spawn for the role.
      * @param {string} role The role of the creep.
      * @param {number} max The maximum number of creeps that should be spawned.
+     * @param {function} successCallback The callback to run on success.
      * @return {Promise} A promise that resolves if a creep should be spawned.
      */
-    checkSpawn(role, max) {
-        return new Promise((resolve, reject) => {
-            var armyName = this.name,
-                count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
-                armyLog = Cache.log.army[armyName];
+    checkSpawn(role, max, successCallback) {
+        var armyName = this.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            armyLog = Cache.log.army[armyName];
 
-            count < max ? resolve() : reject();
+        if (count < max) {
+            successCallback();
+        }
 
-            // Output creep count in the report.
-            if (armyLog && (max > 0 || count > 0)) {
-                armyLog.creeps.push({
-                    role: role,
-                    count: count,
-                    max: max
-                });
-            }
-        });
+        // Output creep count in the report.
+        if (armyLog && (max > 0 || count > 0)) {
+            armyLog.creeps.push({
+                role: role,
+                count: count,
+                max: max
+            });
+        }
     }
 
     /**

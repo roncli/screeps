@@ -15,7 +15,7 @@ class Melee {
             boosts = {
                 RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
                 RESOURCE_CATALYZED_UTRIUM_ACID: units
-            }
+            };
         }
 
         return {

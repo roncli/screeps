@@ -15,7 +15,7 @@ class Ranged {
             boosts = {
                 RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
                 RESOURCE_CATALYZED_KEANIUM_ALKALIDE: units
-            }
+            };
         }
 
         return {

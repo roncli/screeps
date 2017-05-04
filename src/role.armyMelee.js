@@ -3,25 +3,6 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Melee {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.melee.maxCreeps;
-
-        if (count < max) {
-            Melee.spawn(army);
-        }
-
-        // Output melee attacker count in the report.
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyMelee",
-                count: count,
-                max: max
-            });
-        }
-    }
-
     static spawn(army) {
         var armyName = army.name,
             meleeUnits = army.melee.units,

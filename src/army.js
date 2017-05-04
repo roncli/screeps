@@ -40,24 +40,19 @@ class Army {
     run() {
         var name = this.name,
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
-            boostRoomName = this.boostRoom,
             attackRoom = Game.rooms[this.attackRoom],
             dismantler = this.dismantler,
             healer = this.healer,
             melee = this.melee,
             ranged = this.ranged,
-            boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
+            hostileConstructionSites, tasks;
 
         // Bail if scheduled for the future.
         if (this.scheduled && this.scheduled > Game.time) {
             return;
         }
         
-        if (boostRoomName) {
-            boostRoomStorageStore = Game.rooms[boostRoomName].storage.store;
-        }
-
-        // Delete the army if we're successful.
+        // Set the army to be deleted if we're successful.
         if (allCreepsInArmy.length === 0 && this.success) {
             this.delete = true;
             return;
@@ -78,57 +73,69 @@ class Army {
             this.safeMode = this.safeMode.safeMode;
         }
 
-        // Determine conditions for next stage or success.
-        switch (this.directive) {
-            case "preparing":
-                if (!boostRoomName || !boostRoomStorageStore) {
-                    this.directive = "building";
-                } else if (
+        // Directive is "preparing" if we have a boost room and we're missing some compounds.
+        if (this.directive === "preparing") {
+            let boostRoomName = this.boostRoom;
+            
+            if (boostRoomName) {
+                let boostRoomStorageStore = Game.rooms[boostRoomName].storage.store;
+
+                if (!boostRoomStorageStore || (
                     (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&
                     (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * dismantler.units * dismantler.maxCreeps &&
                     (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * healer.units * healer.maxCreeps
-                ) {
+                )) {
                     this.directive = "building";
                 }
-                break;
-            case "building":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === this.buildRoom).length >= dismantler.maxCreeps + healer.maxCreeps + melee.maxCreeps + ranged.maxCreeps) {
-                    this.directive = "staging";
-                }
-                break;
-            case "staging":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
-                    this.directive = "dismantle";
-                }
-                break;
-            case "dismantle":
-                if (!this.dismantle) {
-                    this.directive = "attack";
-                } else if (attackRoom) {
-                    this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
-
-                    if (this.dismantle.length === 0) {
-                        this.directive = "attack";
-                    }
-                }
-                break;
-            case "attack":
-                if (attackRoom) {
-                    hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
-
-                    if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
-                        this.success = true;
-                    }
-                }
-                break;
+            } else {
+                this.directive = "building";
+            }
         }
 
-        // Check spawns if we're building.
+        // Directive is "building" until the creeps are spawned in and in the build room.
+        if (this.directive === "building") {
+            if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === this.buildRoom).length >= dismantler.maxCreeps + healer.maxCreeps + melee.maxCreeps + ranged.maxCreeps) {
+                this.directive = "staging";
+            }
+        }
+
+        // Directive is "staging" until the creeps are in the attack room.
+        if (this.directive === "staging") {
+            if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
+                this.directive = "dismantle";
+            }
+        }
+
+        // Directive is "dismantle" until the objects in the dismantle setting are destroyed.
+        if (this.directive === "dismantle") {
+            if (!this.dismantle) {
+                this.directive = "attack";
+            } else if (attackRoom) {
+                this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
+
+                if (this.dismantle.length === 0) {
+                    this.directive = "attack";
+                }
+            }
+        }
+
+        // Directive is "attack" until the army expires.
+        if (this.directive === "attack") {
+            if (attackRoom) {
+                hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+
+                if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
+                    this.success = true;
+                }
+            }
+        }
+
+        // Check spawns if we're building or reinforcing.
         if (this.directive === "building" || this.reinforce) {
-            RoleArmyDismantler.checkSpawn(this);
-            RoleArmyHealer.checkSpawn(this);
-            RoleArmyMelee.checkSpawn(this);
-            RoleArmyRanged.checkSpawn(this);
+            this.checkSpawn("armyDismantler", dismantler.maxCreeps).then(RoleArmyDismantler.spawn.bind(RoleArmyDismantler, this));
+            this.checkSpawn("armyHealer", healer.maxCreeps).then(RoleArmyHealer.spawn.bind(RoleArmyHealer, this));
+            this.checkSpawn("armyMelee", melee.maxCreeps).then(RoleArmyMelee.spawn.bind(RoleArmyMelee, this));
+            this.checkSpawn("armyRanged", ranged.maxCreeps).then(RoleArmyRanged.spawn.bind(RoleArmyRanged, this));
         }
 
         // Assign escorts.
@@ -159,7 +166,10 @@ class Army {
             rally: { tasks: [] }
         };
 
+        // Go after hostiles in the attack room during "dismantle" and "attack" directives, but only within 3 squares if we're dismantling.
         if (attackRoom) {
+            let hostiles;
+
             switch (this.directive) {
                 case "dismantle":
                     hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
@@ -182,6 +192,31 @@ class Army {
         RoleArmyHealer.assignTasks(this, tasks);
         RoleArmyMelee.assignTasks(this, tasks);
         RoleArmyRanged.assignTasks(this, tasks);
+    }
+
+    /**
+     * Checks whether we should spawn for the role.
+     * @param {string} role The role of the creep.
+     * @param {number} max The maximum number of creeps that should be spawned.
+     * @return {Promise} A promise that resolves if a creep should be spawned.
+     */
+    checkSpawn(role, max) {
+        return new Promise((resolve, reject) => {
+            var armyName = this.name,
+                count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
+                armyLog = Cache.log.army[armyName];
+
+            count < max ? resolve() : reject();
+
+            // Output creep count in the report.
+            if (armyLog && (max > 0 || count > 0)) {
+                armyLog.creeps.push({
+                    role: role,
+                    count: count,
+                    max: max
+                });
+            }
+        });
     }
 
     /**

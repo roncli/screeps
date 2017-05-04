@@ -1,27 +1,9 @@
-var Cache = require("cache"),
+var Army = require("army"),
+    Cache = require("cache"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally");
 
 class Ranged {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.ranged.maxCreeps;
-
-        if (count < max) {
-            Ranged.spawn(armyName);
-        }
-
-        // Output ranged attacker count in the report.
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyRanged",
-                count: count,
-                max: max
-            });
-        }        
-    }
-
     static spawn(army) {
         var armyName = army.name,
             rangedUnits = army.ranged.units,

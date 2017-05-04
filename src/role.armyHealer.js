@@ -4,25 +4,6 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Healer {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.healer.maxCreeps;
-
-        if (count < max) {
-            Healer.spawn(army);
-        }
-
-        // Output healer count in the report.
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyHealer",
-                count: count,
-                max: max
-            });
-        }        
-    }
-
     static spawn(army) {
         var armyName = army.name,
             healerUnits = army.healer.units,

@@ -4,25 +4,6 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Dismantler {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.dismantler.maxCreeps;
-
-        if (count < max) {
-            Dismantler.spawn(army);
-        }
-
-        // Output dismantler count in the report.
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyDismantler",
-                count: count,
-                max: max
-            });
-        }        
-    }
-
     static spawn(army) {
         var armyName = army.name,
             dismantlerUnits = army.dismantler.units,

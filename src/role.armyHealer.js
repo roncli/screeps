@@ -137,7 +137,7 @@ class Healer {
 
                 // Heal creeps in the room.
                 if (attackRoom) {
-                    Assign.tasks(creepsWithNoTask, _.filter(attackRoom.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+                    Assign.healCreeps(creepsWithNoTask, _.filter(attackRoom.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
                 
                     _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
                     if (creepsWithNoTask.length === 0) {

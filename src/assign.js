@@ -128,7 +128,9 @@ class Assign {
                     } else {
                         // If there are any hurt creeps within 3 range, heal them at range.
                         closeCreeps = _.filter(creepsToHeal, (c) => creep.pos.getRangeTo(c) <= 3);
-                        task.rangedHeal = closeCreeps[0].id;
+                        if (closeCreeps.length > 0) {
+                            task.rangedHeal = closeCreeps[0].id;
+                        }
                     }
                 }
             }

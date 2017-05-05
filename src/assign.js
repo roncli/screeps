@@ -136,6 +136,7 @@ class Assign {
             }
             
             if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
             }
         });

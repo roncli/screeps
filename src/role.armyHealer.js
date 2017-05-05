@@ -44,8 +44,7 @@ class Healer {
             buildRoomName = army.buildRoom,
             dismantle = army.dismantle,
             restPosition = army.restPosition,
-            assigned = [],
-            creepsWithNoTask, task;
+            creepsWithNoTask;
 
         // Assign tasks for escorts.
         Assign.escort(healers, "Healing");
@@ -57,7 +56,7 @@ class Healer {
                 // If not yet boosted, go get boosts.
                 Assign.getBoost(creepsWithNoTask, "Boosting");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -65,7 +64,7 @@ class Healer {
                 // Heal creeps in the army.
                 Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -78,7 +77,7 @@ class Healer {
                 // Heal creeps in the army.
                 Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -91,7 +90,7 @@ class Healer {
                 // Return to army's staging location if under 80% health.
                 Assign.retreatArmyUnit(healers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -99,7 +98,7 @@ class Healer {
                 // Heal creeps in the army.
                 Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -108,7 +107,7 @@ class Healer {
                 if (attackRoom && dismantle.length > 0) {
                     Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
 
-                    _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                    _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                     if (creepsWithNoTask.length === 0) {
                         return;
                     }
@@ -122,7 +121,7 @@ class Healer {
                 // Return to army's staging location if under 80% health.
                 Assign.retreatArmyUnit(healers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -130,7 +129,7 @@ class Healer {
                 // Heal creeps in the army.
                 Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -139,7 +138,7 @@ class Healer {
                 if (attackRoom) {
                     Assign.healCreeps(creepsWithNoTask, _.filter(attackRoom.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
                 
-                    _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                    _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                     if (creepsWithNoTask.length === 0) {
                         return;
                     }
@@ -148,7 +147,7 @@ class Healer {
                 // Rally to any hostile construction sites.
                 Assign.tasks(creepsWithNoTask, tasks.rally.tasks, false, "Stomping");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }

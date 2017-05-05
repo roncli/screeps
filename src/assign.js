@@ -82,6 +82,7 @@ class Assign {
         _.forEach(_.filter(creeps, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
             var task = new TaskRally(creep.memory.labs[0]);
             if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
             }
         });
@@ -210,11 +211,10 @@ class Assign {
         if (stageRoomName !== attackRoomName) {
             let task = new TaskRally(stageRoomName);
             
-            task.unimportant = false;
-            
             // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
                 if (task.canAssign(creep)) {
+                    creep.memory.currentTask.priority = Game.time;
                     creep.say(say);
                 }
             });
@@ -242,11 +242,10 @@ class Assign {
         if (stageRoomName !== attackRoomName) {
             let task = new TaskRally(stageRoomName);
             
-            task.unimportant = false;
-
             // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
                 if (task.canAssign(creep)) {
+                    creep.memory.currentTask.priority = Game.time;
                     creep.say(say);
                 }
             });
@@ -262,7 +261,7 @@ class Assign {
                 // Check to see if the closest healer is further than 2 squares away, rally to it if so.
                 if (closest[0].pos.getRangeTo(creep) > 2) {
                     task = new TaskRally(closest[0].id);
-                    task.unimportant = false;
+                    creep.memory.currentTask.priority = Game.time;
                     task.canAssign(creep);
                 }
             });

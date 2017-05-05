@@ -54,7 +54,7 @@ class Dismantler {
                 // If not yet boosted, go get boosts.
                 Assign.getBoost(creepsWithNoTask, "Boosting");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -72,7 +72,7 @@ class Dismantler {
                 // Run to a healer, or return to army's staging location if under 80% health.
                 Assign.retreatArmyUnitOrMoveToHealer(dismantlers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -80,7 +80,7 @@ class Dismantler {
                 // Dismantle a target if it can be seen.
                 Assign.dismantleArmyTarget(creepsWithNoTask, attackRoom, dismantle, "Dismantle");
                 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -93,7 +93,7 @@ class Dismantler {
                 // Return to army's staging location if under 80% health.
                 Assign.retreatArmyUnit(dismantlers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -101,7 +101,7 @@ class Dismantler {
                 // Dismantle towers, spawns, and any remaining structures.
                 Assign.dismantleHostileStructures(creepsWithNoTask, attackRoom, "Dismantle");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
@@ -109,7 +109,7 @@ class Dismantler {
                 // Rally to any hostile construction sites.
                 Assign.tasks(creepsWithNoTask, tasks.rally.tasks, false, "Stomping");
 
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }

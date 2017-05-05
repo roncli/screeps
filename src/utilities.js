@@ -268,6 +268,16 @@ class Utilities {
     static roomLabsArePaused(room) {
         return room.memory.labsInUse && _.filter(room.memory.labsInUse, (l) => l.pause).length > 0;
     }
+    
+    static getControllerOwner(controller) {
+        if (controller.owner) {
+            return controller.owner.username;
+        }
+        if (controller.reservation) {
+            return controller.owner.reservation;
+        }
+        return "";
+    }
 }
 
 if (Memory.profiling) {

@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     TaskCollectEnergy = require("task.collectEnergy"),
+    Utilities = require("utilities"),
     Pathing = require("pathing");
 
 class Pickup {
@@ -11,7 +12,7 @@ class Pickup {
     }
     
     canAssign(creep) {
-        if (creep.spawning || creep.ticksToLive < 150 || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50) {
+        if (creep.spawning || creep.ticksToLive < 150 || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50 || this.resource.room.controller && Memory.allies.indexOf(Utilities.getControllerOwner(this.resource.room.controller)) !== -1) {
             return false;
         }
         

@@ -218,12 +218,14 @@ class Main {
         // Reset the cache.
         Cache.reset();
 
+        // Detect a system reset.
         if (!reset)
         {
             reset = true;
             Cache.log.events.push("System reset.");
         }
 
+        // Set and unset Memory.buy.
         if (Cache.credits < Memory.minimumCredits) {
             delete Memory.buy;
         }
@@ -407,8 +409,8 @@ class Main {
 
         // Setup cached creeps.
         Cache.creeps = Utilities.nest(_.filter(Game.creeps, (c) => c.memory.home || c.memory.army), [(c) => c.memory.home || c.memory.army, (c) => c.memory.role]);
-        _.forEach(Cache.creeps, (creeps, room) => {
-            Cache.creeps[room].all = _.flatten(_.values(creeps));
+        _.forEach(Cache.creeps, (creeps, entity) => {
+            Cache.creeps[entity].all = _.flatten(_.values(creeps));
         });
     }
 
@@ -503,7 +505,7 @@ class Main {
                     allCreepsInRoom = Cache.creeps[roomName] && Cache.creeps[roomName].all,
                     labQueue;
 
-                if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
+                if (!room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
                     return;
                 }
 

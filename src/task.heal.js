@@ -20,26 +20,28 @@ class Heal {
     }
     
     run(creep) {
+        var ally = this.ally;
+        
         // Attempt to heal self if needed.  This is overridden by any future heal.
         if (creep.hits < creep.hitsMax) {
             creep.heal(creep);
         }
     
         // Ally is gone, complete task.
-        if (!this.ally) {
+        if (!ally) {
             delete creep.memory.currentTask;
             return true;
         }
     
         // Move to ally.
-        Pathing.moveTo(creep, this.ally);
+        Pathing.moveTo(creep, ally);
     
-        if (this.ally.hits !== this.ally.hitsMax && creep.id !== this.ally.id) {
+        if (ally.hits !== ally.hitsMax && creep.id !== ally.id) {
             // Heal, or ranged heal if not in range.
-            if (creep.pos.getRangeTo(this.ally) <= 1) {
-                creep.heal(this.ally);
-            } else if (creep.pos.getRangeTo(this.ally) <= 3) {
-                creep.rangedHeal(this.ally);
+            if (creep.pos.getRangeTo(ally) <= 1) {
+                creep.heal(ally);
+            } else if (creep.pos.getRangeTo(ally) <= 3) {
+                creep.rangedHeal(ally);
             }
         }
     }

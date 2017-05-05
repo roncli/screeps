@@ -1,9 +1,16 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskHeal = require("task.heal"),
-    TaskRally = require("task.rally");
+var Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
+/**
+ * Represents the healer role in the army.
+ */
 class Healer {
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {Army} army The army to spawn the creep for.
+     * @return {object} The settings for spawning a creep.
+     */
     static spawnSettings(army) {
         var units = army.healer.units,
             body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
@@ -29,6 +36,8 @@ class Healer {
 
     static assignTasks(army, tasks) {
         var armyName = army.name,
+            healers = Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [],
+            creepsToHeal = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].all || [], (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
             attackRoom = Game.rooms[attackRoomName],
@@ -39,206 +48,118 @@ class Healer {
             creepsWithNoTask, task;
 
         // Assign tasks for escorts.
-        _.forEach(_.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => !c.spawning && c.memory.escorting), (creep) => {
-            // If the escortee is dead, this creep is no longer escorting anyone.
-            if (!Game.getObjectById(creep.memory.escorting)) {
-                delete creep.memory.escorting;
-                return;
-            }
-            
-            // Heal the escortee if under 1000 damage, rally to it otherwise.
-            if (creep.hitsMax - creep.hits < 1000 && !new TaskHeal(creep.memory.escorting).canAssign(creep)) {
-                new TaskRally(creep.memory.escorting).canAssign(creep);
-            }
-        });
+        Assign.escort(healers, "Healing");
 
-        creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
+        creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(healers), (c) => !c.spawning && !c.memory.escorting);
 
         switch (army.directive) {
             case "building":
                 // If not yet boosted, go get boosts.
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-                    var task = new TaskRally(creep.memory.labs[0]);
-                    task.canAssign(creep);
-                    assigned.push(creep.name);
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
+                Assign.getBoost(creepsWithNoTask, "Boosting");
+                
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
+                
+                // Heal creeps in the army.
+                Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
+                
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
                 if (creepsWithNoTask.length === 0) {
                     return;
                 }
 
                 // Rally to army's building location.
-                task = new TaskRally(buildRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Building");
-                    if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
-                        creep.memory.portals.shift();
-                    }
-                    if (creep.memory.portals && creep.memory.portals.length > 0) {
-                        if (creep.memory.portals[0] === creep.room.name) {
-                            creep.memory.portaling = true;
-                            task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
-                        } else {
-                            task = new TaskRally(creep.memory.portals[0]);
-                        }
-                    } else {
-                        task = new TaskRally(buildRoomName);
-                    }
-                    task.canAssign(creep);
-                });
+                Assign.moveToRoom(creepsWithNoTask, buildRoomName, "Building");
+                
                 break;
             case "staging":
-                // Rally to army's staging location.
-                task = new TaskRally(stageRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Staging");
-                    task.canAssign(creep);
-                });
-                break;
-            case "dismantle":
-                // Return to army's staging location if missing 1000 hits.
-                if (stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyHealer, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
+                // Heal creeps in the army.
+                Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
+                
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
                 }
 
-                // Heal hurt creeps.
-                _.forEach(tasks.heal.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Heal");
-                            assigned.push(creep.name);
-                        }
-                    });
+                // Rally to army's staging location.
+                Assign.moveToRoom(creepsWithNoTask, stageRoomName, "Staging");
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
+                break;
+            case "dismantle":
+                // Return to army's staging location if under 80% health.
+                Assign.retreatArmyUnit(healers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
+
+                // Heal creeps in the army.
+                Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
+                
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
 
                 // Rally to near dismantle location.
                 if (attackRoom && dismantle.length > 0) {
-                    task = new TaskRally(dismantle[0]);
-                    task.range = 3;
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
+                    Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
+                    _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
                     if (creepsWithNoTask.length === 0) {
                         return;
                     }
                 }
 
                 // Rally to army's attack location.
-                task = new TaskRally(attackRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
+                Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
 
                 break;
             case "attack":
-                // Return to army's staging location if missing 1000 hits.
-                if (stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyHealer, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
+                // Return to army's staging location if under 80% health.
+                Assign.retreatArmyUnit(healers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
                 }
 
-                // Heal hurt creeps in the amry.
-                _.forEach(tasks.heal.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Heal");
-                            assigned.push(creep.name);
-                        }
-                    });
+                // Heal creeps in the army.
+                Assign.healCreeps(creepsWithNoTask, creepsToHeal, "Healing");
+                
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
+                // Heal creeps in the room.
+                if (attackRoom) {
+                    Assign.tasks(creepsWithNoTask, _.filter(attackRoom.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+                
+                    _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
                     if (creepsWithNoTask.length === 0) {
                         return;
                     }
-                });
-
-                // Heal hurt creeps in the room.
-                
-                if (attackRoom && !attackRoom.unobservable) {
-                    _.forEach(TaskHeal.getTasks(attackRoom), (task) => {
-                        _.forEach(creepsWithNoTask, (creep) => {
-                            if (task.canAssign(creep)) {
-                                creep.say("Heal");
-                                assigned.push(creep.name);
-                            }
-                        });
-
-                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                        assigned = [];
-
-                        if (creepsWithNoTask.length === 0) {
-                            return;
-                        }
-                    });
                 }
 
                 // Rally to any hostile construction sites.
-                _.forEach(tasks.rally.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                        return false;
-                    });
+                Assign.tasks(creepsWithNoTask, tasks.rally.tasks, false, "Stomping");
 
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-
-                // Rally to army's attack location.
-                if (restPosition) {
-                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
-                } else {
-                    task = new TaskRally(attackRoomName);
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
+                if (creepsWithNoTask.length === 0) {
+                    return;
                 }
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
+
+                if (restPosition) {
+                    // Rally to army's rest position.
+                    Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+                } else {
+                    // Rally to army's attack location.
+                    Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
+                }
 
                 break;
         }

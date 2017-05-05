@@ -2,7 +2,15 @@ var Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
+/**
+ * Represents the dismantler role in the army.
+ */
 class Dismantler {
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {Army} army The army to spawn the creep for.
+     * @return {object} The settings for spawning a creep.
+     */
     static spawnSettings(army) {
         var units = army.dismantler.units,
             body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
@@ -25,9 +33,15 @@ class Dismantler {
         };
     }
 
+    /**
+     * Assign tasks to creeps of this role.
+     * @param {Army} army The army to assign tasks to.
+     * @param {object} tasks The tasks to assign.
+     */
     static assignTasks(army, tasks) {
         var armyName = army.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
+            dismantlers = Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlers), (c) => !c.spawning),
             stageRoomName = army.stageRoom,
             attackRoomName = army.attackRoom,
             attackRoom = Game.rooms[attackRoomName],
@@ -56,7 +70,7 @@ class Dismantler {
                 break;
             case "dismantle":
                 // Run to a healer, or return to army's staging location if under 80% health.
-                Assign.retreatArmyUnitOrMoveToHealer(Cache.creeps[armyName].armyDismantler, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnitOrMoveToHealer(dismantlers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
                 if (creepsWithNoTask.length === 0) {
@@ -76,8 +90,8 @@ class Dismantler {
                 
                 break;
             case "attack":
-                // Run to a healer, or return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(Cache.creeps[armyName].armyDismantler, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
+                // Return to army's staging location if under 80% health.
+                Assign.retreatArmyUnit(dismantlers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask);
                 if (creepsWithNoTask.length === 0) {
@@ -102,7 +116,7 @@ class Dismantler {
 
                 if (restPosition) {
                     // Rally to army's rest position.
-                    Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), "Attacking");
+                    Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
                 } else {
                     // Rally to army's attack location.
                     Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");

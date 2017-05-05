@@ -1,6 +1,7 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskDismantle = require("task.dismantle"),
+    TaskHeal = require("task.heal"),
     TaskRally = require("task.rally");
 
 /**
@@ -47,6 +48,30 @@ class Assign {
             }
         }
     }
+    
+    /**
+     * Assigns a creep to escort another, and heal it if it's hurt.
+     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment for healing only.
+     */
+    static escort(creeps, say) {
+        _.forEach(_.filter(creeps, (c) => !c.spawning && c.memory.escorting), (creep) => {
+            var escorting = Game.getObjectById(creep.memory.escorting);
+            
+            // If the escortee is dead, this creep is no longer escorting anyone.
+            if (!escorting) {
+                delete creep.memory.escorting;
+                return;
+            }
+            
+            // Determine who to heal.  If self, rally.  If escortee, heal.
+            if (escorting.hitsMax - escorting.hits === 0 || escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
+                new TaskRally(escorting.id).canAssign(creep);
+            } else {
+                creep.say(say);
+            }
+        });
+    }
 
     /**
      * Assigns creeps to rally to a lab if they require a boost.
@@ -63,13 +88,68 @@ class Assign {
     }
     
     /**
+     * Assigns creeps to rally to a lab if they require a boost.
+     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {object[]} creepsToHeal The list of creeps to heal.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static healCreeps(creeps, creepsToHeal, say) {
+        var mostHurtCreep;
+        
+        // Bail if there are no creeps to heal.
+        if (!creepsToHeal || creepsToHeal.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            mostHurtCreep = creepsToHeal[0];
+            
+            if (creep.id === mostHurtCreep.id && creepsToHeal.length >= 2) {
+                // If we are the most hurt creep, Rally towards the second most hurt creep.  Healers with rally tasks heal themselves by default.
+                task = new TaskRally(creepsToHeal[1].id);
+            } else if (creep.pos.getRangeTo(mostHurtCreep) <= 3) {
+                // Heal the most hurt creep when in range.
+                task = new TaskHeal(mostHurtCreep.id);
+            } else {
+                let closeCreeps;
+                
+                // Rally towards the most hurt creep.
+                task = new TaskRally(mostHurtCreep.id);
+
+                // If we are not hurt, see if we can heal someone else.
+                if (creep.hits === creep.hitsMax) {
+                    // If there are any hurt creeps within 1 range, heal them.
+                    closeCreeps = _.filter(creepsToHeal, (c) => creep.pos.getRangeTo(c) <= 1);
+                    if (closeCreeps.length > 0) {
+                        task.heal = closeCreeps[0].id;
+                    } else {
+                        // If there are any hurt creeps within 3 range, heal them at range.
+                        closeCreeps = _.filter(creepsToHeal, (c) => creep.pos.getRangeTo(c) <= 3);
+                        task.rangedHeal = closeCreeps[0].id;
+                    }
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.say(say);
+            }
+        });
+    }
+    
+    /**
      * Assigns all creeps to rally to a position.
      * @param {object[]} creeps The creeps to assign this task to.
      * @param {RoomPosition} pos The position to rally to.
+     * @param {number|undefined} range The range to move within.
      * @param {string} say Text to say on successful assignment.
      */
-    static moveToPos(creeps, pos, say) {
+    static moveToPos(creeps, pos, range, say) {
         var task = new TaskRally(pos);
+        if (range) {
+            task.range = range;
+        }
         _.forEach(creeps, (creep) => {
             task.canAssign(creep);
         });
@@ -118,7 +198,7 @@ class Assign {
      * @param {string} stageRoomName The name of the staging room.
      * @param {string} attackRoomName The name of the attack room.
      * @param {number} minHealthPercent The minimum amount a health a unit must have to not retreat.
-     * @param {string} say Text to say on successful assignment for retreating only.
+     * @param {string} say Text to say on successful assignment.
      */
     static retreatArmyUnit(creeps, healers, stageRoomName, attackRoomName, minHealthPercent, say) {
         // Bail if there are no healers.
@@ -194,7 +274,7 @@ class Assign {
      * @param {object[]} creeps The creeps to assign this task to.
      * @param {object[]} tasks The tasks to assign.
      * @param {bool} multiAssign Assign the task to more than one creep.
-     * @param {string} say Text to say on successful assignment for retreating only.
+     * @param {string} say Text to say on successful assignment.
      */
     static tasks(creeps, tasks, multiAssign, say) {
         _.forEach(tasks, (task) => {

@@ -29,17 +29,18 @@ class Rally {
     }
     
     run(creep) {
-        var range;
+        var rallyPoint = this.rallyPoint,
+            range;
     
         // If the rally point doesn't exist, complete the task.
-        if (!this.rallyPoint) {
+        if (!rallyPoint) {
             delete creep.memory.currentTask;
             return;
         }
     
         // Rally to the rally point.
-        range = creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName ? this.range || 0 : 20;
-        if (creep.pos.getRangeTo(this.rallyPoint) <= range) {
+        range = creep.room.name === rallyPoint.roomName || !(rallyPoint instanceof RoomPosition) || rallyPoint.pos && creep.room.name === rallyPoint.pos.roomName ? this.range || 0 : 20;
+        if (creep.pos.getRangeTo(rallyPoint) <= range) {
             if (creep.pos.x === 0) {
                 creep.move(RIGHT);
             } else if (creep.pos.x === 49) {
@@ -52,14 +53,23 @@ class Rally {
                 creep.move(Math.floor(Math.random() * 8));
             }
         } else {
-            Pathing.moveTo(creep, this.rallyPoint, range);
+            Pathing.moveTo(creep, rallyPoint, range);
         }
-    
-        // If the creep has a heal part, heal itself.
-        if (creep.hits < creep.hitsMax && creep.getActiveBodyparts(HEAL) > 0) {
-            creep.heal(creep);
+        
+        // Try to heal something.
+        if (creep.getActiveBodyparts(HEAL) > 0) {
+            if (this.heal) {
+                // Heal a creep.
+                creep.heal(Game.getObjectById(this.heal));
+            } else if (this.rangedHeal) {
+                // Heal a creep at range.
+                creep.rangedHeal(Game.getObjectById(this.rangedHeal));
+            } else if (creep.hits < creep.hitsMax) {
+                // Heal itself.
+                creep.heal(creep);
+            }
         }
-    
+
         // If the creep has a ranged attack part. mass attack.
         if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
             creep.rangedMassAttack();

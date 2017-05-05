@@ -274,7 +274,7 @@ class Utilities {
             return controller.owner.username;
         }
         if (controller.reservation) {
-            return controller.owner.reservation;
+            return controller.reservation.owner;
         }
         return "";
     }

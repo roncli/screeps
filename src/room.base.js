@@ -289,7 +289,7 @@ class Base {
             storageStore = storage.store;
         }
         
-        if (terminal && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
+        if (!terminal.cooldown && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
             if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
                 delete memory.buyQueue;
                 buyQueue = undefined;

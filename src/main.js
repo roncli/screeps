@@ -782,6 +782,10 @@ class Main {
                     otherRoomTerminalEnergy = otherRoomTerminal.store[RESOURCE_ENERGY],
                     transCost;
                 
+                if (otherRoomTerminal.cooldown > 0) {
+                    return;
+                }
+                
                 if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
                     return false;
                 }

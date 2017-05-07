@@ -79,6 +79,9 @@ class Pathing {
                         pathing.blocked.push(firstPos);
                     }
                 }
+
+                pathing.stationary = 0;
+                
                 delete pathing.path;
                 delete pathing.restartOn;
             } else if (pathing.path && !wasStationary) {

@@ -453,7 +453,7 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static stomp(creeps, sites, say) {
-        if (sites.length === 0) {
+        if (sites && sites.length === 0) {
             return;
         }
 

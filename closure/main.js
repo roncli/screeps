@@ -266,13 +266,11 @@ class Main {
         var generationTick = Game.time % 1500;
         Segment.init();
         Cache.reset();
-
         if (!reset)
         {
             reset = true;
             Cache.log.events.push("System reset.");
         }
-
         if (Cache.credits < Memory.minimumCredits) {
             delete Memory.buy;
         }
@@ -434,8 +432,8 @@ class Main {
                 break;
         }
         Cache.creeps = Utilities.nest(_.filter(Game.creeps, (c) => c.memory.home || c.memory.army), [(c) => c.memory.home || c.memory.army, (c) => c.memory.role]);
-        _.forEach(Cache.creeps, (creeps, room) => {
-            Cache.creeps[room].all = _.flatten(_.values(creeps));
+        _.forEach(Cache.creeps, (creeps, entity) => {
+            Cache.creeps[entity].all = _.flatten(_.values(creeps));
         });
     }
 
@@ -523,7 +521,7 @@ class Main {
                     allCreepsInRoom = Cache.creeps[roomName] && Cache.creeps[roomName].all,
                     labQueue;
 
-                if (room.unobservable || !room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
+                if (!room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
                     return;
                 }
 
@@ -777,6 +775,10 @@ class Main {
                     otherRoomTerminal = otherRoom.terminal,
                     otherRoomTerminalEnergy = otherRoomTerminal.store[RESOURCE_ENERGY],
                     transCost;
+                
+                if (otherRoomTerminal.cooldown > 0) {
+                    return;
+                }
                 
                 if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
                     return false;
@@ -1658,23 +1660,29 @@ var Cache = __require(3,2),
     RoleArmyDismantler = __require(11,2),
     RoleArmyHealer = __require(12,2),
     RoleArmyMelee = __require(13,2),
-    RoleArmyRanged = __require(14,2),
-    TaskHeal = __require(47,2),
-    TaskMeleeAttack = __require(48,2),
-    TaskRally = __require(51,2),
-    TaskRangedAttack = __require(52,2);
-
+    RoleArmyRanged = __require(14,2);
+/**
+ * Represents an army.
+ */
 class Army {
+    /**
+     * Create a new Army object.
+     * @param {string} name The name of the army.
+     * @param {object} settings The settings for the army.
+     */
     constructor(name, settings) {
+        if (!settings.directive) {
+            settings.directive = "preparing";
+        }
         if (!Memory.army[name]) {
             Memory.army[name] = settings;
         }
-        _.assign(this, settings);
-
+        _.extend(this, settings);
         this.name = name;
-        this.army = Memory.army[name];
     }
-
+    /**
+     * Runs the army.
+     */
     run() {
         var name = this.name,
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
@@ -1682,18 +1690,9 @@ class Army {
             dismantler = this.dismantler,
             healer = this.healer,
             melee = this.melee,
-            ranged = this.ranged,
-            boostRoomStorageStore, hostileConstructionSites, hostiles, tasks;
+            ranged = this.ranged;
         if (this.scheduled && this.scheduled > Game.time) {
             return;
-        }
-        
-        if (attackRoom) {
-            hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
-        }
-        
-        if (this.boostRoom) {
-            boostRoomStorageStore = Game.rooms[this.boostRoom].storage.store;
         }
         if (allCreepsInArmy.length === 0 && this.success) {
             this.delete = true;
@@ -1710,50 +1709,58 @@ class Army {
             this.dismantle = this.safeMode.dismantle;
             this.safeMode = this.safeMode.safeMode;
         }
-        switch (this.directive) {
-            case "preparing":
-                if (!this.boostRoom) {
-                    this.directive = "building";
-                } else if (
+        if (this.directive === "preparing") {
+            let boostRoomName = this.boostRoom;
+            
+            if (boostRoomName) {
+                let boostRoomStorageStore = Game.rooms[boostRoomName].storage.store;
+
+                if (!boostRoomStorageStore || (
                     (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&
                     (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * dismantler.units * dismantler.maxCreeps &&
                     (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * healer.units * healer.maxCreeps
-                ) {
+                )) {
                     this.directive = "building";
                 }
-                break;
-            case "building":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === this.buildRoom).length >= dismantler.maxCreeps + healer.maxCreeps + melee.maxCreeps + ranged.maxCreeps) {
-                    this.directive = "staging";
-                }
-                break;
-            case "staging":
-                if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
-                    this.directive = "dismantle";
-                }
-                break;
-            case "dismantle":
-                if (attackRoom) {
-                    this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
+            } else {
+                this.directive = "building";
+            }
+        }
+        if (this.directive === "building") {
+            if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.buildRoom).length === 0 && _.filter(allCreepsInArmy, (c) => c.room.name === this.buildRoom).length >= dismantler.maxCreeps + healer.maxCreeps + melee.maxCreeps + ranged.maxCreeps) {
+                this.directive = "staging";
+            }
+        }
+        if (this.directive === "staging") {
+            if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
+                this.directive = "dismantle";
+            }
+        }
+        if (this.directive === "dismantle") {
+            if (!this.dismantle) {
+                this.directive = "attack";
+            } else if (attackRoom) {
+                this.dismantle = _.filter(this.dismantle, (d) => Game.getObjectById(d));
 
-                    if (this.dismantle.length === 0) {
-                        this.directive = "attack";
-                    }
+                if (this.dismantle.length === 0) {
+                    this.directive = "attack";
                 }
-                break;
-            case "attack":
-                if (attackRoom) {
-                    if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
-                        this.success = true;
-                    }
+            }
+        }
+        if (this.directive === "attack") {
+            if (attackRoom) {
+                this.hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+
+                if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && this.hostileConstructionSites.length === 0) {
+                    this.success = true;
                 }
-                break;
+            }
         }
         if (this.directive === "building" || this.reinforce) {
-            RoleArmyDismantler.checkSpawn(this);
-            RoleArmyHealer.checkSpawn(this);
-            RoleArmyMelee.checkSpawn(this);
-            RoleArmyRanged.checkSpawn(this);
+            this.checkSpawn("armyDismantler", dismantler.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyDismantler));
+            this.checkSpawn("armyHealer", healer.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyHealer));
+            this.checkSpawn("armyMelee", melee.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyMelee));
+            this.checkSpawn("armyRanged", ranged.maxCreeps, this.spawnFromRegion.bind(this, RoleArmyRanged));
         }
         if (dismantler.escort || melee.escort || ranged.escort) {
             _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
@@ -1771,36 +1778,90 @@ class Army {
                 }
             });
         }
-        tasks = {
-            melee: { tasks: [] },
-            ranged: { tasks: [] },
-            heal: {
-                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => b.hitsMax - b.hits - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
-            },
-            rally: { tasks: [] }
-        };
-
         if (attackRoom) {
             switch (this.directive) {
-                case "dismantle":
-                    hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
-                    tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
-                    tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
-                    break;
                 case "attack":
-                    hostiles = Cache.hostilesInRoom(attackRoom);
-                    tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
-                    tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
-                    tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
+                    this.hostiles = Cache.hostilesInRoom(attackRoom);
+                    break;
+                default:
+                    if (allCreepsInArmy.length > 0) {
+                        this.hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
+                    } else {
+                        this.hostiles = [];
+                    }
                     break;
             }
         }
-        RoleArmyDismantler.assignTasks(this, tasks);
-        RoleArmyHealer.assignTasks(this, tasks);
-        RoleArmyMelee.assignTasks(this, tasks);
-        RoleArmyRanged.assignTasks(this, tasks);
+        RoleArmyDismantler.assignTasks(this);
+        RoleArmyHealer.assignTasks(this);
+        RoleArmyMelee.assignTasks(this);
+        RoleArmyRanged.assignTasks(this);
     }
+    /**
+     * Checks whether we should spawn for the role.
+     * @param {string} role The role of the creep.
+     * @param {number} max The maximum number of creeps that should be spawned.
+     * @param {function} successCallback The callback to run on success.
+     */
+    checkSpawn(role, max, successCallback) {
+        var armyName = this.name,
+            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            armyLog = Cache.log.army[armyName];
 
+        if (count < max) {
+            successCallback();
+        }
+        if (armyLog && (max > 0 || count > 0)) {
+            armyLog.creeps.push({
+                role: role,
+                count: count,
+                max: max
+            });
+        }
+    }
+    /**
+     * Spawn a creep for this army from within the region.
+     * @param {class} Role The class of the role to create the creep for.
+     */
+    spawnFromRegion(Role) {
+        var settings = Role.spawnSettings(this),
+            spawns = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(settings.body) && s.room.memory.region === this.region),
+            boostRoom, labsInUse, labsToBoostWith, name;
+        if (spawns.length === 0) {
+            return false;
+        }
+        if (this.boostRoom) {
+            boostRoom = Game.rooms[this.boostRoom];
+            labsInUse = boostRoom.memory.labsInUse;
+            if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length))) {
+                return false;
+            }
+        }
+        name = spawns[0].createCreep(settings.body, `${settings.name}-${this.name}-${Game.time.toFixed(0).substring(4)}`, {role: settings.name, army: this.name, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: this.portals});
+        Cache.spawning[spawns[0].id] = typeof name !== "number";
+
+        if (typeof name !== "number" && boostRoom) {
+            let labIndex = 0;
+            _.forEach(settings.boosts, (amount, compound) => {
+                labsToBoostWith[labIndex].creepToBoost = name;
+                labsToBoostWith[labIndex].resource = compound;
+                labsToBoostWith[labIndex].amount = 30 * amount;
+                labsInUse.push(labsToBoostWith[labIndex]);
+
+                labIndex++;
+            });
+            if (Cache.creeps[boostRoom.name]) {
+                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
+                    delete creep.memory.currentTask;
+                });
+            }
+        }
+
+        return typeof name !== "number";
+    }
+    /**
+     * Serializes the army to memory.
+     */
     toObj() {
         if (this.delete) {
             delete Memory.army[this.name];
@@ -1825,7 +1886,12 @@ class Army {
             };
         }
     }
-
+    /**
+     * Deserializes the object from memory.
+     * @param {string} armyName The name of the army.
+     * @param {object} army The army object from memory.
+     * @return {Army} The Army object.
+     */
     static fromObj(armyName, army) {
         return new Army(armyName, army);
     }
@@ -2872,6 +2938,16 @@ class Utilities {
     static roomLabsArePaused(room) {
         return room.memory.labsInUse && _.filter(room.memory.labsInUse, (l) => l.pause).length > 0;
     }
+    
+    static getControllerOwner(controller) {
+        if (controller.owner) {
+            return controller.owner.username;
+        }
+        if (controller.reservation) {
+            return controller.reservation.owner;
+        }
+        return "";
+    }
 }
 
 if (Memory.profiling) {
@@ -2884,1125 +2960,679 @@ return module.exports;
 /********** End of module 10: ..\src\utilities.js **********/
 /********** Start module 11: ..\src\role.armyDismantler.js **********/
 __modules[11] = function(module, exports) {
-var Cache = __require(3,11),
-    Utilities = __require(10,11),
-    TaskDismantle = __require(43,11),
-    TaskRally = __require(51,11);
+var Assign = __require(56,11),
+    Cache = __require(3,11),
+    Utilities = __require(10,11);
+/**
+ * Represents the dismantler role in the army.
+ */
+class RoleArmyDismantler {
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {Army} army The army to spawn the creep for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(army) {
+        var units = army.dismantler.units,
+            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
-class Dismantler {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.dismantler.maxCreeps;
-
-        if (count < max) {
-            Dismantler.spawn(army);
-        }
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyDismantler",
-                count: count,
-                max: max
-            });
-        }        
-    }
-
-    static spawn(army) {
-        var armyName = army.name,
-            dismantlerUnits = army.dismantler.units,
-            body = [],
-            boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
+        body.push(...Array(units).fill(WORK));
+        body.push(...Array(units + 5).fill(MOVE));
 
         if (army.boostRoom) {
-            boostRoom = Game.rooms[army.boostRoom];
-            labsInUse = boostRoom.memory.labsInUse;
-        }
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        for (count = 0; count < 5; count++) {
-            body.push(TOUGH);
-        }
-        
-        for (count = 0; count < dismantlerUnits; count++) {
-            body.push(WORK);
+            boosts = {
+                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
+                RESOURCE_CATALYZED_ZYNTHIUM_ACID: units
+            };
         }
 
-        for (count = 0; count < dismantlerUnits + 5; count++) {
-            body.push(MOVE);
-        }
-
-        if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, 2))) {
-            return false;
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === army.region)[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `armyDismantler-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyDismantler", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && boostRoom) {
-            labsToBoostWith[0].creepToBoost = name;
-            labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
-            labsToBoostWith[0].amount = 30 * 5;
-            labsInUse.push(labsToBoostWith[0]);
-
-            labsToBoostWith[1].creepToBoost = name;
-            labsToBoostWith[1].resource = RESOURCE_CATALYZED_ZYNTHIUM_ACID;
-            labsToBoostWith[1].amount = 30 * dismantlerUnits;
-            labsInUse.push(labsToBoostWith[1]);
-            if (Cache.creeps[boostRoom.name]) {
-                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
-                    delete creep.memory.currentTask;
-                });
-            }
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            name: "armyDismantler"
+        };
     }
-
-    static assignTasks(army, tasks) {
-        var armyName = army.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || []), (c) => !c.spawning),
-            stageRoomName = army.stageRoom,
-            attackRoomName = army.attackRoom,
-            attackRoom = Game.rooms[attackRoomName],
-            buildRoomName = army.buildRoom,
-            dismantle = army.dismantle,
-            restPosition = army.restPosition,
-            assigned = [],
-            task, structures, healers;
-
+    /**
+     * Assign tasks to creeps of this role.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignTasks(army) {
         switch (army.directive) {
             case "building":
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-                    var task = new TaskRally(creep.memory.labs[0]);
-                    task.canAssign(creep);
-                    assigned.push(creep.name);
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                task = new TaskRally(buildRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Building");
-                    if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
-                        creep.memory.portals.shift();
-                    }
-                    if (creep.memory.portals && creep.memory.portals.length > 0) {
-                        if (creep.memory.portals[0] === creep.room.name) {
-                            creep.memory.portaling = true;
-                            task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
-                        } else {
-                            task = new TaskRally(creep.memory.portals[0]);
-                        }
-                    } else {
-                        task = new TaskRally(buildRoomName);
-                    }
-                    task.canAssign(creep);
-                });
+                this.assignBuildingTasks(army);
                 break;
             case "staging":
-                task = new TaskRally(stageRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Staging");
-                    task.canAssign(creep);
-                });
+                this.assignStagingTasks(army);
                 break;
             case "dismantle":
-                healers = Cache.creeps[armyName].armyHealer || [];
-                if (healers.length > 0 && stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyDismantler, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        var closest = Utilities.objectsClosestToObj(healers, creep),
-                            task;
-
-                        if (closest[0].pos.getRangeTo(creep) > 2) {
-                            task = new TaskRally(closest[0].id);
-                            task.canAssign(creep);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
-                }
-                if (attackRoom && dismantle.length > 0) {
-                    task = new TaskDismantle(dismantle[0]);
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Dismantle");
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                task = new TaskRally(attackRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
+                this.assignDismantleTasks(army);
                 break;
             case "attack":
-                healers = Cache.creeps[armyName].armyHealer || [];
-                if (healers.length > 0 && stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyDismantler, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
-                }
-
-                if (attackRoom) {
-                    structures = _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR));
-                    if (structures.length > 0) {
-                        task = new TaskDismantle(structures[0].id);
-                        _.forEach(creepsWithNoTask, (creep) => {
-                            if (task.canAssign(creep)) {
-                                creep.say("Dismantle");
-                                assigned.push(creep.name);
-                            }
-                        });
-
-                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                        assigned = [];
-
-                        if (creepsWithNoTask.length === 0) {
-                            return;
-                        }
-                    }
-                }
-                _.forEach(tasks.rally.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                        return false;
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-                if (restPosition) {
-                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
-                } else {
-                    task = new TaskRally(attackRoomName);
-                }
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignAttackTasks(army);
                 break;
+        }
+    }
+    /**
+     * Assignments for the building directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignBuildingTasks(army) {
+        var creeps = creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning);
+        Assign.getBoost(creepsWithNoTask, "Boosting");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
+    }
+    /**
+     * Assignments for the staging directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignStagingTasks(army) {
+        var creeps = creeps = Cache.creeps[army.name];
+        Assign.moveToRoom(_.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning), army.stageRoom, "Staging");
+    }
+    /**
+     * Assignments for the dismantle directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignDismantleTasks(army) {
+        var armyName = army.name,
+            creeps = Cache.creeps[armyName],
+            dismantlerCreeps = creeps && creeps.armyDismantler || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning);
+        Assign.retreatArmyUnitOrMoveToHealer(dismantlerCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.dismantleArmyTarget(creepsWithNoTask, attackRoomName, army.dismantle, "Dismantle");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
+    }
+    /**
+     * Assignments for the attack directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignAttackTasks(army) {
+        var armyName = army.name,
+            creeps = Cache.creeps[armyName],
+            dismantlerCreeps = creeps && creeps.armyDismantler || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning),
+            restPosition;
+        Assign.retreatArmyUnit(dismantlerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.dismantleHostileStructures(creepsWithNoTask, attackRoomName, "Dismantle");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.stomp(creepsWithNoTask, army.hostileConstructionSites, "Stomping");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        if (restPosition = army.restPosition) {
+            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+        } else {
+            Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
         }
     }
 }
 
 if (Memory.profiling) {
-    __require(1,11).registerObject(Dismantler, "ArmyDismantler");
+    __require(1,11).registerObject(RoleArmyDismantler, "RoleArmyDismantler");
 }
-module.exports = Dismantler;
+module.exports = RoleArmyDismantler;
 
 return module.exports;
 }
 /********** End of module 11: ..\src\role.armyDismantler.js **********/
 /********** Start module 12: ..\src\role.armyHealer.js **********/
 __modules[12] = function(module, exports) {
-var Cache = __require(3,12),
-    Utilities = __require(10,12),
-    TaskHeal = __require(47,12),
-    TaskRally = __require(51,12);
+var Assign = __require(56,12),
+    Cache = __require(3,12),
+    Utilities = __require(10,12);
+/**
+ * Represents the healer role in the army.
+ */
+class RoleArmyHealer {
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {Army} army The army to spawn the creep for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(army) {
+        var units = army.healer.units,
+            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
-class Healer {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.healer.maxCreeps;
-
-        if (count < max) {
-            Healer.spawn(army);
-        }
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyHealer",
-                count: count,
-                max: max
-            });
-        }        
-    }
-
-    static spawn(army) {
-        var armyName = army.name,
-            healerUnits = army.healer.units,
-            body = [],
-            boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
-            
-        if (army.boostRoom) {
-            boostRoom = Game.rooms[army.boostRoom];
-            labsInUse = boostRoom.memory.labsInUse;
-        }
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        for (count = 0; count < 5; count++) {
-            body.push(TOUGH);
-        }
-        
-        for (count = 0; count < healerUnits - 1; count++) {
-            body.push(HEAL);
-        }
-
-        for (count = 0; count < healerUnits + 5; count++) {
-            body.push(MOVE);
-        }
-        
+        body.push(...Array(units - 1).fill(HEAL));
+        body.push(...Array(units + 5).fill(MOVE));
         body.push(HEAL);
 
-        if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, 2))) {
-            return false;
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === army.region)[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `armyHealer-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyHealer", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && boostRoom) {
-            labsToBoostWith[0].creepToBoost = name;
-            labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
-            labsToBoostWith[0].amount = 30 * 5;
-            labsInUse.push(labsToBoostWith[0]);
-
-            labsToBoostWith[1].creepToBoost = name;
-            labsToBoostWith[1].resource = RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE;
-            labsToBoostWith[1].amount = 30 * healerUnits;
-            labsInUse.push(labsToBoostWith[1]);
-            if (Cache.creeps[boostRoom.name]) {
-                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
-                    delete creep.memory.currentTask;
-                });
-            }
+        if (army.boostRoom) {
+            boosts = {
+                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
+                RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE: units
+            };
         }
 
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            name: "armyHealer"
+        };
     }
-
-    static assignTasks(army, tasks) {
-        var armyName = army.name,
-            stageRoomName = army.stageRoom,
-            attackRoomName = army.attackRoom,
-            attackRoom = Game.rooms[attackRoomName],
-            buildRoomName = army.buildRoom,
-            dismantle = army.dismantle,
-            restPosition = army.restPosition,
-            assigned = [],
-            creepsWithNoTask, task;
-        _.forEach(_.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [], (c) => !c.spawning && c.memory.escorting), (creep) => {
-            if (!Game.getObjectById(creep.memory.escorting)) {
-                delete creep.memory.escorting;
-                return;
-            }
-            if (creep.hitsMax - creep.hits < 1000 && !new TaskHeal(creep.memory.escorting).canAssign(creep)) {
-                new TaskRally(creep.memory.escorting).canAssign(creep);
-            }
-        });
-
-        creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
+    /**
+     * Assign tasks to creeps of this role.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignTasks(army) {
+        var creeps = Cache.creeps[army.name];
+        Assign.escort(creeps && creeps.armyHealer || [], "Healing");
 
         switch (army.directive) {
             case "building":
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-                    var task = new TaskRally(creep.memory.labs[0]);
-                    task.canAssign(creep);
-                    assigned.push(creep.name);
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                task = new TaskRally(buildRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Building");
-                    if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
-                        creep.memory.portals.shift();
-                    }
-                    if (creep.memory.portals && creep.memory.portals.length > 0) {
-                        if (creep.memory.portals[0] === creep.room.name) {
-                            creep.memory.portaling = true;
-                            task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
-                        } else {
-                            task = new TaskRally(creep.memory.portals[0]);
-                        }
-                    } else {
-                        task = new TaskRally(buildRoomName);
-                    }
-                    task.canAssign(creep);
-                });
+                this.assignBuildingTasks(army);
                 break;
             case "staging":
-                task = new TaskRally(stageRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Staging");
-                    task.canAssign(creep);
-                });
+                this.assignStagingTasks(army);
                 break;
             case "dismantle":
-                if (stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyHealer, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                _.forEach(tasks.heal.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Heal");
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-                if (attackRoom && dismantle.length > 0) {
-                    task = new TaskRally(dismantle[0]);
-                    task.range = 3;
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                task = new TaskRally(attackRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignDismantleTasks(army);
                 break;
             case "attack":
-                if (stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyHealer, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                _.forEach(tasks.heal.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Heal");
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-                
-                if (attackRoom && !attackRoom.unobservable) {
-                    _.forEach(TaskHeal.getTasks(attackRoom), (task) => {
-                        _.forEach(creepsWithNoTask, (creep) => {
-                            if (task.canAssign(creep)) {
-                                creep.say("Heal");
-                                assigned.push(creep.name);
-                            }
-                        });
-
-                        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                        assigned = [];
-
-                        if (creepsWithNoTask.length === 0) {
-                            return;
-                        }
-                    });
-                }
-                _.forEach(tasks.rally.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                        return false;
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-                if (restPosition) {
-                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
-                } else {
-                    task = new TaskRally(attackRoomName);
-                }
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignAttackTasks(army);
                 break;
+        }
+    }
+    /**
+     * Assignments for the building directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignBuildingTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
+        Assign.getBoost(creepsWithNoTask, "Boosting");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.heal(creepsWithNoTask, _.filter(creeps && creeps.all || [], (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
+    }
+    /**
+     * Assignments for the staging directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignStagingTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
+        Assign.heal(creepsWithNoTask, _.filter(creeps && creeps.all || [], (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.stageRoom, "Staging");
+    }
+    /**
+     * Assignments for the dismantle directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignDismantleTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            healerCreeps = creeps && creeps.armyHealer || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(healerCreeps), (c) => !c.spawning && !c.memory.escorting),
+            dismantle;
+        Assign.retreatArmyUnit(healerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.heal(creepsWithNoTask, _.filter(creeps && creeps.all || [], (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        if (Game.rooms[attackRoomName] && (dismantle = army.dismantle).length > 0) {
+            Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
+
+            _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+        }
+        Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
+    }
+    /**
+     * Assignments for the attack directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignAttackTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            healerCreeps = creeps && creeps.armyHealer || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(healerCreeps), (c) => !c.spawning && !c.memory.escorting),
+            attackRoom, restPosition;
+        Assign.retreatArmyUnit(healerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.heal(creepsWithNoTask, _.filter(creeps && creeps.all || [], (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        if (attackRoom = Game.rooms[attackRoomName]) {
+            Assign.heal(creepsWithNoTask, _.filter(attackRoom.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax), "Healing");
+        
+            _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+        }
+        Assign.stomp(creepsWithNoTask, army.hostileConstructionSites, "Stomping");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        if (restPosition = army.restPosition) {
+            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+        } else {
+            Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
         }
     }
 }
 
 if (Memory.profiling) {
-    __require(1,12).registerObject(Healer, "ArmyHealer");
+    __require(1,12).registerObject(RoleArmyHealer, "RoleArmyHealer");
 }
-module.exports = Healer;
+module.exports = RoleArmyHealer;
 
 return module.exports;
 }
 /********** End of module 12: ..\src\role.armyHealer.js **********/
 /********** Start module 13: ..\src\role.armyMelee.js **********/
 __modules[13] = function(module, exports) {
-var Cache = __require(3,13),
-    Utilities = __require(10,13),
-    TaskRally = __require(51,13);
+var Assign = __require(56,13),
+    Cache = __require(3,13),
+    Utilities = __require(10,13);
+/**
+ * Represents the melee role in the army.
+ */
+class RoleArmyMelee {
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {Army} army The army to spawn the creep for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(army) {
+        var units = army.melee.units,
+            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
-class Melee {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.melee.maxCreeps;
-
-        if (count < max) {
-            Melee.spawn(army);
-        }
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyMelee",
-                count: count,
-                max: max
-            });
-        }
-    }
-
-    static spawn(army) {
-        var armyName = army.name,
-            meleeUnits = army.melee.units,
-            body = [],
-            boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
+        body.push(...Array(units).fill(ATTACK));
+        body.push(...Array(units + 5).fill(MOVE));
 
         if (army.boostRoom) {
-            boostRoom = Game.rooms[army.boostRoom];
-            labsInUse = boostRoom.memory.labsInUse;
-        }
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        for (count = 0; count < 5; count++) {
-            body.push(TOUGH);
-        }
-        
-        for (count = 0; count < meleeUnits; count++) {
-            body.push(ATTACK);
+            boosts = {
+                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
+                RESOURCE_CATALYZED_UTRIUM_ACID: units
+            };
         }
 
-        for (count = 0; count < meleeUnits + 5; count++) {
-            body.push(MOVE);
-        }
-
-        if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, 2))) {
-            return false;
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === army.region)[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `armyMelee-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyMelee", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && boostRoom) {
-            labsToBoostWith[0].creepToBoost = name;
-            labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
-            labsToBoostWith[0].amount = 30 * 5;
-            labsInUse.push(labsToBoostWith[0]);
-
-            labsToBoostWith[1].creepToBoost = name;
-            labsToBoostWith[1].resource = RESOURCE_CATALYZED_UTRIUM_ACID;
-            labsToBoostWith[1].amount = 30 * meleeUnits;
-            labsInUse.push(labsToBoostWith[1]);
-            if (Cache.creeps[boostRoom.name]) {
-                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
-                    delete creep.memory.currentTask;
-                });
-            }
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            name: "armyMelee"
+        };
     }
-
-    static assignTasks(army, tasks) {
-        var armyName = army.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || []), (c) => !c.spawning),
-            stageRoomName = army.stageRoom,
-            attackRoomName = army.attackRoom,
-            buildRoomName = army.buildRoom,
-            dismantle = army.dismantle,
-            restPosition = army.restPosition,
-            assigned = [],
-            task, healers;
-
+    /**
+     * Assign tasks to creeps of this role.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignTasks(army) {
         switch (army.directive) {
             case "building":
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-                    var task = new TaskRally(creep.memory.labs[0]);
-                    task.canAssign(creep);
-                    assigned.push(creep.name);
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                task = new TaskRally(buildRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Building");
-                    if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
-                        creep.memory.portals.shift();
-                    }
-                    if (creep.memory.portals && creep.memory.portals.length > 0) {
-                        if (creep.memory.portals[0] === creep.room.name) {
-                            creep.memory.portaling = true;
-                            task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
-                        } else {
-                            task = new TaskRally(creep.memory.portals[0]);
-                        }
-                    } else {
-                        task = new TaskRally(buildRoomName);
-                    }
-                    task.canAssign(creep);
-                });
+                this.assignBuildingTasks(army);
                 break;
             case "staging":
-                task = new TaskRally(stageRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Staging");
-                    task.canAssign(creep);
-                });
+                this.assignStagingTasks(army);
                 break;
             case "dismantle":
-                healers = Cache.creeps[armyName].armyHealer || [];
-                if (healers.length > 0 && stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyMelee, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        var closest = Utilities.objectsClosestToObj(healers, creep),
-                            task;
-
-                        if (closest[0].pos.getRangeTo(creep) > 2) {
-                            task = new TaskRally(closest[0].id);
-                            task.canAssign(creep);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
-                }
-                _.forEach(tasks.melee.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Die!", true);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return false;
-                    }
-                });
-                
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                if (Game.rooms[attackRoomName] && dismantle.length > 0) {
-                    task = new TaskRally(dismantle[0]);
-                    task.range = 3;
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                task = new TaskRally(attackRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignDismantleTasks(army);
                 break;
             case "attack":
-                healers = Cache.creeps[armyName].armyHealer || [];
-                if (healers.length > 0 && stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyMelee, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
-                }
-                _.forEach(tasks.melee.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Die!", true);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return false;
-                    }
-                });
-                
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                _.forEach(tasks.rally.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                        return false;
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-                if (restPosition) {
-                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
-                } else {
-                    task = new TaskRally(attackRoomName);
-                }
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignAttackTasks(army);
                 break;
+        }
+    }
+    /**
+     * Assignments for the building directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignBuildingTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyMelee || []), (c) => !c.spawning);
+        Assign.getBoost(creepsWithNoTask, "Boosting");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.attack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
+    }
+    /**
+     * Assignments for the staging directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignStagingTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyMelee || []), (c) => !c.spawning);
+        Assign.attack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.stageRoom, "Staging");
+    }
+    /**
+     * Assignments for the dismantle directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignDismantleTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            meleeCreeps = creeps && creeps.armyMelee || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(meleeCreeps), (c) => !c.spawning),
+            dismantle;
+        Assign.retreatArmyUnitOrMoveToHealer(meleeCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.attack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        if (Game.rooms[attackRoomName] && (dismantle = army.dismantle).length > 0) {
+            Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
+
+            _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+        }
+        Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
+    }
+    /**
+     * Assignments for the attack directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignAttackTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            meleeCreeps = creeps && creeps.armyMelee || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(meleeCreeps), (c) => !c.spawning),
+            restPosition;
+        Assign.retreatArmyUnit(meleeCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.attack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.stomp(creepsWithNoTask, army.hostileConstructionSites, "Stomping");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        if (restPosition = army.restPosition) {
+            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+        } else {
+            Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
         }
     }
 }
 
 if (Memory.profiling) {
-    __require(1,13).registerObject(Melee, "ArmyMelee");
+    __require(1,13).registerObject(RoleArmyMelee, "RoleArmyMelee");
 }
-module.exports = Melee;
+module.exports = RoleArmyMelee;
 
 return module.exports;
 }
 /********** End of module 13: ..\src\role.armyMelee.js **********/
 /********** Start module 14: ..\src\role.armyRanged.js **********/
 __modules[14] = function(module, exports) {
-var Cache = __require(3,14),
-    Utilities = __require(10,14),
-    TaskRally = __require(51,14);
+var Assign = __require(56,14),
+    Cache = __require(3,14),
+    Utilities = __require(10,14);
+/**
+ * Represents the ranged role in the army.
+ */
+class RoleArmyRanged {
+    /**
+                                    ##          #     #     #                       
+                                   #  #         #     #                             
+     ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+      ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+           #                                                            ###         
+     * Gets the settings for spawning a creep.
+     * @param {Army} army The army to spawn the creep for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(army) {
+        var units = army.ranged.units,
+            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
-class Ranged {
-    static checkSpawn(army) {
-        var armyName = army.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            max = army.ranged.maxCreeps;
-
-        if (count < max) {
-            Ranged.spawn(armyName);
-        }
-        if (Memory.log && max > 0 && Cache.log.army[armyName]) {
-            Cache.log.army[armyName].creeps.push({
-                role: "armyRanged",
-                count: count,
-                max: max
-            });
-        }        
-    }
-
-    static spawn(army) {
-        var armyName = army.name,
-            rangedUnits = army.ranged.units,
-            body = [],
-            boostRoom, labsInUse, count, spawnToUse, name, labsToBoostWith;
+        body.push(...Array(units).fill(RANGED_ATTACK));
+        body.push(...Array(units + 5).fill(MOVE));
 
         if (army.boostRoom) {
-            boostRoom = Game.rooms[army.boostRoom];
-            labsInUse = boostRoom.memory.labsInUse;
-        }
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        for (count = 0; count < 5; count++) {
-            body.push(TOUGH);
-        }
-        
-        for (count = 0; count < rangedUnits; count++) {
-            body.push(RANGED_ATTACK);
+            boosts = {
+                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
+                RESOURCE_CATALYZED_UTRIUM_ACID: units
+            };
         }
 
-        for (count = 0; count < rangedUnits + 5; count++) {
-            body.push(MOVE);
-        }
-
-        if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, 2))) {
-            return false;
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === army.region)[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `armyRanged-${armyName}-${Game.time.toFixed(0).substring(4)}`, {role: "armyRanged", army: armyName, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: army.portals});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && boostRoom) {
-            labsToBoostWith[0].creepToBoost = name;
-            labsToBoostWith[0].resource = RESOURCE_CATALYZED_GHODIUM_ALKALIDE;
-            labsToBoostWith[0].amount = 30 * 5;
-            labsInUse.push(labsToBoostWith[0]);
-
-            labsToBoostWith[1].creepToBoost = name;
-            labsToBoostWith[1].resource = RESOURCE_CATALYZED_KEANIUM_ALKALIDE;
-            labsToBoostWith[1].amount = 30 * rangedUnits;
-            labsInUse.push(labsToBoostWith[1]);
-            if (Cache.creeps[boostRoom.name]) {
-                _.forEach(_.filter(Cache.creeps[boostRoom.name].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
-                    delete creep.memory.currentTask;
-                });
-            }
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            name: "armyRanged"
+        };
     }
 
-    static assignTasks(army, tasks) {
-        var armyName = army.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[armyName] && Cache.creeps[armyName].armyRanged || []), (c) => !c.spawning),
-            assigned = [],
-            stageRoomName = army.stageRoom,
-            attackRoomName = army.attackRoom,
-            buildRoomName = army.buildRoom,
-            dismantle = army.dismantle,
-            restPosition = army.restPosition,
-            task, healers;
-
+    /**
+                         #                ###                #            
+                                           #                 #            
+     ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+     # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+                               ###                                        
+     * Assign tasks to creeps of this role.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignTasks(army) {
         switch (army.directive) {
             case "building":
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-                    var task = new TaskRally(creep.memory.labs[0]);
-                    task.canAssign(creep);
-                    assigned.push(creep.name);
-                });
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                task = new TaskRally(buildRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Building");
-                    if (creep.memory.portaling && creep.memory.portals[0] !== creep.room.name) {
-                        creep.memory.portals.shift();
-                    }
-                    if (creep.memory.portals && creep.memory.portals.length > 0) {
-                        if (creep.memory.portals[0] === creep.room.name) {
-                            creep.memory.portaling = true;
-                            task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
-                        } else {
-                            task = new TaskRally(creep.memory.portals[0]);
-                        }
-                    } else {
-                        task = new TaskRally(buildRoomName);
-                    }
-                    task.canAssign(creep);
-                });
+                this.assignBuildingTasks(army);
                 break;
             case "staging":
-                task = new TaskRally(stageRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    creep.say("Staging");
-                    task.canAssign(creep);
-                });
+                this.assignStagingTasks(army);
                 break;
             case "dismantle":
-                healers = Cache.creeps[armyName].armyHealer || [];
-                if (healers.length > 0 && stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyRanged, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        var closest = Utilities.objectsClosestToObj(healers, creep),
-                            task;
-
-                        if (closest[0].pos.getRangeTo(creep) > 2) {
-                            task = new TaskRally(closest[0].id);
-                            task.canAssign(creep);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
-                }
-                _.forEach(tasks.ranged.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Die!", true);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return false;
-                    }
-                });
-                
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                if (Game.rooms[attackRoomName] && dismantle.length > 0) {
-                    task = new TaskRally(dismantle[0]);
-                    task.range = 3;
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                task = new TaskRally(attackRoomName);
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignDismantleTasks(army);
                 break;
             case "attack":
-                healers = Cache.creeps[armyName].armyHealer || [];
-                if (healers.length > 0 && stageRoomName !== attackRoomName) {
-                    task = new TaskRally(stageRoomName);
-                    task.range = 22;
-                    _.forEach(_.filter(Cache.creeps[armyName].armyRanged, (c) => (c.room.name === attackRoomName || c.pos.x <=1 || c.pos.x >=48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hitsMax - c.hits >= 1000), (creep) => {
-                        creep.say("Ouch!");
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                }
-                if (healers.length > 0) {
-                    _.remove(creepsWithNoTask, (c) => c.hitsMax - c.hits >= 1000);
-                }
-                _.forEach(tasks.ranged.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        if (task.canAssign(creep)) {
-                            creep.say("Die!", true);
-                            assigned.push(creep.name);
-                        }
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return false;
-                    }
-                });
-                
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                _.forEach(tasks.rally.tasks, (task) => {
-                    _.forEach(creepsWithNoTask, (creep) => {
-                        task.canAssign(creep);
-                        assigned.push(creep.name);
-                        return false;
-                    });
-
-                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                    assigned = [];
-
-                    if (creepsWithNoTask.length === 0) {
-                        return;
-                    }
-                });
-                if (restPosition) {
-                    task = new TaskRally(new RoomPosition(restPosition.x, restPosition.y, restPosition.room));
-                } else {
-                    task = new TaskRally(attackRoomName);
-                }
-                _.forEach(creepsWithNoTask, (creep) => {
-                    task.canAssign(creep);
-                });
-
+                this.assignAttackTasks(army);
                 break;
+        }
+    }
+    /**
+     * Assignments for the building directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignBuildingTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
+        Assign.getBoost(creepsWithNoTask, "Boosting");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.rangedAttack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
+    }
+    /**
+     * Assignments for the staging directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignStagingTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
+        Assign.rangedAttack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.moveToRoom(creepsWithNoTask, army.stageRoom, "Staging");
+    }
+    /**
+     * Assignments for the dismantle directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignDismantleTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            rangedCreeps = creeps && creeps.armyRanged || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning),
+            dismantle;
+        Assign.retreatArmyUnitOrMoveToHealer(rangedCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.rangedAttack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        if (Game.rooms[attackRoomName] && (dismantle = army.dismantle).length > 0) {
+            Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
+
+            _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
+        }
+        Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
+    }
+    /**
+     * Assignments for the attack directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignAttackTasks(army) {
+        var creeps = Cache.creeps[army.name],
+            rangedCreeps = creeps && creeps.armyRanged || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning),
+            restPosition;
+        Assign.retreatArmyUnit(rangedCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.rangedAttack(creepsWithNoTask, army.hostiles, "Attacking");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        Assign.stomp(creepsWithNoTask, army.hostileConstructionSites, "Stomping");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        if (restPosition = army.restPosition) {
+            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+        } else {
+            Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
         }
     }
 }
 
 if (Memory.profiling) {
-    __require(1,14).registerObject(Ranged, "ArmyRanged");
+    __require(1,14).registerObject(RoleArmyRanged, "RoleArmyRanged");
 }
-module.exports = Ranged;
+module.exports = RoleArmyRanged;
 
 return module.exports;
 }
@@ -8198,7 +7828,7 @@ class Base {
             storageStore = storage.store;
         }
         
-        if (terminal && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
+        if (!terminal.cooldown && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
             if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
                 delete memory.buyQueue;
                 buyQueue = undefined;
@@ -9432,7 +9062,7 @@ return module.exports;
 /********** Start module 38: ..\src\task.attack.js **********/
 __modules[38] = function(module, exports) {
 var Cache = __require(3,38),
-    Pathing = __require(56,38);
+    Pathing = __require(57,38);
 
 class Attack {
     constructor() {
@@ -9492,7 +9122,7 @@ return module.exports;
 /********** Start module 39: ..\src\task.build.js **********/
 __modules[39] = function(module, exports) {
 var Cache = __require(3,39),
-    Pathing = __require(56,39);
+    Pathing = __require(57,39);
 
 class Build {
     constructor(id) {
@@ -9562,7 +9192,7 @@ return module.exports;
 /********** Start module 40: ..\src\task.claim.js **********/
 __modules[40] = function(module, exports) {
 var Cache = __require(3,40),
-    Pathing = __require(56,40);
+    Pathing = __require(57,40);
 
 class Claim {
     constructor() {
@@ -9622,7 +9252,7 @@ return module.exports;
 /********** Start module 41: ..\src\task.collectEnergy.js **********/
 __modules[41] = function(module, exports) {
 var Cache = __require(3,41),
-    Pathing = __require(56,41);
+    Pathing = __require(57,41);
 
 class CollectEnergy {
     constructor(id) {
@@ -9733,7 +9363,7 @@ return module.exports;
 /********** Start module 42: ..\src\task.collectMinerals.js **********/
 __modules[42] = function(module, exports) {
 var Cache = __require(3,42),
-    Pathing = __require(56,42),
+    Pathing = __require(57,42),
     Utilities = __require(10,42);
 
 class CollectMinerals {
@@ -9980,7 +9610,7 @@ return module.exports;
 /********** Start module 43: ..\src\task.dismantle.js **********/
 __modules[43] = function(module, exports) {
 var Cache = __require(3,43),
-    Pathing = __require(56,43);
+    Pathing = __require(57,43);
 
 class Dismantle {
     constructor(id) {
@@ -10050,7 +9680,7 @@ return module.exports;
 /********** Start module 44: ..\src\task.fillEnergy.js **********/
 __modules[44] = function(module, exports) {
 var Cache = __require(3,44),
-    Pathing = __require(56,44),
+    Pathing = __require(57,44),
     Utilities = __require(10,44);
 
 class FillEnergy {
@@ -10202,7 +9832,7 @@ return module.exports;
 /********** Start module 45: ..\src\task.fillMinerals.js **********/
 __modules[45] = function(module, exports) {
 var Cache = __require(3,45),
-    Pathing = __require(56,45),
+    Pathing = __require(57,45),
     Utilities = __require(10,45);
 
 class FillMinerals {
@@ -10407,7 +10037,7 @@ return module.exports;
 /********** Start module 46: ..\src\task.harvest.js **********/
 __modules[46] = function(module, exports) {
 var Cache = __require(3,46),
-    Pathing = __require(56,46);
+    Pathing = __require(57,46);
 
 class Harvest {
     constructor(failIn, source) {
@@ -10485,7 +10115,7 @@ return module.exports;
 /********** Start module 47: ..\src\task.heal.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(3,47),
-    Pathing = __require(56,47);
+    Pathing = __require(57,47);
 
 class Heal {
     constructor(id) {
@@ -10506,20 +10136,21 @@ class Heal {
     }
     
     run(creep) {
+        var ally = this.ally;
         if (creep.hits < creep.hitsMax) {
             creep.heal(creep);
         }
-        if (!this.ally) {
+        if (!ally) {
             delete creep.memory.currentTask;
             return true;
         }
-        Pathing.moveTo(creep, this.ally);
+        Pathing.moveTo(creep, ally);
     
-        if (this.ally.hits !== this.ally.hitsMax && creep.id !== this.ally.id) {
-            if (creep.pos.getRangeTo(this.ally) <= 1) {
-                creep.heal(this.ally);
-            } else if (creep.pos.getRangeTo(this.ally) <= 3) {
-                creep.rangedHeal(this.ally);
+        if (ally.hits !== ally.hitsMax && creep.id !== ally.id) {
+            if (creep.pos.getRangeTo(ally) <= 1) {
+                creep.heal(ally);
+            } else if (creep.pos.getRangeTo(ally) <= 3) {
+                creep.rangedHeal(ally);
             }
         }
     }
@@ -10564,7 +10195,7 @@ return module.exports;
 /********** Start module 48: ..\src\task.meleeAttack.js **********/
 __modules[48] = function(module, exports) {
 var Cache = __require(3,48),
-    Pathing = __require(56,48);
+    Pathing = __require(57,48);
 
 class Melee {
     constructor(id) {
@@ -10640,7 +10271,7 @@ return module.exports;
 /********** Start module 49: ..\src\task.mine.js **********/
 __modules[49] = function(module, exports) {
 var Cache = __require(3,49),
-    Pathing = __require(56,49),
+    Pathing = __require(57,49),
     Utilities = __require(10,49);
 
 class Mine {
@@ -10733,7 +10364,8 @@ return module.exports;
 __modules[50] = function(module, exports) {
 var Cache = __require(3,50),
     TaskCollectEnergy = __require(41,50),
-    Pathing = __require(56,50);
+    Utilities = __require(10,50),
+    Pathing = __require(57,50);
 
 class Pickup {
     constructor(id) {
@@ -10744,7 +10376,7 @@ class Pickup {
     }
     
     canAssign(creep) {
-        if (creep.spawning || creep.ticksToLive < 150 || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50) {
+        if (creep.spawning || creep.ticksToLive < 150 || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50 || this.resource.room.controller && Memory.allies.indexOf(Utilities.getControllerOwner(this.resource.room.controller)) !== -1) {
             return false;
         }
         
@@ -10808,7 +10440,7 @@ return module.exports;
 /********** Start module 51: ..\src\task.rally.js **********/
 __modules[51] = function(module, exports) {
 var Cache = __require(3,51),
-    Pathing = __require(56,51);
+    Pathing = __require(57,51);
 
 class Rally {
     constructor(id, creep) {
@@ -10838,13 +10470,14 @@ class Rally {
     }
     
     run(creep) {
-        var range;
-        if (!this.rallyPoint) {
+        var rallyPoint = this.rallyPoint,
+            range;
+        if (!rallyPoint) {
             delete creep.memory.currentTask;
             return;
         }
-        range = creep.room.name === this.rallyPoint.roomName || !(this.rallyPoint instanceof RoomPosition) || this.rallyPoint.pos && creep.room.name === this.rallyPoint.pos.roomName ? this.range || 0 : 20;
-        if (creep.pos.getRangeTo(this.rallyPoint) <= range) {
+        range = creep.room.name === rallyPoint.roomName || !(rallyPoint instanceof RoomPosition) || rallyPoint.pos && creep.room.name === rallyPoint.pos.roomName ? this.range || 0 : 20;
+        if (creep.pos.getRangeTo(rallyPoint) <= range) {
             if (creep.pos.x === 0) {
                 creep.move(RIGHT);
             } else if (creep.pos.x === 49) {
@@ -10857,13 +10490,28 @@ class Rally {
                 creep.move(Math.floor(Math.random() * 8));
             }
         } else {
-            Pathing.moveTo(creep, this.rallyPoint, range);
+            Pathing.moveTo(creep, rallyPoint, range);
         }
-        if (creep.hits < creep.hitsMax && creep.getActiveBodyparts(HEAL) > 0) {
-            creep.heal(creep);
+        if (creep.getActiveBodyparts(HEAL) > 0) {
+            if (this.heal) {
+                creep.heal(Game.getObjectById(this.heal));
+            } else if (this.rangedHeal) {
+                creep.rangedHeal(Game.getObjectById(this.rangedHeal));
+            } else if (creep.hits < creep.hitsMax) {
+                creep.heal(creep);
+            }
+        }
+        if (creep.getActiveBodyparts(ATTACK) > 0) {
+            if (this.attack) {
+                creep.attack(Game.getObjectById(this.attack));
+            }
         }
         if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
-            creep.rangedMassAttack();
+            if (this.rangedAttack) {
+                creep.rangedAttack(Game.getObjectById(this.rangedAttack));
+            } else {
+                creep.rangedMassAttack();
+            }
         }
     }
     
@@ -10926,7 +10574,7 @@ return module.exports;
 /********** Start module 52: ..\src\task.rangedAttack.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(3,52),
-    Pathing = __require(56,52);
+    Pathing = __require(57,52);
 
 class Ranged {
     constructor(id) {
@@ -11011,7 +10659,7 @@ return module.exports;
 /********** Start module 53: ..\src\task.repair.js **********/
 __modules[53] = function(module, exports) {
 var Cache = __require(3,53),
-    Pathing = __require(56,53);
+    Pathing = __require(57,53);
 
 class Repair {
     constructor(id) {
@@ -11092,7 +10740,7 @@ return module.exports;
 /********** Start module 54: ..\src\task.reserve.js **********/
 __modules[54] = function(module, exports) {
 var Cache = __require(3,54),
-    Pathing = __require(56,54);
+    Pathing = __require(57,54);
 
 class Reserve {
     constructor(id) {
@@ -11163,7 +10811,7 @@ return module.exports;
 /********** Start module 55: ..\src\task.upgradeController.js **********/
 __modules[55] = function(module, exports) {
 var Cache = __require(3,55),
-    Pathing = __require(56,55),
+    Pathing = __require(57,55),
     Utilities = __require(10,55);
 
 class Upgrade {
@@ -11274,8 +10922,354 @@ module.exports = Upgrade;
 return module.exports;
 }
 /********** End of module 55: ..\src\task.upgradeController.js **********/
-/********** Start module 56: ..\src\pathing.js **********/
+/********** Start module 56: ..\src\assign.js **********/
 __modules[56] = function(module, exports) {
+var Cache = __require(3,56),
+    Utilities = __require(10,56),
+    TaskMeleeAttack = __require(48,56),
+    TaskDismantle = __require(43,56),
+    TaskHeal = __require(47,56),
+    TaskRally = __require(51,56),
+    TaskRangedAttack = __require(52,56);
+/**
+ * A set of static functions that assigns creeps in an array to tasks.
+ */
+class Assign {
+    /**
+     * Assigns creeps to attack other creeps.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToAttack The list of creeps to attack.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static attack(creeps, creepsToAttack, say) {
+        var firstCreep;
+        if (!creepsToAttack || creepsToAttack.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            firstCreep = creepsToAttack[0];
+            
+            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+                task = new TaskMeleeAttack(firstCreep.id);
+            } else {
+                let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
+                task = new TaskRally(firstCreep.id);
+                if (closeCreeps.length > 0) {
+                    task.attack = closeCreeps[0].id;
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns creeps to dismantle a target from the army dismantle list if available.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} roomName The name of the room.
+     * @param {string[]} dismantle An array of object IDs to dismantle.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static dismantleArmyTarget(creeps, roomName, dismantle, say) {
+        if (Game.rooms[roomName] && dismantle && dismantle.length > 0) {
+            let task = new TaskDismantle(dismantle[0]);
+
+            _.forEach(creeps, (creep) => {
+                if (task.canAssign(creep)) {
+                    creep.say(say);
+                }
+            });
+        }
+    }
+    /**
+     * Assigns creeps to dismantle a hostile structure.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} roomName The name of the room.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static dismantleHostileStructures(creeps, roomName, say) {
+        var room;
+        if (room = Game.rooms[roomName]) {
+            let structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
+
+            if (structures.length > 0) {
+                let task = new TaskDismantle(structures[0].id);
+
+                _.forEach(creeps, (creep) => {
+                    if (task.canAssign(creep)) {
+                        creep.say(say);
+                    }
+                });
+            }
+        }
+    }
+    /**
+     * Assigns creeps to escort another, and heal it if it's hurt.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment for healing only.
+     */
+    static escort(creeps, say) {
+        _.forEach(_.filter(creeps, (c) => !c.spawning && c.memory.escorting), (creep) => {
+            var escorting = Game.getObjectById(creep.memory.escorting);
+            if (!escorting) {
+                delete creep.memory.escorting;
+                return;
+            }
+            if (escorting.hitsMax - escorting.hits === 0 || escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
+                new TaskRally(escorting.id).canAssign(creep);
+            } else {
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns creeps to rally to a lab if they require a boost.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static getBoost(creeps, say) {
+        _.forEach(_.filter(creeps, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
+            var task = new TaskRally(creep.memory.labs[0]);
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns creeps to heal other creeps.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToHeal The list of creeps to heal.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static heal(creeps, creepsToHeal, say) {
+        var mostHurtCreep;
+        if (!creepsToHeal || creepsToHeal.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            mostHurtCreep = creepsToHeal[0];
+            
+            if (creep.id === mostHurtCreep.id && creepsToHeal.length >= 2) {
+                task = new TaskRally(creepsToHeal[1].id);
+            } else if (creep.pos.getRangeTo(mostHurtCreep) <= 3) {
+                task = new TaskHeal(mostHurtCreep.id);
+            } else {
+                let closeCreeps;
+                task = new TaskRally(mostHurtCreep.id);
+                if (creep.hits === creep.hitsMax) {
+                    closeCreeps = _.filter(creepsToHeal, (c) => creep.pos.getRangeTo(c) <= 1);
+                    if (closeCreeps.length > 0) {
+                        task.heal = closeCreeps[0].id;
+                    } else {
+                        closeCreeps = _.filter(creepsToHeal, (c) => creep.pos.getRangeTo(c) <= 3);
+                        if (closeCreeps.length > 0) {
+                            task.rangedHeal = closeCreeps[0].id;
+                        }
+                    }
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns all creeps to rally to a position.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {RoomPosition} pos The position to rally to.
+     * @param {number|undefined} range The range to move within.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static moveToPos(creeps, pos, range, say) {
+        var task = new TaskRally(pos);
+        if (range) {
+            task.range = range;
+        }
+        _.forEach(creeps, (creep) => {
+            if (task.canAssign(creep)) {
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns all creeps to rally to a room.  Will go through portals if specified.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} roomName The name of the room to rally to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static moveToRoom(creeps, roomName, say) {
+        _.forEach(creeps, (creep) => {
+            var portals = creep.memory.portals,
+                task;
+            if (creep.memory.portaling && portals[0] !== creep.room.name) {
+                portals.shift();
+            }
+            if (portals && portals.length > 0) {
+                if (portals[0] === creep.room.name) {
+                    creep.memory.portaling = true;
+                    task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
+                } else {
+                    task = new TaskRally(portals[0]);
+                }
+            } else {
+                task = new TaskRally(roomName);
+            }
+            if (task.canAssign(creep)) {
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns creeps to attack other creeps at range.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToAttack The list of creeps to attack.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static rangedAttack(creeps, creepsToAttack, say) {
+        var firstCreep;
+        if (!creepsToAttack || creepsToAttack.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            firstCreep = creepsToAttack[0];
+            
+            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+                task = new TaskRangedAttack(firstCreep.id);
+            } else {
+                let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 3);
+                task = new TaskRally(firstCreep.id);
+                if (closeCreeps.length > 0) {
+                    task.rangedAttack = closeCreeps[0].id;
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns an army unit to retreat when hurt.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} healers The healers to check against.
+     * @param {string} stageRoomName The name of the staging room.
+     * @param {string} attackRoomName The name of the attack room.
+     * @param {number} minHealthPercent The minimum amount a health a unit must have to not retreat.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static retreatArmyUnit(creeps, healers, stageRoomName, attackRoomName, minHealthPercent, say) {
+        if (!healers || healers.length === 0) {
+            return;
+        }
+        if (stageRoomName !== attackRoomName) {
+            let task = new TaskRally(stageRoomName);
+            _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
+                if (task.canAssign(creep)) {
+                    creep.memory.currentTask.priority = Game.time;
+                    creep.say(say);
+                }
+            });
+        }
+    }
+    /**
+     * Assigns an army unit to retreat when hurt or move to a healer if too far from one.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} healers The healers to check against.
+     * @param {string} stageRoomName The name of the staging room.
+     * @param {string} attackRoomName The name of the attack room.
+     * @param {number} minHealthPercent The minimum amount a health a unit must have to not retreat.
+     * @param {string} say Text to say on successful assignment for retreating only.
+     */
+    static retreatArmyUnitOrMoveToHealer(creeps, healers, stageRoomName, attackRoomName, minHealthPercent, say) {
+        var healersNotEscorting;
+        if (!healers || healers.length === 0) {
+            return;
+        }
+        if (stageRoomName !== attackRoomName) {
+            let task = new TaskRally(stageRoomName);
+            _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
+                if (task.canAssign(creep)) {
+                    creep.memory.currentTask.priority = Game.time;
+                    creep.say(say);
+                }
+            });
+        }
+        healersNotEscorting = _.filter(healers, (h) => !h.memory.escorting);
+        if (healersNotEscorting.length > 0) {
+            _.forEach(creeps, (creep) => {
+                var closest = Utilities.objectsClosestToObj(healersNotEscorting, creep),
+                    task;
+                if (closest[0].pos.getRangeTo(creep) > 2) {
+                    task = new TaskRally(closest[0].id);
+                    if (task.canAssign(creep)) {
+                        creep.memory.currentTask.priority = Game.time;
+                    }
+                }
+            });
+        }
+    }
+    /**
+     * Assign creeps to stomp out hostile construction sites.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {ConstructionSite[]} sites 
+     * @param {string} say Text to say on successful assignment.
+     */
+    static stomp(creeps, sites, say) {
+        if (sites.length === 0) {
+            return;
+        }
+
+        _.forEach(creeps, (creep) => {
+            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0]).canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+    /**
+     * Assigns a task from a list to each creep.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {object[]} tasks The tasks to assign.
+     * @param {bool} multiAssign Assign the task to more than one creep.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static tasks(creeps, tasks, multiAssign, say) {
+        _.forEach(tasks, (task) => {
+            _.forEach(creeps, (creep) => {
+                if (task.canAssign(creep)) {
+                    creep.say(say);
+                }
+                return multiAssign;
+            });
+        });
+    }
+}
+
+if (Memory.profiling) {
+    __require(1,56).registerObject(Assign, "Assign");
+}
+module.exports = Assign;
+
+return module.exports;
+}
+/********** End of module 56: ..\src\assign.js **********/
+/********** Start module 57: ..\src\pathing.js **********/
+__modules[57] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
     2: {dx: 1, dy: -1},
@@ -11287,8 +11281,8 @@ const direction = {
     8: {dx: -1, dy: -1}
 };
 
-var Cache = __require(3,56),
-    Segment = __require(9,56);
+var Cache = __require(3,57),
+    Segment = __require(9,57);
 
 class Pathing {
     static moveTo(creep, pos, range) {
@@ -11348,6 +11342,9 @@ class Pathing {
                         pathing.blocked.push(firstPos);
                     }
                 }
+
+                pathing.stationary = 0;
+                
                 delete pathing.path;
                 delete pathing.restartOn;
             } else if (pathing.path && !wasStationary) {
@@ -11536,13 +11533,13 @@ class Pathing {
 }
 
 if (Memory.profiling) {
-    __require(1,56).registerObject(Pathing, "Pathing");
+    __require(1,57).registerObject(Pathing, "Pathing");
 }
 module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 56: ..\src\pathing.js **********/
+/********** End of module 57: ..\src\pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

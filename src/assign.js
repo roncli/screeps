@@ -351,8 +351,9 @@ class Assign {
                 // Check to see if the closest healer is further than 2 squares away, rally to it if so.
                 if (closest[0].pos.getRangeTo(creep) > 2) {
                     task = new TaskRally(closest[0].id);
-                    creep.memory.currentTask.priority = Game.time;
-                    task.canAssign(creep);
+                    if (task.canAssign(creep)) {
+                        creep.memory.currentTask.priority = Game.time;
+                    }
                 }
             });
         }

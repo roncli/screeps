@@ -40,8 +40,8 @@ class Dismantler {
      */
     static assignTasks(army, tasks) {
         var armyName = army.name,
-            dismantlers = Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlers), (c) => !c.spawning),
+            dismantlerCreeps = Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning),
             attackRoomName, restPosition;
 
         switch (army.directive) {
@@ -67,7 +67,7 @@ class Dismantler {
                 attackRoomName = army.attackRoom;
 
                 // Run to a healer, or return to army's staging location if under 80% health.
-                Assign.retreatArmyUnitOrMoveToHealer(dismantlers, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnitOrMoveToHealer(dismantlerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -88,9 +88,9 @@ class Dismantler {
                 break;
             case "attack":
                 attackRoomName = army.attackRoom;
-                
+
                 // Return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(dismantlers, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnit(dismantlerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {

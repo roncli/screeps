@@ -35,8 +35,8 @@ class Melee {
 
     static assignTasks(army, tasks) {
         var armyName = army.name,
-            melees = Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(melees), (c) => !c.spawning),
+            meleeCreeps = Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(meleeCreeps), (c) => !c.spawning),
             attackRoomName, dismantle, restPosition;
 
         switch (army.directive) {
@@ -78,7 +78,7 @@ class Melee {
                 attackRoomName = army.attackRoom;
 
                 // Run to a healer, or return to army's staging location if under 80% health.
-                Assign.retreatArmyUnitOrMoveToHealer(melees, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnitOrMoveToHealer(meleeCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -111,7 +111,7 @@ class Melee {
                 attackRoomName = army.attackRoom;
 
                 // Return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(melees, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnit(meleeCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {

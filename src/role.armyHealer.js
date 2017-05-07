@@ -41,14 +41,14 @@ class Healer {
      */
     static assignTasks(army, tasks) {
         var armyName = army.name,
-            healers = Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [],
+            healerCreeps = Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [],
             creepsToHeal = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName].all || [], (c) => c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),
             creepsWithNoTask, attackRoomName, dismantle, attackRoom, restPosition;
 
         // Assign tasks for escorts.
-        Assign.escort(healers, "Healing");
+        Assign.escort(healerCreeps, "Healing");
 
-        creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(healers), (c) => !c.spawning && !c.memory.escorting);
+        creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(healerCreeps), (c) => !c.spawning && !c.memory.escorting);
 
         switch (army.directive) {
             case "building":
@@ -89,7 +89,7 @@ class Healer {
                 attackRoomName = army.attackRoom
 
                 // Return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(healers, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnit(healerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -122,7 +122,7 @@ class Healer {
                 attackRoomName = army.attackRoom
 
                 // Return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(healers, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnit(healerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {

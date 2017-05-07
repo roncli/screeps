@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskAttack = require("task.attack"),
     TaskDismantle = require("task.dismantle"),
     TaskHeal = require("task.heal"),
     TaskRally = require("task.rally");
@@ -9,14 +10,55 @@ var Cache = require("cache"),
  */
 class Assign {
     /**
+     * Assigns creeps to attack other creeps.
+     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {object[]} creepsToAttack The list of creeps to attack.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static attack(creeps, creepsToAttack, say) {
+        var firstCreep;
+
+        // Bail if there are no creeps to heal.
+        if (!creepsToAttack || creepsToAttack.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            firstCreep = creepsToAttack[0];
+            
+            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+                // Attack the first creep when in range.
+                task = new TaskAttack(firstCreep.id);
+            } else {
+                let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
+                
+                // Rally towards the most hurt creep.
+                task = new TaskRally(firstCreep.id);
+
+                // If there are any creeps within 1 range, attack them.
+                if (closeCreeps.length > 0) {
+                    task.attack = closeCreeps[0].id;
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+
+    /**
      * Assigns creeps to dismantle a target from the army dismantle list if available.
      * @param {object[]} creeps The creeps to assign this task to.
-     * @param {string} attackRoom The name of the attack room.
+     * @param {string} roomName The name of the room.
      * @param {string[]} dismantle An array of object IDs to dismantle.
      * @param {string} say Text to say on successful assignment.
      */
-    static dismantleArmyTarget(creeps, attackRoom, dismantle, say) {
-        if (attackRoom && dismantle && dismantle.length > 0) {
+    static dismantleArmyTarget(creeps, roomName, dismantle, say) {
+        if (Game.rooms[roomName] && dismantle && dismantle.length > 0) {
             let task = new TaskDismantle(dismantle[0]);
 
             _.forEach(creeps, (creep) => {
@@ -30,12 +72,13 @@ class Assign {
     /**
      * Assigns creeps to dismantle a hostile structure.
      * @param {object[]} creeps The creeps to assign this task to.
-     * @param {string} attackRoom The name of the attack room.
+     * @param {string} roomName The name of the room.
      * @param {string} say Text to say on successful assignment.
      */
-    static dismantleHostileStructures(creeps, attackRoom, say) {
-        if (attackRoom) {
-            let structures = _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
+    static dismantleHostileStructures(creeps, roomName, say) {
+        var room;
+        if (room = Game.rooms[roomName]) {
+            let structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
 
             if (structures.length > 0) {
                 let task = new TaskDismantle(structures[0].id);
@@ -50,7 +93,7 @@ class Assign {
     }
     
     /**
-     * Assigns a creep to escort another, and heal it if it's hurt.
+     * Assigns creeps to escort another, and heal it if it's hurt.
      * @param {object[]} creeps The creeps to assign this task to.
      * @param {string} say Text to say on successful assignment for healing only.
      */
@@ -89,12 +132,12 @@ class Assign {
     }
     
     /**
-     * Assigns creeps to rally to a lab if they require a boost.
+     * Assigns creeps to heal other creeps.
      * @param {object[]} creeps The creeps to assign this task to.
      * @param {object[]} creepsToHeal The list of creeps to heal.
      * @param {string} say Text to say on successful assignment.
      */
-    static healCreeps(creeps, creepsToHeal, say) {
+    static heal(creeps, creepsToHeal, say) {
         var mostHurtCreep;
         
         // Bail if there are no creeps to heal.
@@ -155,7 +198,9 @@ class Assign {
             task.range = range;
         }
         _.forEach(creeps, (creep) => {
-            task.canAssign(creep);
+            if (task.canAssign(creep)) {
+                creep.say(say);
+            }
         });
     }
 
@@ -195,6 +240,47 @@ class Assign {
         });
     }
     
+    /**
+     * Assigns creeps to attack other creeps at range.
+     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {object[]} creepsToAttack The list of creeps to attack.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static attack(creeps, creepsToAttack, say) {
+        var firstCreep;
+
+        // Bail if there are no creeps to heal.
+        if (!creepsToAttack || creepsToAttack.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            firstCreep = creepsToAttack[0];
+            
+            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+                // Attack the first creep when in range.
+                task = new TaskRangedAttack(firstCreep.id);
+            } else {
+                let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 3);
+                
+                // Rally towards the most hurt creep.
+                task = new TaskRally(firstCreep.id);
+
+                // If there are any creeps within 3 range, attack them.
+                if (closeCreeps.length > 0) {
+                    task.rangedAttack = closeCreeps[0].id;
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+
     /**
      * Assigns an army unit to retreat when hurt.
      * @param {object[]} creeps The creeps to assign this task to.

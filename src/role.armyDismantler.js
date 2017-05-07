@@ -42,12 +42,7 @@ class Dismantler {
         var armyName = army.name,
             dismantlers = Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlers), (c) => !c.spawning),
-            stageRoomName = army.stageRoom,
-            attackRoomName = army.attackRoom,
-            attackRoom = Game.rooms[attackRoomName],
-            buildRoomName = army.buildRoom,
-            dismantle = army.dismantle,
-            restPosition = army.restPosition;
+            attackRoomName, restPosition;
 
         switch (army.directive) {
             case "building":
@@ -60,17 +55,19 @@ class Dismantler {
                 }
 
                 // Rally to army's building location.
-                Assign.moveToRoom(creepsWithNoTask, buildRoomName, "Building");
+                Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
                 
                 break;
             case "staging":
                 // Rally to army's staging location.
-                Assign.moveToRoom(creepsWithNoTask, stageRoomName, "Staging");
+                Assign.moveToRoom(creepsWithNoTask, army.stageRoom, "Staging");
 
                 break;
             case "dismantle":
+                attackRoomName = army.attackRoom;
+
                 // Run to a healer, or return to army's staging location if under 80% health.
-                Assign.retreatArmyUnitOrMoveToHealer(dismantlers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnitOrMoveToHealer(dismantlers, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -78,7 +75,7 @@ class Dismantler {
                 }
 
                 // Dismantle a target if it can be seen.
-                Assign.dismantleArmyTarget(creepsWithNoTask, attackRoom, dismantle, "Dismantle");
+                Assign.dismantleArmyTarget(creepsWithNoTask, attackRoomName, army.dismantle, "Dismantle");
                 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -90,8 +87,10 @@ class Dismantler {
                 
                 break;
             case "attack":
+                attackRoomName = army.attackRoom;
+                
                 // Return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(dismantlers, Cache.creeps[army.name].armyHealer, stageRoomName, attackRoomName, 0.8, "Ouch!");
+                Assign.retreatArmyUnit(dismantlers, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -99,7 +98,7 @@ class Dismantler {
                 }
                 
                 // Dismantle towers, spawns, and any remaining structures.
-                Assign.dismantleHostileStructures(creepsWithNoTask, attackRoom, "Dismantle");
+                Assign.dismantleHostileStructures(creepsWithNoTask, attackRoomName, "Dismantle");
 
                 _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
                 if (creepsWithNoTask.length === 0) {
@@ -114,7 +113,7 @@ class Dismantler {
                     return;
                 }
 
-                if (restPosition) {
+                if (restPosition = army.restPosition) {
                     // Rally to army's rest position.
                     Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
                 } else {

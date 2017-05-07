@@ -160,31 +160,20 @@ class Army {
 
         // Create tasks.
         tasks = {
-            melee: { tasks: [] },
-            ranged: { tasks: [] },
-            heal: {
-                tasks: _.map(_.filter(allCreepsInArmy, (c) => c.hits < c.hitsMax).sort((a, b) => b.hitsMax - b.hits - (a.hitsMax - a.hits)), (c) => new TaskHeal(c.id))
-            },
             rally: { tasks: [] }
         };
 
         // Go after hostiles in the attack room during "dismantle" and "attack" directives, but only within 3 squares if we're dismantling.
         if (attackRoom) {
-            let hostiles;
-
             switch (this.directive) {
-                case "dismantle":
-                    hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
-                    tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
-                    tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
-                    break;
                 case "attack":
-                    hostiles = Cache.hostilesInRoom(attackRoom);
-                    tasks.melee.tasks = _.map(hostiles, (c) => new TaskMeleeAttack(c.id));
-                    tasks.ranged.tasks = _.map(hostiles, (c) => new TaskRangedAttack(c.id));
+                    this.hostiles = Cache.hostilesInRoom(attackRoom);
                     if (hostileConstructionSites) {
                         tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
                     }
+                    break;
+                default:
+                    this.hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
                     break;
             }
         }
@@ -201,7 +190,6 @@ class Army {
      * @param {string} role The role of the creep.
      * @param {number} max The maximum number of creeps that should be spawned.
      * @param {function} successCallback The callback to run on success.
-     * @return {Promise} A promise that resolves if a creep should be spawned.
      */
     checkSpawn(role, max, successCallback) {
         var armyName = this.name,

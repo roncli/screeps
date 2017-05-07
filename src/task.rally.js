@@ -64,6 +64,12 @@ class Rally {
             } else if (this.rangedHeal) {
                 // Heal a creep at range.
                 creep.rangedHeal(Game.getObjectById(this.rangedHeal));
+            } else if (this.attack) {
+                // Attack a creep.
+                creep.attack(Game.getObjectById(this.attack));
+            } else if (this.rangedAttack) {
+                // Attack a creep at range.
+                creep.rangedAttack(Game.getObjectById(this.rangedAttack));
             } else if (creep.hits < creep.hitsMax) {
                 // Heal itself.
                 creep.heal(creep);

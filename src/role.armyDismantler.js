@@ -2,10 +2,26 @@ var Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
+//  ####           ##             #                         ####     #                                 #      ##                 
+//  #   #           #            # #                         #  #                                      #       #                 
+//  #   #   ###     #     ###   #   #  # ##   ## #   #   #   #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##  
+//  ####   #   #    #    #   #  #   #  ##  #  # # #  #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  # 
+//  # #    #   #    #    #####  #####  #      # # #  #  ##   #  #    #     ###   # # #   ####  #   #   #       #    #####  #     
+//  #  #   #   #    #    #      #   #  #      # # #   ## #   #  #    #        #  # # #  #   #  #   #   #  #    #    #      #     
+//  #   #   ###    ###    ###   #   #  #      #   #      #  ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #     
+//                                                   #   #                                                                       
+//                                                    ###                                                                        
 /**
  * Represents the dismantler role in the army.
  */
-class Dismantler {
+class RoleArmyDismantler {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
      * @param {Army} army The army to spawn the creep for.
@@ -33,100 +49,171 @@ class Dismantler {
         };
     }
 
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
     /**
      * Assign tasks to creeps of this role.
      * @param {Army} army The army to assign tasks to.
-     * @param {object} tasks The tasks to assign.
      */
-    static assignTasks(army, tasks) {
-        var armyName = army.name,
-            dismantlerCreeps = Cache.creeps[armyName] && Cache.creeps[armyName].armyDismantler || [],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning),
-            attackRoomName, restPosition;
-
+    static assignTasks(army) {
         switch (army.directive) {
             case "building":
-                // If not yet boosted, go get boosts.
-                Assign.getBoost(creepsWithNoTask, "Boosting");
-                
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-
-                // Rally to army's building location.
-                Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
-                
+                this.assignBuildingTasks(army);
                 break;
             case "staging":
-                // Rally to army's staging location.
-                Assign.moveToRoom(creepsWithNoTask, army.stageRoom, "Staging");
-
+                this.assignStagingTasks(army);
                 break;
             case "dismantle":
-                attackRoomName = army.attackRoom;
-
-                // Run to a healer, or return to army's staging location if under 80% health.
-                Assign.retreatArmyUnitOrMoveToHealer(dismantlerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
-
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-
-                // Dismantle a target if it can be seen.
-                Assign.dismantleArmyTarget(creepsWithNoTask, attackRoomName, army.dismantle, "Dismantle");
-                
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                
-                // Rally to army's attack location.
-                Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
-                
+                this.assignDismantleTasks(army);
                 break;
             case "attack":
-                attackRoomName = army.attackRoom;
-
-                // Return to army's staging location if under 80% health.
-                Assign.retreatArmyUnit(dismantlerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
-
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-                
-                // Dismantle towers, spawns, and any remaining structures.
-                Assign.dismantleHostileStructures(creepsWithNoTask, attackRoomName, "Dismantle");
-
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-
-                // Rally to any hostile construction sites.
-                Assign.tasks(creepsWithNoTask, tasks.rally.tasks, false, "Stomping");
-
-                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-
-                if (restPosition = army.restPosition) {
-                    // Rally to army's rest position.
-                    Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
-                } else {
-                    // Rally to army's attack location.
-                    Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
-                }
-
+                this.assignAttackTasks(army);
                 break;
+        }
+    }
+
+    //                      #                ###          #    ##       #   #                ###                #            
+    //                                       #  #               #       #                     #                 #            
+    //  ###   ###    ###   ##     ###  ###   ###   #  #  ##     #     ###  ##    ###    ###   #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #  #  #  #  #   #     #    #  #   #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #  #  #  #  #   #     #    #  #   #    #  #   ##    #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #  ###    ###  ###   ###    ###  ###   #  #  #      #     # #  ###    #  #  ###    
+    //                            ###                                                   ###                                  
+    /**
+     * Assignments for the building directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignBuildingTasks(army) {
+        var creeps = creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning);
+
+        // If not yet boosted, go get boosts.
+        Assign.getBoost(creepsWithNoTask, "Boosting");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Rally to army's building location.
+        Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
+    }
+
+    //                      #                 ##    #                 #                ###                #            
+    //                                       #  #   #                                   #                 #            
+    //  ###   ###    ###   ##     ###  ###    #    ###    ###   ###  ##    ###    ###   #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #    #    #    #  #  #  #   #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #  #  #   #    # ##   ##    #    #  #   ##    #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   ##     ##   # #  #     ###   #  #  #      #     # #  ###    #  #  ###    
+    //                            ###                           ###               ###                                  
+    /**
+     * Assignments for the staging directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignStagingTasks(army) {
+        var creeps = creeps = Cache.creeps[army.name];
+
+        // Rally to army's staging location.
+        Assign.moveToRoom(_.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning), army.stageRoom, "Staging");
+    }
+
+    //                      #                ###    #                              #    ##          ###                #            
+    //                                       #  #                                  #     #           #                 #            
+    //  ###   ###    ###   ##     ###  ###   #  #  ##     ###   # #    ###  ###   ###    #     ##    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #  #  #   #    ##     ####  #  #  #  #   #     #    # ##   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #  #  #   #      ##   #  #  # ##  #  #   #     #    ##     #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #  ###   ###   ###    #  #   # #  #  #    ##  ###    ##    #     # #  ###    #  #  ###    
+    //                            ###                                                                                               
+    /**
+     * Assignments for the dismantle directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignDismantleTasks(army) {
+        var armyName = army.name,
+            creeps = Cache.creeps[armyName],
+            dismantlerCreeps = creeps && creeps.armyDismantler || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning);
+
+        // Run to a healer, or return to army's staging location if under 80% health.
+        Assign.retreatArmyUnitOrMoveToHealer(dismantlerCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Dismantle a target if it can be seen.
+        Assign.dismantleArmyTarget(creepsWithNoTask, attackRoomName, army.dismantle, "Dismantle");
+        
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        
+        // Rally to army's attack location.
+        Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
+    }
+
+    //                      #                 ##    #     #                #     ###                #            
+    //                                       #  #   #     #                #      #                 #            
+    //  ###   ###    ###   ##     ###  ###   #  #  ###   ###    ###   ##   # #    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #  ####   #     #    #  #  #     ##     #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #  #  #   #     #    # ##  #     # #    #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #  #  #    ##    ##   # #   ##   #  #   #     # #  ###    #  #  ###    
+    //                            ###                                                                            
+    /**
+     * Assignments for the attack directive.
+     * @param {Army} army The army to assign tasks to.
+     */
+    static assignAttackTasks(army) {
+        var armyName = army.name,
+            creeps = Cache.creeps[armyName],
+            dismantlerCreeps = creeps && creeps.armyDismantler || [],
+            attackRoomName = army.attackRoom,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning),
+            restPosition;
+
+        // Return to army's staging location if under 80% health.
+        Assign.retreatArmyUnit(dismantlerCreeps, Cache.creeps[army.name].armyHealer, army.stageRoom, attackRoomName, 0.8, "Ouch!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        
+        // Dismantle towers, spawns, and any remaining structures.
+        Assign.dismantleHostileStructures(creepsWithNoTask, attackRoomName, "Dismantle");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Stomp construction sites.
+        Assign.stomp(creepsWithNoTask, army.hostileConstructionSites, "Stomping");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        if (restPosition = army.restPosition) {
+            // Rally to army's rest position.
+            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+        } else {
+            // Rally to army's attack location.
+            Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
         }
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Dismantler, "ArmyDismantler");
+    require("screeps-profiler").registerObject(RoleArmyDismantler, "RoleArmyDismantler");
 }
-module.exports = Dismantler;
+module.exports = RoleArmyDismantler;

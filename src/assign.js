@@ -6,14 +6,29 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack");
 
+//    #                    #                 
+//   # #                                     
+//  #   #   ###    ###    ##     ## #  # ##  
+//  #   #  #      #        #    #  #   ##  # 
+//  #####   ###    ###     #     ##    #   # 
+//  #   #      #      #    #    #      #   # 
+//  #   #  ####   ####    ###    ###   #   # 
+//                              #   #        
+//                               ###         
 /**
  * A set of static functions that assigns creeps in an array to tasks.
  */
 class Assign {
+    //        #     #                #     
+    //        #     #                #     
+    //  ###  ###   ###    ###   ##   # #   
+    // #  #   #     #    #  #  #     ##    
+    // # ##   #     #    # ##  #     # #   
+    //  # #    ##    ##   # #   ##   #  #  
     /**
      * Assigns creeps to attack other creeps.
-     * @param {object[]} creeps The creeps to assign this task to.
-     * @param {object[]} creepsToAttack The list of creeps to attack.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToAttack The list of creeps to attack.
      * @param {string} say Text to say on successful assignment.
      */
     static attack(creeps, creepsToAttack, say) {
@@ -51,9 +66,16 @@ class Assign {
         });
     }
 
+    //    #   #                              #    ##           ##                     ###                            #    
+    //    #                                  #     #          #  #                     #                             #    
+    //  ###  ##     ###   # #    ###  ###   ###    #     ##   #  #  ###   # #   #  #   #     ###  ###    ###   ##   ###   
+    // #  #   #    ##     ####  #  #  #  #   #     #    # ##  ####  #  #  ####  #  #   #    #  #  #  #  #  #  # ##   #    
+    // #  #   #      ##   #  #  # ##  #  #   #     #    ##    #  #  #     #  #   # #   #    # ##  #      ##   ##     #    
+    //  ###  ###   ###    #  #   # #  #  #    ##  ###    ##   #  #  #     #  #    #    #     # #  #     #      ##     ##  
+    //                                                                           #                       ###              
     /**
      * Assigns creeps to dismantle a target from the army dismantle list if available.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {string} roomName The name of the room.
      * @param {string[]} dismantle An array of object IDs to dismantle.
      * @param {string} say Text to say on successful assignment.
@@ -70,9 +92,15 @@ class Assign {
         }
     }
 
+    //    #   #                              #    ##          #  #                #     #    ##           ##    #                       #                             
+    //    #                                  #     #          #  #                #           #          #  #   #                       #                             
+    //  ###  ##     ###   # #    ###  ###   ###    #     ##   ####   ##    ###   ###   ##     #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###   
+    // #  #   #    ##     ####  #  #  #  #   #     #    # ##  #  #  #  #  ##      #     #     #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##     
+    // #  #   #      ##   #  #  # ##  #  #   #     #    ##    #  #  #  #    ##    #     #     #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##   
+    //  ###  ###   ###    #  #   # #  #  #    ##  ###    ##   #  #   ##   ###      ##  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    
     /**
      * Assigns creeps to dismantle a hostile structure.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {string} roomName The name of the room.
      * @param {string} say Text to say on successful assignment.
      */
@@ -93,9 +121,15 @@ class Assign {
         }
     }
     
+    //                                 #    
+    //                                 #    
+    //  ##    ###    ##    ##   ###   ###   
+    // # ##  ##     #     #  #  #  #   #    
+    // ##      ##   #     #  #  #      #    
+    //  ##   ###     ##    ##   #       ##  
     /**
      * Assigns creeps to escort another, and heal it if it's hurt.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {string} say Text to say on successful assignment for healing only.
      */
     static escort(creeps, say) {
@@ -117,9 +151,16 @@ class Assign {
         });
     }
 
+    //              #    ###                       #    
+    //              #    #  #                      #    
+    //  ###   ##   ###   ###    ##    ##    ###   ###   
+    // #  #  # ##   #    #  #  #  #  #  #  ##      #    
+    //  ##   ##     #    #  #  #  #  #  #    ##    #    
+    // #      ##     ##  ###    ##    ##   ###      ##  
+    //  ###                                             
     /**
      * Assigns creeps to rally to a lab if they require a boost.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {string} say Text to say on successful assignment.
      */
     static getBoost(creeps, say) {
@@ -132,10 +173,16 @@ class Assign {
         });
     }
     
+    // #                 ##    
+    // #                  #    
+    // ###    ##    ###   #    
+    // #  #  # ##  #  #   #    
+    // #  #  ##    # ##   #    
+    // #  #   ##    # #  ###   
     /**
      * Assigns creeps to heal other creeps.
-     * @param {object[]} creeps The creeps to assign this task to.
-     * @param {object[]} creepsToHeal The list of creeps to heal.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToHeal The list of creeps to heal.
      * @param {string} say Text to say on successful assignment.
      */
     static heal(creeps, creepsToHeal, say) {
@@ -186,9 +233,15 @@ class Assign {
         });
     }
     
+    //                         ###         ###                
+    //                          #          #  #               
+    // # #    ##   # #    ##    #     ##   #  #   ##    ###   
+    // ####  #  #  # #   # ##   #    #  #  ###   #  #  ##     
+    // #  #  #  #  # #   ##     #    #  #  #     #  #    ##   
+    // #  #   ##    #     ##    #     ##   #      ##   ###    
     /**
      * Assigns all creeps to rally to a position.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {RoomPosition} pos The position to rally to.
      * @param {number|undefined} range The range to move within.
      * @param {string} say Text to say on successful assignment.
@@ -205,9 +258,15 @@ class Assign {
         });
     }
 
+    //                         ###         ###                     
+    //                          #          #  #                    
+    // # #    ##   # #    ##    #     ##   #  #   ##    ##   # #   
+    // ####  #  #  # #   # ##   #    #  #  ###   #  #  #  #  ####  
+    // #  #  #  #  # #   ##     #    #  #  # #   #  #  #  #  #  #  
+    // #  #   ##    #     ##    #     ##   #  #   ##    ##   #  #  
     /**
      * Assigns all creeps to rally to a room.  Will go through portals if specified.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {string} roomName The name of the room to rally to.
      * @param {string} say Text to say on successful assignment.
      */
@@ -241,10 +300,17 @@ class Assign {
         });
     }
     
+    //                                  #   ##    #     #                #     
+    //                                  #  #  #   #     #                #     
+    // ###    ###  ###    ###   ##    ###  #  #  ###   ###    ###   ##   # #   
+    // #  #  #  #  #  #  #  #  # ##  #  #  ####   #     #    #  #  #     ##    
+    // #     # ##  #  #   ##   ##    #  #  #  #   #     #    # ##  #     # #   
+    // #      # #  #  #  #      ##    ###  #  #    ##    ##   # #   ##   #  #  
+    //                    ###                                                  
     /**
      * Assigns creeps to attack other creeps at range.
-     * @param {object[]} creeps The creeps to assign this task to.
-     * @param {object[]} creepsToAttack The list of creeps to attack.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToAttack The list of creeps to attack.
      * @param {string} say Text to say on successful assignment.
      */
     static rangedAttack(creeps, creepsToAttack, say) {
@@ -282,10 +348,17 @@ class Assign {
         });
     }
 
+    //              #                       #     ##                     #  #         #     #    
+    //              #                       #    #  #                    #  #               #    
+    // ###    ##   ###   ###    ##    ###  ###   #  #  ###   # #   #  #  #  #  ###   ##    ###   
+    // #  #  # ##   #    #  #  # ##  #  #   #    ####  #  #  ####  #  #  #  #  #  #   #     #    
+    // #     ##     #    #     ##    # ##   #    #  #  #     #  #   # #  #  #  #  #   #     #    
+    // #      ##     ##  #      ##    # #    ##  #  #  #     #  #    #    ##   #  #  ###     ##  
+    //                                                              #                            
     /**
      * Assigns an army unit to retreat when hurt.
-     * @param {object[]} creeps The creeps to assign this task to.
-     * @param {object[]} healers The healers to check against.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} healers The healers to check against.
      * @param {string} stageRoomName The name of the staging room.
      * @param {string} attackRoomName The name of the attack room.
      * @param {number} minHealthPercent The minimum amount a health a unit must have to not retreat.
@@ -311,10 +384,17 @@ class Assign {
         }
     }
 
+    //              #                       #     ##                     #  #         #     #     ##         #  #                    ###         #  #              ##                
+    //              #                       #    #  #                    #  #               #    #  #        ####                     #          #  #               #                
+    // ###    ##   ###   ###    ##    ###  ###   #  #  ###   # #   #  #  #  #  ###   ##    ###   #  #  ###   ####   ##   # #    ##    #     ##   ####   ##    ###   #     ##   ###   
+    // #  #  # ##   #    #  #  # ##  #  #   #    ####  #  #  ####  #  #  #  #  #  #   #     #    #  #  #  #  #  #  #  #  # #   # ##   #    #  #  #  #  # ##  #  #   #    # ##  #  #  
+    // #     ##     #    #     ##    # ##   #    #  #  #     #  #   # #  #  #  #  #   #     #    #  #  #     #  #  #  #  # #   ##     #    #  #  #  #  ##    # ##   #    ##    #     
+    // #      ##     ##  #      ##    # #    ##  #  #  #     #  #    #    ##   #  #  ###     ##   ##   #     #  #   ##    #     ##    #     ##   #  #   ##    # #  ###    ##   #     
+    //                                                              #                                                                                                                
     /**
      * Assigns an army unit to retreat when hurt or move to a healer if too far from one.
-     * @param {object[]} creeps The creeps to assign this task to.
-     * @param {object[]} healers The healers to check against.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} healers The healers to check against.
      * @param {string} stageRoomName The name of the staging room.
      * @param {string} attackRoomName The name of the attack room.
      * @param {number} minHealthPercent The minimum amount a health a unit must have to not retreat.
@@ -358,10 +438,42 @@ class Assign {
             });
         }
     }
+
+    //         #                      
+    //         #                      
+    //  ###   ###    ##   # #   ###   
+    // ##      #    #  #  ####  #  #  
+    //   ##    #    #  #  #  #  #  #  
+    // ###      ##   ##   #  #  ###   
+    //                          #     
+    /**
+     * Assign creeps to stomp out hostile construction sites.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {ConstructionSite[]} sites 
+     * @param {string} say Text to say on successful assignment.
+     */
+    static stomp(creeps, sites, say) {
+        if (sites.length === 0) {
+            return;
+        }
+
+        _.forEach(creeps, (creep) => {
+            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0]).canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
     
+    //  #                 #            
+    //  #                 #            
+    // ###    ###   ###   # #    ###   
+    //  #    #  #  ##     ##    ##     
+    //  #    # ##    ##   # #     ##   
+    //   ##   # #  ###    #  #  ###    
     /**
      * Assigns a task from a list to each creep.
-     * @param {object[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {object[]} tasks The tasks to assign.
      * @param {bool} multiAssign Assign the task to more than one creep.
      * @param {string} say Text to say on successful assignment.

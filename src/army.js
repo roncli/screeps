@@ -3,16 +3,27 @@ var Cache = require("cache"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
     RoleArmyMelee = require("role.armyMelee"),
-    RoleArmyRanged = require("role.armyRanged"),
-    TaskHeal = require("task.heal"),
-    TaskMeleeAttack = require("task.meleeAttack"),
-    TaskRally = require("task.rally"),
-    TaskRangedAttack = require("task.rangedAttack");
+    RoleArmyRanged = require("role.armyRanged");
 
+//    #                        
+//   # #                       
+//  #   #  # ##   ## #   #   # 
+//  #   #  ##  #  # # #  #   # 
+//  #####  #      # # #  #  ## 
+//  #   #  #      # # #   ## # 
+//  #   #  #      #   #      # 
+//                       #   # 
+//                        ###  
 /**
  * Represents an army.
  */
 class Army {
+    //                           #                       #                
+    //                           #                       #                
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
     /**
      * Create a new Army object.
      * @param {string} name The name of the army.
@@ -36,6 +47,10 @@ class Army {
         this.name = name;
     }
 
+    // ###   #  #  ###   
+    // #  #  #  #  #  #  
+    // #     #  #  #  #  
+    // #      ###  #  #  
     /**
      * Runs the army.
      */
@@ -46,8 +61,7 @@ class Army {
             dismantler = this.dismantler,
             healer = this.healer,
             melee = this.melee,
-            ranged = this.ranged,
-            hostileConstructionSites, tasks;
+            ranged = this.ranged;
 
         // Bail if scheduled for the future.
         if (this.scheduled && this.scheduled > Game.time) {
@@ -124,9 +138,9 @@ class Army {
         // Directive is "attack" until the army expires.
         if (this.directive === "attack") {
             if (attackRoom) {
-                hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+                this.hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
 
-                if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && hostileConstructionSites.length === 0) {
+                if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && this.hostileConstructionSites.length === 0) {
                     this.success = true;
                 }
             }
@@ -158,19 +172,11 @@ class Army {
             });
         }
 
-        // Create tasks.
-        tasks = {
-            rally: { tasks: [] }
-        };
-
         // Go after hostiles in the attack room during "dismantle" and "attack" directives, but only within 3 squares if we're dismantling.
         if (attackRoom) {
             switch (this.directive) {
                 case "attack":
                     this.hostiles = Cache.hostilesInRoom(attackRoom);
-                    if (hostileConstructionSites) {
-                        tasks.rally.tasks = _.map(hostileConstructionSites, (c) => new TaskRally(c.id));
-                    }
                     break;
                 default:
                     if (allCreepsInArmy.length > 0) {
@@ -183,12 +189,19 @@ class Army {
         }
 
         // Assign tasks.
-        RoleArmyDismantler.assignTasks(this, tasks);
-        RoleArmyHealer.assignTasks(this, tasks);
-        RoleArmyMelee.assignTasks(this, tasks);
-        RoleArmyRanged.assignTasks(this, tasks);
+        RoleArmyDismantler.assignTasks(this);
+        RoleArmyHealer.assignTasks(this);
+        RoleArmyMelee.assignTasks(this);
+        RoleArmyRanged.assignTasks(this);
     }
 
+    //       #                 #      ##                           
+    //       #                 #     #  #                          
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #  
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #  
+    //                                     #                       
     /**
      * Checks whether we should spawn for the role.
      * @param {string} role The role of the creep.
@@ -214,6 +227,13 @@ class Army {
         }
     }
 
+    //                                ####                    ###                #                
+    //                                #                       #  #                                
+    //  ###   ###    ###  #  #  ###   ###   ###    ##   # #   #  #   ##    ###  ##     ##   ###   
+    // ##     #  #  #  #  #  #  #  #  #     #  #  #  #  ####  ###   # ##  #  #   #    #  #  #  #  
+    //   ##   #  #  # ##  ####  #  #  #     #     #  #  #  #  # #   ##     ##    #    #  #  #  #  
+    // ###    ###    # #  ####  #  #  #     #      ##   #  #  #  #   ##   #     ###    ##   #  #  
+    //        #                                                            ###                    
     /**
      * Spawn a creep for this army from within the region.
      * @param {class} Role The class of the role to create the creep for.
@@ -264,6 +284,13 @@ class Army {
         return typeof name !== "number";
     }
 
+    //  #           ##   #       #   
+    //  #          #  #  #           
+    // ###    ##   #  #  ###     #   
+    //  #    #  #  #  #  #  #    #   
+    //  #    #  #  #  #  #  #    #   
+    //   ##   ##    ##   ###   # #   
+    //                          #    
     /**
      * Serializes the army to memory.
      */
@@ -292,6 +319,13 @@ class Army {
         }
     }
 
+    //   #                      ##   #       #   
+    //  # #                    #  #  #           
+    //  #    ###    ##   # #   #  #  ###     #   
+    // ###   #  #  #  #  ####  #  #  #  #    #   
+    //  #    #     #  #  #  #  #  #  #  #    #   
+    //  #    #      ##   #  #   ##   ###   # #   
+    //                                      #    
     /**
      * Deserializes the object from memory.
      * @param {string} armyName The name of the army.

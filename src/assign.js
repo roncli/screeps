@@ -1,9 +1,10 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskAttack = require("task.attack"),
+    TaskMeleeAttack = require("task.meleeAttack"),
     TaskDismantle = require("task.dismantle"),
     TaskHeal = require("task.heal"),
-    TaskRally = require("task.rally");
+    TaskRally = require("task.rally"),
+    TaskRangedAttack = require("task.rangedAttack");
 
 /**
  * A set of static functions that assigns creeps in an array to tasks.
@@ -30,7 +31,7 @@ class Assign {
             
             if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.
-                task = new TaskAttack(firstCreep.id);
+                task = new TaskMeleeAttack(firstCreep.id);
             } else {
                 let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
                 
@@ -246,7 +247,7 @@ class Assign {
      * @param {object[]} creepsToAttack The list of creeps to attack.
      * @param {string} say Text to say on successful assignment.
      */
-    static attack(creeps, creepsToAttack, say) {
+    static rangedAttack(creeps, creepsToAttack, say) {
         var firstCreep;
 
         // Bail if there are no creeps to heal.

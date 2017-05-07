@@ -64,21 +64,29 @@ class Rally {
             } else if (this.rangedHeal) {
                 // Heal a creep at range.
                 creep.rangedHeal(Game.getObjectById(this.rangedHeal));
-            } else if (this.attack) {
-                // Attack a creep.
-                creep.attack(Game.getObjectById(this.attack));
-            } else if (this.rangedAttack) {
-                // Attack a creep at range.
-                creep.rangedAttack(Game.getObjectById(this.rangedAttack));
             } else if (creep.hits < creep.hitsMax) {
                 // Heal itself.
                 creep.heal(creep);
             }
         }
-
-        // If the creep has a ranged attack part. mass attack.
+        
+        // Try to attack something.
+        if (creep.getActiveBodyparts(ATTACK) > 0) {
+            if (this.attack) {
+                // Attack a creep.
+                creep.attack(Game.getObjectById(this.attack));
+            }
+        }
+        
+        // Try to attack something at range.
         if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
-            creep.rangedMassAttack();
+            if (this.rangedAttack) {
+                // Attack a creep at range.
+                creep.rangedAttack(Game.getObjectById(this.rangedAttack));
+            } else {
+                // Mass attack.
+                creep.rangedMassAttack();
+            }
         }
     }
     

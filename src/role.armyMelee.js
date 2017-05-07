@@ -35,7 +35,7 @@ class Melee {
 
     static assignTasks(army, tasks) {
         var armyName = army.name,
-            melees = Cache.creeps[armyName] && Cache.creeps[armyName].armyHealer || [],
+            melees = Cache.creeps[armyName] && Cache.creeps[armyName].armyMelee || [],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(melees), (c) => !c.spawning),
             attackRoomName, dismantle, restPosition;
 

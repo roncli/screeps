@@ -173,7 +173,11 @@ class Army {
                     }
                     break;
                 default:
-                    this.hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
+                    if (allCreepsInArmy.length > 0) {
+                        this.hostiles = _.filter(Cache.hostilesInRoom(attackRoom), (c) => Utilities.objectsClosestToObj(allCreepsInArmy, c)[0].pos.getRangeTo(c) <= 3);
+                    } else {
+                        this.hostiles = [];
+                    }
                     break;
             }
         }

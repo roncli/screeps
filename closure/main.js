@@ -1749,7 +1749,7 @@ class Army {
         }
         if (attackRoom) {
             this.hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
-            if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && this.hostileConstructionSites.length === 0) {
+            if (this.find(FIND_HOSTILE_CREEPS).length === 0 && !this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && this.hostileConstructionSites.length === 0) {
                 this.directive = "attack";
                 this.success = true;
             }

@@ -135,14 +135,11 @@ class Army {
             }
         }
 
-        // Directive is "attack" until the army expires.
-        if (this.directive === "attack") {
-            if (attackRoom) {
-                this.hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
-
-                if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && this.hostileConstructionSites.length === 0) {
-                    this.success = true;
-                }
+        // Call success if there is nothing else to do.
+        if (attackRoom) {
+            this.hostileConstructionSites = attackRoom.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+            if (!this.reinforce && _.filter(attackRoom.find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)).length === 0 && this.hostileConstructionSites.length === 0) {
+                this.success = true;
             }
         }
 

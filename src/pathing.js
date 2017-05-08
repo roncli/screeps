@@ -161,7 +161,7 @@ class Pathing {
                             return;
                         }
 
-                        matrix = Cache.getCostMatrix(room);
+                        matrix = Cache.costMatrixForRoom(room);
 
                         if (pathing && roomName === creepRoom) {
                             _.forEach(pathing.blocked, (blocked) => {

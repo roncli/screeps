@@ -59,13 +59,6 @@ class Mine {
                 return;
             }
     
-            if (creep.harvest(source) === OK) {
-                if (Memory.rooms[creep.room.name].harvested === undefined) {
-                    Memory.rooms[creep.room.name].harvested = 30000;
-                }
-                Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
-            }
-    
             // Suicide creep if there's another one right here with a higher TTL.
             if (_.filter([].concat.apply([], [Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].miner || [], Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].remoteMiner || []]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {
                 creep.say(":(", true);

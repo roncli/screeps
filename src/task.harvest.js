@@ -40,12 +40,7 @@ class Harvest {
         
         // Move to the source and harvest it.
         Pathing.moveTo(creep, source, 1);
-        if (creep.harvest(source) === OK) {
-            if (Memory.rooms[creep.room.name].harvested === undefined) {
-                Memory.rooms[creep.room.name].harvested = 30000;
-            }
-            Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
-        } else {
+        if (creep.harvest(source) !== OK) {
             this.failIn--;
             if (this.failIn === 0) {
                 delete creep.memory.currentTask;

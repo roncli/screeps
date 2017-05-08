@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: H:\dev\git\github\screeps\src\main.js **********/
+/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
 __modules[0] = function(module, exports) {
 var profiler = __require(1,0),
     Army = __require(2,0),
@@ -1350,8 +1350,8 @@ module.exports = Main;
 
 return module.exports;
 }
-/********** End of module 0: H:\dev\git\github\screeps\src\main.js **********/
-/********** Start module 1: ..\src\screeps-profiler.js **********/
+/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 1: ../src/screeps-profiler.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.forEach = function(callback, thisArg) {
     var arr = this;
@@ -1652,8 +1652,8 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 1: ..\src\screeps-profiler.js **********/
-/********** Start module 2: ..\src\army.js **********/
+/********** End of module 1: ../src/screeps-profiler.js **********/
+/********** Start module 2: ../src/army.js **********/
 __modules[2] = function(module, exports) {
 var Cache = __require(3,2),
     Utilities = __require(10,2),
@@ -1904,52 +1904,40 @@ module.exports = Army;
 
 return module.exports;
 }
-/********** End of module 2: ..\src\army.js **********/
-/********** Start module 3: ..\src\cache.js **********/
+/********** End of module 2: ../src/army.js **********/
+/********** Start module 3: ../src/cache.js **********/
 __modules[3] = function(module, exports) {
-var spawnsInRoom = {},
-    powerSpawnsInRoom = {},
-    extensionsInRoom = {},
-    towersInRoom = {},
-    labsInRoom = {},
-    nukersInRoom = {},
-    containersInRoom = {},
-    linksInRoom = {},
-    repairableStructuresInRoom = {},
-    sortedRepairableStructuresInRoom = {},
-    extractorsInRoom = {},
-    portalsInRoom = {},
-    hostilesInRoom = {},
-    sourceKeepersInRoom = {},
-    powerBanksInRoom = {},
-    resourcesInRoom = {},
-    costMatricies = {};
-
+//   ###                 #            
+/**
+ * A class that caches data.
+ */
 class Cache {
+    /**
+     * Resets the cache.
+     */
     static reset() {
-        spawnsInRoom = {};
-        powerSpawnsInRoom = {};
-        extensionsInRoom = {};
-        towersInRoom = {};
-        labsInRoom = {};
-        nukersInRoom = {};
-        containersInRoom = {};
-        linksInRoom = {};
-        repairableStructuresInRoom = {};
-        sortedRepairableStructuresInRoom = {};
-        extractorsInRoom = {};
-        portalsInRoom = {};
-        hostilesInRoom = {};
-        sourceKeepersInRoom = {};
-        powerBanksInRoom = {};
-        resourcesInRoom = {};
-        costMatricies = {};
-        this.creepTasks = {};
-        this.rooms = {};
+        this.containers = {};
+        this.costMatrixes = {};
+        this.extensions = {};
+        this.extractors = {};
+        this.hostiles = {};
+        this.labs = {};
+        this.links = {};
+        this.nukers = {};
+        this.portals = {};
+        this.powerBanks = {};
+        this.powerSpawns = {};
+        this.repairableStructures = {};
+        this.resources = {};
+        this.sortedRepairableStructures = {};
+        this.sourceKeepers = {};
+        this.spawns = {};
+        this.towers = {};
         this.armies = {};
-        this.spawning = {};
+        this.creepTasks = {};
         this.minerals = {};
-
+        this.spawning = {};
+        this.rooms = {};
         this.log = {
             events: [],
             hostiles: [],
@@ -1959,107 +1947,33 @@ class Cache {
             rooms: {},
             army: {}
         };
-        
         this.credits = Game.market.credits;
         if (Memory.visualizations) {
             this.globalVisual = new RoomVisual();
             this.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
         }
     }
-
-    static spawnsInRoom(room) {
-        return spawnsInRoom[room.name] ? spawnsInRoom[room.name] : spawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
-    }
-
-    static powerSpawnsInRoom(room) {
-        return powerSpawnsInRoom[room.name] ? powerSpawnsInRoom[room.name] : powerSpawnsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
-    }
-
-    static extensionsInRoom(room) {
-        return extensionsInRoom[room.name] ? extensionsInRoom[room.name] : extensionsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
-    }
-
-    static towersInRoom(room) {
-        return towersInRoom[room.name] ? towersInRoom[room.name] : towersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
-    }
-
-    static labsInRoom(room) {
-        return labsInRoom[room.name] ? labsInRoom[room.name] : labsInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
-    }
-
-    static nukersInRoom(room) {
-        return nukersInRoom[room.name] ? nukersInRoom[room.name] : nukersInRoom[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
-    }
-
+    /**
+     * Caches containers in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureContainer[]} The containers in the room.
+     */
     static containersInRoom(room) {
-        return containersInRoom[room.name] ? containersInRoom[room.name] : containersInRoom[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
+        return this.containers[room.name] ? this.containers[room.name] : this.containers[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
     }
-
-    static linksInRoom(room) {
-        return linksInRoom[room.name] ? linksInRoom[room.name] : linksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
-    }
-
-    static repairableStructuresInRoom(room) {
-        return repairableStructuresInRoom[room.name] ? repairableStructuresInRoom[room.name] : repairableStructuresInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
-    }
-
-    static sortedRepairableStructuresInRoom(room) {
-        return sortedRepairableStructuresInRoom[room.name] ? sortedRepairableStructuresInRoom[room.name] : sortedRepairableStructuresInRoom[room.name] = this.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
-    }
-
-    static extractorsInRoom(room) {
-        return extractorsInRoom[room.name] ? extractorsInRoom[room.name] : extractorsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
-    }
-
-    static portalsInRoom(room) {
-        return portalsInRoom[room.name] ? portalsInRoom[room.name] : portalsInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
-    }
-
-    static hostilesInRoom(room) {
-        var roomName = room.name,
-            hostiles;
-
-        if (!room || room.unobservable) {
-            return [];
-        }
-
-        hostiles = hostilesInRoom[room.name] ? hostilesInRoom[room.name] : hostilesInRoom[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
-
-        if (!Memory.rooms[roomName].hostiles) {
-            Memory.rooms[roomName].hostiles = [];
-        }
-
-        _.forEach(hostiles, (hostile) => {
-            if (Memory.rooms[roomName].hostiles.indexOf(hostile.id) !== -1) {
-                Memory.rooms[roomName].harvested = 0;
-            }
-        });
-
-        room.memory.hostiles = _.map(hostiles, (h) => h.id);
-
-        return hostiles;
-    }
-
-    static sourceKeepersInRoom(room) {
-        return sourceKeepersInRoom[room.name] ? sourceKeepersInRoom[room.name] : sourceKeepersInRoom[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
-    }
-
-    static powerBanksInRoom(room) {
-        return powerBanksInRoom[room.name] ? powerBanksInRoom[room.name] : powerBanksInRoom[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
-    }
-    
-    static resourcesInRoom(room) {
-        return resourcesInRoom[room.name] ? resourcesInRoom[room.name] : resourcesInRoom[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount);
-    }
-
-    static getCostMatrix(room) {
+    /**
+     * Caches the cost matrix for a room.
+     * @param {Room} room The room to cache for.
+     * @return {CostMatrix} The cost matrix for the room.
+     */
+    static costMatrixForRoom(room) {
         var roomName = room.name;
 
         if (!room || room.unobservable) {
             return new PathFinder.CostMatrix();
         }
 
-        if (!costMatricies[roomName]) {
+        if (!this.costMatrixes[roomName]) {
             let matrix = new PathFinder.CostMatrix();
 
             _.forEach(room.find(FIND_STRUCTURES), (structure) => {
@@ -2091,11 +2005,147 @@ class Cache {
                 });
             }
             
-            costMatricies[roomName] = matrix;
+            this.costMatrixes[roomName] = matrix;
         }
         
-        return costMatricies[roomName];
+        return this.costMatrixes[roomName];
     }
+    /**
+     * Caches extensions in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureExtension[]} The extensions in the room.
+     */
+    static extensionsInRoom(room) {
+        return this.extensions[room.name] ? this.extensions[room.name] : this.extensions[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
+    }
+    /**
+     * Caches extractors in a room.
+     * @param {Room} room The room to cache for.
+     * @return {Structure[]} The extractors in the room.
+     */
+    static extractorsInRoom(room) {
+        return this.extractors[room.name] ? this.extractors[room.name] : this.extractors[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
+    }
+    /**
+     * Caches hostiles in a room.  Allies are excluded.
+     * @param {Room} room The room to cache for.
+     * @return {Creep[]} The hostiles in the room.
+     */
+    static hostilesInRoom(room) {
+        var hostiles, memory;
+
+        if (!room || room.unobservable) {
+            return [];
+        }
+
+        hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
+        memory = room.memory;
+
+        if (!memory.hostiles) {
+            memory.hostiles = [];
+        }
+
+        memory.hostiles = _.map(hostiles, (h) => h.id);
+
+        return hostiles;
+    }
+    /**
+     * Caches labs in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureLab[]} The labs in the room.
+     */
+    static labsInRoom(room) {
+        return this.labs[room.name] ? this.labs[room.name] : this.labs[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
+    }
+    /**
+     * Caches links in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureLink[]} The links in the room.
+     */
+    static linksInRoom(room) {
+        return this.links[room.name] ? this.links[room.name] : this.links[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
+    }
+    /**
+     * Caches nukers in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureNuker[]} The nukers in the room.
+     */
+    static nukersInRoom(room) {
+        return this.nukers[room.name] ? this.nukers[room.name] : this.nukers[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
+    }
+    /**
+     * Caches portals in a room.
+     * @param {Room} room The room to cache for.
+     * @return {Structure[]} The portals in the room.
+     */
+    static portalsInRoom(room) {
+        return this.portals[room.name] ? this.portals[room.name] : this.portals[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
+    }
+    /**
+     * Caches power banks in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructurePowerBank[]} The power banks in the room.
+     */
+    static powerBanksInRoom(room) {
+        return this.powerBanks[room.name] ? this.powerBanks[room.name] : this.powerBanks[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
+    }
+    /**
+     * Caches power spawns in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructurePowerSpawn[]} The power spawns in the room.
+     */
+    static powerSpawnsInRoom(room) {
+        return this.powerSpawns[room.name] ? this.powerSpawns[room.name] : this.powerSpawns[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
+    }
+    /**
+     * Caches repairable structures in a room.
+     * @param {Room} room The room to cache for.
+     * @return {Structure[]} The structures in the room.
+     */
+    static repairableStructuresInRoom(room) {
+        return this.repairableStructures[room.name] ? this.repairableStructures[room.name] : this.repairableStructures[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
+    }
+    /**
+     * Caches repairable structures in a room, sorted by hits ascending.
+     * @param {Room} room The room to cache for.
+     * @return {Structure[]} The structures in the room.
+     */
+    static sortedRepairableStructuresInRoom(room) {
+        return this.sortedRepairableStructures[room.name] ? this.sortedRepairableStructures[room.name] : this.sortedRepairableStructures[room.name] = this.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
+    }
+    /**
+     * Caches source keepers in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureKeeperLair[]} The source keepers in the room.
+     */
+    static sourceKeepersInRoom(room) {
+        return this.sourceKeepers[room.name] ? this.sourceKeepers[room.name] : this.sourceKeepers[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
+    }
+    /**
+     * Caches spawns in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureSpawn[]} The spawns in the room.
+     */
+    static spawnsInRoom(room) {
+        return this.spawns[room.name] ? this.spawns[room.name] : this.spawns[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
+    }
+    /**
+     * Caches towers in a room.
+     * @param {Room} room The room to cache for.
+     * @return {StructureTower[]} The towers in the room.
+     */
+    static towersInRoom(room) {
+        return this.towers[room.name] ? this.towers[room.name] : this.towers[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
+    }
+    /**
+     * Caches resources in a room.
+     * @param {Room} room The room to cache for.
+     * @return {Resource[]} The resources in the room.
+     */
+    static resourcesInRoom(room) {
+        return this.resources[room.name] ? this.resources[room.name] : this.resources[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => b.amount - a.amount);
+    }
+
 }
 
 if (Memory.profiling) {
@@ -2105,8 +2155,8 @@ module.exports = Cache;
 
 return module.exports;
 }
-/********** End of module 3: ..\src\cache.js **********/
-/********** Start module 4: ..\src\commands.js **********/
+/********** End of module 3: ../src/cache.js **********/
+/********** Start module 4: ../src/commands.js **********/
 __modules[4] = function(module, exports) {
 var Cache = __require(3,4);
 
@@ -2257,8 +2307,8 @@ module.exports = Commands;
 
 return module.exports;
 }
-/********** End of module 4: ..\src\commands.js **********/
-/********** Start module 5: ..\src\drawing.js **********/
+/********** End of module 4: ../src/commands.js **********/
+/********** Start module 5: ../src/drawing.js **********/
 __modules[5] = function(module, exports) {
 class Drawing {
     static progressBar(visual, x, y, w, h, value, max, options) {
@@ -2512,8 +2562,8 @@ module.exports = Drawing;
 
 return module.exports;
 }
-/********** End of module 5: ..\src\drawing.js **********/
-/********** Start module 6: ..\src\market.js **********/
+/********** End of module 5: ../src/drawing.js **********/
+/********** Start module 6: ../src/market.js **********/
 __modules[6] = function(module, exports) {
 var Cache = __require(3,6),
     Utilities = __require(10,6);
@@ -2579,8 +2629,8 @@ module.exports = Market;
 
 return module.exports;
 }
-/********** End of module 6: ..\src\market.js **********/
-/********** Start module 7: ..\src\minerals.js **********/
+/********** End of module 6: ../src/market.js **********/
+/********** Start module 7: ../src/minerals.js **********/
 __modules[7] = function(module, exports) {
 var Minerals = {};
 
@@ -2630,8 +2680,8 @@ module.exports = Minerals;
 
 return module.exports;
 }
-/********** End of module 7: ..\src\minerals.js **********/
-/********** Start module 8: ..\src\proxy.js **********/
+/********** End of module 7: ../src/minerals.js **********/
+/********** Start module 8: ../src/proxy.js **********/
 __modules[8] = function(module, exports) {
 /**
  * A way to proxy calls so the profiler picks them up.
@@ -2652,8 +2702,8 @@ module.exports = Proxy;
 
 return module.exports;
 }
-/********** End of module 8: ..\src\proxy.js **********/
-/********** Start module 9: ..\src\segment.js **********/
+/********** End of module 8: ../src/proxy.js **********/
+/********** Start module 9: ../src/segment.js **********/
 __modules[9] = function(module, exports) {
 var memory = [];
 
@@ -2694,8 +2744,8 @@ module.exports = Segment;
 
 return module.exports;
 }
-/********** End of module 9: ..\src\segment.js **********/
-/********** Start module 10: ..\src\utilities.js **********/
+/********** End of module 9: ../src/segment.js **********/
+/********** Start module 10: ../src/utilities.js **********/
 __modules[10] = function(module, exports) {
 var Cache = __require(3,10);
 
@@ -2957,8 +3007,8 @@ module.exports = Utilities;
 
 return module.exports;
 }
-/********** End of module 10: ..\src\utilities.js **********/
-/********** Start module 11: ..\src\role.armyDismantler.js **********/
+/********** End of module 10: ../src/utilities.js **********/
+/********** Start module 11: ../src/role.armyDismantler.js **********/
 __modules[11] = function(module, exports) {
 var Assign = __require(56,11),
     Cache = __require(3,11),
@@ -3105,8 +3155,8 @@ module.exports = RoleArmyDismantler;
 
 return module.exports;
 }
-/********** End of module 11: ..\src\role.armyDismantler.js **********/
-/********** Start module 12: ..\src\role.armyHealer.js **********/
+/********** End of module 11: ../src/role.armyDismantler.js **********/
+/********** Start module 12: ../src/role.armyHealer.js **********/
 __modules[12] = function(module, exports) {
 var Assign = __require(56,12),
     Cache = __require(3,12),
@@ -3285,8 +3335,8 @@ module.exports = RoleArmyHealer;
 
 return module.exports;
 }
-/********** End of module 12: ..\src\role.armyHealer.js **********/
-/********** Start module 13: ..\src\role.armyMelee.js **********/
+/********** End of module 12: ../src/role.armyHealer.js **********/
+/********** Start module 13: ../src/role.armyMelee.js **********/
 __modules[13] = function(module, exports) {
 var Assign = __require(56,13),
     Cache = __require(3,13),
@@ -3453,8 +3503,8 @@ module.exports = RoleArmyMelee;
 
 return module.exports;
 }
-/********** End of module 13: ..\src\role.armyMelee.js **********/
-/********** Start module 14: ..\src\role.armyRanged.js **********/
+/********** End of module 13: ../src/role.armyMelee.js **********/
+/********** Start module 14: ../src/role.armyRanged.js **********/
 __modules[14] = function(module, exports) {
 var Assign = __require(56,14),
     Cache = __require(3,14),
@@ -3636,8 +3686,8 @@ module.exports = RoleArmyRanged;
 
 return module.exports;
 }
-/********** End of module 14: ..\src\role.armyRanged.js **********/
-/********** Start module 15: ..\src\role.claimer.js **********/
+/********** End of module 14: ../src/role.armyRanged.js **********/
+/********** Start module 15: ../src/role.claimer.js **********/
 __modules[15] = function(module, exports) {
 var Cache = __require(3,15),
     Commands = __require(4,15),
@@ -3740,8 +3790,8 @@ module.exports = Claimer;
 
 return module.exports;
 }
-/********** End of module 15: ..\src\role.claimer.js **********/
-/********** Start module 16: ..\src\role.collector.js **********/
+/********** End of module 15: ../src/role.claimer.js **********/
+/********** Start module 16: ../src/role.collector.js **********/
 __modules[16] = function(module, exports) {
 var Cache = __require(3,16),
     Utilities = __require(10,16),
@@ -4062,8 +4112,8 @@ module.exports = Collector;
 
 return module.exports;
 }
-/********** End of module 16: ..\src\role.collector.js **********/
-/********** Start module 17: ..\src\role.converter.js **********/
+/********** End of module 16: ../src/role.collector.js **********/
+/********** Start module 17: ../src/role.converter.js **********/
 __modules[17] = function(module, exports) {
 var Cache = __require(3,17),
     Commands = __require(4,17),
@@ -4179,8 +4229,8 @@ module.exports = Converter;
 
 return module.exports;
 }
-/********** End of module 17: ..\src\role.converter.js **********/
-/********** Start module 18: ..\src\role.defender.js **********/
+/********** End of module 17: ../src/role.converter.js **********/
+/********** Start module 18: ../src/role.defender.js **********/
 __modules[18] = function(module, exports) {
 var Cache = __require(3,18),
     Utilities = __require(10,18),
@@ -4286,8 +4336,8 @@ module.exports = Defender;
 
 return module.exports;
 }
-/********** End of module 18: ..\src\role.defender.js **********/
-/********** Start module 19: ..\src\role.dismantler.js **********/
+/********** End of module 18: ../src/role.defender.js **********/
+/********** Start module 19: ../src/role.dismantler.js **********/
 __modules[19] = function(module, exports) {
 var Cache = __require(3,19),
     Utilities = __require(10,19),
@@ -4513,8 +4563,8 @@ module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 19: ..\src\role.dismantler.js **********/
-/********** Start module 20: ..\src\role.healer.js **********/
+/********** End of module 19: ../src/role.dismantler.js **********/
+/********** Start module 20: ../src/role.healer.js **********/
 __modules[20] = function(module, exports) {
 var Cache = __require(3,20),
     Utilities = __require(10,20),
@@ -4621,8 +4671,8 @@ module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 20: ..\src\role.healer.js **********/
-/********** Start module 21: ..\src\role.miner.js **********/
+/********** End of module 20: ../src/role.healer.js **********/
+/********** Start module 21: ../src/role.miner.js **********/
 __modules[21] = function(module, exports) {
 var Cache = __require(3,21),
     Utilities = __require(10,21),
@@ -4753,8 +4803,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 21: ..\src\role.miner.js **********/
-/********** Start module 22: ..\src\role.remoteBuilder.js **********/
+/********** End of module 21: ../src/role.miner.js **********/
+/********** Start module 22: ../src/role.remoteBuilder.js **********/
 __modules[22] = function(module, exports) {
 var Cache = __require(3,22),
     Utilities = __require(10,22),
@@ -4950,8 +5000,8 @@ module.exports = Builder;
 
 return module.exports;
 }
-/********** End of module 22: ..\src\role.remoteBuilder.js **********/
-/********** Start module 23: ..\src\role.remoteCollector.js **********/
+/********** End of module 22: ../src/role.remoteBuilder.js **********/
+/********** Start module 23: ../src/role.remoteCollector.js **********/
 __modules[23] = function(module, exports) {
 var Cache = __require(3,23),
     Utilities = __require(10,23),
@@ -5172,8 +5222,8 @@ module.exports = RemoteCollector;
 
 return module.exports;
 }
-/********** End of module 23: ..\src\role.remoteCollector.js **********/
-/********** Start module 24: ..\src\role.remoteDismantler.js **********/
+/********** End of module 23: ../src/role.remoteCollector.js **********/
+/********** Start module 24: ../src/role.remoteDismantler.js **********/
 __modules[24] = function(module, exports) {
 var Cache = __require(3,24),
     Utilities = __require(10,24),
@@ -5290,8 +5340,8 @@ module.exports = RemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 24: ..\src\role.remoteDismantler.js **********/
-/********** Start module 25: ..\src\role.remoteMiner.js **********/
+/********** End of module 24: ../src/role.remoteDismantler.js **********/
+/********** Start module 25: ../src/role.remoteMiner.js **********/
 __modules[25] = function(module, exports) {
 var Cache = __require(3,25),
     Utilities = __require(10,25),
@@ -5435,8 +5485,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 25: ..\src\role.remoteMiner.js **********/
-/********** Start module 26: ..\src\role.remoteReserver.js **********/
+/********** End of module 25: ../src/role.remoteMiner.js **********/
+/********** Start module 26: ../src/role.remoteReserver.js **********/
 __modules[26] = function(module, exports) {
 var Cache = __require(3,26),
     Commands = __require(4,26),
@@ -5572,8 +5622,8 @@ module.exports = Reserver;
 
 return module.exports;
 }
-/********** End of module 26: ..\src\role.remoteReserver.js **********/
-/********** Start module 27: ..\src\role.remoteStorer.js **********/
+/********** End of module 26: ../src/role.remoteReserver.js **********/
+/********** Start module 27: ../src/role.remoteStorer.js **********/
 __modules[27] = function(module, exports) {
 var Cache = __require(3,27),
     Utilities = __require(10,27),
@@ -5816,8 +5866,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 27: ..\src\role.remoteStorer.js **********/
-/********** Start module 28: ..\src\role.remoteWorker.js **********/
+/********** End of module 27: ../src/role.remoteStorer.js **********/
+/********** Start module 28: ../src/role.remoteWorker.js **********/
 __modules[28] = function(module, exports) {
 var Cache = __require(3,28),
     Utilities = __require(10,28),
@@ -6117,8 +6167,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 28: ..\src\role.remoteWorker.js **********/
-/********** Start module 29: ..\src\role.scientist.js **********/
+/********** End of module 28: ../src/role.remoteWorker.js **********/
+/********** Start module 29: ../src/role.scientist.js **********/
 __modules[29] = function(module, exports) {
 var Cache = __require(3,29),
     Utilities = __require(10,29),
@@ -6535,8 +6585,8 @@ module.exports = Scientist;
 
 return module.exports;
 }
-/********** End of module 29: ..\src\role.scientist.js **********/
-/********** Start module 30: ..\src\role.storer.js **********/
+/********** End of module 29: ../src/role.scientist.js **********/
+/********** Start module 30: ../src/role.storer.js **********/
 __modules[30] = function(module, exports) {
 var Cache = __require(3,30),
     Utilities = __require(10,30),
@@ -6835,8 +6885,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 30: ..\src\role.storer.js **********/
-/********** Start module 31: ..\src\role.tower.js **********/
+/********** End of module 30: ../src/role.storer.js **********/
+/********** Start module 31: ../src/role.tower.js **********/
 __modules[31] = function(module, exports) {
 var Cache = __require(3,31);
 
@@ -6870,8 +6920,8 @@ module.exports = Tower;
 
 return module.exports;
 }
-/********** End of module 31: ..\src\role.tower.js **********/
-/********** Start module 32: ..\src\role.upgrader.js **********/
+/********** End of module 31: ../src/role.tower.js **********/
+/********** Start module 32: ../src/role.upgrader.js **********/
 __modules[32] = function(module, exports) {
 var Cache = __require(3,32),
     Utilities = __require(10,32),
@@ -7143,8 +7193,8 @@ module.exports = Upgrader;
 
 return module.exports;
 }
-/********** End of module 32: ..\src\role.upgrader.js **********/
-/********** Start module 33: ..\src\role.worker.js **********/
+/********** End of module 32: ../src/role.upgrader.js **********/
+/********** Start module 33: ../src/role.worker.js **********/
 __modules[33] = function(module, exports) {
 var Cache = __require(3,33),
     Utilities = __require(10,33),
@@ -7574,8 +7624,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 33: ..\src\role.worker.js **********/
-/********** Start module 34: ..\src\room.base.js **********/
+/********** End of module 33: ../src/role.worker.js **********/
+/********** Start module 34: ../src/room.base.js **********/
 __modules[34] = function(module, exports) {
 var Cache = __require(3,34),
     Commands = __require(4,34),
@@ -8336,8 +8386,8 @@ module.exports = Base;
 
 return module.exports;
 }
-/********** End of module 34: ..\src\room.base.js **********/
-/********** Start module 35: ..\src\room.cleanup.js **********/
+/********** End of module 34: ../src/room.base.js **********/
+/********** Start module 35: ../src/room.cleanup.js **********/
 __modules[35] = function(module, exports) {
 var Cache = __require(3,35),
     Commands = __require(4,35),
@@ -8455,8 +8505,8 @@ module.exports = Cleanup;
 
 return module.exports;
 }
-/********** End of module 35: ..\src\room.cleanup.js **********/
-/********** Start module 36: ..\src\room.mine.js **********/
+/********** End of module 35: ../src/room.cleanup.js **********/
+/********** Start module 36: ../src/room.mine.js **********/
 __modules[36] = function(module, exports) {
 var Cache = __require(3,36),
     Commands = __require(4,36),
@@ -8767,8 +8817,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 36: ..\src\room.mine.js **********/
-/********** Start module 37: ..\src\room.source.js **********/
+/********** End of module 36: ../src/room.mine.js **********/
+/********** Start module 37: ../src/room.source.js **********/
 __modules[37] = function(module, exports) {
 var Cache = __require(3,37),
     Commands = __require(4,37),
@@ -9058,8 +9108,8 @@ module.exports = Source;
 
 return module.exports;
 }
-/********** End of module 37: ..\src\room.source.js **********/
-/********** Start module 38: ..\src\task.attack.js **********/
+/********** End of module 37: ../src/room.source.js **********/
+/********** Start module 38: ../src/task.attack.js **********/
 __modules[38] = function(module, exports) {
 var Cache = __require(3,38),
     Pathing = __require(57,38);
@@ -9118,8 +9168,8 @@ module.exports = Attack;
 
 return module.exports;
 }
-/********** End of module 38: ..\src\task.attack.js **********/
-/********** Start module 39: ..\src\task.build.js **********/
+/********** End of module 38: ../src/task.attack.js **********/
+/********** Start module 39: ../src/task.build.js **********/
 __modules[39] = function(module, exports) {
 var Cache = __require(3,39),
     Pathing = __require(57,39);
@@ -9188,8 +9238,8 @@ module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 39: ..\src\task.build.js **********/
-/********** Start module 40: ..\src\task.claim.js **********/
+/********** End of module 39: ../src/task.build.js **********/
+/********** Start module 40: ../src/task.claim.js **********/
 __modules[40] = function(module, exports) {
 var Cache = __require(3,40),
     Pathing = __require(57,40);
@@ -9248,8 +9298,8 @@ module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 40: ..\src\task.claim.js **********/
-/********** Start module 41: ..\src\task.collectEnergy.js **********/
+/********** End of module 40: ../src/task.claim.js **********/
+/********** Start module 41: ../src/task.collectEnergy.js **********/
 __modules[41] = function(module, exports) {
 var Cache = __require(3,41),
     Pathing = __require(57,41);
@@ -9359,8 +9409,8 @@ module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 41: ..\src\task.collectEnergy.js **********/
-/********** Start module 42: ..\src\task.collectMinerals.js **********/
+/********** End of module 41: ../src/task.collectEnergy.js **********/
+/********** Start module 42: ../src/task.collectMinerals.js **********/
 __modules[42] = function(module, exports) {
 var Cache = __require(3,42),
     Pathing = __require(57,42),
@@ -9606,8 +9656,8 @@ module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 42: ..\src\task.collectMinerals.js **********/
-/********** Start module 43: ..\src\task.dismantle.js **********/
+/********** End of module 42: ../src/task.collectMinerals.js **********/
+/********** Start module 43: ../src/task.dismantle.js **********/
 __modules[43] = function(module, exports) {
 var Cache = __require(3,43),
     Pathing = __require(57,43);
@@ -9676,8 +9726,8 @@ module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 43: ..\src\task.dismantle.js **********/
-/********** Start module 44: ..\src\task.fillEnergy.js **********/
+/********** End of module 43: ../src/task.dismantle.js **********/
+/********** Start module 44: ../src/task.fillEnergy.js **********/
 __modules[44] = function(module, exports) {
 var Cache = __require(3,44),
     Pathing = __require(57,44),
@@ -9828,8 +9878,8 @@ module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 44: ..\src\task.fillEnergy.js **********/
-/********** Start module 45: ..\src\task.fillMinerals.js **********/
+/********** End of module 44: ../src/task.fillEnergy.js **********/
+/********** Start module 45: ../src/task.fillMinerals.js **********/
 __modules[45] = function(module, exports) {
 var Cache = __require(3,45),
     Pathing = __require(57,45),
@@ -10033,8 +10083,8 @@ module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 45: ..\src\task.fillMinerals.js **********/
-/********** Start module 46: ..\src\task.harvest.js **********/
+/********** End of module 45: ../src/task.fillMinerals.js **********/
+/********** Start module 46: ../src/task.harvest.js **********/
 __modules[46] = function(module, exports) {
 var Cache = __require(3,46),
     Pathing = __require(57,46);
@@ -10074,12 +10124,7 @@ class Harvest {
             return;
         }
         Pathing.moveTo(creep, source, 1);
-        if (creep.harvest(source) === OK) {
-            if (Memory.rooms[creep.room.name].harvested === undefined) {
-                Memory.rooms[creep.room.name].harvested = 30000;
-            }
-            Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
-        } else {
+        if (creep.harvest(source) !== OK) {
             this.failIn--;
             if (this.failIn === 0) {
                 delete creep.memory.currentTask;
@@ -10111,8 +10156,8 @@ module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 46: ..\src\task.harvest.js **********/
-/********** Start module 47: ..\src\task.heal.js **********/
+/********** End of module 46: ../src/task.harvest.js **********/
+/********** Start module 47: ../src/task.heal.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(3,47),
     Pathing = __require(57,47);
@@ -10191,8 +10236,8 @@ module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 47: ..\src\task.heal.js **********/
-/********** Start module 48: ..\src\task.meleeAttack.js **********/
+/********** End of module 47: ../src/task.heal.js **********/
+/********** Start module 48: ../src/task.meleeAttack.js **********/
 __modules[48] = function(module, exports) {
 var Cache = __require(3,48),
     Pathing = __require(57,48);
@@ -10267,8 +10312,8 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 48: ..\src\task.meleeAttack.js **********/
-/********** Start module 49: ..\src\task.mine.js **********/
+/********** End of module 48: ../src/task.meleeAttack.js **********/
+/********** Start module 49: ../src/task.mine.js **********/
 __modules[49] = function(module, exports) {
 var Cache = __require(3,49),
     Pathing = __require(57,49),
@@ -10322,13 +10367,6 @@ class Mine {
             if (source instanceof Mineral && _.sum(container.store) >= 1500) {
                 return;
             }
-    
-            if (creep.harvest(source) === OK) {
-                if (Memory.rooms[creep.room.name].harvested === undefined) {
-                    Memory.rooms[creep.room.name].harvested = 30000;
-                }
-                Memory.rooms[creep.room.name].harvested += (creep.getActiveBodyparts(WORK) * 2);
-            }
             if (_.filter([].concat.apply([], [Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].miner || [], Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].remoteMiner || []]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {
                 creep.say(":(", true);
                 creep.suicide();
@@ -10359,8 +10397,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 49: ..\src\task.mine.js **********/
-/********** Start module 50: ..\src\task.pickupResource.js **********/
+/********** End of module 49: ../src/task.mine.js **********/
+/********** Start module 50: ../src/task.pickupResource.js **********/
 __modules[50] = function(module, exports) {
 var Cache = __require(3,50),
     TaskCollectEnergy = __require(41,50),
@@ -10436,8 +10474,8 @@ module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 50: ..\src\task.pickupResource.js **********/
-/********** Start module 51: ..\src\task.rally.js **********/
+/********** End of module 50: ../src/task.pickupResource.js **********/
+/********** Start module 51: ../src/task.rally.js **********/
 __modules[51] = function(module, exports) {
 var Cache = __require(3,51),
     Pathing = __require(57,51);
@@ -10570,8 +10608,8 @@ module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 51: ..\src\task.rally.js **********/
-/********** Start module 52: ..\src\task.rangedAttack.js **********/
+/********** End of module 51: ../src/task.rally.js **********/
+/********** Start module 52: ../src/task.rangedAttack.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(3,52),
     Pathing = __require(57,52);
@@ -10655,8 +10693,8 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 52: ..\src\task.rangedAttack.js **********/
-/********** Start module 53: ..\src\task.repair.js **********/
+/********** End of module 52: ../src/task.rangedAttack.js **********/
+/********** Start module 53: ../src/task.repair.js **********/
 __modules[53] = function(module, exports) {
 var Cache = __require(3,53),
     Pathing = __require(57,53);
@@ -10736,8 +10774,8 @@ module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 53: ..\src\task.repair.js **********/
-/********** Start module 54: ..\src\task.reserve.js **********/
+/********** End of module 53: ../src/task.repair.js **********/
+/********** Start module 54: ../src/task.reserve.js **********/
 __modules[54] = function(module, exports) {
 var Cache = __require(3,54),
     Pathing = __require(57,54);
@@ -10807,8 +10845,8 @@ module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 54: ..\src\task.reserve.js **********/
-/********** Start module 55: ..\src\task.upgradeController.js **********/
+/********** End of module 54: ../src/task.reserve.js **********/
+/********** Start module 55: ../src/task.upgradeController.js **********/
 __modules[55] = function(module, exports) {
 var Cache = __require(3,55),
     Pathing = __require(57,55),
@@ -10921,8 +10959,8 @@ module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 55: ..\src\task.upgradeController.js **********/
-/********** Start module 56: ..\src\assign.js **********/
+/********** End of module 55: ../src/task.upgradeController.js **********/
+/********** Start module 56: ../src/assign.js **********/
 __modules[56] = function(module, exports) {
 var Cache = __require(3,56),
     Utilities = __require(10,56),
@@ -11267,8 +11305,8 @@ module.exports = Assign;
 
 return module.exports;
 }
-/********** End of module 56: ..\src\assign.js **********/
-/********** Start module 57: ..\src\pathing.js **********/
+/********** End of module 56: ../src/assign.js **********/
+/********** Start module 57: ../src/pathing.js **********/
 __modules[57] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
@@ -11411,7 +11449,7 @@ class Pathing {
                             return;
                         }
 
-                        matrix = Cache.getCostMatrix(room);
+                        matrix = Cache.costMatrixForRoom(room);
 
                         if (pathing && roomName === creepRoom) {
                             _.forEach(pathing.blocked, (blocked) => {
@@ -11539,7 +11577,7 @@ module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 57: ..\src\pathing.js **********/
+/********** End of module 57: ../src/pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

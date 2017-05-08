@@ -6619,18 +6619,6 @@ class Scientist {
         if (creepsWithNoTask.length === 0) {
             return;
         }
-        if (room.storage && room.storage.store[RESOURCE_ENERGY] <= 25000) {
-            var powerSpawns = Cache.powerSpawnsInRoom(room);
-
-            if (powerSpawns.length > 0) {
-                if (new TaskCollectEnergy(powerSpawns[0].id).canAssign(creepsWithNoTask[0])) {
-                    assigned.push(creepsWithNoTask[0].name);
-                }
-
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        }
         if (tasks.collectEnergy.terminalTask) {
             _.forEach(creepsWithNoTask, (creep) => {
                 if (tasks.collectEnergy.terminalTask.canAssign(creep)) {

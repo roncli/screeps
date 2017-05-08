@@ -58,7 +58,9 @@ class Mine {
             if (source instanceof Mineral && _.sum(container.store) >= 1500) {
                 return;
             }
-    
+
+            creep.harvest(source);
+
             // Suicide creep if there's another one right here with a higher TTL.
             if (_.filter([].concat.apply([], [Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].miner || [], Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].remoteMiner || []]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {
                 creep.say(":(", true);

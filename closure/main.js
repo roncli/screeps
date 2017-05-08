@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 0: H:\dev\git\github\screeps\src\main.js **********/
 __modules[0] = function(module, exports) {
 var profiler = __require(1,0),
     Army = __require(2,0),
@@ -1350,8 +1350,8 @@ module.exports = Main;
 
 return module.exports;
 }
-/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
-/********** Start module 1: ../src/screeps-profiler.js **********/
+/********** End of module 0: H:\dev\git\github\screeps\src\main.js **********/
+/********** Start module 1: ..\src\screeps-profiler.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.forEach = function(callback, thisArg) {
     var arr = this;
@@ -1652,8 +1652,8 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 1: ../src/screeps-profiler.js **********/
-/********** Start module 2: ../src/army.js **********/
+/********** End of module 1: ..\src\screeps-profiler.js **********/
+/********** Start module 2: ..\src\army.js **********/
 __modules[2] = function(module, exports) {
 var Cache = __require(3,2),
     Utilities = __require(10,2),
@@ -1904,8 +1904,8 @@ module.exports = Army;
 
 return module.exports;
 }
-/********** End of module 2: ../src/army.js **********/
-/********** Start module 3: ../src/cache.js **********/
+/********** End of module 2: ..\src\army.js **********/
+/********** Start module 3: ..\src\cache.js **********/
 __modules[3] = function(module, exports) {
 //   ###                 #            
 /**
@@ -2155,8 +2155,8 @@ module.exports = Cache;
 
 return module.exports;
 }
-/********** End of module 3: ../src/cache.js **********/
-/********** Start module 4: ../src/commands.js **********/
+/********** End of module 3: ..\src\cache.js **********/
+/********** Start module 4: ..\src\commands.js **********/
 __modules[4] = function(module, exports) {
 var Cache = __require(3,4);
 /**
@@ -2381,8 +2381,8 @@ module.exports = Commands;
 
 return module.exports;
 }
-/********** End of module 4: ../src/commands.js **********/
-/********** Start module 5: ../src/drawing.js **********/
+/********** End of module 4: ..\src\commands.js **********/
+/********** Start module 5: ..\src\drawing.js **********/
 __modules[5] = function(module, exports) {
 class Drawing {
     static progressBar(visual, x, y, w, h, value, max, options) {
@@ -2636,8 +2636,8 @@ module.exports = Drawing;
 
 return module.exports;
 }
-/********** End of module 5: ../src/drawing.js **********/
-/********** Start module 6: ../src/market.js **********/
+/********** End of module 5: ..\src\drawing.js **********/
+/********** Start module 6: ..\src\market.js **********/
 __modules[6] = function(module, exports) {
 var Cache = __require(3,6),
     Utilities = __require(10,6);
@@ -2703,8 +2703,8 @@ module.exports = Market;
 
 return module.exports;
 }
-/********** End of module 6: ../src/market.js **********/
-/********** Start module 7: ../src/minerals.js **********/
+/********** End of module 6: ..\src\market.js **********/
+/********** Start module 7: ..\src\minerals.js **********/
 __modules[7] = function(module, exports) {
 var Minerals = {};
 
@@ -2754,8 +2754,8 @@ module.exports = Minerals;
 
 return module.exports;
 }
-/********** End of module 7: ../src/minerals.js **********/
-/********** Start module 8: ../src/proxy.js **********/
+/********** End of module 7: ..\src\minerals.js **********/
+/********** Start module 8: ..\src\proxy.js **********/
 __modules[8] = function(module, exports) {
 /**
  * A way to proxy calls so the profiler picks them up.
@@ -2776,8 +2776,8 @@ module.exports = Proxy;
 
 return module.exports;
 }
-/********** End of module 8: ../src/proxy.js **********/
-/********** Start module 9: ../src/segment.js **********/
+/********** End of module 8: ..\src\proxy.js **********/
+/********** Start module 9: ..\src\segment.js **********/
 __modules[9] = function(module, exports) {
 var memory = [];
 
@@ -2818,8 +2818,8 @@ module.exports = Segment;
 
 return module.exports;
 }
-/********** End of module 9: ../src/segment.js **********/
-/********** Start module 10: ../src/utilities.js **********/
+/********** End of module 9: ..\src\segment.js **********/
+/********** Start module 10: ..\src\utilities.js **********/
 __modules[10] = function(module, exports) {
 var Cache = __require(3,10);
 
@@ -3081,8 +3081,8 @@ module.exports = Utilities;
 
 return module.exports;
 }
-/********** End of module 10: ../src/utilities.js **********/
-/********** Start module 11: ../src/role.armyDismantler.js **********/
+/********** End of module 10: ..\src\utilities.js **********/
+/********** Start module 11: ..\src\role.armyDismantler.js **********/
 __modules[11] = function(module, exports) {
 var Assign = __require(56,11),
     Cache = __require(3,11),
@@ -3229,8 +3229,8 @@ module.exports = RoleArmyDismantler;
 
 return module.exports;
 }
-/********** End of module 11: ../src/role.armyDismantler.js **********/
-/********** Start module 12: ../src/role.armyHealer.js **********/
+/********** End of module 11: ..\src\role.armyDismantler.js **********/
+/********** Start module 12: ..\src\role.armyHealer.js **********/
 __modules[12] = function(module, exports) {
 var Assign = __require(56,12),
     Cache = __require(3,12),
@@ -3409,8 +3409,8 @@ module.exports = RoleArmyHealer;
 
 return module.exports;
 }
-/********** End of module 12: ../src/role.armyHealer.js **********/
-/********** Start module 13: ../src/role.armyMelee.js **********/
+/********** End of module 12: ..\src\role.armyHealer.js **********/
+/********** Start module 13: ..\src\role.armyMelee.js **********/
 __modules[13] = function(module, exports) {
 var Assign = __require(56,13),
     Cache = __require(3,13),
@@ -3577,8 +3577,8 @@ module.exports = RoleArmyMelee;
 
 return module.exports;
 }
-/********** End of module 13: ../src/role.armyMelee.js **********/
-/********** Start module 14: ../src/role.armyRanged.js **********/
+/********** End of module 13: ..\src\role.armyMelee.js **********/
+/********** Start module 14: ..\src\role.armyRanged.js **********/
 __modules[14] = function(module, exports) {
 var Assign = __require(56,14),
     Cache = __require(3,14),
@@ -3760,8 +3760,8 @@ module.exports = RoleArmyRanged;
 
 return module.exports;
 }
-/********** End of module 14: ../src/role.armyRanged.js **********/
-/********** Start module 15: ../src/role.claimer.js **********/
+/********** End of module 14: ..\src\role.armyRanged.js **********/
+/********** Start module 15: ..\src\role.claimer.js **********/
 __modules[15] = function(module, exports) {
 var Cache = __require(3,15),
     Commands = __require(4,15),
@@ -3864,8 +3864,8 @@ module.exports = Claimer;
 
 return module.exports;
 }
-/********** End of module 15: ../src/role.claimer.js **********/
-/********** Start module 16: ../src/role.collector.js **********/
+/********** End of module 15: ..\src\role.claimer.js **********/
+/********** Start module 16: ..\src\role.collector.js **********/
 __modules[16] = function(module, exports) {
 var Cache = __require(3,16),
     Utilities = __require(10,16),
@@ -4186,8 +4186,8 @@ module.exports = Collector;
 
 return module.exports;
 }
-/********** End of module 16: ../src/role.collector.js **********/
-/********** Start module 17: ../src/role.converter.js **********/
+/********** End of module 16: ..\src\role.collector.js **********/
+/********** Start module 17: ..\src\role.converter.js **********/
 __modules[17] = function(module, exports) {
 var Cache = __require(3,17),
     Commands = __require(4,17),
@@ -4303,8 +4303,8 @@ module.exports = Converter;
 
 return module.exports;
 }
-/********** End of module 17: ../src/role.converter.js **********/
-/********** Start module 18: ../src/role.defender.js **********/
+/********** End of module 17: ..\src\role.converter.js **********/
+/********** Start module 18: ..\src\role.defender.js **********/
 __modules[18] = function(module, exports) {
 var Cache = __require(3,18),
     Utilities = __require(10,18),
@@ -4410,8 +4410,8 @@ module.exports = Defender;
 
 return module.exports;
 }
-/********** End of module 18: ../src/role.defender.js **********/
-/********** Start module 19: ../src/role.dismantler.js **********/
+/********** End of module 18: ..\src\role.defender.js **********/
+/********** Start module 19: ..\src\role.dismantler.js **********/
 __modules[19] = function(module, exports) {
 var Cache = __require(3,19),
     Utilities = __require(10,19),
@@ -4637,8 +4637,8 @@ module.exports = Dismantler;
 
 return module.exports;
 }
-/********** End of module 19: ../src/role.dismantler.js **********/
-/********** Start module 20: ../src/role.healer.js **********/
+/********** End of module 19: ..\src\role.dismantler.js **********/
+/********** Start module 20: ..\src\role.healer.js **********/
 __modules[20] = function(module, exports) {
 var Cache = __require(3,20),
     Utilities = __require(10,20),
@@ -4745,8 +4745,8 @@ module.exports = Healer;
 
 return module.exports;
 }
-/********** End of module 20: ../src/role.healer.js **********/
-/********** Start module 21: ../src/role.miner.js **********/
+/********** End of module 20: ..\src\role.healer.js **********/
+/********** Start module 21: ..\src\role.miner.js **********/
 __modules[21] = function(module, exports) {
 var Cache = __require(3,21),
     Utilities = __require(10,21),
@@ -4794,7 +4794,6 @@ class Miner {
     static spawn(room, id) {
         var spawns = Cache.spawnsInRoom(room),
             body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-            storage = room.storage,
             roomName = room.name,
             energy, units, remainder, count, spawnToUse, name;
         if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -4877,8 +4876,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 21: ../src/role.miner.js **********/
-/********** Start module 22: ../src/role.remoteBuilder.js **********/
+/********** End of module 21: ..\src\role.miner.js **********/
+/********** Start module 22: ..\src\role.remoteBuilder.js **********/
 __modules[22] = function(module, exports) {
 var Cache = __require(3,22),
     Utilities = __require(10,22),
@@ -5074,8 +5073,8 @@ module.exports = Builder;
 
 return module.exports;
 }
-/********** End of module 22: ../src/role.remoteBuilder.js **********/
-/********** Start module 23: ../src/role.remoteCollector.js **********/
+/********** End of module 22: ..\src\role.remoteBuilder.js **********/
+/********** Start module 23: ..\src\role.remoteCollector.js **********/
 __modules[23] = function(module, exports) {
 var Cache = __require(3,23),
     Utilities = __require(10,23),
@@ -5296,8 +5295,8 @@ module.exports = RemoteCollector;
 
 return module.exports;
 }
-/********** End of module 23: ../src/role.remoteCollector.js **********/
-/********** Start module 24: ../src/role.remoteDismantler.js **********/
+/********** End of module 23: ..\src\role.remoteCollector.js **********/
+/********** Start module 24: ..\src\role.remoteDismantler.js **********/
 __modules[24] = function(module, exports) {
 var Cache = __require(3,24),
     Utilities = __require(10,24),
@@ -5414,8 +5413,8 @@ module.exports = RemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 24: ../src/role.remoteDismantler.js **********/
-/********** Start module 25: ../src/role.remoteMiner.js **********/
+/********** End of module 24: ..\src\role.remoteDismantler.js **********/
+/********** Start module 25: ..\src\role.remoteMiner.js **********/
 __modules[25] = function(module, exports) {
 var Cache = __require(3,25),
     Utilities = __require(10,25),
@@ -5559,8 +5558,8 @@ module.exports = Miner;
 
 return module.exports;
 }
-/********** End of module 25: ../src/role.remoteMiner.js **********/
-/********** Start module 26: ../src/role.remoteReserver.js **********/
+/********** End of module 25: ..\src\role.remoteMiner.js **********/
+/********** Start module 26: ..\src\role.remoteReserver.js **********/
 __modules[26] = function(module, exports) {
 var Cache = __require(3,26),
     Commands = __require(4,26),
@@ -5696,8 +5695,8 @@ module.exports = Reserver;
 
 return module.exports;
 }
-/********** End of module 26: ../src/role.remoteReserver.js **********/
-/********** Start module 27: ../src/role.remoteStorer.js **********/
+/********** End of module 26: ..\src\role.remoteReserver.js **********/
+/********** Start module 27: ..\src\role.remoteStorer.js **********/
 __modules[27] = function(module, exports) {
 var Cache = __require(3,27),
     Utilities = __require(10,27),
@@ -5940,8 +5939,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 27: ../src/role.remoteStorer.js **********/
-/********** Start module 28: ../src/role.remoteWorker.js **********/
+/********** End of module 27: ..\src\role.remoteStorer.js **********/
+/********** Start module 28: ..\src\role.remoteWorker.js **********/
 __modules[28] = function(module, exports) {
 var Cache = __require(3,28),
     Utilities = __require(10,28),
@@ -6241,8 +6240,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 28: ../src/role.remoteWorker.js **********/
-/********** Start module 29: ../src/role.scientist.js **********/
+/********** End of module 28: ..\src\role.remoteWorker.js **********/
+/********** Start module 29: ..\src\role.scientist.js **********/
 __modules[29] = function(module, exports) {
 var Cache = __require(3,29),
     Utilities = __require(10,29),
@@ -6659,8 +6658,8 @@ module.exports = Scientist;
 
 return module.exports;
 }
-/********** End of module 29: ../src/role.scientist.js **********/
-/********** Start module 30: ../src/role.storer.js **********/
+/********** End of module 29: ..\src\role.scientist.js **********/
+/********** Start module 30: ..\src\role.storer.js **********/
 __modules[30] = function(module, exports) {
 var Cache = __require(3,30),
     Utilities = __require(10,30),
@@ -6959,8 +6958,8 @@ module.exports = Storer;
 
 return module.exports;
 }
-/********** End of module 30: ../src/role.storer.js **********/
-/********** Start module 31: ../src/role.tower.js **********/
+/********** End of module 30: ..\src\role.storer.js **********/
+/********** Start module 31: ..\src\role.tower.js **********/
 __modules[31] = function(module, exports) {
 var Cache = __require(3,31);
 
@@ -6994,8 +6993,8 @@ module.exports = Tower;
 
 return module.exports;
 }
-/********** End of module 31: ../src/role.tower.js **********/
-/********** Start module 32: ../src/role.upgrader.js **********/
+/********** End of module 31: ..\src\role.tower.js **********/
+/********** Start module 32: ..\src\role.upgrader.js **********/
 __modules[32] = function(module, exports) {
 var Cache = __require(3,32),
     Utilities = __require(10,32),
@@ -7267,8 +7266,8 @@ module.exports = Upgrader;
 
 return module.exports;
 }
-/********** End of module 32: ../src/role.upgrader.js **********/
-/********** Start module 33: ../src/role.worker.js **********/
+/********** End of module 32: ..\src\role.upgrader.js **********/
+/********** Start module 33: ..\src\role.worker.js **********/
 __modules[33] = function(module, exports) {
 var Cache = __require(3,33),
     Utilities = __require(10,33),
@@ -7698,8 +7697,8 @@ module.exports = Worker;
 
 return module.exports;
 }
-/********** End of module 33: ../src/role.worker.js **********/
-/********** Start module 34: ../src/room.base.js **********/
+/********** End of module 33: ..\src\role.worker.js **********/
+/********** Start module 34: ..\src\room.base.js **********/
 __modules[34] = function(module, exports) {
 var Cache = __require(3,34),
     Commands = __require(4,34),
@@ -8460,8 +8459,8 @@ module.exports = Base;
 
 return module.exports;
 }
-/********** End of module 34: ../src/room.base.js **********/
-/********** Start module 35: ../src/room.cleanup.js **********/
+/********** End of module 34: ..\src\room.base.js **********/
+/********** Start module 35: ..\src\room.cleanup.js **********/
 __modules[35] = function(module, exports) {
 var Cache = __require(3,35),
     Commands = __require(4,35),
@@ -8579,8 +8578,8 @@ module.exports = Cleanup;
 
 return module.exports;
 }
-/********** End of module 35: ../src/room.cleanup.js **********/
-/********** Start module 36: ../src/room.mine.js **********/
+/********** End of module 35: ..\src\room.cleanup.js **********/
+/********** Start module 36: ..\src\room.mine.js **********/
 __modules[36] = function(module, exports) {
 var Cache = __require(3,36),
     Commands = __require(4,36),
@@ -8891,8 +8890,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 36: ../src/room.mine.js **********/
-/********** Start module 37: ../src/room.source.js **********/
+/********** End of module 36: ..\src\room.mine.js **********/
+/********** Start module 37: ..\src\room.source.js **********/
 __modules[37] = function(module, exports) {
 var Cache = __require(3,37),
     Commands = __require(4,37),
@@ -9182,8 +9181,8 @@ module.exports = Source;
 
 return module.exports;
 }
-/********** End of module 37: ../src/room.source.js **********/
-/********** Start module 38: ../src/task.attack.js **********/
+/********** End of module 37: ..\src\room.source.js **********/
+/********** Start module 38: ..\src\task.attack.js **********/
 __modules[38] = function(module, exports) {
 var Cache = __require(3,38),
     Pathing = __require(57,38);
@@ -9242,8 +9241,8 @@ module.exports = Attack;
 
 return module.exports;
 }
-/********** End of module 38: ../src/task.attack.js **********/
-/********** Start module 39: ../src/task.build.js **********/
+/********** End of module 38: ..\src\task.attack.js **********/
+/********** Start module 39: ..\src\task.build.js **********/
 __modules[39] = function(module, exports) {
 var Cache = __require(3,39),
     Pathing = __require(57,39);
@@ -9312,8 +9311,8 @@ module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 39: ../src/task.build.js **********/
-/********** Start module 40: ../src/task.claim.js **********/
+/********** End of module 39: ..\src\task.build.js **********/
+/********** Start module 40: ..\src\task.claim.js **********/
 __modules[40] = function(module, exports) {
 var Cache = __require(3,40),
     Pathing = __require(57,40);
@@ -9372,8 +9371,8 @@ module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 40: ../src/task.claim.js **********/
-/********** Start module 41: ../src/task.collectEnergy.js **********/
+/********** End of module 40: ..\src\task.claim.js **********/
+/********** Start module 41: ..\src\task.collectEnergy.js **********/
 __modules[41] = function(module, exports) {
 var Cache = __require(3,41),
     Pathing = __require(57,41);
@@ -9483,8 +9482,8 @@ module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 41: ../src/task.collectEnergy.js **********/
-/********** Start module 42: ../src/task.collectMinerals.js **********/
+/********** End of module 41: ..\src\task.collectEnergy.js **********/
+/********** Start module 42: ..\src\task.collectMinerals.js **********/
 __modules[42] = function(module, exports) {
 var Cache = __require(3,42),
     Pathing = __require(57,42),
@@ -9730,8 +9729,8 @@ module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 42: ../src/task.collectMinerals.js **********/
-/********** Start module 43: ../src/task.dismantle.js **********/
+/********** End of module 42: ..\src\task.collectMinerals.js **********/
+/********** Start module 43: ..\src\task.dismantle.js **********/
 __modules[43] = function(module, exports) {
 var Cache = __require(3,43),
     Pathing = __require(57,43);
@@ -9800,8 +9799,8 @@ module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 43: ../src/task.dismantle.js **********/
-/********** Start module 44: ../src/task.fillEnergy.js **********/
+/********** End of module 43: ..\src\task.dismantle.js **********/
+/********** Start module 44: ..\src\task.fillEnergy.js **********/
 __modules[44] = function(module, exports) {
 var Cache = __require(3,44),
     Pathing = __require(57,44),
@@ -9952,8 +9951,8 @@ module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 44: ../src/task.fillEnergy.js **********/
-/********** Start module 45: ../src/task.fillMinerals.js **********/
+/********** End of module 44: ..\src\task.fillEnergy.js **********/
+/********** Start module 45: ..\src\task.fillMinerals.js **********/
 __modules[45] = function(module, exports) {
 var Cache = __require(3,45),
     Pathing = __require(57,45),
@@ -10157,8 +10156,8 @@ module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 45: ../src/task.fillMinerals.js **********/
-/********** Start module 46: ../src/task.harvest.js **********/
+/********** End of module 45: ..\src\task.fillMinerals.js **********/
+/********** Start module 46: ..\src\task.harvest.js **********/
 __modules[46] = function(module, exports) {
 var Cache = __require(3,46),
     Pathing = __require(57,46);
@@ -10230,8 +10229,8 @@ module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 46: ../src/task.harvest.js **********/
-/********** Start module 47: ../src/task.heal.js **********/
+/********** End of module 46: ..\src\task.harvest.js **********/
+/********** Start module 47: ..\src\task.heal.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(3,47),
     Pathing = __require(57,47);
@@ -10310,8 +10309,8 @@ module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 47: ../src/task.heal.js **********/
-/********** Start module 48: ../src/task.meleeAttack.js **********/
+/********** End of module 47: ..\src\task.heal.js **********/
+/********** Start module 48: ..\src\task.meleeAttack.js **********/
 __modules[48] = function(module, exports) {
 var Cache = __require(3,48),
     Pathing = __require(57,48);
@@ -10386,8 +10385,8 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 48: ../src/task.meleeAttack.js **********/
-/********** Start module 49: ../src/task.mine.js **********/
+/********** End of module 48: ..\src\task.meleeAttack.js **********/
+/********** Start module 49: ..\src\task.mine.js **********/
 __modules[49] = function(module, exports) {
 var Cache = __require(3,49),
     Pathing = __require(57,49),
@@ -10441,6 +10440,8 @@ class Mine {
             if (source instanceof Mineral && _.sum(container.store) >= 1500) {
                 return;
             }
+
+            creep.harvest(source);
             if (_.filter([].concat.apply([], [Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].miner || [], Cache.creeps[creep.room.name] && Cache.creeps[creep.room.name].remoteMiner || []]), (c) => c.room.name === creep.room.name && c.memory.container === creep.memory.container && c.pos.getRangeTo(creep) === 1 && c.ticksToLive > creep.ticksToLive && c.fatigue === 0).length > 0) {
                 creep.say(":(", true);
                 creep.suicide();
@@ -10471,8 +10472,8 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 49: ../src/task.mine.js **********/
-/********** Start module 50: ../src/task.pickupResource.js **********/
+/********** End of module 49: ..\src\task.mine.js **********/
+/********** Start module 50: ..\src\task.pickupResource.js **********/
 __modules[50] = function(module, exports) {
 var Cache = __require(3,50),
     TaskCollectEnergy = __require(41,50),
@@ -10548,8 +10549,8 @@ module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 50: ../src/task.pickupResource.js **********/
-/********** Start module 51: ../src/task.rally.js **********/
+/********** End of module 50: ..\src\task.pickupResource.js **********/
+/********** Start module 51: ..\src\task.rally.js **********/
 __modules[51] = function(module, exports) {
 var Cache = __require(3,51),
     Pathing = __require(57,51);
@@ -10682,8 +10683,8 @@ module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 51: ../src/task.rally.js **********/
-/********** Start module 52: ../src/task.rangedAttack.js **********/
+/********** End of module 51: ..\src\task.rally.js **********/
+/********** Start module 52: ..\src\task.rangedAttack.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(3,52),
     Pathing = __require(57,52);
@@ -10767,8 +10768,8 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 52: ../src/task.rangedAttack.js **********/
-/********** Start module 53: ../src/task.repair.js **********/
+/********** End of module 52: ..\src\task.rangedAttack.js **********/
+/********** Start module 53: ..\src\task.repair.js **********/
 __modules[53] = function(module, exports) {
 var Cache = __require(3,53),
     Pathing = __require(57,53);
@@ -10848,8 +10849,8 @@ module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 53: ../src/task.repair.js **********/
-/********** Start module 54: ../src/task.reserve.js **********/
+/********** End of module 53: ..\src\task.repair.js **********/
+/********** Start module 54: ..\src\task.reserve.js **********/
 __modules[54] = function(module, exports) {
 var Cache = __require(3,54),
     Pathing = __require(57,54);
@@ -10919,8 +10920,8 @@ module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 54: ../src/task.reserve.js **********/
-/********** Start module 55: ../src/task.upgradeController.js **********/
+/********** End of module 54: ..\src\task.reserve.js **********/
+/********** Start module 55: ..\src\task.upgradeController.js **********/
 __modules[55] = function(module, exports) {
 var Cache = __require(3,55),
     Pathing = __require(57,55),
@@ -11033,8 +11034,8 @@ module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 55: ../src/task.upgradeController.js **********/
-/********** Start module 56: ../src/assign.js **********/
+/********** End of module 55: ..\src\task.upgradeController.js **********/
+/********** Start module 56: ..\src\assign.js **********/
 __modules[56] = function(module, exports) {
 var Cache = __require(3,56),
     Utilities = __require(10,56),
@@ -11379,8 +11380,8 @@ module.exports = Assign;
 
 return module.exports;
 }
-/********** End of module 56: ../src/assign.js **********/
-/********** Start module 57: ../src/pathing.js **********/
+/********** End of module 56: ..\src\assign.js **********/
+/********** Start module 57: ..\src\pathing.js **********/
 __modules[57] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
@@ -11651,7 +11652,7 @@ module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 57: ../src/pathing.js **********/
+/********** End of module 57: ..\src\pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

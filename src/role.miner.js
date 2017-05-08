@@ -54,7 +54,6 @@ class Miner {
     static spawn(room, id) {
         var spawns = Cache.spawnsInRoom(room),
             body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-            storage = room.storage,
             roomName = room.name,
             energy, units, remainder, count, spawnToUse, name;
 

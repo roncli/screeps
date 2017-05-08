@@ -6243,6 +6243,7 @@ return module.exports;
 __modules[29] = function(module, exports) {
 var Cache = __require(3,29),
     Utilities = __require(10,29),
+    TaskCollectEnergy = __require(41,29),
     TaskPickupResource = __require(50,29),
     TaskRally = __require(51,29);
 
@@ -6482,23 +6483,25 @@ class Scientist {
         if (creepsWithNoTask.length === 0) {
             return;
         }
-        _.forEach(tasks.fillEnergy.powerSpawnTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
-            if (energyMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("PwrEnergy");
-                        assigned.push(creep.name);
-                        energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                        if (energyMissing <= 0) {
-                            return false;
+        if (room.storage && _.sum(room.storage.store) > 25000) {
+            _.forEach(tasks.fillEnergy.powerSpawnTasks, (task) => {
+                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
+                if (energyMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
+                        if (task.canAssign(creep)) {
+                            creep.say("PwrEnergy");
+                            assigned.push(creep.name);
+                            energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            if (energyMissing <= 0) {
+                                return false;
+                            }
                         }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+                    });
+                    _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                    assigned = [];
+                }
+            });
+        }
         
         if (creepsWithNoTask.length === 0) {
             return;
@@ -6615,6 +6618,18 @@ class Scientist {
 
         if (creepsWithNoTask.length === 0) {
             return;
+        }
+        if (room.storage && _.sum(room.storage.store) <= 25000) {
+            var powerSpawns = Cache.powerSpawnsInRoom(room);
+
+            if (powerSpawns.length > 0) {
+                if (new TaskCollectEnergy(powerSpawns[0].id).assign(creepsWithNoTask[0])) {
+                    assigned.push(creepsWithNoTask[0].name);
+                }
+
+                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+                assigned = [];
+            }
         }
         if (tasks.collectEnergy.terminalTask) {
             _.forEach(creepsWithNoTask, (creep) => {

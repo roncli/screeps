@@ -107,7 +107,7 @@ class Cache {
                 if (structure.structureType === STRUCTURE_ROAD) {
                     matrix.set(pos.x, pos.y, Math.max(1, matrix.get(pos.x, pos.y)));
                 } else if (structure.structureType === STRUCTURE_WALL) {
-                    matrix.set(pos.x, pos.y, Math.max(255, matrix.get(pos.x, pos.y)));
+                    matrix.set(pos.x, pos.y, 255);
                 } else if (structure.structureType === STRUCTURE_CONTAINER) {
                     matrix.set(pos.x, pos.y, Math.max(10, matrix.get(pos.x, pos.y)));
                 } else if (!(structure.structureType === STRUCTURE_RAMPART) || !structure.my) {
@@ -122,7 +122,7 @@ class Cache {
             
             _.forEach(this.portalsInRoom(room), (structure) => {
                 var pos = structure.pos;
-                matrix.set(pos.x, pos.y, 5);
+                matrix.set(pos.x, pos.y, 10);
             });
 
             if (Memory.avoidSquares[roomName]) {

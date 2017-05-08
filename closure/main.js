@@ -6483,7 +6483,7 @@ class Scientist {
         if (creepsWithNoTask.length === 0) {
             return;
         }
-        if (room.storage && _.sum(room.storage.store) > 25000) {
+        if (room.storage && room.storage[RESOURCE_ENERGY] > 25000) {
             _.forEach(tasks.fillEnergy.powerSpawnTasks, (task) => {
                 var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
                 if (energyMissing > 0) {
@@ -6619,7 +6619,7 @@ class Scientist {
         if (creepsWithNoTask.length === 0) {
             return;
         }
-        if (room.storage && _.sum(room.storage.store) <= 25000) {
+        if (room.storage && room.storage[RESOURCE_ENERGY] <= 25000) {
             var powerSpawns = Cache.powerSpawnsInRoom(room);
 
             if (powerSpawns.length > 0) {

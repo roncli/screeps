@@ -6623,7 +6623,7 @@ class Scientist {
             var powerSpawns = Cache.powerSpawnsInRoom(room);
 
             if (powerSpawns.length > 0) {
-                if (new TaskCollectEnergy(powerSpawns[0].id).assign(creepsWithNoTask[0])) {
+                if (new TaskCollectEnergy(powerSpawns[0].id).canAssign(creepsWithNoTask[0])) {
                     assigned.push(creepsWithNoTask[0].name);
                 }
 

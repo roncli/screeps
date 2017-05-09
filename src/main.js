@@ -57,7 +57,27 @@ var profiler = require("screeps-profiler"),
     reset,
     unobservableRooms;
 
+//  #   #           #          
+//  #   #                      
+//  ## ##   ###    ##    # ##  
+//  # # #      #    #    ##  # 
+//  #   #   ####    #    #   # 
+//  #   #  #   #    #    #   # 
+//  #   #   ####   ###   #   # 
+/**
+ * A class representing the main entry point of the scripts.
+ */
 class Main {
+    // ##                      
+    //  #                      
+    //  #     ##    ##   ###   
+    //  #    #  #  #  #  #  #  
+    //  #    #  #  #  #  #  #  
+    // ###    ##    ##   ###   
+    //                   #     
+    /**
+     * The main loop that runs every tick.
+     */
     static loop() {
         var cpu = Game.cpu.getUsed(),
             bucket = Game.cpu.bucket;
@@ -209,6 +229,15 @@ class Main {
         }
     }
 
+    //  #           #     #    
+    //                    #    
+    // ##    ###   ##    ###   
+    //  #    #  #   #     #    
+    //  #    #  #   #     #    
+    // ###   #  #  ###     ##  
+    /**
+     * Initializes the script.
+     */
     static init() {
         var generationTick = Game.time % 1500;
 
@@ -414,6 +443,15 @@ class Main {
         });
     }
 
+    //        #                            ##           
+    //                                      #           
+    // # #   ##    ###    ##   ###    ###   #     ###   
+    // ####   #    #  #  # ##  #  #  #  #   #    ##     
+    // #  #   #    #  #  ##    #     # ##   #      ##   
+    // #  #  ###   #  #   ##   #      # #  ###   ###    
+    /**
+     * Gets data on minerals needed for rooms, including what labs should buy or create.
+     */
     static minerals() {
         var mineralOrders = {},
             minerals, sellOrder;
@@ -600,6 +638,15 @@ class Main {
         }
     }
 
+    // #                        #  #         #           #                       
+    // #                        ####         #                                   
+    // ###    ###   ###    ##   ####   ###  ###   ###   ##    #  #   ##    ###   
+    // #  #  #  #  ##     # ##  #  #  #  #   #    #  #   #     ##   # ##  ##     
+    // #  #  # ##    ##   ##    #  #  # ##   #    #      #     ##   ##      ##   
+    // ###    # #  ###     ##   #  #   # #    ##  #     ###   #  #   ##   ###    
+    /**
+     * Creates defensive CostMatrixes for base rooms that need them.
+     */
     static baseMatrixes() {
         if (!Memory.baseMatrixes) {
             Memory.baseMatrixes = {};
@@ -667,6 +714,16 @@ class Main {
         });
     }
 
+    //    #                            #          ##     #                 ##                                  
+    //    #                                        #                      #  #                                 
+    //  ###   ##    ###    ##   ###   ##     ###   #    ##    ####   ##   #     ###    ##    ##   ###    ###   
+    // #  #  # ##  ##     # ##  #  #   #    #  #   #     #      #   # ##  #     #  #  # ##  # ##  #  #  ##     
+    // #  #  ##      ##   ##    #      #    # ##   #     #     #    ##    #  #  #     ##    ##    #  #    ##   
+    //  ###   ##   ###     ##   #     ###    # #  ###   ###   ####   ##    ##   #      ##    ##   ###   ###    
+    //                                                                                            #            
+    /**
+     * Deserialies creep tasks from memory into task objects.
+     */
     static deserializeCreeps() {
         // Loop through each creep to deserialize their task.
         _.forEach(Game.creeps, (creep) => {
@@ -731,6 +788,15 @@ class Main {
         });
     }
 
+    //    #                            #          ##     #                ###                            
+    //    #                                        #                      #  #                           
+    //  ###   ##    ###    ##   ###   ##     ###   #    ##    ####   ##   #  #   ##    ##   # #    ###   
+    // #  #  # ##  ##     # ##  #  #   #    #  #   #     #      #   # ##  ###   #  #  #  #  ####  ##     
+    // #  #  ##      ##   ##    #      #    # ##   #     #     #    ##    # #   #  #  #  #  #  #    ##   
+    //  ###   ##   ###     ##   #     ###    # #  ###   ###   ####   ##   #  #   ##    ##   #  #  ###    
+    /**
+     * Deserialize rooms from memory into room objects.
+     */
     static deserializeRooms() {
         // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
         unobservableRooms = [];
@@ -761,12 +827,31 @@ class Main {
         });
     }
 
+    //    #                            #          ##     #                 ##                #                 
+    //    #                                        #                      #  #                                 
+    //  ###   ##    ###    ##   ###   ##     ###   #    ##    ####   ##   #  #  ###   # #   ##     ##    ###   
+    // #  #  # ##  ##     # ##  #  #   #    #  #   #     #      #   # ##  ####  #  #  ####   #    # ##  ##     
+    // #  #  ##      ##   ##    #      #    # ##   #     #     #    ##    #  #  #     #  #   #    ##      ##   
+    //  ###   ##   ###     ##   #     ###    # #  ###   ###   ####   ##   #  #  #     #  #  ###    ##   ###    
+    /**
+     * Deserializes armies from memory into army objects.
+     */
     static deserializeArmies() {
         _.forEach(Memory.army, (army, armyName) => {
             Cache.armies[armyName] = Army.fromObj(armyName, army);
         });
     }
 
+    // #           ##                            ####                                
+    // #            #                            #                                   
+    // ###    ###   #     ###  ###    ##    ##   ###   ###    ##   ###    ###  #  #  
+    // #  #  #  #   #    #  #  #  #  #     # ##  #     #  #  # ##  #  #  #  #  #  #  
+    // #  #  # ##   #    # ##  #  #  #     ##    #     #  #  ##    #      ##    # #  
+    // ###    # #  ###    # #  #  #   ##    ##   ####  #  #   ##   #     #       #   
+    //                                                                    ###   #    
+    /**
+     * Balance energy between rooms with terminals.
+     */
     static balanceEnergy() {
         // See if there is some energy balancing we can do.
         var rooms, energyGoal;
@@ -800,6 +885,16 @@ class Main {
         }
     }
 
+    // ##                
+    //  #                
+    //  #     ##    ###  
+    //  #    #  #  #  #  
+    //  #    #  #   ##   
+    // ###    ##   #     
+    //              ###  
+    /**
+     * Create a log.
+     */
     static log() {
         Cache.log.creeps = _.map(Game.creeps, (c) => {
             return {
@@ -986,6 +1081,13 @@ class Main {
         });
     }
 
+    // ###    ##    ##   # #    ###   
+    // #  #  #  #  #  #  ####  ##     
+    // #     #  #  #  #  #  #    ##   
+    // #      ##    ##   #  #  ###    
+    /**
+     * Process game rooms.
+     */
     static rooms() {
         var roomOrder = ["base", "source", "mine", "cleanup", ""],
             memoryRooms = Memory.rooms,
@@ -1018,6 +1120,16 @@ class Main {
         });
     }
 
+    //    #                    ###                     
+    //    #                    #  #                    
+    //  ###  ###    ###  #  #  #  #   ##    ##   # #   
+    // #  #  #  #  #  #  #  #  ###   #  #  #  #  ####  
+    // #  #  #     # ##  ####  # #   #  #  #  #  #  #  
+    //  ###  #      # #  ####  #  #   ##    ##   #  #  
+    /**
+     * Draws the visualizations for a room.
+     * @param {Room} room The room to draw visualizations for.
+     */
     static drawRoom(room) {
         var visual = room.visual,
             x, y, towers, labs, nukers, powerSpawns;
@@ -1136,6 +1248,14 @@ class Main {
         }
     }
 
+    //  ###  ###   # #   #  #  
+    // #  #  #  #  ####  #  #  
+    // # ##  #     #  #   # #  
+    //  # #  #     #  #    #   
+    //                    #    
+    /**
+     * Process armies.
+     */
     static army() {
         // Loop through each army and run it.
         _.forEach(Cache.armies, (army) => {
@@ -1146,6 +1266,14 @@ class Main {
         });
     }
 
+    //  ##   ###    ##    ##   ###    ###   
+    // #     #  #  # ##  # ##  #  #  ##     
+    // #     #     ##    ##    #  #    ##   
+    //  ##   #      ##    ##   ###   ###    
+    //                         #            
+    /**
+     * Process creep tasks.
+     */
     static creeps() {
         // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
         _.forEach(Game.creeps, (creep) => {
@@ -1315,6 +1443,16 @@ class Main {
         // paths.set();
     }
 
+    //    #        #                 
+    //    #        #                 
+    //  ###   ##   ###   #  #   ###  
+    // #  #  # ##  #  #  #  #  #  #  
+    // #  #  ##    #  #  #  #   ##   
+    //  ###   ##   ###    ###  #     
+    //                          ###  
+    /**
+     * Show each creep name, role, and current task in their respective RoomVisual.
+     */
     static debug() {
         _.forEach(Game.creeps, (creep) => {
             creep.room.visual.text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
@@ -1323,20 +1461,15 @@ class Main {
         });
     }
 
-    static finalize() {
-        Cache.log.tick = Game.time;
-        Cache.log.date = new Date();
-        Cache.log.gcl = Game.gcl.level;
-        Cache.log.progress = Game.gcl.progress;
-        Cache.log.progressTotal = Game.gcl.progressTotal;
-        Cache.log.limit = Game.cpu.limit;
-        Cache.log.tickLimit = Game.cpu.tickLimit;
-        Cache.log.bucket = Game.cpu.bucket;
-        Cache.log.credits = Game.market.credits;
-        Cache.log.cpuUsed = Game.cpu.getUsed();
-        Memory.console = Cache.log;
-    }
-
+    //    #                     ##   ##          #           ##    
+    //    #                    #  #   #          #            #    
+    //  ###  ###    ###  #  #  #      #     ##   ###    ###   #    
+    // #  #  #  #  #  #  #  #  # ##   #    #  #  #  #  #  #   #    
+    // #  #  #     # ##  ####  #  #   #    #  #  #  #  # ##   #    
+    //  ###  #      # #  ####   ###  ###    ##   ###    # #  ###   
+    /**
+     * Draw information onto the global visual.
+     */
     static drawGlobal() {
         var y;
 
@@ -1396,6 +1529,29 @@ class Main {
 
         // CPU
         Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
+    }
+
+    //   #    #                ##     #                
+    //  # #                     #                      
+    //  #    ##    ###    ###   #    ##    ####   ##   
+    // ###    #    #  #  #  #   #     #      #   # ##  
+    //  #     #    #  #  # ##   #     #     #    ##    
+    //  #    ###   #  #   # #  ###   ###   ####   ##   
+    /**
+     * Finalize log data and write it to memory.
+     */
+    static finalize() {
+        Cache.log.tick = Game.time;
+        Cache.log.date = new Date();
+        Cache.log.gcl = Game.gcl.level;
+        Cache.log.progress = Game.gcl.progress;
+        Cache.log.progressTotal = Game.gcl.progressTotal;
+        Cache.log.limit = Game.cpu.limit;
+        Cache.log.tickLimit = Game.cpu.tickLimit;
+        Cache.log.bucket = Game.cpu.bucket;
+        Cache.log.credits = Game.market.credits;
+        Cache.log.cpuUsed = Game.cpu.getUsed();
+        Memory.console = Cache.log;
     }
 }
 

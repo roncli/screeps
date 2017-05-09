@@ -1,4 +1,4 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),

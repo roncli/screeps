@@ -1,11 +1,10 @@
-var profiler = require("screeps-profiler"),
+const profiler = require("screeps-profiler"),
     Army = require("army"),
     Cache = require("cache"),
     Commands = require("commands"),
     Drawing = require("drawing"),
     Market = require("market"),
     Minerals = require("minerals"),
-    Proxy = require("proxy"),
     Segment = require("segment"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
@@ -52,10 +51,7 @@ var profiler = require("screeps-profiler"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
     TaskReserve = require("task.reserve"),
-    TaskUpgradeController = require("task.upgradeController"),
-    paths,
-    reset,
-    unobservableRooms;
+    TaskUpgradeController = require("task.upgradeController");
 
 //  #   #           #          
 //  #   #                      
@@ -248,9 +244,9 @@ class Main {
         Cache.reset();
 
         // Detect a system reset.
-        if (!reset)
+        if (!this.reset)
         {
-            reset = true;
+            this.reset = true;
             Cache.log.events.push("System reset.");
         }
 
@@ -324,9 +320,9 @@ class Main {
             Memory.paths = {};
         }
 
-        // paths = new Segment(4);
-        // if (!paths.memory) {
-        //     paths.memory = Memory.paths;
+        // this.paths = new Segment(4);
+        // if (!this.paths.memory) {
+        //     this.paths.memory = Memory.paths;
         // }
         
         if (!Memory.lengthToStorage) {
@@ -411,7 +407,7 @@ class Main {
                     delete Memory.paths[id];
                 }
             });
-            // _.forEach(paths, (value, id) => {
+            // _.forEach(this.paths, (value, id) => {
             //    if (value[3] <= Game.time - 500 || value[2] <= Game.time - 1500) {
             //         delete paths.memory[id];
             //     }
@@ -799,7 +795,7 @@ class Main {
      */
     static deserializeRooms() {
         // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
-        unobservableRooms = [];
+        this.unobservableRooms = [];
         _.forEach(Memory.rooms, (roomMemory, name) => {
             if (roomMemory.roomType) {
                 switch (roomMemory.roomType.type) {
@@ -818,7 +814,7 @@ class Main {
                 }
 
                 if (!Game.rooms[name]) {
-                    unobservableRooms.push({
+                    this.unobservableRooms.push({
                         name: name,
                         unobservable: true
                     });
@@ -946,7 +942,7 @@ class Main {
             };
         });
 
-        _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]), (room) => {
+        _.forEach([].concat.apply([], [_.filter(Game.rooms), this.unobservableRooms]), (room) => {
             var roomName = room.name,
                 roomMemory = Memory.rooms[roomName],
                 type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown",
@@ -1097,7 +1093,7 @@ class Main {
         Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
 
         // Loop through each room to determine the required tasks for the room, and then serialize the room.
-        _.forEach([].concat.apply([], [_.filter(Game.rooms), unobservableRooms]).sort((a, b) => {
+        _.forEach([].concat.apply([], [_.filter(Game.rooms), this.unobservableRooms]).sort((a, b) => {
             return roomOrder.indexOf(memoryRooms[a.name] && memoryRooms[a.name].roomType && memoryRooms[a.name].roomType.type || "") - roomOrder.indexOf(memoryRooms[b.name] && memoryRooms[b.name].roomType && memoryRooms[b.name].roomType.type || "");
         }), (room) => {
             var roomName = room.name,
@@ -1440,7 +1436,7 @@ class Main {
             }
         });
         
-        // paths.set();
+        // this.paths.set();
     }
 
     //    #        #                 

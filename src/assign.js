@@ -1,4 +1,4 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Utilities = require("utilities"),
     TaskMeleeAttack = require("task.meleeAttack"),
     TaskDismantle = require("task.dismantle"),

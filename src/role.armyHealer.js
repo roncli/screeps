@@ -1,4 +1,4 @@
-var Assign = require("assign"),
+const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 

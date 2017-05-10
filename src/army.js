@@ -89,7 +89,7 @@ class Army {
             this.safeMode = this.safeMode.safeMode;
         }
 
-        // Directive is "preparing" if we have a boost room and we're missing some compounds.
+        // Directive is "preparing" if we have a boost room and we're missing some resources.
         if (this.directive === "preparing") {
             let boostRoomName = this.boostRoom;
             
@@ -262,9 +262,9 @@ class Army {
         if (typeof name !== "number" && boostRoom) {
             // Set the labs to be in use.
             let labIndex = 0;
-            _.forEach(settings.boosts, (amount, compound) => {
+            _.forEach(settings.boosts, (amount, resource) => {
                 labsToBoostWith[labIndex].creepToBoost = name;
-                labsToBoostWith[labIndex].resource = compound;
+                labsToBoostWith[labIndex].resource = resource;
                 labsToBoostWith[labIndex].amount = 30 * amount;
                 labsInUse.push(labsToBoostWith[labIndex]);
 

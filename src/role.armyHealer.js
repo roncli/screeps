@@ -31,16 +31,18 @@ class RoleArmyHealer {
         var units = army.healer.units,
             body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             boosts;
-
+)
         body.push(...Array(units - 1).fill(HEAL));
-        body.push(...Array(units + 5).fill(MOVE));
+        body.push(...Array(army.super ? 10 : units + 5).fill(MOVE));
         body.push(HEAL);
 
         if (army.boostRoom) {
-            boosts = {
-                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
-                RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE: units
-            };
+            boosts = {};
+            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
+            boosts[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] = units;
+            if (army.super) {
+                boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10
+            }
         }
 
         return {

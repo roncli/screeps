@@ -33,13 +33,15 @@ class RoleArmyRanged {
             boosts;
 
         body.push(...Array(units).fill(RANGED_ATTACK));
-        body.push(...Array(units + 5).fill(MOVE));
+        body.push(...Array(army.super ? 10 : units + 5).fill(MOVE));
 
         if (army.boostRoom) {
-            boosts = {
-                RESOURCE_CATALYZED_GHODIUM_ALKALIDE: 5,
-                RESOURCE_CATALYZED_UTRIUM_ACID: units
-            };
+            boosts = {};
+            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
+            boosts[RESOURCE_CATALYZED_UTRIUM_ACID] = units;
+            if (army.super) {
+                boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10
+            }
         }
 
         return {

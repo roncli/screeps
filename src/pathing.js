@@ -7,30 +7,50 @@ const direction = {
     6: {dx: -1, dy: 1},
     7: {dx: -1, dy: 0},
     8: {dx: -1, dy: -1}
-};
+},
+    Cache = require("cache"); //,
+//    Segment = require("segment");
 
-var Cache = require("cache"),
-    Segment = require("segment");
-
+//  ####           #     #        #                 
+//  #   #          #     #                          
+//  #   #   ###   ####   # ##    ##    # ##    ## # 
+//  ####       #   #     ##  #    #    ##  #  #  #  
+//  #       ####   #     #   #    #    #   #   ##   
+//  #      #   #   #  #  #   #    #    #   #  #     
+//  #       ####    ##   #   #   ###   #   #   ###  
+//                                            #   # 
+//                                             ###  
+/**
+ * A class for efficient creep pathing.
+ */
 class Pathing {
+    //                         ###         
+    //                          #          
+    // # #    ##   # #    ##    #     ##   
+    // ####  #  #  # #   # ##   #    #  #  
+    // #  #  #  #  # #   ##     #    #  #  
+    // #  #   ##    #     ##    #     ##   
+    /**
+     * Moves a creep to a position.
+     * @param {Creep} creep The creep to move.
+     * @param {object} pos The position or object to path to.
+     * @param {number} [range=0] The range to path within.
+     */
     static moveTo(creep, pos, range) {
-        var pathing = creep.memory._pathing,
+        var creepMemory = creep.memory,
+            pathing = creepMemory._pathing,
             restartOn = [],
             creepPos = creep.pos,
             creepX = creepPos.x,
             creepY = creepPos.y,
             creepRoom = creepPos.roomName,
             tick = Game.time,
-            posX, posY, posRoom, wasStationary, firstPos, multiplier, path, key;
+            posX, posY, posRoom, wasStationary, firstPos, multiplier, key;
 
         if (pos instanceof RoomObject) {
             pos = pos.pos;
         }
         
-        posX = pos.x;
-        posY = pos.y;
-        posRoom = pos.roomName;
-
         // Default range to 0.
         if (!range) {
             range = 0;
@@ -41,10 +61,14 @@ class Pathing {
             return;
         }
 
+        posX = pos.x;
+        posY = pos.y;
+        posRoom = pos.roomName;
+
         if (pathing) {
             // If the position doesn't match where we're going, nuke pathing.
             if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
-                delete creep.memory._pathing;
+                delete creepMemory._pathing;
                 pathing = undefined;
             }
         }
@@ -88,7 +112,7 @@ class Pathing {
                 // We were successful moving last turn, update accordingly.
                 if (pathing.path.length === 1) {
                     // We've reached the end of the path.
-                    delete creep.memory._pathing;
+                    delete creepMemory._pathing;
                     pathing = undefined;
                 } else {
                     // Update start position and remaining path.
@@ -105,7 +129,9 @@ class Pathing {
         // If we don't have a pathing, generate it.
         if (!pathing || !pathing.path) {
             let moveParts = creep.getActiveBodyparts(MOVE),
-                paths = new Segment(4);
+//                paths = new Segment(4).memory;
+                paths = Memory.paths,
+                key, path, newPath;
             
             // Determine multiplier to use for terrain cost.
             multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - moveParts) / moveParts;
@@ -117,11 +143,13 @@ class Pathing {
 
             key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`;
 
-            if ((!pathing || pathing.blocked.length === 0) && Memory.paths[key]) {
+            path = paths[key];
+
+            if ((!pathing || pathing.blocked.length === 0) && path) {
                 // Use the cache.
                 if (pathing) {
-                    pathing.path = Memory.paths[key][0];
-                    pathing.restartOn = Memory.paths[key][1];
+                    pathing.path = this.decodePath(path[0]);
+                    pathing.restartOn = path[1];
                 } else {
                     pathing = {
                         start: {
@@ -134,16 +162,15 @@ class Pathing {
                             y: posY,
                             room: posRoom
                         },
-                        path: Memory.paths[key][0],
+                        path: this.decodePath(path[0]),
                         stationary: 0,
                         blocked: [],
-                        restartOn: Memory.paths[key][1]
+                        restartOn: path[1]
                     };
                 }
-                Memory.paths[key][3] = tick;
-                // paths.memory[key][3] = tick;
+                path[3] = tick;
             } else {
-                path = PathFinder.search(creepPos, {pos: pos, range: range}, {
+                newPath = PathFinder.search(creepPos, {pos: pos, range: range}, {
                     plainCost: Math.ceil(1 * multiplier),
                     swampCost: Math.ceil(5 * multiplier),
                     maxOps: creepRoom === posRoom ? 2000 : 100000,
@@ -152,7 +179,7 @@ class Pathing {
                             matrix;
 
                         // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room and this creep is not a remote worker or army creep.
-                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || creepRoom === posRoom && roomName !== posRoom && !creep.memory.role.startsWith("remote") && !creep.memory.role.startsWith("army"))) {
+                        if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || creepRoom === posRoom && roomName !== posRoom && !creepMemory.role.startsWith("remote") && !creepMemory.role.startsWith("army"))) {
                             return false;
                         }
 
@@ -175,14 +202,14 @@ class Pathing {
                     }
                 });
 
-                if (!path.path || path.path.length === 0) {
+                if (!newPath.path || newPath.path.length === 0) {
                     // There is no path, just return.
                     return;
                 }
 
                 // Serialize the path.
                 if (pathing) {
-                    pathing.path = this.serializePath(creepPos, path.path);
+                    pathing.path = this.serializePath(creepPos, newPath.path);
                     pathing.restartOn = restartOn;
                 } else {
                     pathing = {
@@ -196,7 +223,7 @@ class Pathing {
                             y: posY,
                             room: posRoom
                         },
-                        path: this.serializePath(creepPos, path.path),
+                        path: this.serializePath(creepPos, newPath.path),
                         stationary: 0,
                         blocked: [],
                         restartOn: restartOn
@@ -205,16 +232,10 @@ class Pathing {
 
                 // Cache serialized path
                 if (pathing.blocked.length === 0 && pathing.path.length > 10) {
-                    Memory.paths[key] = [pathing.path, [], tick, tick];
+                    paths[key] = [this.encodePath(pathing.path), [], tick, tick];
                     if (restartOn && restartOn.length > 0) {
-                        Memory.paths[key][1] = restartOn;
+                        paths[key][1] = restartOn;
                     }
-                    /*
-                    paths.memory[key] = [pathing.path, [], tick, tick];
-                    if (restartOn && restartOn.length > 0) {
-                        paths.memory[key][1] = restartOn;
-                    }
-                    */
                 }
             }
         }
@@ -225,9 +246,20 @@ class Pathing {
             pathing.stationary -= 1;
         }
 
-        creep.memory._pathing = pathing;
+        creepMemory._pathing = pathing;
     }
 
+    //                     #          ##     #                ###          #    #     
+    //                                 #                      #  #         #    #     
+    //  ###    ##   ###   ##     ###   #    ##    ####   ##   #  #   ###  ###   ###   
+    // ##     # ##  #  #   #    #  #   #     #      #   # ##  ###   #  #   #    #  #  
+    //   ##   ##    #      #    # ##   #     #     #    ##    #     # ##   #    #  #  
+    // ###     ##   #     ###    # #  ###   ###   ####   ##   #      # #    ##  #  #  
+    /**
+     * Serializes the path to a string.
+     * @param {RoomPosition} start The starting location of the path.
+     * @param {RoomPosition[]} path Every location along the path.
+     */
     static serializePath(start, path) {
         return _.map(path, (pos, index) => {
             var startPos;
@@ -299,6 +331,59 @@ class Pathing {
                     break;
             }
         }).join("");
+    }
+
+    //                            #        ###          #    #     
+    //                            #        #  #         #    #     
+    //  ##   ###    ##    ##    ###   ##   #  #   ###  ###   ###   
+    // # ##  #  #  #     #  #  #  #  # ##  ###   #  #   #    #  #  
+    // ##    #  #  #     #  #  #  #  ##    #     # ##   #    #  #  
+    //  ##   #  #   ##    ##    ###   ##   #      # #    ##  #  #  
+    /**
+     * Encodes a path to reduce size by ~50%.
+     * @param {string} path The path to encode.
+     * @return {string} The encoded path.
+     */
+    static encodePath(path) {
+        var codes = [],
+            index;
+        
+        for (index = 0; index < path.length; index += 2) {
+            if (index === path.length - 1) {
+                codes.push(path.charCodeAt(index) - 17);
+            } else {
+                codes.push((path.charCodeAt(index) - 49) * 8 + (path.charCodeAt(index + 1) - 49) + 40);
+            }
+        }
+
+        return String.fromCharCode(...codes);
+    }
+
+    //    #                       #        ###          #    #     
+    //    #                       #        #  #         #    #     
+    //  ###   ##    ##    ##    ###   ##   #  #   ###  ###   ###   
+    // #  #  # ##  #     #  #  #  #  # ##  ###   #  #   #    #  #  
+    // #  #  ##    #     #  #  #  #  ##    #     # ##   #    #  #  
+    //  ###   ##    ##    ##    ###   ##   #      # #    ##  #  #  
+    /**
+     * Decodes an encoded path.
+     * @param {string} path The decoded path.
+     */
+    static decodePath(path) {
+        var codes = [],
+            index;
+        
+        for (index = 0; index < path.length; index++) {
+            let char = path.charCodeAt(index);
+            if (char < 40) {
+                codes.push(char + 17);
+            } else {
+                codes.push(Math.floor((char - 40) / 8) + 49);
+                codes.push((char - 40) % 8 + 49);
+            }
+        }
+
+        return String.fromCharCode(...codes);
     }
 }
 

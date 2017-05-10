@@ -1119,7 +1119,7 @@ class Main {
                 roomMemory = memoryRooms[roomName],
                 roomType;
             
-            if (rooms && roomMemory && (roomType = memoryRooms[roomName].roomMemory.roomType)) {
+            if (rooms && roomMemory && (roomType = roomMemory.roomType)) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                     // Run rooms.
                     rooms.run(room);

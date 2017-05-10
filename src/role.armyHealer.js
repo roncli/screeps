@@ -31,7 +31,7 @@ class RoleArmyHealer {
         var units = army.healer.units,
             body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             boosts;
-)
+
         body.push(...Array(units - 1).fill(HEAL));
         body.push(...Array(army.super ? 10 : units + 5).fill(MOVE));
         body.push(HEAL);

@@ -1023,9 +1023,10 @@ class Main {
         }), (room) => {
             var roomName = room.name,
                 rooms = Cache.rooms[roomName],
-                roomType = memoryRooms[roomName].roomMemory.roomType;
+                roomMemory = memoryRooms[roomName],
+                roomType;
             
-            if (rooms && roomType) {
+            if (rooms && roomMemory && (roomType = memoryRooms[roomName].roomMemory.roomType)) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                     rooms.run(room);
                 }
@@ -2730,10 +2731,16 @@ return module.exports;
 /********** End of module 5: ../src/drawing.js **********/
 /********** Start module 6: ../src/market.js **********/
 __modules[6] = function(module, exports) {
-var Cache = __require(3,6),
+const Cache = __require(3,6),
     Utilities = __require(8,6);
-
+/**
+ * A class for dealing with and caching market data.
+ */
 class Market {
+    /**
+     * Gets and caches all of the orders on the market.
+     * @return {object[]} All of the orders on the market.
+     */
     static getAllOrders() {
         if (!Market.orders || Game.cpu.bucket >= Memory.marketBucket) {
             Market.orders = Game.market.getAllOrders();
@@ -2742,7 +2749,10 @@ class Market {
         
         return Market.orders;
     }
-
+    /**
+     * Gets all orders on the market filtered by type (buy/sell) and resource type.
+     * @return {object} All of the orders on the market, filtered by type and resource type.
+     */
     static getFilteredOrders() {
         if (!Market.filteredOrders) {
             Market.filteredOrders = Utilities.nest(_.filter(Market.getAllOrders(), (o) => o.amount > 0), [(d) => d.type, (d) => d.resourceType]);
@@ -2756,7 +2766,13 @@ class Market {
         
         return Market.filteredOrders;
     }
-
+    /**
+     * Attempt to deal on the market.
+     * @param {string} orderId The order ID to fill.
+     * @param {number} amount The quantity of the order to fill.
+     * @param {string} yourRoomName The room name containing the terminal to deal from.
+     * @return {number} The return value from Game.market.deal.
+     */
     static deal(orderId, amount, yourRoomName) {
         var ret = Game.market.deal(orderId, amount, yourRoomName),
             order = _.find(Market.orders, (m) => m.id === orderId);

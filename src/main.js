@@ -1116,9 +1116,10 @@ class Main {
         }), (room) => {
             var roomName = room.name,
                 rooms = Cache.rooms[roomName],
-                roomType = memoryRooms[roomName].roomMemory.roomType;
+                roomMemory = memoryRooms[roomName],
+                roomType;
             
-            if (rooms && roomType) {
+            if (rooms && roomMemory && (roomType = memoryRooms[roomName].roomMemory.roomType)) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                     // Run rooms.
                     rooms.run(room);

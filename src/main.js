@@ -1479,10 +1479,12 @@ class Main {
      */
     static debug() {
         _.forEach(Game.creeps, (creep) => {
+            var creepMemory = creep.memory;
+
             creep.room.visual
                 .text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"})
-                .text(creep.memory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"})
-                .text(creep.memory.currentTask ? creep.memory.currentTask.type : "", creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
+                .text(creepMemory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"})
+                .text(creepMemory.currentTask ? creepMemory.currentTask.type : "", creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
         });
     }
 

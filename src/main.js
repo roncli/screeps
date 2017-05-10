@@ -5,7 +5,7 @@ const profiler = require("screeps-profiler"),
     Drawing = require("drawing"),
     Market = require("market"),
     Minerals = require("minerals"),
-    Segment = require("segment"),
+    // Segment = require("segment"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -75,17 +75,19 @@ class Main {
      * The main loop that runs every tick.
      */
     static loop() {
-        var cpu = Game.cpu.getUsed(),
-            bucket = Game.cpu.bucket;
+        var gameCpu = Game.cpu,
+            cpu = gameCpu.getUsed(),
+            bucket = gameCpu.bucket,
+            logCpu = Memory.logCpu;
 
         if (cpu >= 10) {
-            if (Game.cpu.bucket < 9800) {
+            if (gameCpu.bucket < 9700) {
                 Game.notify(`CPU started at ${cpu.toFixed(2)} with bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
                 return;
             }
         }
 
-        if (bucket < Game.cpu.tickLimit) {
+        if (bucket < gameCpu.tickLimit) {
             Game.notify(`Bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
             return;
         }
@@ -94,63 +96,63 @@ class Main {
             var log = "",
                 lastCpu, thisCpu;
             
-            if (Memory.logCpu) {
+            if (logCpu) {
                 lastCpu = thisCpu;
                 log = `Started at ${lastCpu.toFixed(2)}`;
             }
 
             this.init();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}init took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.minerals();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}minerals took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.baseMatrixes();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}baseMatrixes took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.deserializeCreeps();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}deserializeCreeps took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.deserializeRooms();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}deserializeRooms took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.deserializeArmies();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}deserializeArmies took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.balanceEnergy();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}balanceEnergy took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
@@ -158,8 +160,8 @@ class Main {
             if (Memory.log) {
                 this.log();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
+                if (logCpu) {
+                    thisCpu = gameCpu.getUsed();
                     log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
@@ -167,24 +169,24 @@ class Main {
 
             this.rooms();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}rooms took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.army();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}army took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
 
             this.creeps();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}creeps took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
@@ -192,8 +194,8 @@ class Main {
             if (Memory.debug) {
                 this.debug();
                 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
+                if (logCpu) {
+                    thisCpu = gameCpu.getUsed();
                     log += `${log.length > 0 ? " - " : ""}debug took ${(thisCpu - lastCpu).toFixed(2)}`;
                     lastCpu = thisCpu;
                 }
@@ -202,8 +204,8 @@ class Main {
             if (Memory.visualizations) {
                 this.drawGlobal();
 
-                if (Memory.logCpu) {
-                    thisCpu = Game.cpu.getUsed();
+                if (logCpu) {
+                    thisCpu = gameCpu.getUsed();
                     log += `${log.length > 0 ? " - " : ""}drawGlobal took ${(thisCpu - lastCpu).toFixed(2)}`;
                     Cache.log.events.push(log);
                 }
@@ -211,8 +213,8 @@ class Main {
 
             this.finalize();
 
-            if (Memory.logCpu) {
-                thisCpu = Game.cpu.getUsed();
+            if (logCpu) {
+                thisCpu = gameCpu.getUsed();
                 log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
                 lastCpu = thisCpu;
             }
@@ -238,7 +240,7 @@ class Main {
         var generationTick = Game.time % 1500;
 
         // Init memory.
-        Segment.init();
+        // Segment.init();
         
         // Reset the cache.
         Cache.reset();
@@ -409,7 +411,7 @@ class Main {
             });
             // _.forEach(this.paths, (value, id) => {
             //    if (value[3] <= Game.time - 500 || value[2] <= Game.time - 1500) {
-            //         delete paths.memory[id];
+            //         delete this.paths.memory[id];
             //     }
             // });
         }
@@ -536,41 +538,49 @@ class Main {
             _.forEach(Game.rooms, (room, roomName) => {
                 var lowest = Infinity,
                     roomMemory = room.memory,
-                    allCreepsInRoom = Cache.creeps[roomName] && Cache.creeps[roomName].all,
-                    labQueue;
+                    roomType = roomMemory.roomType,
+                    storage = room.storage,
+                    terminal = room.terminal,
+                    creeps = Cache.creeps[roomName],
+                    allCreepsInRoom = creeps && creeps.all,
+                    labQueue, storageStore, terminalStore;
 
-                if (!room.storage || !room.terminal || !room.terminal.my || !room.memory.roomType || room.memory.roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
+                if (!storage || !terminal || !terminal.my || !roomType || roomType.type !== "base" || Cache.labsInRoom(room) < 3) {
                     return;
                 }
+
+                storageStore = storage.store;
+                terminalStore = terminal.store;
 
                 Cache.minerals[roomName] = _.cloneDeep(minerals);
 
                 // Build the mineral data.
                 _.forEach(Cache.minerals[roomName], (mineral) => {
                     var fx = (node, innerFx) => {
-                        var buyPrice,
-                            resource = node.resource,
-                            roomResources = (room.storage.store[resource] || 0) + (room.terminal.store[resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[resource] || 0);
+                        var resource = node.resource,
+                            roomResources = (storageStore[resource] || 0) + (terminalStore[resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[resource] || 0),
+                            children = node.children,
+                            buyPrice;
 
                         node.buyPrice = mineralOrders[resource] ? mineralOrders[resource].price : Infinity;
                         node.amount = Math.max(node.amount - roomResources, 0);
 
-                        _.forEach(node.children, (child) => {
+                        _.forEach(children, (child) => {
                             innerFx(child, innerFx);
                         });
 
-                        if (!node.children || node.children.length === 0) {
+                        if (!children || children.length === 0) {
                             node.action = "buy";
                         } else {
-                            buyPrice = _.sum(_.map(node.children, (c) => c.buyPrice)) * 1.2;
+                            buyPrice = _.sum(_.map(children, (c) => c.buyPrice)) * 1.2;
                             Memory.minimumSell[resource] = Math.min(Infinity, buyPrice);
                             if (Memory.minimumSell[resource] === 0 || Memory.minimumSell[resource] === Infinity) {
                                 delete Memory.minimumSell[resource];
                             }
                             if (node.buyPrice > buyPrice || !Memory.buy) {
                                 // Ensure we have the necessary minerals.
-                                let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
-                                    roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
+                                let roomResources1 = Math.floor(((storageStore[children[0].resource] || 0) + (terminalStore[children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[children[0].resource] || 0)) / 5) * 5,
+                                    roomResources2 = Math.floor(((storageStore[children[1].resource] || 0) + (terminalStore[children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[children[1].resource] || 0)) / 5) * 5;
 
                                 node.amount = Math.min(Math.min(node.amount, roomResources1), roomResources2);
 
@@ -602,7 +612,8 @@ class Main {
                 // Set the lab queue if necessary.
                 if (labQueue && !roomMemory.labQueue) {
                     var fx = (node, innerFx) => {
-                        var resource = node.resource;
+                        var resource = node.resource,
+                            children = node.children;
 
                         // If we have the requested mineral, we're done.
                         if (node.amount <= 0) {
@@ -611,18 +622,18 @@ class Main {
 
                         if (node.action === "create") {
                             // Ensure we have the necessary minerals.
-                            let roomResources1 = Math.floor(((room.storage.store[node.children[0].resource] || 0) + (room.terminal.store[node.children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[0].resource] || 0)) / 5) * 5,
-                                roomResources2 = Math.floor(((room.storage.store[node.children[1].resource] || 0) + (room.terminal.store[node.children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[node.children[1].resource] || 0)) / 5) * 5;
+                            let roomResources1 = Math.floor(((storageStore[children[0].resource] || 0) + (terminalStore[children[0].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[children[0].resource] || 0)) / 5) * 5,
+                                roomResources2 = Math.floor(((storageStore[children[1].resource] || 0) + (terminalStore[children[1].resource] || 0) + _.sum(allCreepsInRoom, (c) => c.carry[children[1].resource] || 0)) / 5) * 5;
 
                             // We need to create the mineral, but we also need to traverse the hierarchy to make sure the children are available.
                             roomMemory.labQueue = {
                                 resource: resource,
                                 amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(node.amount, roomResources1), roomResources2), LAB_MINERAL_CAPACITY) / 5), 3000),
-                                children: _.map(node.children, (c) => c.resource),
+                                children: _.map(children, (c) => c.resource),
                                 start: Game.time
                             };
 
-                            _.forEach(node.children, (child) => {
+                            _.forEach(children, (child) => {
                                 innerFx(child, innerFx);
                             });
                         }
@@ -650,7 +661,7 @@ class Main {
         
         _.forEach(Memory.baseMatrixes, (matrix, roomName) => {
             var room = Game.rooms[roomName],
-                tempMatrix, costMatrix, repairableStructuresInRoom;
+                repairableStructuresInRoom;
             
             if (!room || room.unobservable || matrix.status === "complete" || Cache.spawnsInRoom(room).length === 0) {
                 return;
@@ -659,7 +670,8 @@ class Main {
             // Step 1, create the room's initial matrix with structures defined.
             repairableStructuresInRoom = Cache.repairableStructuresInRoom(room);
             if (!matrix.status) {
-                costMatrix = new PathFinder.CostMatrix();
+                let costMatrix = new PathFinder.CostMatrix();
+
                 _.forEach(_.filter(repairableStructuresInRoom, (s) => !(s.structureType === STRUCTURE_ROAD)), (structure) => {
                     costMatrix.set(structure.pos.x, structure.pos.y, 255);
                 });
@@ -672,8 +684,9 @@ class Main {
             
             // Step 2, try to get to each position within the room.  If it fails, set the terrain as unwalkable.
             if (matrix.status === "building") {
-                tempMatrix = PathFinder.CostMatrix.deserialize(matrix.tempMatrix);
-                costMatrix = PathFinder.CostMatrix.deserialize(matrix.costMatrix);
+                let firstSpawn = Cache.spawnsInRoom(room)[0],
+                    tempMatrix = PathFinder.CostMatrix.deserialize(matrix.tempMatrix),
+                    costMatrix = PathFinder.CostMatrix.deserialize(matrix.costMatrix);
 
                 for (; matrix.x < 50; matrix.x++) {
                     for (; matrix.y < 50; matrix.y++) {
@@ -683,7 +696,7 @@ class Main {
                             return false;
                         }
                         
-                        if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, roomName), {pos: Cache.spawnsInRoom(room)[0].pos, range: 1}, {
+                        if (PathFinder.search(new RoomPosition(matrix.x, matrix.y, roomName), {pos: firstSpawn.pos, range: 1}, {
                             roomCallback: () => {
                                 return tempMatrix;
                             },
@@ -721,63 +734,64 @@ class Main {
      * Deserialies creep tasks from memory into task objects.
      */
     static deserializeCreeps() {
+        var creepTasks = Cache.creepTasks;
         // Loop through each creep to deserialize their task.
         _.forEach(Game.creeps, (creep) => {
             if (creep.memory.currentTask) {
                 switch (creep.memory.currentTask.type) {
                     case "attack":
-                        Cache.creepTasks[creep.name] = TaskAttack.fromObj(creep);
+                        creepTasks[creep.name] = TaskAttack.fromObj(creep);
                         break;
                     case "build":
-                        Cache.creepTasks[creep.name] = TaskBuild.fromObj(creep);
+                        creepTasks[creep.name] = TaskBuild.fromObj(creep);
                         break;
                     case "claim":
-                        Cache.creepTasks[creep.name] = TaskClaim.fromObj(creep);
+                        creepTasks[creep.name] = TaskClaim.fromObj(creep);
                         break;
                     case "collectEnergy":
-                        Cache.creepTasks[creep.name] = TaskCollectEnergy.fromObj(creep);
+                        creepTasks[creep.name] = TaskCollectEnergy.fromObj(creep);
                         break;
                     case "collectMinerals":
-                        Cache.creepTasks[creep.name] = TaskCollectMinerals.fromObj(creep);
+                        creepTasks[creep.name] = TaskCollectMinerals.fromObj(creep);
                         break;
                     case "dismantle":
-                        Cache.creepTasks[creep.name] = TaskDismantle.fromObj(creep);
+                        creepTasks[creep.name] = TaskDismantle.fromObj(creep);
                         break;
                     case "fillEnergy":
-                        Cache.creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
+                        creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
                         break;
                     case "fillMinerals":
-                        Cache.creepTasks[creep.name] = TaskFillMinerals.fromObj(creep);
+                        creepTasks[creep.name] = TaskFillMinerals.fromObj(creep);
                         break;
                     case "harvest":
-                        Cache.creepTasks[creep.name] = TaskHarvest.fromObj(creep);
+                        creepTasks[creep.name] = TaskHarvest.fromObj(creep);
                         break;
                     case "heal":
-                        Cache.creepTasks[creep.name] = TaskHeal.fromObj(creep);
+                        creepTasks[creep.name] = TaskHeal.fromObj(creep);
                         break;
                     case "meleeAttack":
-                        Cache.creepTasks[creep.name] = TaskMeleeAttack.fromObj(creep);
+                        creepTasks[creep.name] = TaskMeleeAttack.fromObj(creep);
                         break;
                     case "mine":
-                        Cache.creepTasks[creep.name] = TaskMine.fromObj(creep);
+                        creepTasks[creep.name] = TaskMine.fromObj(creep);
                         break;
                     case "pickupResource":
-                        Cache.creepTasks[creep.name] = TaskPickupResource.fromObj(creep);
+                        creepTasks[creep.name] = TaskPickupResource.fromObj(creep);
                         break;
                     case "rally":
-                        Cache.creepTasks[creep.name] = TaskRally.fromObj(creep);
+                        creepTasks[creep.name] = TaskRally.fromObj(creep);
                         break;
                     case "rangedAttack":
-                        Cache.creepTasks[creep.name] = TaskRangedAttack.fromObj(creep);
+                        creepTasks[creep.name] = TaskRangedAttack.fromObj(creep);
                         break;
                     case "repair":
-                        Cache.creepTasks[creep.name] = TaskRepair.fromObj(creep);
+                        creepTasks[creep.name] = TaskRepair.fromObj(creep);
                         break;
                     case "reserve":
-                        Cache.creepTasks[creep.name] = TaskReserve.fromObj(creep);
+                        creepTasks[creep.name] = TaskReserve.fromObj(creep);
                         break;
                     case "upgradeController":
-                        Cache.creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);
+                        creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);
                         break;
                 }
             }
@@ -794,22 +808,24 @@ class Main {
      * Deserialize rooms from memory into room objects.
      */
     static deserializeRooms() {
+        var rooms = Cache.rooms;
+
         // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
         this.unobservableRooms = [];
         _.forEach(Memory.rooms, (roomMemory, name) => {
             if (roomMemory.roomType) {
                 switch (roomMemory.roomType.type) {
                     case "base":
-                        Cache.rooms[name] = RoomBase.fromObj(roomMemory);
+                        rooms[name] = RoomBase.fromObj(roomMemory);
                         break;
                     case "cleanup":
-                        Cache.rooms[name] = RoomCleanup.fromObj(roomMemory);
+                        rooms[name] = RoomCleanup.fromObj(roomMemory);
                         break;
                     case "mine":
-                        Cache.rooms[name] = RoomMine.fromObj(roomMemory);
+                        rooms[name] = RoomMine.fromObj(roomMemory);
                         break;
                     case "source":
-                        Cache.rooms[name] = RoomSource.fromObj(roomMemory);
+                        rooms[name] = RoomSource.fromObj(roomMemory);
                         break;
                 }
 
@@ -833,8 +849,10 @@ class Main {
      * Deserializes armies from memory into army objects.
      */
     static deserializeArmies() {
+        var armies = Cache.armies;
+
         _.forEach(Memory.army, (army, armyName) => {
-            Cache.armies[armyName] = Army.fromObj(armyName, army);
+            armies[armyName] = Army.fromObj(armyName, army);
         });
     }
 
@@ -1088,7 +1106,7 @@ class Main {
         var roomOrder = ["base", "source", "mine", "cleanup", ""],
             memoryRooms = Memory.rooms,
             roomsToAlwaysRun = ["source", "cleanup"],
-            runRooms = Game.cpu.bucket >= 9800 || Game.time % 2 === 0;
+            runRooms = Game.cpu.bucket >= 9700 || Game.time % 2 === 0;
 
         Memory.rushRoom = (_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.controller && r.controller.level < 8).sort((a, b) => b.controller.level - a.controller.level || b.controller.progress - a.controller.progress)[0] || {name: ""}).name;
 
@@ -1097,16 +1115,16 @@ class Main {
             return roomOrder.indexOf(memoryRooms[a.name] && memoryRooms[a.name].roomType && memoryRooms[a.name].roomType.type || "") - roomOrder.indexOf(memoryRooms[b.name] && memoryRooms[b.name].roomType && memoryRooms[b.name].roomType.type || "");
         }), (room) => {
             var roomName = room.name,
-                roomMemory = memoryRooms[roomName],
-                roomType = roomMemory.roomType;
+                rooms = Cache.rooms[roomName],
+                roomType = memoryRooms[roomName].roomMemory.roomType;
             
-            if (Cache.rooms[roomName]) {
+            if (rooms && roomType) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                     // Run rooms.
-                    Cache.rooms[roomName].run(room);
+                    rooms.run(room);
                 }
-                if (roomType.type === Cache.rooms[roomName].type) {
-                    Cache.rooms[roomName].toObj(room);
+                if (roomType.type === rooms.type) {
+                    rooms.toObj(room);
                 }
             }
             
@@ -1271,16 +1289,26 @@ class Main {
      * Process creep tasks.
      */
     static creeps() {
+        var time = Game.time;
+
         // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
         _.forEach(Game.creeps, (creep) => {
+            let ttl, creepMemory, army, creepRoom, creepTasks;
+
             // Don't do anything if the creep is spawning or stopped.
             if (creep.spawning || creep.memory.stop) {
                 return;
             }
 
+            ttl = creep.ticksToLive;
+            creepMemory = creep.memory;
+            army = creepMemory.army;
+            creepRoom = creep.room.name;
+            creepTasks = Cache.creepTasks[creep.name];
+            
             // Countdown to death!
-            if (creep.ticksToLive <= 150 || creep.ticksToLive < 500 && creep.ticksToLive % 10 === 1 || creep.ticksToLive % 100 === 1) {
-                switch (creep.ticksToLive - 1) {
+            if (ttl <= 150 || ttl < 500 && ttl % 10 === 1 || ttl % 100 === 1) {
+                switch (ttl - 1) {
                     case 3:
                         creep.say("R.I.P. and", true);
                         break;
@@ -1291,18 +1319,18 @@ class Main {
                         creep.say(":(", true);
                         break;
                     default:
-                        creep.say(`TTL ${creep.ticksToLive - 1}`);
+                        creep.say(`TTL ${ttl - 1}`);
                         break;
                 }
             }
 
             // Army creeps know who their friends are.
-            if (creep.memory.army && Cache.armies[creep.memory.army] && creep.room.name === Cache.armies[creep.memory.army].attackRoom) {
-                creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][Game.time % 35], true);
+            if (army && Cache.armies[army] && creepRoom === Cache.armies[army].attackRoom) {
+                creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][time % 35], true);
             }
 
             // Happy new million!
-            switch (Game.time % 1000000) {
+            switch (time % 1000000) {
                 case 999990:
                     creep.say("TEN!", true);
                     break;
@@ -1341,7 +1369,7 @@ class Main {
                     break;
             }
 
-            if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
+            if (creepMemory.currentTask && creepTasks) {
                 // Ensure creeps try to move off of the sides of the room if they're not moving anywhere else this turn.
                 if (creep.pos.x === 0) {
                     switch (Math.floor(Math.random() * 3)) {
@@ -1400,17 +1428,17 @@ class Main {
                 }
 
                 // Run creeps.
-                Cache.creepTasks[creep.name].run(creep);
+                creepTasks.run(creep);
 
                 // Purge current task if the creep is in a new room.
-                if (creep.memory.lastRoom && creep.memory.lastRoom !== creep.room.name && (!Cache.creepTasks[creep.name] || !Cache.creepTasks[creep.name].force)) {
-                    delete creep.memory.currentTask;
+                if (creepMemory.lastRoom && creepMemory.lastRoom !== creepRoom && (!creepTasks || !creepTasks.force)) {
+                    delete creepMemory.currentTask;
                 }
-                creep.memory.lastRoom = creep.room.name;
+                creepMemory.lastRoom = creepRoom;
 
                 // Only serialize if the task wasn't completed.
-                if (creep.memory.currentTask && Cache.creepTasks[creep.name]) {
-                    Cache.creepTasks[creep.name].toObj(creep);
+                if (creepMemory.currentTask && creepTasks) {
+                    creepTasks.toObj(creep);
                 }
 
                 // If the creep has a work part, try to repair any road that may be under it.
@@ -1421,14 +1449,14 @@ class Main {
                 }
 
                 // Suicide a rallying creep if necessary.
-                if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && (!creep.memory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                     creep.suicide();
                 }
             } else {
-                delete creep.memory.currentTask;
+                delete creepMemory.currentTask;
 
                 // RIP & Pepperonis :(
-                if (!creep.spawning && creep.ticksToLive < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creepMemory.role) === -1) {
                     creep.suicide();
                 } else {
                     creep.say("Idle");
@@ -1451,9 +1479,10 @@ class Main {
      */
     static debug() {
         _.forEach(Game.creeps, (creep) => {
-            creep.room.visual.text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"});
-            creep.room.visual.text(creep.memory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"});
-            creep.room.visual.text(creep.memory.currentTask ? creep.memory.currentTask.type : "", creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
+            creep.room.visual
+                .text(creep.name, creep.pos.x, creep.pos.y + 1, {align: "center", font: "0.5 Arial"})
+                .text(creep.memory.role, creep.pos.x, creep.pos.y + 1.5, {align: "center", font: "0.5 Arial"})
+                .text(creep.memory.currentTask ? creep.memory.currentTask.type : "", creep.pos.x, creep.pos.y + 2, {align: "center", font: "0.5 Arial"});
         });
     }
 
@@ -1477,8 +1506,8 @@ class Main {
         Drawing.progressBar(Cache.globalVisual, 34.5, -0.4, 10, 0.5, Game.cpu.bucket, 10000, {label: "Bucket", background: "#808080", showMax: false, bar: Game.cpu.bucket >= 9990 ? "#00ffff" : Game.cpu.bucket >= 9000 ? "#00ff00" : Game.cpu.bucket >= 5000 ? "#cccc00" : "#ff0000", color: "#ffffff", font: "0.5 Arial"});
 
         // Time
-        Cache.globalVisual.text(`Tick ${Game.time}`, 49.5, 0.025, {align: "right", font: "0.5 Arial"});
-        Cache.globalVisual.text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
+        Cache.globalVisual.text(`Tick ${Game.time}`, 49.5, 0.025, {align: "right", font: "0.5 Arial"})
+            .text(Cache.time, 49.5, 0.725, {align: "right", font: "0.5 Arial"});
 
         // Credits
         Cache.globalVisual.text(`Credits ${Game.market.credits.toFixed(2)}`, -0.5, 0.725, {align: "left", font: "0.5 Arial"});

@@ -4,6 +4,40 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Miner {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {bool} isMineralHarvester Whether this creep will be harvesting minerals or not.
+     * @param {bool} isSourceRoom Whether this creep will be harvesting in a source keeper room or not.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine, isMineralHarvester, isSourceRoom) {
+        var body = [];
+
+        if (isMineralHarvester) {
+            let energy = Math.min(engine.room.energyCapacityAvailable, 4500),
+                units = Math.floor(energy / 450),
+                remainder = energy % 450;
+            
+            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
+            body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
+        } else {
+            body = isSourceRoom ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK];
+        }
+
+        return {
+            body: body,
+            name: "remoteMiner"
+        };
+    }
+
     static checkSpawn(room) {
         var roomName = room.name,
             supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],

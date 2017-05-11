@@ -8,6 +8,36 @@ var Cache = require("cache"),
     TaskRepair = require("task.repair");
 
 class Worker {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 3300),
+            units = Math.floor(Math.min(energy, 2000) / 200),
+            secondUnits = Math.floor(Math.max((energy - 2000), 0) / 150),
+            remainder = Math.min(energy, 2000) % 200,
+            secondRemainder = Math.max((energy - 2000), 0) % 150,
+            body = [];
+
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + secondUnits * 2 + (remainder >= 100 && remainder < 150 ? 1 : 0) + (secondRemainder > 100 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + secondUnits + (remainder >= 50 ? 1 : 0) + (secondRemainder >= 50 ? 1 : 0)).fill(MOVE));
+
+        return {
+            body: body,
+            name: "remoteWorker"
+        };
+    }
+
     static checkSpawn(room) {
         var roomName = room.name,
             supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],

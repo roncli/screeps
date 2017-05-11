@@ -1,10 +1,34 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskBuild = require("task.build"),
-    TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
 class RemoteDismantler {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 3750),
+            units = Math.floor(energy / 150),
+            body = [];
+
+        body.push(...Array(units).fill(WORK));
+        body.push(...Array(units).fill(MOVE));
+
+        return {
+            body: body,
+            name: "remoteDismantler"
+        };
+    }
+
     static checkSpawn(room, supportRoom, max) {
         var roomName = room.name,
             dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [];
@@ -37,7 +61,7 @@ class RemoteDismantler {
         var body = [],
             roomName = room.name,
             supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
+            energy, units, count, spawnToUse, name;
 
         // Fail if all the spawns are busy.
         if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
@@ -47,7 +71,6 @@ class RemoteDismantler {
         // Get the total energy in the room, limited to 3750.
         energy = Math.min(supportRoom.energyCapacityAvailable, 3750);
         units = Math.floor(energy / 150);
-        remainder = energy % 150;
 
         // Create the body based on the energy.
         for (count = 0; count < units; count++) {

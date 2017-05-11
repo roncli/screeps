@@ -80,7 +80,7 @@ class Defender {
         return typeof name !== "number";
     }
 
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].defender || []), (c) => !c.spawning),
             hostiles, keepers;

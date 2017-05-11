@@ -4,6 +4,32 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Healer {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 7500),
+            units = Math.floor(energy / 300),
+            body = [];
+
+        body.push(...Array(units).fill(MOVE));
+        body.push(...Array(units).fill(HEAL));
+
+        return {
+            body: body,
+            name: "healer"
+        };
+    }
+
     static checkSpawn(room) {
         var roomName = room.name,
             healers = Cache.creeps[roomName] && Cache.creeps[roomName].healer || [],
@@ -61,7 +87,7 @@ class Healer {
         return typeof name !== "number";
     }
 
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].healer || []), (c) => !c.spawning),
             assigned = [];

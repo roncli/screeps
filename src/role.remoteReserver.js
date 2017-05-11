@@ -5,6 +5,32 @@ var Cache = require("cache"),
     TaskReserve = require("task.reserve");
 
 class Reserver {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 3250),
+            units = Math.floor(energy / 650),
+            body = [];
+
+        body.push(...Array(units).fill(CLAIM));
+        body.push(...Array(units).fill(MOVE));
+
+        return {
+            body: body,
+            name: "remoteReserver"
+        };
+    }
+
     static checkSpawn(room) {
         var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
             supportRoomName = supportRoom.name,
@@ -94,7 +120,7 @@ class Reserver {
         return typeof name !== "number";
     }
 
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []),
             assigned = [];

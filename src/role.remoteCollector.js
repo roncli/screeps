@@ -4,6 +4,32 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class RemoteCollector {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 2400),
+            units = Math.floor(energy / 150),
+            body = [];
+
+        body.push(...Array(units * 2).fill(CARRY));
+        body.push(...Array(units).fill(MOVE));
+
+        return {
+            body: body,
+            name: "remoteCollector"
+        };
+    }
+
     static checkSpawn(room, supportRoom, max) {
         var roomName = room.name,
             creeps = Cache.creeps[roomName],

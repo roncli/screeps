@@ -7,6 +7,34 @@ var Cache = require("cache"),
     TaskRepair = require("task.repair");
 
 class Builder {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 3300),
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            body = [];
+
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+
+        return {
+            body: body,
+            name: "remoteBuilder"
+        };
+    }
+
     static checkSpawn(room) {
         var roomName = room.name,
             supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],

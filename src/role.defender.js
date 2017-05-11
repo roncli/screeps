@@ -4,16 +4,34 @@ var Cache = require("cache"),
     TaskMeleeAttack = require("task.meleeAttack");
 
 class Defender {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings() {
+        return {
+            body: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, HEAL, HEAL, HEAL, HEAL],
+            name: "defender"
+        };
+    }
+
     static checkQuadrant(pos, quadrant) {
         switch (quadrant) {
             case 0:
                 return pos.x < 25 && pos.y < 25;
             case 1:
-                return pos.x < 25 && pos.y > 25;
+                return pos.x < 25 && pos.y >= 25;
             case 2:
-                return pos.x > 25 && pos.y > 25;
+                return pos.x >= 25 && pos.y >= 25;
             case 3:
-                return pos.x > 25 && pos.y < 25;
+                return pos.x >= 25 && pos.y < 25;
         }
     }
 

@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Commands = require("commands"),
+    RoomEngine = require("room.engine"),
     Utilities = require("utilities"),
     RoleDismantler = require("role.dismantler"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
@@ -12,14 +13,15 @@ var Cache = require("cache"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals");
 
-class Mine {
+class RoomMine extends RoomEngine {
     constructor(supportRoom, stage) {
+        super();
         this.type = "mine";
         this.supportRoom = supportRoom;
         this.stage = stage || 1;
     }
 
-    convert(room, supportRoom) {
+    convert(room) {
         var roomName = room.name,
             memory = Memory.rooms[roomName],
             oldRoomType = memory.roomType.type;
@@ -316,7 +318,7 @@ class Mine {
 
         // If the controller is ours, convert this to a base.
         if (room.controller && room.controller.my) {
-            this.convert(room, supportRoom);
+            this.convert(room);
             return;
         }
 
@@ -338,11 +340,11 @@ class Mine {
     }
 
     static fromObj(roomMemory) {
-        return new Mine(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
+        return new RoomMine(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Mine, "RoomMine");
+    require("screeps-profiler").registerObject(RoomMine, "RoomMine");
 }
-module.exports = Mine;
+module.exports = RoomMine;

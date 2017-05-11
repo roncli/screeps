@@ -2,6 +2,7 @@ var Cache = require("cache"),
     Commands = require("commands"),
     Market = require("market"),
     Minerals = require("minerals"),
+    RoomEngine = require("roomEngine"),
     Utilities = require("utilities"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
@@ -24,8 +25,9 @@ var Cache = require("cache"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController");
 
-class Base {
+class RoomBase extends RoomEngine {
     constructor() {
+        super();
         this.type = "base";
     }
 
@@ -819,12 +821,12 @@ class Base {
         };
     }
 
-    static fromObj(roomMemory) {
-        return new Base();
+    static fromObj() {
+        return new RoomBase();
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Base, "RoomBase");
+    require("screeps-profiler").registerObject(RoomBase, "RoomBase");
 }
-module.exports = Base;
+module.exports = RoomBase;

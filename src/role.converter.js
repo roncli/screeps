@@ -1,15 +1,39 @@
 var Cache = require("cache"),
-    Commands = require("commands"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally"),
     TaskAttack = require("task.attack");
 
 class Converter {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var energy = Math.min(engine.room.energyCapacityAvailable, 24400),
+            units = Math.floor(energy / 3050),
+            body = [];
+
+        body.push(...Array(units * 5).fill(CLAIM));
+        body.push(...Array(units).fill(MOVE));
+
+        return {
+            body: body,
+            name: "converter"
+        };
+    }
+
     static checkSpawn(room) {
         var converter = Memory.maxCreeps.converter,
             roomName = room.name,
             converters = Cache.creeps[roomName] && Cache.creeps[roomName].converter || [],
-            num = 0,
             max = 0;
         
         // Loop through the room converters to see if we need to spawn a creep.
@@ -17,7 +41,6 @@ class Converter {
             _.forEach(converter[roomName], (value, toRoom) => {
                 var count = _.filter(converters, (c) => c.memory.attack === toRoom).length;
 
-                num += count;
                 max += 1;
 
                 if (count === 0) {
@@ -38,9 +61,7 @@ class Converter {
 
     static spawn(room, toRoom) {
         var body = [],
-            roomName = room.name,
             spawns = Cache.spawnsInRoom(room),
-            supportRoomName = supportRoom.name,
             energy, units, count, spawnToUse, name;
 
         // Fail if all the spawns are busy.
@@ -49,7 +70,7 @@ class Converter {
         }
 
         // Get the total energy in the room, limited to 24400.
-        energy = Math.min(supportRoom.energyCapacityAvailable, 24400);
+        energy = Math.min(room.energyCapacityAvailable, 24400);
         units = Math.floor(energy / 3050);
 
         // Create the body based on the energy.
@@ -76,7 +97,7 @@ class Converter {
         return typeof name !== "number";
     }
 
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].converter || []),
             assigned = [];

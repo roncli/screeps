@@ -259,6 +259,7 @@
         "STRUCTURE_TERMINAL": false,
         "STRUCTURE_TOWER": false,
         "STRUCTURE_WALL": false,
+        "SUBSCRIPTION_TOKEN": false,
         "SYSTEM_USERNAME": false,
         "TERMINAL_CAPACITY": false,
         "TERMINAL_HITS": false,

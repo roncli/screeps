@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Commands = require("commands"),
+    RoomEngine = require("roomEngine"),
     Utilities = require("utilities"),
     RoleRemoteDismantler = require("role.remoteDismantler"),
     RoleRemoteCollector = require("role.remoteCollector"),
@@ -10,8 +11,9 @@ var Cache = require("cache"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskPickupResource = require("task.pickupResource");
 
-class Cleanup {
+class RoomCleanup extends RoomEngine {
     constructor(supportRoom) {
+        super();
         this.type = "cleanup";
         this.supportRoom = supportRoom;
     }
@@ -128,11 +130,11 @@ class Cleanup {
     }
 
     static fromObj(roomMemory) {
-        return new Cleanup(roomMemory.roomType.supportRoom);
+        return new RoomCleanup(roomMemory.roomType.supportRoom);
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Cleanup, "RoomCleanup");
+    require("screeps-profiler").registerObject(RoomCleanup, "RoomCleanup");
 }
-module.exports = Cleanup;
+module.exports = RoomCleanup;

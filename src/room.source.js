@@ -1,5 +1,6 @@
 var Cache = require("cache"),
     Commands = require("commands"),
+    RoomEngine = require("roomEngine"),
     Utilities = require("utilities"),
     RoleDefender = require("role.defender"),
     RoleDismantler = require("role.dismantler"),
@@ -14,8 +15,9 @@ var Cache = require("cache"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals");
 
-class Source {
+class RoomSource extends RoomEngine {
     constructor(supportRoom, stage) {
+        super();
         this.type = "source";
         this.supportRoom = supportRoom;
         this.stage = stage || 1;
@@ -290,12 +292,6 @@ class Source {
             return;
         }
 
-        // If the controller is ours, convert this to a base.
-        if (room.controller && room.controller.my) {
-            this.convert(room, supportRoom);
-            return;
-        }
-
         if (this.stage === 1) {
             this.stage1(room, supportRoom);
         }
@@ -314,11 +310,11 @@ class Source {
     }
 
     static fromObj(roomMemory) {
-        return new Source(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
+        return new RoomSource(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Source, "RoomSource");
+    require("screeps-profiler").registerObject(RoomSource, "RoomSource");
 }
-module.exports = Source;
+module.exports = RoomSource;

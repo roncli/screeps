@@ -1,15 +1,31 @@
 var Cache = require("cache"),
-    Commands = require("commands"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally"),
     TaskClaim = require("task.claim");
 
 class Claimer {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings() {
+        return {
+            body: [CLAIM, MOVE],
+            name: "claimer"
+        };
+    }
+
     static checkSpawn(room) {
         var claimer = Memory.maxCreeps.claimer,
             roomName = room.name,
             claimers = Cache.creeps[roomName] && Cache.creeps[roomName].claimer || [],
-            num = 0,
             max = 0;
         
         // Loop through the room claimers to see if we need to spawn a creep.
@@ -17,7 +33,6 @@ class Claimer {
             _.forEach(claimer[roomName], (value, toRoom) => {
                 var count = _.filter(claimers, (c) => c.memory.claim === toRoom).length;
 
-                num += count;
                 max += 1;
 
                 if (count === 0) {
@@ -57,7 +72,7 @@ class Claimer {
         return typeof name !== "number";
     }
 
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].claimer || []),
             assigned = [];

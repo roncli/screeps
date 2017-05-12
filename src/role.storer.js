@@ -3,6 +3,39 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Storer {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var body;
+
+        switch (engine.room.controller.level) {
+            case 7:
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                break;
+            case 8:
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                break;
+            default:
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                break;
+        }
+
+        return {
+            body: body,
+            name: "storer"
+        };
+    }
+
     static checkSpawn(room) {
         var containers = Cache.containersInRoom(room),
             roomName = room.name,

@@ -6,6 +6,55 @@ var Cache = require("cache"),
     TaskRally = require("task.rally");
 
 class Upgrader {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {RoomEngine} engine The room engine to spawn for.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(engine) {
+        var room = engine.room,
+            links = Cache.linksInRoom(room),
+            controller = room.controller,
+            energy = room.energyCapacityAvailable,
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            body = [];
+
+        // Check if we have a link in range of the controller and build the creep accordingly.
+        if (links >= 2 && Utilities.objectsClosestToObj(links, controller)[0].pos.getRangeTo(controller) <= 2) {
+            let carryUnits;
+
+            energy = Math.min(energy, controller.level === 8 ? 1950 : 4100);
+            carryUnits = Math.ceil(energy / 3200);
+            units = Math.floor((energy - carryUnits * 50) / 250);
+            remainder = (energy - carryUnits * 50) % 250;
+
+            body.push(...Array(units * 2 + (remainder >= 150 ? 1 : 0)).fill(WORK));
+            body.push(...Array(carryUnits).fill(CARRY));
+            body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+        } else {
+            energy = Math.min(energy, controller.level === 8 ? 3000 : 3300);
+            units = Math.floor(energy / 200);
+            remainder = energy % 200;
+
+            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+            body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+            body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+        }
+
+        return {
+            body: body,
+            name: "upgrader"
+        };
+    }
+
     static checkSpawn(room) {
         var roomName = room.name,
             upgraders = Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || [],

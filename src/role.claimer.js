@@ -26,29 +26,22 @@ class Claimer {
         var claimer = Memory.maxCreeps.claimer,
             roomName = room.name,
             claimers = Cache.creeps[roomName] && Cache.creeps[roomName].claimer || [],
-            max = 0;
+            max = Object.keys(claimer[roomName]).length,
+            roomToClaim;
         
         // Loop through the room claimers to see if we need to spawn a creep.
         if (claimer) {
             _.forEach(claimer[roomName], (value, toRoom) => {
                 var count = _.filter(claimers, (c) => c.memory.claim === toRoom).length;
 
-                max += 1;
-
                 if (count === 0) {
-                    Claimer.spawn(room, toRoom);
+                    roomToClaim = toRoom;
+                    return false;
                 }
             });
         }
 
-        // Output claimer count in the report.
-        if (Memory.log && (claimers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "claimer",
-                count: claimers.length,
-                max: max
-            });
-        }        
+        return roomToClaim;
     }
 
     static spawn(room, toRoom) {

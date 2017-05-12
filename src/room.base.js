@@ -25,14 +25,109 @@ var Cache = require("cache"),
     TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController");
 
+//  ####                        ####                       
+//  #   #                        #  #                      
+//  #   #   ###    ###   ## #    #  #   ###    ###    ###  
+//  ####   #   #  #   #  # # #   ###       #  #      #   # 
+//  # #    #   #  #   #  # # #   #  #   ####   ###   ##### 
+//  #  #   #   #  #   #  # # #   #  #  #   #      #  #     
+//  #   #   ###    ###   #   #  ####    ####  ####    ###  
+/**
+ * A class that represents a base room.
+ */
 class RoomBase extends RoomEngine {
-    constructor() {
+    //                           #                       #                
+    //                           #                       #                
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    /**
+     * Creates a new base room.
+     * @param {Room} room The room.
+     */
+    constructor(room) {
         super();
         this.type = "base";
+        this.room = room;
     }
 
-    manage(room) {
-        var controller = room.controller,
+    // ###   #  #  ###   
+    // #  #  #  #  #  #  
+    // #     #  #  #  #  
+    // #      ###  #  #  
+    /**
+     * Run the room.
+     */
+    run() {
+        var room = this.room,
+            roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
+
+        if (room.unobservable) {
+            // Something is supremely wrong.  Notify and bail.
+            Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
+            return;
+        }
+
+        roomName = room.name;
+        spawns = Cache.spawnsInRoom(room);
+        terminal = room.terminal;
+        storage = room.storage;
+        memory = room.memory;
+        labQueue = memory.labQueue;
+        labsInUse = memory.labsInUse;
+
+        // Manage room.
+        if (Game.time % 100 === 0 && spawns.length > 0) {
+            this.manage();
+        }
+
+        // Defend base.
+        this.defend();
+
+        // Transfer energy from near link to far link.
+        if (spawns.length > 0) {
+            this.transferEnergy();
+        }
+        
+        // Check to see if we can do a deal in the terminal.
+        if (terminal) {
+            this.terminal();
+        }
+
+        // Get the tasks needed for this room.
+        tasks = this.tasks();
+
+        // Spawn new creeps.
+        this.spawn(!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
+
+        // Assign tasks to creeps and towers.
+        this.assignTasks(tasks);
+
+        // Update lab queue if necessary.
+        if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
+            this.labQueue();
+        }
+
+        // Update labs in use.
+        if (labsInUse) {
+            this.labsInUse();
+        }
+        
+        this.processPower();
+    }
+
+    // # #    ###  ###    ###   ###   ##   
+    // ####  #  #  #  #  #  #  #  #  # ##  
+    // #  #  # ##  #  #  # ##   ##   ##    
+    // #  #   # #  #  #   # #  #      ##   
+    //                          ###        
+    /**
+     * Manage the room's layout.
+     */
+    manage() {
+        var room = this.room,
+            controller = room.controller,
             rcl = controller.level,
             sites = room.find(FIND_MY_CONSTRUCTION_SITES),
             spawn = Cache.spawnsInRoom(room)[0],
@@ -42,14 +137,8 @@ class RoomBase extends RoomEngine {
             roomName = room.name,
             extensionsToBuild;
 
-        // Bail if this base does not have a controller.
-        if (!controller || rcl === 0) {
-            return;
-        }
-
-        // Build more extensions if they are available.
+        // Build extensions.
         if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][rcl - 1] - (Cache.extensionsInRoom(room).length + _.filter(sites, (c) => c.structureType === STRUCTURE_EXTENSION).length)) > 0) {
-            // Build the needed structures.
             Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, spawn);
         }
 
@@ -75,7 +164,6 @@ class RoomBase extends RoomEngine {
                         structure.destroy();
                     });
 
-                    // Build the container.
                     room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
                 }
             });
@@ -124,7 +212,6 @@ class RoomBase extends RoomEngine {
                         structure.destroy();
                     });
 
-                    // Build the container.
                     room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
                 }
             });
@@ -151,16 +238,26 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    // Basic philosophy: We want to respond appropriately to incoming threats, but we also don't want to overdo it.
-    // 0-50 ticks - Enemy is being annoying, let towers deal with them.
-    // 50-500 ticks - Enemy is proving to be at least a basic threat, deal with them using a standard army.
-    // 500-2000 ticks - Light threat.  Use boosts with the standard army.
-    // 2000-2500 ticks - Moderate threat.  All bases in the region should send an army to any rooms identified as a threat.
-    // 2500+ ticks - Massive sustained threat.  Use boosts with all armies.
-    // NYI - Casualties taken? - Create an army of similar size that respects the base matrixes.  If a base matrix has not yet been created, queue one for creation.
-    // Enemy spending a lot of time on 0/49 tiles? - Create an army of similar size that goes after creeps in the border room they are trying to drain from.
-    defend(room) {
-        var roomName = room.name,
+    //    #          #                  #  
+    //    #         # #                 #  
+    //  ###   ##    #     ##   ###    ###  
+    // #  #  # ##  ###   # ##  #  #  #  #  
+    // #  #  ##     #    ##    #  #  #  #  
+    //  ###   ##    #     ##   #  #   ###  
+    /**
+     * Defend the room.
+     * Basic philosophy: We want to respond appropriately to incoming threats, but we also don't want to overdo it.
+     * 0-50 ticks - Enemy is being annoying, let towers deal with them.
+     * 50-500 ticks - Enemy is proving to be at least a basic threat, deal with them using a standard army.
+     * 500-2000 ticks - Light threat.  Use boosts with the standard army.
+     * 2000-2500 ticks - Moderate threat.  All bases in the region should send an army to any rooms identified as a threat.
+     * 2500+ ticks - Massive sustained threat.  Use boosts with all armies.
+     * NYI - Casualties taken? - Create an army of similar size that respects the base matrixes.  If a base matrix has not yet been created, queue one for creation.
+     * Enemy spending a lot of time on 0/49 tiles? - Create an army of similar size that goes after creeps in the border room they are trying to drain from.
+     */
+    defend() {
+        var room = this.room,
+            roomName = room.name,
             roomMemory = room.memory,
             hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
             armyName = `${roomName}-defense`,
@@ -255,11 +352,27 @@ class RoomBase extends RoomEngine {
                 delete roomMemory.threats;
                 delete roomMemory.edgeTicks;
             }
+        } else {
+            delete roomMemory.lastHostile;
+            delete roomMemory.currentAttack;
+            delete roomMemory.threats;
+            delete roomMemory.edgeTicks;
         }
     }
 
-    transferEnergy(room) {
-        var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
+    //  #                               #               ####                                
+    //  #                              # #              #                                   
+    // ###   ###    ###  ###    ###    #     ##   ###   ###   ###    ##   ###    ###  #  #  
+    //  #    #  #  #  #  #  #  ##     ###   # ##  #  #  #     #  #  # ##  #  #  #  #  #  #  
+    //  #    #     # ##  #  #    ##    #    ##    #     #     #  #  ##    #      ##    # #  
+    //   ##  #      # #  #  #  ###     #     ##   #     ####  #  #   ##   #     #       #   
+    //                                                                           ###   #    
+    /**
+     * Transfers energy from links closest to the first spawn to remote links.
+     */
+    transferEnergy() {
+        var room = this.room,
+            links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
             firstLink = links[0];
 
         _.forEach(links, (link, index) => {
@@ -273,8 +386,19 @@ class RoomBase extends RoomEngine {
         });
     }
 
-    terminal(room, terminal) {
-        var terminalStore = terminal.store,
+    //  #                       #                ##    
+    //  #                                         #    
+    // ###    ##   ###   # #   ##    ###    ###   #    
+    //  #    # ##  #  #  ####   #    #  #  #  #   #    
+    //  #    ##    #     #  #   #    #  #  # ##   #    
+    //   ##   ##   #     #  #  ###   #  #   # #  ###   
+    /**
+     * Make resource deals in the terminal.
+     */
+    terminal() {
+        var room = this.room,
+            terminal = room.terminal,
+            terminalStore = terminal.store,
             terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
             storage = room.storage,
             roomName = room.name,
@@ -471,8 +595,19 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    tasks(room) {
-        var terminal = room.terminal,
+    //  #                 #            
+    //  #                 #            
+    // ###    ###   ###   # #    ###   
+    //  #    #  #  ##     ##    ##     
+    //  #    # ##    ##   # #     ##   
+    //   ##   # #  ###    #  #  ###    
+    /**
+     * Compile the tasks available for this room.
+     * @return {object} The list of available tasks.
+     */
+    tasks() {
+        var room = this.room,
+            terminal = room.terminal,
             dismantle = Memory.dismantle,
             roomName = room.name,
             terminalEnergy = 0,
@@ -602,27 +737,82 @@ class RoomBase extends RoomEngine {
         return tasks;
     }
 
-    spawn(room, canSpawnWorkers) {
-        var dismantle = Memory.dismantle,
+    //  ###   ###    ###  #  #  ###   
+    // ##     #  #  #  #  #  #  #  #  
+    //   ##   #  #  # ##  ####  #  #  
+    // ###    ###    # #  ####  #  #  
+    //        #                       
+    /**
+     * Spawns needed creeps.
+     * @param {bool} canSpawnWorkers Whether we should spawn workers or not.
+     */
+    spawn(canSpawnWorkers) {
+        var room = this.room,
+            dismantle = Memory.dismantle,
             roomName = room.name,
             controller = room.controller;
 
-        RoleWorker.checkSpawn(room, canSpawnWorkers);
-        RoleMiner.checkSpawn(room);
-        RoleStorer.checkSpawn(room);
-        RoleScientist.checkSpawn(room);
+        this.checkSpawn("worker", ??, this.spawnFromRegion.bind(this, RoleWorker)); // canSpawnWorkers
+        this.checkSpawn("miner", ??, this.spawnFromRegion.bind(this, RoleMiner));
+        this.checkSpawn("storer", ??, this.spawnFromRegion.bind(this, RoleStorer));
+        this.checkSpawn("scientist", ??, this.spawnFromRegion.bind(this, RoleScientist));
         if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-            RoleDismantler.checkSpawn(room);
+            this.checkSpawn("dismantler", ??, this.spawnFromRegion.bind(this, RoleDismantler));
         }
-        RoleCollector.checkSpawn(room);
-        RoleClaimer.checkSpawn(room);
-        RoleConverter.checkSpawn(room);
+        this.checkSpawn("collector", ??, this.spawnFromRegion.bind(this, RoleCollector));
+        this.checkSpawn("claimer", ??, this.spawnFromRegion.bind(this, RoleClaimer));
+        this.checkSpawn("converter", ??, this.spawnFromRegion.bind(this, RoleConverter));
         if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
-            RoleUpgrader.checkSpawn(room);
+            this.checkSpawn("upgrader", ??, this.spawnFromRegion.bind(this, RoleUpgrader));
         }
     }
 
-    assignTasks(room, tasks) {
+    //       #                 #      ##                           
+    //       #                 #     #  #                          
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #  
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #  
+    //                                     #                       
+    /**
+     * Checks whether we should spawn for the role.
+     * @param {string} role The role of the creep.
+     * @param {number} max The maximum number of creeps that should be spawned.
+     * @param {function} successCallback The callback to run on success.
+     */
+    checkSpawn(role, max, successCallback) {
+        var roomName = this.room.name,
+            count = _.filter(Cache.creeps[roomName] && Cache.creeps[roomName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
+            roomLog = Cache.log.room[roomName];
+
+        if (count < max) {
+            successCallback();
+        }
+
+        // Output creep count in the report.
+        if (roomLog && (max > 0 || count > 0)) {
+            roomLog.creeps.push({
+                role: role,
+                count: count,
+                max: max
+            });
+        }
+    }
+
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps.
+     * @param {object} tasks The tasks to assign.
+     */
+    assignTasks(tasks) {
+        var room = this.room;
+
         RoleWorker.assignTasks(room, tasks);
         RoleMiner.assignTasks(room, tasks);
         RoleStorer.assignTasks(room, tasks);
@@ -636,8 +826,20 @@ class RoomBase extends RoomEngine {
         RoleTower.assignTasks(room, tasks);
     }
 
-    labQueue(room, labQueue) {
-        var memory = room.memory,
+    // ##          #      ##                           
+    //  #          #     #  #                          
+    //  #     ###  ###   #  #  #  #   ##   #  #   ##   
+    //  #    #  #  #  #  #  #  #  #  # ##  #  #  # ##  
+    //  #    # ##  #  #  ## #  #  #  ##    #  #  ##    
+    // ###    # #  ###    ##    ###   ##    ###   ##   
+    //                      #                          
+    /**
+     * Processes the lab queue.
+     */
+    labQueue() {
+        var room = this.room,
+            memory = room.memory,
+            labQueue = memory.labQueue,
             labs = Cache.labsInRoom(room),
             labsInUse = memory.labsInUse,
             sourceLabs = labQueue.sourceLabs || [],
@@ -705,8 +907,18 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    labsInUse(room, labsInUse) {
-        var boosted = [];
+    // ##          #            ###         #  #               
+    //  #          #             #          #  #               
+    //  #     ###  ###    ###    #    ###   #  #   ###    ##   
+    //  #    #  #  #  #  ##      #    #  #  #  #  ##     # ##  
+    //  #    # ##  #  #    ##    #    #  #  #  #    ##   ##    
+    // ###    # #  ###   ###    ###   #  #   ##   ###     ##   
+    /**
+     * Checks for labs in use and updates the queue with what needs to be done with them.
+     */
+    labsInUse() {
+        var labsInUse = this.room.memory.labsInUse,
+            boosted = [];
 
         _.forEach(labsInUse, (queue) => {
             var lab = Game.getObjectById(queue.id);
@@ -750,79 +962,52 @@ class RoomBase extends RoomEngine {
         });
     }
 
-    processPower(room) {
-        _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
+    //                                             ###                           
+    //                                             #  #                          
+    // ###   ###    ##    ##    ##    ###    ###   #  #   ##   #  #   ##   ###   
+    // #  #  #  #  #  #  #     # ##  ##     ##     ###   #  #  #  #  # ##  #  #  
+    // #  #  #     #  #  #     ##      ##     ##   #     #  #  ####  ##    #     
+    // ###   #      ##    ##    ##   ###    ###    #      ##   ####   ##   #     
+    // #                                                                         
+    /**
+     * Processes power in the room.
+     */
+    processPower() {
+        _.forEach(Cache.powerSpawnsInRoom(this.room), (spawn) => {
             if (spawn.power >= 1 && spawn.energy >= 50) {
                 spawn.processPower();
             }
         });
     }
 
-    run(room) {
-        var roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
-
-        // Something is supremely wrong.  Notify and bail.
-        if (room.unobservable) {
-            Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
-            return;
-        }
-
-        roomName = room.name;
-        spawns = Cache.spawnsInRoom(room);
-        terminal = room.terminal;
-        storage = room.storage;
-        memory = room.memory;
-        labQueue = memory.labQueue;
-        labsInUse = memory.labsInUse;
-
-        // Manage room.
-        if (Game.time % 100 === 0 && spawns.length > 0) {
-            this.manage(room);
-        }
-
-        // Defend base.
-        this.defend(room);
-
-        // Transfer energy from near link to far link.
-        if (spawns.length > 0) {
-            this.transferEnergy(room);
-        }
-        
-        // Check to see if we can do a deal in the terminal.
-        if (terminal) {
-            this.terminal(room, terminal);
-        }
-
-        // Get the tasks needed for this room.
-        tasks = this.tasks(room);
-
-        // Spawn new creeps.
-        this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
-
-        // Assign tasks to creeps and towers.
-        this.assignTasks(room, tasks);
-
-        // Update lab queue if necessary.
-        if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
-            this.labQueue(room, labQueue);
-        }
-
-        // Update labs in use.
-        if (labsInUse) {
-            this.labsInUse(room, labsInUse);
-        }
-        
-        this.processPower(room);
-    }
-
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
+    //  #           ##   #       #   
+    //  #          #  #  #           
+    // ###    ##   #  #  ###     #   
+    //  #    #  #  #  #  #  #    #   
+    //  #    #  #  #  #  #  #    #   
+    //   ##   ##    ##   ###   # #   
+    //                          #    
+    /**
+     * Serialize the room to an object.
+     */
+    toObj() {
+        Memory.rooms[this.room.name].roomType = {
             type: this.type
         };
     }
 
-    static fromObj() {
-        return new RoomBase();
+    //   #                      ##   #       #   
+    //  # #                    #  #  #           
+    //  #    ###    ##   # #   #  #  ###     #   
+    // ###   #  #  #  #  ####  #  #  #  #    #   
+    //  #    #     #  #  #  #  #  #  #  #    #   
+    //  #    #      ##   #  #   ##   ###   # #   
+    //                                      #    
+    /**
+     * Deserializes room from an object.
+     */
+    static fromObj(room) {
+        return new RoomBase(room);
     }
 }
 

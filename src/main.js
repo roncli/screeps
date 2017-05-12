@@ -808,35 +808,38 @@ class Main {
      * Deserialize rooms from memory into room objects.
      */
     static deserializeRooms() {
-        var rooms = Cache.rooms;
+        var rooms = Cache.rooms,
+            unobservableRooms = {};
 
         // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
-        this.unobservableRooms = [];
         _.forEach(Memory.rooms, (roomMemory, name) => {
+            if (!Game.rooms[name]) {
+                unobservableRooms[name]({
+                    name: name,
+                    unobservable: true,
+                    memory: roomMemory
+                });
+            }
+
             if (roomMemory.roomType) {
                 switch (roomMemory.roomType.type) {
                     case "base":
-                        rooms[name] = RoomBase.fromObj(roomMemory);
+                        rooms[name] = RoomBase.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
                     case "cleanup":
-                        rooms[name] = RoomCleanup.fromObj(roomMemory);
+                        rooms[name] = RoomCleanup.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
                     case "mine":
-                        rooms[name] = RoomMine.fromObj(roomMemory);
+                        rooms[name] = RoomMine.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
                     case "source":
-                        rooms[name] = RoomSource.fromObj(roomMemory);
+                        rooms[name] = RoomSource.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
-                }
-
-                if (!Game.rooms[name]) {
-                    this.unobservableRooms.push({
-                        name: name,
-                        unobservable: true
-                    });
                 }
             }
         });
+
+        this.unobservableRooms = _.values(unobservableRooms);
     }
 
     //    #                            #          ##     #                 ##                #                 
@@ -1122,10 +1125,10 @@ class Main {
             if (rooms && roomMemory && (roomType = roomMemory.roomType)) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
                     // Run rooms.
-                    rooms.run(room);
+                    rooms.run();
                 }
                 if (roomType.type === rooms.type) {
-                    rooms.toObj(room);
+                    rooms.toObj();
                 }
             }
             

@@ -18,9 +18,11 @@ class Worker {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(engine) {
-        var energy = Math.min(engine.room.energyCapacityAvailable, 3300),
+        var room = engine.room,
+            energy = Math.min(room.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
+            storage = room.storage,
             body = [],
             boosts;
 
@@ -28,8 +30,19 @@ class Worker {
         body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
         body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
+        if (storage && Cache.labsInRoom(room).length > 0) {
+            if (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
+            } else if (storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_LEMERGIUM_ACID] = units;
+            } else if (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_LEMERGIUM_HYDRIDE] = units;
+            }
+        }
+
         return {
             body: body,
+            boosts: boosts,
             name: "worker"
         };
     }

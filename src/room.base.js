@@ -99,7 +99,7 @@ class RoomBase extends RoomEngine {
         tasks = this.tasks();
 
         // Spawn new creeps.
-        this.spawn(!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
+        this.spawn();
 
         // Assign tasks to creeps and towers.
         this.assignTasks(tasks);
@@ -744,26 +744,26 @@ class RoomBase extends RoomEngine {
     //        #                       
     /**
      * Spawns needed creeps.
-     * @param {bool} canSpawnWorkers Whether we should spawn workers or not.
      */
-    spawn(canSpawnWorkers) {
+    spawn() {
         var room = this.room,
+            storage = room.storage,
             dismantle = Memory.dismantle,
             roomName = room.name,
             controller = room.controller;
 
-        this.checkSpawn("worker", ??, this.spawnFromRegion.bind(this, RoleWorker)); // canSpawnWorkers
-        this.checkSpawn("miner", ??, this.spawnFromRegion.bind(this, RoleMiner));
-        this.checkSpawn("storer", ??, this.spawnFromRegion.bind(this, RoleStorer));
-        this.checkSpawn("scientist", ??, this.spawnFromRegion.bind(this, RoleScientist));
+        this.checkSpawn("worker", RoleWorker.checkSpawnSettings.bind(RoleWorker, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0), this.spawnFromRegion.bind(this, RoleWorker)); // canSpawnWorkers
+        this.checkSpawn("miner", RoleMiner.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleMiner));
+        this.checkSpawn("storer", RoleStorer.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleStorer));
+        this.checkSpawn("scientist", RoleScientist.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleScientist));
         if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-            this.checkSpawn("dismantler", ??, this.spawnFromRegion.bind(this, RoleDismantler));
+            this.checkSpawn("dismantler", RoleDismantler.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleDismantler));
         }
-        this.checkSpawn("collector", ??, this.spawnFromRegion.bind(this, RoleCollector));
-        this.checkSpawn("claimer", ??, this.spawnFromRegion.bind(this, RoleClaimer));
-        this.checkSpawn("converter", ??, this.spawnFromRegion.bind(this, RoleConverter));
+        this.checkSpawn("collector", RoleCollector.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleCollector));
+        this.checkSpawn("claimer", RoleClaimer.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleClaimer));
+        this.checkSpawn("converter", RoleConverter.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleConverter));
         if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
-            this.checkSpawn("upgrader", ??, this.spawnFromRegion.bind(this, RoleUpgrader));
+            this.checkSpawn("upgrader", RoleUpgrader.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleUpgrader));
         }
     }
 

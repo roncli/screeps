@@ -6,6 +6,7 @@ const profiler = require("screeps-profiler"),
     Market = require("market"),
     Minerals = require("minerals"),
     // Segment = require("segment"),
+    Tower = require("tower"),
     Utilities = require("utilities"),
     RoleArmyDismantler = require("role.armyDismantler"),
     RoleArmyHealer = require("role.armyHealer"),
@@ -13,9 +14,9 @@ const profiler = require("screeps-profiler"),
     RoleArmyRanged = require("role.armyRanged"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
-    RoleConverter = require("role.converter"),
     RoleDefender = require("role.defender"),
     RoleDismantler = require("role.dismantler"),
+    RoleDowngrader = require("role.downgrader"),
     RoleHealer = require("role.healer"),
     RoleMiner = require("role.miner"),
     RoleRemoteBuilder = require("role.remoteBuilder"),
@@ -27,19 +28,18 @@ const profiler = require("screeps-profiler"),
     RoleRemoteWorker = require("role.remoteWorker"),
     RoleScientist = require("role.scientist"),
     RoleStorer = require("role.storer"),
-    RoleTower = require("role.tower"),
     RoleUpgrader = require("role.upgrader"),
     RoleWorker = require("role.worker"),
     RoomBase = require("room.base"),
     RoomCleanup = require("room.cleanup"),
     RoomMine = require("room.mine"),
     RoomSource = require("room.source"),
-    TaskAttack = require("task.attack"),
     TaskBuild = require("task.build"),
     TaskClaim = require("task.claim"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskCollectMinerals = require("task.collectMinerals"),
     TaskDismantle = require("task.dismantle"),
+    TaskDowngrade = require("task.downgrade"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHarvest = require("task.harvest"),
@@ -275,9 +275,9 @@ class Main {
                 ArmyRanged: RoleArmyRanged,
                 Claimer: RoleClaimer,
                 Collector: RoleCollector,
-                Converter: RoleConverter,
                 Defender: RoleDefender,
                 Dismantler: RoleDismantler,
+                Downgrader: RoleDowngrader,
                 Healer: RoleHealer,
                 Miner: RoleMiner,
                 RemoteBuilder: RoleRemoteBuilder,
@@ -289,7 +289,6 @@ class Main {
                 RemoteWorker: RoleRemoteWorker,
                 Scientist: RoleScientist,
                 Storer: RoleStorer,
-                Tower: RoleTower,
                 Upgrader: RoleUpgrader,
                 Worker: RoleWorker
             },
@@ -299,6 +298,7 @@ class Main {
                 Mine: RoomMine,
                 Source: RoomSource
             },
+            Tower: Tower,
             Utilities: Utilities
         };
         
@@ -327,6 +327,12 @@ class Main {
         //     this.paths.memory = Memory.paths;
         // }
         
+        if (!Memory.lengthToController) {
+            Memory.lengthToController = {};
+        }
+        if (!Memory.lengthToContainer) {
+            Memory.lengthToContainer = {};
+        }
         if (!Memory.lengthToStorage) {
             Memory.lengthToStorage = {};
         }
@@ -454,7 +460,7 @@ class Main {
         var mineralOrders = {},
             minerals, sellOrder;
 
-        if (Game.cpu.bucket >= Memory.marketBucket) {
+        if (Game.time % 10 === 0 || Game.cpu.bucket >= Memory.marketBucket) {
             // Determine the minerals we need.
             minerals = [
                 {resource: RESOURCE_HYDROGEN, amount: 3000},
@@ -739,9 +745,6 @@ class Main {
         _.forEach(Game.creeps, (creep) => {
             if (creep.memory.currentTask) {
                 switch (creep.memory.currentTask.type) {
-                    case "attack":
-                        creepTasks[creep.name] = TaskAttack.fromObj(creep);
-                        break;
                     case "build":
                         creepTasks[creep.name] = TaskBuild.fromObj(creep);
                         break;
@@ -756,6 +759,9 @@ class Main {
                         break;
                     case "dismantle":
                         creepTasks[creep.name] = TaskDismantle.fromObj(creep);
+                        break;
+                    case "downgrade":
+                        creepTasks[creep.name] = TaskDowngrade.fromObj(creep);
                         break;
                     case "fillEnergy":
                         creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
@@ -1453,14 +1459,14 @@ class Main {
                 }
 
                 // Suicide a rallying creep if necessary.
-                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "downgrader", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                     creep.suicide();
                 }
             } else {
                 delete creepMemory.currentTask;
 
                 // RIP & Pepperonis :(
-                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creepMemory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "downgrader", "defender", "healer", "remoteReserver"].indexOf(creepMemory.role) === -1) {
                     creep.suicide();
                 } else {
                     creep.say("Idle");

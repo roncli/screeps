@@ -3,7 +3,39 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskMeleeAttack = require("task.meleeAttack");
 
-class Defender {
+//  ####           ##           ####            ##                     #               
+//  #   #           #            #  #          #  #                    #               
+//  #   #   ###     #     ###    #  #   ###    #      ###   # ##    ## #   ###   # ##  
+//  ####   #   #    #    #   #   #  #  #   #  ####   #   #  ##  #  #  ##  #   #  ##  # 
+//  # #    #   #    #    #####   #  #  #####   #     #####  #   #  #   #  #####  #     
+//  #  #   #   #    #    #       #  #  #       #     #      #   #  #  ##  #      #     
+//  #   #   ###    ###    ###   ####    ###    #      ###   #   #   ## #   ###   #     
+/**
+ * Represents the defender role.
+ */
+class RoleDefender {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            max = 1;
+
+        return {
+            spawn: _.filter(creeps && creeps.defender || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -32,27 +64,6 @@ class Defender {
                 return pos.x >= 25 && pos.y >= 25;
             case 3:
                 return pos.x >= 25 && pos.y < 25;
-        }
-    }
-
-    static checkSpawn(room) {
-        var roomName = room.name,
-            defenders = Cache.creeps[roomName] && Cache.creeps[roomName].defender || [],
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            max = 1;
-
-        // See if we need to spawn a creep.
-        if (_.filter(defenders, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            Defender.spawn(room, supportRoom);
-        }
-
-        // Output defender count in the report.
-        if (Memory.log && (defenders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "defender",
-                count: defenders.length,
-                max: max
-            });
         }
     }
 
@@ -129,6 +140,6 @@ class Defender {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Defender, "RoleDefender");
+    require("screeps-profiler").registerObject(RoleDefender, "RoleDefender");
 }
-module.exports = Defender;
+module.exports = RoleDefender;

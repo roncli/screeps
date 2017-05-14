@@ -241,7 +241,7 @@ class Utilities {
                 labToUse = {
                     id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l) === -1)[0],
                     pause: true
-                }
+                };
                 
                 if (!labToUse.id) {
                     return false;

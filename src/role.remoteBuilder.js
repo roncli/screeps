@@ -6,7 +6,39 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair");
 
-class Builder {
+//  ####           ##           ####                         #            ####            #     ##        #               
+//  #   #           #           #   #                        #             #  #                  #        #               
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###    #  #  #   #   ##      #     ## #   ###   # ##  
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   ###   #   #    #      #    #  ##  #   #  ##  # 
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####   #  #  #   #    #      #    #   #  #####  #     
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #       #  #  #  ##    #      #    #  ##  #      #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   ####    ## #   ###    ###    ## #   ###   #     
+/**
+ * Represents the remote builder role.
+ */
+class RoleRemoteBuilder {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            max = 2;
+
+        return {
+            spawn: (creeps && creeps.remoteBuilder || []).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -33,32 +65,6 @@ class Builder {
             body: body,
             name: "remoteBuilder"
         };
-    }
-
-    static checkSpawn(room) {
-        var roomName = room.name,
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            max = 2,
-            num;
-
-        // If there are no spawns in the support room, ignore the room.
-        if (Cache.spawnsInRoom(supportRoom).length === 0) {
-            return;
-        }
-
-        // If we don't find a remote builder, spawn a new remote builder.
-        if ((num = (Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || []).length) < max) {
-            Builder.spawn(room, supportRoom);
-        }
-
-        // Output remote builder count in the report.
-        if (Memory.log && (num > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteBuilder",
-                count: num,
-                max: max
-            });
-        }
     }
 
     static spawn(room, supportRoom) {
@@ -240,6 +246,6 @@ class Builder {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Builder, "RoleRemoteBuilder");
+    require("screeps-profiler").registerObject(RoleRemoteBuilder, "RoleRemoteBuilder");
 }
-module.exports = Builder;
+module.exports = RoleRemoteBuilder;

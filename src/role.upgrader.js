@@ -5,7 +5,83 @@ var Cache = require("cache"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
-class Upgrader {
+//  ####           ##           #   #                                  #               
+//  #   #           #           #   #                                  #               
+//  #   #   ###     #     ###   #   #  # ##    ## #  # ##    ###    ## #   ###   # ##  
+//  ####   #   #    #    #   #  #   #  ##  #  #  #   ##  #      #  #  ##  #   #  ##  # 
+//  # #    #   #    #    #####  #   #  ##  #   ##    #       ####  #   #  #####  #     
+//  #  #   #   #    #    #      #   #  # ##   #      #      #   #  #  ##  #      #     
+//  #   #   ###    ###    ###    ###   #       ###   #       ####   ## #   ###   #     
+//                                     #      #   #                                    
+//                                     #       ###                                     
+/**
+ * Represents the upgrader role.
+ */
+class RoleUpgrader {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            storage = room.storage,
+            roomName = room.name,
+            controller = room.controller,
+            creeps = Cache.creeps[roomName],
+            storageEnergy, max, spawnForRoom;
+
+        storageEnergy = storage ? storage.store[RESOURCE_ENERGY] : 0;
+
+        if (roomName === Memory.rushRoom) {
+            max = 1;
+        } else if (!storage || storageEnergy < Memory.upgradeEnergy) {
+            max = 0;
+        } else {
+            max = 1;
+        }
+
+        if (max > 0 && (controller && controller.level < 8 && storage && storageEnergy > 900000 || _.filter(creeps && creeps.upgrader || [], (c) => c.spawning || c.ticksToLive >= 150).length < max)) {
+            spawnForRoom = roomName;
+        }
+
+        // Support smaller rooms in the region.
+        if (!spawnForRoom) {
+            _.forEach(_.filter(Game.rooms, (r) => {
+                var memory = r.memory,
+                    roomType = memory.roomType,
+                    controller = r.controller;
+
+                return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && r.name !== room.name && controller && controller.level < 7;
+            }), (otherRoom) => {
+                var otherRoomName = otherRoom.name,
+                    otherCreeps = Cache.creeps[otherRoomName];
+                
+                if (_.filter(otherCreeps && otherCreeps.upgrader || [], (c) => {
+                    var memory = c.memory;
+
+                    return memory.supportRoom !== memory.home;
+                }).length === 0) {
+                    spawnForRoom = otherRoomName;
+                    return false;
+                }
+            });
+        }
+
+        return {
+            spawn: !!spawnForRoom,
+            max: max,
+            spawnForRoom: spawnForRoom
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -53,54 +129,6 @@ class Upgrader {
             body: body,
             name: "upgrader"
         };
-    }
-
-    static checkSpawn(room) {
-        var roomName = room.name,
-            upgraders = Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || [],
-            storage = room.storage,
-            controller = room.controller,
-            storageEnergy, count, max;
-
-        // If there are no spawns in the room, ignore the room.
-        if (Cache.spawnsInRoom(room).length === 0) {
-            return;
-        }
-
-        if (storage) {
-            storageEnergy = storage.store[RESOURCE_ENERGY];
-        }
-
-        count = _.filter(upgraders, (c) => c.spawning || c.ticksToLive >= 150).length;
-        if (roomName === Memory.rushRoom) {
-            max = 1;
-        } else if (!storage || storageEnergy < Memory.upgradeEnergy) {
-            // If there is not enough energy in storage, ignore the room.Array
-            max = 0;
-        } else {
-            // If we have less than max upgraders, spawn an upgrader.
-            max = 1;
-        }
-
-        if (count < max || controller && controller.level < 8 && storage && storageEnergy > 900000) {
-            Upgrader.spawn(room);
-        }
-
-        // Output upgrader count in the report.
-        if (Memory.log && (upgraders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "upgrader",
-                count: upgraders.length,
-                max: max
-            });
-        }
-
-        // Support smaller rooms in the region.
-        _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 7), (otherRoom) => {
-            if (_.filter(Cache.creeps[otherRoom.name] && Cache.creeps[otherRoom.name].upgrader || [], (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
-                Upgrader.spawn(otherRoom, room);
-            }
-        });
     }
 
     static spawn(room, supportRoom) {
@@ -349,6 +377,6 @@ class Upgrader {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Upgrader, "RoleUpgrader");
+    require("screeps-profiler").registerObject(RoleUpgrader, "RoleUpgrader");
 }
-module.exports = Upgrader;
+module.exports = RoleUpgrader;

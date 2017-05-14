@@ -3,7 +3,46 @@ var Cache = require("cache"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
-class Scientist {
+//  ####           ##            ###            #                   #       #            #    
+//  #   #           #           #   #                               #                    #    
+//  #   #   ###     #     ###   #       ###    ##     ###   # ##   ####    ##     ###   ####  
+//  ####   #   #    #    #   #   ###   #   #    #    #   #  ##  #   #       #    #       #    
+//  # #    #   #    #    #####      #  #        #    #####  #   #   #       #     ###    #    
+//  #  #   #   #    #    #      #   #  #   #    #    #      #   #   #  #    #        #   #  # 
+//  #   #   ###    ###    ###    ###    ###    ###    ###   #   #    ##    ###   ####     ##  
+/**
+ * Represents the scientist role.
+ */
+class RoleScientist {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            controller = room.controller,
+            creeps = Cache.creeps[room.name],
+            max = 1;
+        
+        // If the room's controller is not 6 or higher, ignore the room.
+        if (!controller || controller.level < 6) {
+            return;
+        }
+
+        return {
+            spawn: _.filter(creeps && creeps.scientist || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -29,35 +68,6 @@ class Scientist {
             body: body,
             name: "scientist"
         };
-    }
-
-    static checkSpawn(room) {
-        var controller = room.controller,
-            roomName = room.name,
-            scientists = Cache.creeps[roomName] && Cache.creeps[roomName].scientist || [],
-            max = 1,
-            count;
-        
-        // If the room's controller is not 6 or higher, ignore the room.
-        if (!controller || controller.level < 6) {
-            return;
-        }
-
-        // If we have less than max scientists, spawn a scientist.
-        count = _.filter(scientists, (c) => c.spawning || c.ticksToLive >= 150).length;
-
-        if (count < max) {
-            Scientist.spawn(room);
-        }
-
-        // Output scientist count in the report.
-        if (Memory.log && (scientists.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[room.name].creeps.push({
-                role: "scientist",
-                count: scientists.length,
-                max: max
-            });
-        }
     }
 
     static spawn(room) {
@@ -491,6 +501,6 @@ class Scientist {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Scientist, "RoleScientist");
+    require("screeps-profiler").registerObject(RoleScientist, "RoleScientist");
 }
-module.exports = Scientist;
+module.exports = RoleScientist;

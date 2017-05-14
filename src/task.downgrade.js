@@ -1,15 +1,15 @@
 var Cache = require("cache"),
     Pathing = require("pathing");
 
-class Attack {
+class Downgrade {
     constructor() {
-        this.type = "attack";
+        this.type = "downgrade";
     }
 
     canAssign(creep) {
         var controller = creep.room.controller;
 
-        if (creep.spawning || creep.memory.role !== "converter" || !controller || controller.level === 0 || creep.getActiveBodyparts(CLAIM) === 0) {
+        if (creep.spawning || creep.memory.role !== "downgrader" || !controller || controller.level === 0 || creep.getActiveBodyparts(CLAIM) === 0) {
             return false;
         }
         
@@ -24,7 +24,7 @@ class Attack {
             return;
         }
 
-        // Move towards the controller and attack it.    
+        // Move towards the controller and downgrade it.    
         Pathing.moveTo(creep, creep.room.controller, 1);
         creep.attackController(creep.room.controller);
     }
@@ -39,18 +39,18 @@ class Attack {
         }
     }
 
-    static fromObj(creep) {
-        return new Attack();
+    static fromObj() {
+        return new Downgrade();
     }
 
     static getTask(creep) {
         if (creep.room.controller) {
-            return new Attack();
+            return new Downgrade();
         }
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Attack, "TaskAttack");
+    require("screeps-profiler").registerObject(Downgrade, "TaskDowngrade");
 }
-module.exports = Attack;
+module.exports = Downgrade;

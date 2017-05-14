@@ -2,7 +2,82 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally");
 
-class Storer {
+//  ####           ##            ###    #                                
+//  #   #           #           #   #   #                                
+//  #   #   ###     #     ###   #      ####    ###   # ##    ###   # ##  
+//  ####   #   #    #    #   #   ###    #     #   #  ##  #  #   #  ##  # 
+//  # #    #   #    #    #####      #   #     #   #  #      #####  #     
+//  #  #   #   #    #    #      #   #   #  #  #   #  #      #      #     
+//  #   #   ###    ###    ###    ###     ##    ###   #       ###   #     
+/**
+ * Represents the storer role.
+ */
+class RoleStorer {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            containers = Cache.containersInRoom(room),
+            length = 0,
+            max = 0,
+            containerSource, sources, lengthToStorage, controller, rcl, army, creeps, storers;
+        
+        // If there are no containers or storages in the room, ignore the room.
+        if (containers.length === 0 || !room.storage || !room.storage.my) {
+            return;
+        }
+
+        containerSource = Memory.containerSource;
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
+        lengthToStorage = Memory.lengthToStorage;
+        controller = room.controller;
+        rcl = controller.level;
+        army = Memory.army;
+        creeps = Cache.creeps[room.name];
+        storers = creeps && creeps.storer || [];
+
+        // Determine the number storers needed.
+        _.forEach(containers, (container) => {
+            var containerId = container.id,
+                closest;
+
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
+            }
+
+            closest = Game.getObjectById(containerSource[containerId]);
+
+            if (closest instanceof Mineral) {
+                if (closest.mineralAmount > 0) {
+                    max += 1;
+                }
+            } else {
+                if (!lengthToStorage[container.id]) {
+                    lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
+                }
+
+                length += lengthToStorage[container.id];
+            }
+        });
+
+        max += Math.ceil(2 * length / (controller && rcl === 8 ? 35 : 30)) + (rcl >= 7 && army && _.filter(army, (a) => a.region === room.memory.region && a.directive === "building").length > 0 ? 1 : 0);
+
+        return {
+            spawn: _.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -34,69 +109,6 @@ class Storer {
             body: body,
             name: "storer"
         };
-    }
-
-    static checkSpawn(room) {
-        var containers = Cache.containersInRoom(room),
-            roomName = room.name,
-            length = 0,
-            max = 0,
-            controller, army, storers, lengthToStorage;
-        
-        // If there are no spawns, containers, or storages in the room, ignore the room.
-        if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage || !room.storage.my) {
-            return;
-        }
-
-        controller = room.controller;
-        army = Memory.army;
-        storers = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [];
-
-        // Init road length cache.
-        if (!Memory.lengthToStorage) {
-            Memory.lengthToStorage = {};
-        }
-
-        lengthToStorage = Memory.lengthToStorage;
-
-        // Determine the number storers needed.
-        _.forEach(containers, (container) => {
-            var containerId = container.id,
-                closest;
-
-            if (!Memory.containerSource[containerId]) {
-                Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
-            }
-
-            closest = Game.getObjectById(Memory.containerSource[containerId]);
-
-            if (closest instanceof Mineral) {
-                if (closest.mineralAmount > 0) {
-                    max += 1;
-                }
-            } else {
-                if (!lengthToStorage[container.id]) {
-                    lengthToStorage[container.id] = PathFinder.search(container.pos, {pos: room.storage.pos, range: 1}, {swampCost: 1}).path.length;
-                }
-
-                length += lengthToStorage[container.id];
-            }
-        });
-
-        // If we don't have a storer for each container, spawn one.
-        max += Math.ceil(2 * length / (controller && controller.level === 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
-        if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            Storer.spawn(room);
-        }
-
-        // Output storer count in the report.
-        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "storer",
-                count: storers.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room) {
@@ -359,6 +371,6 @@ class Storer {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Storer, "RoleStorer");
+    require("screeps-profiler").registerObject(RoleStorer, "RoleStorer");
 }
-module.exports = Storer;
+module.exports = RoleStorer;

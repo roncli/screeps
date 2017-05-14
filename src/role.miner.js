@@ -3,7 +3,81 @@ var Cache = require("cache"),
     TaskMine = require("task.mine"),
     TaskRally = require("task.rally");
 
-class Miner {
+//  ####           ##           #   #    #                        
+//  #   #           #           #   #                             
+//  #   #   ###     #     ###   ## ##   ##    # ##    ###   # ##  
+//  ####   #   #    #    #   #  # # #    #    ##  #  #   #  ##  # 
+//  # #    #   #    #    #####  #   #    #    #   #  #####  #     
+//  #  #   #   #    #    #      #   #    #    #   #  #      #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###   #     
+/**
+ * Represents the miner role.
+ */
+class RoleMiner {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            containers = Cache.containersInRoom(room),
+            minerals = room.find(FIND_MINERALS),
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), minerals]),
+            containerSource, minerals, sources, creeps, miners, containerIdToMineOn, isMineralHarvester;
+
+        // If there are no containers or sources in the room, ignore the room.
+        if (containers.length === 0 || sources.length === 0) {
+            return {
+                spawn: false,
+                max: 0
+            };
+        }
+
+        containerSource = Memory.containerSource;
+        creeps = Cache.creeps[room.name];
+        miners = creeps && creeps.miner || [];
+
+        // Loop through containers to see if we have anything we need to spawn.
+        _.forEach(containers, (container) => {
+            var containerId = container.id,
+                source, isMineral;
+
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
+            }
+
+            source = Game.getObjectById(containerSource[containerId]);
+            isMineral = source instanceof Mineral;
+            
+            // If this container is for a mineral, check to make sure it has resources.
+            if (isMineral && source.mineralAmount === 0) {
+                return;
+            }
+
+            // If we don't have a miner for this container, spawn one.
+            if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === containerId).length === 0) {
+                containerIdToMineOn = containerId;
+                isMineralHarvester = isMineral;
+                return false;
+            }
+        });
+
+        return {
+            spawn: !!containerIdToMineOn,
+            max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
+            containerIdToMineOn: containerIdToMineOn,
+            isMineralHarvester: isMineralHarvester
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -35,53 +109,6 @@ class Miner {
             body: body,
             name: "miner"
         };
-    }
-
-    static checkSpawn(room) {
-        var roomName = room.name,
-            containers = Cache.containersInRoom(room),
-            max = 0,
-            miners;
-
-        // If there are no spawns or containers in the room, ignore the room.
-        if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0) {
-            return;
-        }
-        
-        miners = Cache.creeps[roomName] && Cache.creeps[roomName].miner || [];
-
-        // Loop through containers to see if we have anything we need to spawn.
-        _.forEach(containers, (container) => {
-            var containerId = container.id,
-                source;
-
-            if (!Memory.containerSource[containerId]) {
-                Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
-            }
-
-            source = Game.getObjectById(Memory.containerSource[containerId]);
-            
-            // If this container is for a mineral, check to make sure it has resources.
-            if (source instanceof Mineral && source.mineralAmount === 0) {
-                return;
-            }
-
-            max += 1;
-
-            // If we don't have a miner for this container, spawn one.
-            if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === containerId).length === 0) {
-                Miner.spawn(room, containerId);
-            }
-        });
-
-        // Output miner count in the report.
-        if (Memory.log && (miners.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "miner",
-                count: miners.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, id) {
@@ -177,6 +204,6 @@ class Miner {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Miner, "RoleMiner");
+    require("screeps-profiler").registerObject(RoleMiner, "RoleMiner");
 }
-module.exports = Miner;
+module.exports = RoleMiner;

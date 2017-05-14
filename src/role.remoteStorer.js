@@ -5,7 +5,95 @@ var Cache = require("cache"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
-class Storer {
+//  ####           ##           ####                         #             ###    #                                
+//  #   #           #           #   #                        #            #   #   #                                
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #      ####    ###   # ##    ###   # ##  
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   ###    #     #   #  ##  #  #   #  ##  # 
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####      #   #     #   #  #      #####  #     
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #   #   #  #  #   #  #      #      #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###    ###     ##    ###   #       ###   #     
+/**
+ * Represents the remote storer role.
+ */
+class RoleRemoteStorer {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            containers = Cache.containersInRoom(room),
+            containerSource, sources, foundFirstSource, lengthToContainer, supportRoom, supportRoomName, supportRoomRcl, creeps, remoteStorers, containerIdToCollectFrom;
+
+        // If there are no containers in the room, ignore the room.
+        if (containers.length === 0) {
+            return {
+                spawn: false,
+                max: 0
+            };
+        }
+
+        containerSource = Memory.containerSource;
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
+        foundFirstSource = false;
+        lengthToContainer = Memory.lengthToContainer;
+        supportRoom = engine.supportRoom;
+        supportRoomName = supportRoom.name;
+        supportRoomRcl = supportRoom.controller.level;
+        creeps = Cache.creeps[room.name];
+        remoteStorers = creeps && creeps.remoteStorer;
+
+        // Loop through containers to see if we have anything we need to spawn.
+        _.forEach(containers, (container) => {
+            var count = 0,
+                containerId = container.id,
+                source, length;
+
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
+            }
+
+            source = Game.getObjectById(containerSource[containerId]);
+            
+            if (source instanceof Mineral) {
+                // If this container is for a mineral, bail if there are no minerals left.
+                if (source.mineralAmount === 0) {
+                    return;
+                }
+            } else if (!foundFirstSource) {
+                // If this is the first energy source, don't count the worker.
+                count = -1;
+                foundFirstSource = true;
+            }
+
+            // Calculate the length the storers need to travel.
+            length = lengthToContainer[containerId][supportRoomName];
+
+            // Calculate number of storers needed.
+            count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0);
+
+            // If we don't have enough remote storers for this container, spawn one.
+            if (_.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
+                containerIdToCollectFrom = containerId;
+                return false;
+            }
+        });
+
+        return {
+            spawn: !!containerIdToCollectFrom,
+            max: _.sum(_.map(containers, (c) => Math.max(Math.ceil(Memory.lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0))),
+            containerIdToCollectFrom: containerIdToCollectFrom
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -44,64 +132,6 @@ class Storer {
             body: body,
             name: "remoteStorer"
         };
-    }
-
-    static checkSpawn(room) {
-        var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
-            containers = Cache.containersInRoom(room),
-            roomName = room.name,
-            storers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || [],
-            max = 0,
-            foundFirstSource = false;
-
-        // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
-            return;
-        }
-
-        // Loop through containers to see if we have anything we need to spawn.
-        _.forEach(containers, (container) => {
-            var count = 0,
-                id = container.id,
-                source, length;
-
-            if (!Memory.containerSource[id]) {
-                Memory.containerSource[id] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
-            }
-
-            source = Game.getObjectById(Memory.containerSource[id]);
-            
-            // If this container is for a mineral, bail if there are no minerals left.  If it's not a mineral, start counter at -1 since it has a worker on it already.
-            if (source instanceof Mineral) {
-                if (source.mineralAmount === 0) {
-                    return;
-                }
-            } else {
-                // If this is the first source, don't count the worker.
-                count = foundFirstSource ? 0 : -1;
-                foundFirstSource = true;
-            }
-
-            // Calculate the length the storers need to travel.
-            length = Memory.lengthToContainer[id][supportRoom.name];
-
-            // Calculate number of storers needed.
-            count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoom.controller.level]), 0);
-            max += count;
-
-            // If we don't have enough remote storers for this container, spawn one.
-            if (_.filter(storers, (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === id).length < count) {
-                Storer.spawn(room, supportRoom, id);
-            }
-        });
-
-        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteStorer",
-                count: storers.length,
-                max: max
-            });
-        }
     }
 
     static spawn(room, supportRoom, id) {
@@ -304,6 +334,6 @@ class Storer {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Storer, "RoleRemoteStorer");
+    require("screeps-profiler").registerObject(RoleRemoteStorer, "RoleRemoteStorer");
 }
-module.exports = Storer;
+module.exports = RoleRemoteStorer;

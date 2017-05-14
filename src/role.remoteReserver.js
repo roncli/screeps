@@ -4,7 +4,65 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskReserve = require("task.reserve");
 
-class Reserver {
+//  ####           ##           ####                         #            ####                                                   
+//  #   #           #           #   #                        #            #   #                                                  
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #   #   ###    ###    ###   # ##   #   #   ###   # ##  
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  ####   #   #  #      #   #  ##  #  #   #  #   #  ##  # 
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  # #    #####   ###   #####  #       # #   #####  #     
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #  #   #          #  #      #       # #   #      #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   ####    ###   #        #     ###   #     
+/**
+ * Represents the remote reserver role.
+ */
+class RoleRemoteReserver {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            controller = room.controller,
+            reservation = controller.reservation,
+            max = 1,
+            lengthToController, controllerId, supportRoom, supportRoomName, creeps, lengthToThisController;
+
+        if (reservation && reservation.ticksToEnd >= 4000) {
+            return {
+                spawn: false,
+                max: 0
+            };
+        }
+
+        lengthToController = Memory.lengthToController;
+        controllerId = controller.id;
+        supportRoom = engine.supportRoom;
+        supportRoomName = supportRoom.name;
+        creeps = Cache.creeps[room.name];
+
+        if (!lengthToController[controllerId]) {
+            lengthToController[controllerId] = {};
+        }
+
+        lengthToThisController = lengthToController[controllerId];
+
+        if (!lengthToThisController[supportRoomName]) {
+            lengthToThisController[supportRoomName] = PathFinder.search(controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+        }
+
+        return {
+            spawn: _.filter(creeps && creeps.remoteReserver || [], (c) => c.spawning || c.ticksToLive > lengthToThisController[supportRoomName]).length < max,
+            max: 0
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -29,58 +87,6 @@ class Reserver {
             body: body,
             name: "remoteReserver"
         };
-    }
-
-    static checkSpawn(room) {
-        var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
-            supportRoomName = supportRoom.name,
-            spawns = Cache.spawnsInRoom(supportRoom),
-            controller = room.controller,
-            roomName = room.name,
-            reservers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || [],
-            count = 0,
-            max = 0,
-            id, reservation;
-        
-        // If there are no spawns in the support room, or the room is unobservable, or there is no controller in the room, ignore the room.
-        if (spawns.length === 0 || room.unobservable || !controller) {
-            return;
-        }
-        
-        id = controller.id;
-        reservation = controller.reservation;
-
-        // Init road length cache.
-        if (!Memory.lengthToController) {
-            Memory.lengthToController = {};
-        }
-
-        // Calculate path length from controller to support room's storage.
-        if (!Memory.lengthToController[id]) {
-            Memory.lengthToController[id] = {};
-        }
-        if (!Memory.lengthToController[id][supportRoomName]) {
-            Memory.lengthToController[id][supportRoomName] = PathFinder.search(controller.pos, {pos: spawns[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
-        }
-
-        count = _.filter(reservers, (c) => c.spawning || c.ticksToLive > Memory.lengthToController[id][supportRoomName]).length;
-
-        if (!reservation || reservation.ticksToEnd < 4000) {
-            max += 1;
-        }
-
-        if (count < max) {
-            Reserver.spawn(room, supportRoom);
-        }
-
-        // Output remote reserver count in the report.
-        if (Memory.log && (reservers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteReserver",
-                count: reservers.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, supportRoom) {
@@ -175,6 +181,6 @@ class Reserver {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Reserver, "RoleRemoteReserver");
+    require("screeps-profiler").registerObject(RoleRemoteReserver, "RoleRemoteReserver");
 }
-module.exports = Reserver;
+module.exports = RoleRemoteReserver;

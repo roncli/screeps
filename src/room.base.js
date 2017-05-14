@@ -3,15 +3,15 @@ var Cache = require("cache"),
     Market = require("market"),
     Minerals = require("minerals"),
     RoomEngine = require("roomEngine"),
+    Tower = require("tower"),
     Utilities = require("utilities"),
     RoleClaimer = require("role.claimer"),
     RoleCollector = require("role.collector"),
-    RoleConverter = require("role.converter"),
     RoleDismantler = require("role.dismantler"),
+    RoleDowngrader = require("role.downgrader"),
     RoleMiner = require("role.miner"),
     RoleScientist = require("role.scientist"),
     RoleStorer = require("role.storer"),
-    RoleTower = require("role.tower"),
     RoleUpgrader = require("role.upgrader"),
     RoleWorker = require("role.worker"),
     TaskBuild = require("task.build"),
@@ -91,15 +91,17 @@ class RoomBase extends RoomEngine {
         }
         
         // Check to see if we can do a deal in the terminal.
-        if (terminal) {
+        if (terminal && !terminal.cooldown) {
             this.terminal();
         }
 
         // Get the tasks needed for this room.
         tasks = this.tasks();
 
-        // Spawn new creeps.
-        this.spawn();
+        // Spawn new creeps if there are available spawns in the room.
+        if (_.filter(spawns, (s) => !s.spawning).length > 0) {
+            this.spawn();
+        }
 
         // Assign tasks to creeps and towers.
         this.assignTasks(tasks);
@@ -415,7 +417,7 @@ class RoomBase extends RoomEngine {
             storageStore = storage.store;
         }
         
-        if (!terminal.cooldown && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
+        if (terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
             if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
                 delete memory.buyQueue;
                 buyQueue = undefined;
@@ -752,7 +754,9 @@ class RoomBase extends RoomEngine {
             roomName = room.name,
             controller = room.controller;
 
-        this.checkSpawn("worker", RoleWorker.checkSpawnSettings.bind(RoleWorker, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0), this.spawnFromRegion.bind(this, RoleWorker)); // canSpawnWorkers
+        if (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0) {
+            this.checkSpawn("worker", RoleWorker.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleWorker)); // canSpawnWorkers
+        }
         this.checkSpawn("miner", RoleMiner.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleMiner));
         this.checkSpawn("storer", RoleStorer.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleStorer));
         this.checkSpawn("scientist", RoleScientist.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleScientist));
@@ -761,7 +765,7 @@ class RoomBase extends RoomEngine {
         }
         this.checkSpawn("collector", RoleCollector.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleCollector));
         this.checkSpawn("claimer", RoleClaimer.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleClaimer));
-        this.checkSpawn("converter", RoleConverter.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleConverter));
+        this.checkSpawn("downgrader", RoleDowngrader.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleDowngrader));
         if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
             this.checkSpawn("upgrader", RoleUpgrader.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleUpgrader));
         }
@@ -820,10 +824,10 @@ class RoomBase extends RoomEngine {
         RoleDismantler.assignTasks(room, tasks);
         RoleCollector.assignTasks(room, tasks);
         RoleClaimer.assignTasks(room, tasks);
-        RoleConverter.assignTasks(room, tasks);
+        RoleDowngrader.assignTasks(room, tasks);
         RoleUpgrader.assignTasks(room, tasks);
 
-        RoleTower.assignTasks(room, tasks);
+        Tower.assignTasks(room, tasks);
     }
 
     // ##          #      ##                           

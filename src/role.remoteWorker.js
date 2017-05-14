@@ -7,7 +7,75 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair");
 
-class Worker {
+                                                                                                                
+//  ####           ##           ####                         #            #   #                #                   
+//  #   #           #           #   #                        #            #   #                #                   
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #   #   ###   # ##   #   #   ###   # ##  
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  # # #  #   #  ##  #  #  #   #   #  ##  # 
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  # # #  #   #  #      ###    #####  #     
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      ## ##  #   #  #      #  #   #      #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   #      #   #   ###   #     
+/**
+ * Represents the remote worker role.
+ */
+class RoleRemoteWorker {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            containers = Cache.containersInRoom(room),
+            spawn = false,
+            sources, lengthToContainer, creeps, workers, supportRoomName;
+
+        // If there are no containers in the room, ignore the room.
+        if (containers.length === 0) {
+            return {
+                spawn: false,
+                max: 0
+            };
+        }
+
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
+        lengthToContainer = Memory.lengthToContainer;
+        creeps = Cache.creeps[room.name];
+        workers = creeps && creeps.remoteWorker || [];
+        supportRoomName = engine.supportRoom.name;
+
+        // Loop through containers to see if we have anything we need to spawn.
+        _.forEach(containers, (container) => {
+            var source = Utilities.objectsClosestToObj(sources, container)[0],
+                containerId = container.id,
+                lengthToThisAContainer = lengthToContainer[containerId];
+
+            // If this container is for a mineral, skip it.
+            if (source instanceof Mineral) {
+                return;
+            }
+
+            if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
+                spawn = true;
+            }
+
+            // Only 1 worker per room.
+            return false;
+        });
+
+        return {
+            spawn: spawn,
+            max: 1
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -36,49 +104,6 @@ class Worker {
             body: body,
             name: "remoteWorker"
         };
-    }
-
-    static checkSpawn(room) {
-        var roomName = room.name,
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            supportRoomName = supportRoom.name,
-            containers = Cache.containersInRoom(room),
-            workers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || [],
-            max = 0;
-
-        // If there are no spawns in the support room, or the room is unobservable, or there are no containers in the room, ignore the room.
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
-            return;
-        }
-
-        // Loop through containers to see if we have anything we need to spawn.
-        _.forEach(containers, (container) => {
-            var source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
-                containerId = container.id;
-
-            // If this container is for a mineral, skip it.
-            if (source instanceof Mineral) {
-                return;
-            }
-
-            max += 1;
-
-            if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (Memory.lengthToContainer && Memory.lengthToContainer[containerId] && Memory.lengthToContainer[containerId][supportRoomName] ? Memory.lengthToContainer[containerId][supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
-                Worker.spawn(room, supportRoom, containerId);
-            }
-
-            // Only 1 worker per room.
-            return false;
-        });
-
-        // Output remote worker count in the report.
-        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteWorker",
-                count: workers.length,
-                max: max
-            });
-        }
     }
 
     static spawn(room, supportRoom, id) {
@@ -358,6 +383,6 @@ class Worker {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Worker, "RoleRemoteWorker");
+    require("screeps-profiler").registerObject(RoleRemoteWorker, "RoleRemoteWorker");
 }
-module.exports = Worker;
+module.exports = RoleRemoteWorker;

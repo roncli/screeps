@@ -5,7 +5,39 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRepair = require("task.repair");
 
-class Dismantler {
+//  ####           ##           ####     #                                 #      ##                 
+//  #   #           #            #  #                                      #       #                 
+//  #   #   ###     #     ###    #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##  
+//  ####   #   #    #    #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  # 
+//  # #    #   #    #    #####   #  #    #     ###   # # #   ####  #   #   #       #    #####  #     
+//  #  #   #   #    #    #       #  #    #        #  # # #  #   #  #   #   #  #    #    #      #     
+//  #   #   ###    ###    ###   ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #     
+/**
+ * Represents the dismantler role.
+ */
+class RoleDismantler {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            max = 1;
+
+        return {
+            spawn: _.filter(creeps && creeps.dismantler || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -32,35 +64,6 @@ class Dismantler {
             body: body,
             name: "dismantler"
         };
-    }
-
-    static checkSpawn(room, supportRoom) {
-        var max = 1,
-            roomName = room.name,
-            dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [];
-
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-
-        // If there are no spawns in the support room, or the room is unobservable, ignore the room.
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable) {
-            return;
-        }
-
-        // If we don't have a dismantler for this room, spawn one.
-        if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
-            Dismantler.spawn(room, supportRoom);
-        }
-
-        // Output dismantler count in the report.
-        if (Memory.log && (dismantlers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "dismantler",
-                count: dismantlers.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, supportRoom) {
@@ -274,6 +277,6 @@ class Dismantler {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Dismantler, "RoleDismantler");
+    require("screeps-profiler").registerObject(RoleDismantler, "RoleDismantler");
 }
-module.exports = Dismantler;
+module.exports = RoleDismantler;

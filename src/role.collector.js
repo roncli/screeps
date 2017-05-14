@@ -4,7 +4,79 @@ var Cache = require("cache"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
-class Collector {
+//  ####           ##            ###           ##     ##                   #                  
+//  #   #           #           #   #           #      #                   #                  
+//  #   #   ###     #     ###   #       ###     #      #     ###    ###   ####    ###   # ##  
+//  ####   #   #    #    #   #  #      #   #    #      #    #   #  #   #   #     #   #  ##  # 
+//  # #    #   #    #    #####  #      #   #    #      #    #####  #       #     #   #  #     
+//  #  #   #   #    #    #      #   #  #   #    #      #    #      #   #   #  #  #   #  #     
+//  #   #   ###    ###    ###    ###    ###    ###    ###    ###    ###     ##    ###   #     
+/**
+ * Represents the collector role.
+ */
+class RoleCollector {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var room = engine.room,
+            storage = room.storage,
+            maxPerSource = 3,
+            sources, creeps, collectors, max, sourceIdToCollect;
+        
+        // If there is storage and containers in the room, ignore the room.
+        if (Cache.containersInRoom(room).length !== 0 && storage && storage.my) {
+            return {
+                spawn: false,
+                max: 0
+            };
+        }
+
+        // If there is only one energy source, ignore the room.
+        sources = room.find(FIND_SOURCES);
+        if (sources.length <= 1) {
+            return {
+                spawn: false,
+                max: 0
+            };
+        }
+
+        creeps = Cache.creeps[room.name];
+        collectors = creeps && creeps.collector || [];
+        max = maxPerSource * (sources.length - 1);
+
+        // Loop through sources to see if we have anything we need to spawn.
+        _.forEach(Utilities.objectsClosestToObj(sources, Cache.spawnsInRoom(room)[0]), (source, index) => {
+            var sourceId;
+            
+            // Skip the first source, it is for workers instead of collectors.
+            if (index === 0) {
+                return;
+            }
+
+            sourceId = source.id;
+            if (_.filter(collectors, (c) => c.memory.homeSource === sourceId).length < maxPerSource) {
+                sourceIdToCollect = sourceId;
+                return false;
+            }
+        });
+
+        return {
+            spawn: !!sourceIdToCollect,
+            max: max,
+            sourceIdToCollect: sourceIdToCollect
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -31,60 +103,6 @@ class Collector {
             body: body,
             name: "collector"
         };
-    }
-
-    static checkSpawn(room) {
-        var spawns = Cache.spawnsInRoom(room),
-            max = 0,
-            roomName = room.name,
-            collectors = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
-            count, sources, adjustment;
-        
-        // If there is storage and containers in the room, ignore the room.
-        if (Cache.containersInRoom(room).length !== 0 && room.storage && room.storage.my) {
-            return;
-        }
-
-        // If there are no spawns in the room, ignore the room.
-        if (spawns.length === 0) {
-            return;
-        }
-
-        // If there is only one energy source, ignore the room.
-        sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0]);
-        if (sources.length <= 1) {
-            return;
-        }
-
-        // Determine the max creep adjustment to use.
-        adjustment = Math.max((2500 - room.energyCapacityAvailable) / 2500, 0.1);
-
-        //  Loop through sources to see if we have anything we need to spawn.
-        _.forEach(sources, (source, index) => {
-            var sourceId = source.id;
-            
-            // Skip the first index.
-            if (index === 0) {
-                return;
-            }
-
-            max += Math.ceil(3 * adjustment);
-
-            // If we have less than max collectors, spawn a collector.
-            count = _.filter(collectors, (c) => c.memory.homeSource === sourceId).length;
-            if (count < 3 * adjustment) {
-                Collector.spawn(room, sourceId);
-            }
-        });
-
-        // Output collector count in the report.
-        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "collector",
-                count: collectors.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, id) {
@@ -388,6 +406,6 @@ class Collector {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Collector, "RoleCollector");
+    require("screeps-profiler").registerObject(RoleCollector, "RoleCollector");
 }
-module.exports = Collector;
+module.exports = RoleCollector;

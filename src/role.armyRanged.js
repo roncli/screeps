@@ -15,14 +15,14 @@ const Assign = require("assign"),
  * Represents the ranged role in the army.
  */
 class RoleArmyRanged {
+    //                                 ##          #     #     #                       
+    //                                #  #         #     #                             
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //        #                                                            ###         
     /**
-                                    ##          #     #     #                       
-                                   #  #         #     #                             
-     ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-      ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-           #                                                            ###         
      * Gets the settings for spawning a creep.
      * @param {Army} army The army to spawn the creep for.
      * @return {object} The settings for spawning a creep.
@@ -51,14 +51,14 @@ class RoleArmyRanged {
         };
     }
 
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
     /**
-                         #                ###                #            
-                                           #                 #            
-     ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-     # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-                               ###                                        
      * Assign tasks to creeps of this role.
      * @param {Army} army The army to assign tasks to.
      */

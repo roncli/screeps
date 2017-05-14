@@ -3,7 +3,39 @@ var Cache = require("cache"),
     TaskHeal = require("task.heal"),
     TaskRally = require("task.rally");
 
-class Healer {
+//  ####           ##           #   #                 ##                 
+//  #   #           #           #   #                  #                 
+//  #   #   ###     #     ###   #   #   ###    ###     #     ###   # ##  
+//  ####   #   #    #    #   #  #####  #   #      #    #    #   #  ##  # 
+//  # #    #   #    #    #####  #   #  #####   ####    #    #####  #     
+//  #  #   #   #    #    #      #   #  #      #   #    #    #      #     
+//  #   #   ###    ###    ###   #   #   ###    ####   ###    ###   #     
+/**
+ * Represents the healer role.
+ */
+class RoleHealer {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            max = 1;
+        
+        return {
+            spawn: _.filter(creeps && creeps.healer || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -28,27 +60,6 @@ class Healer {
             body: body,
             name: "healer"
         };
-    }
-
-    static checkSpawn(room) {
-        var roomName = room.name,
-            healers = Cache.creeps[roomName] && Cache.creeps[roomName].healer || [],
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            max = 1;
-        
-        // See if we need to spawn a creep.
-        if (_.filter(healers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            Healer.spawn(room, supportRoom);
-        }
-
-        // Output healer count in the report.
-        if (Memory.log && (healers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "healer",
-                count: healers.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, supportRoom) {
@@ -139,6 +150,6 @@ class Healer {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Healer, "RoleHealer");
+    require("screeps-profiler").registerObject(RoleHealer, "RoleHealer");
 }
-module.exports = Healer;
+module.exports = RoleHealer;

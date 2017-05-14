@@ -1,9 +1,57 @@
 var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally"),
-    TaskAttack = require("task.attack");
+    TaskDowngrade = require("task.downgrade");
 
-class Converter {
+//  ####           ##           ####                                                 #               
+//  #   #           #            #  #                                                #               
+//  #   #   ###     #     ###    #  #   ###   #   #  # ##    ## #  # ##    ###    ## #   ###   # ##  
+//  ####   #   #    #    #   #   #  #  #   #  #   #  ##  #  #  #   ##  #      #  #  ##  #   #  ##  # 
+//  # #    #   #    #    #####   #  #  #   #  # # #  #   #   ##    #       ####  #   #  #####  #     
+//  #  #   #   #    #    #       #  #  #   #  # # #  #   #  #      #      #   #  #  ##  #      #     
+//  #   #   ###    ###    ###   ####    ###    # #   #   #   ###   #       ####   ## #   ###   #     
+//                                                          #   #                                    
+//                                                           ###                                     
+/**
+ * Represents the downgrader role.
+ */
+class RoleDowngrader {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var downgrader = Memory.maxCreeps.downgrader,
+            roomName = engine.room.name,
+            creeps = Cache.creeps[roomName],
+            downgraders = creeps && creeps.downgrader || [],
+            roomToDowngrade;
+        
+        // Loop through the room downgraders to see if we need to spawn a creep.
+        if (downgrader) {
+            _.forEach(downgrader[roomName], (value, toRoom) => {
+                if (_.filter(downgraders, (c) => c.memory.attack === toRoom).length === 0) {
+                    roomToDowngrade = toRoom;
+                    return false;
+                }
+            });
+        }
+
+        return {
+            spawn: !!roomToDowngrade,
+            max: Object.keys(downgrader[roomName]).length,
+            roomToClaim: roomToDowngrade
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -26,37 +74,8 @@ class Converter {
 
         return {
             body: body,
-            name: "converter"
+            name: "downgrader"
         };
-    }
-
-    static checkSpawn(room) {
-        var converter = Memory.maxCreeps.converter,
-            roomName = room.name,
-            converters = Cache.creeps[roomName] && Cache.creeps[roomName].converter || [],
-            max = 0;
-        
-        // Loop through the room converters to see if we need to spawn a creep.
-        if (converter) {
-            _.forEach(converter[roomName], (value, toRoom) => {
-                var count = _.filter(converters, (c) => c.memory.attack === toRoom).length;
-
-                max += 1;
-
-                if (count === 0) {
-                    Converter.spawn(room, toRoom);
-                }
-            });
-        }
-
-        // Output converter count in the report.
-        if (Memory.log && (converters.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "converter",
-                count: converters.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, toRoom) {
@@ -91,7 +110,7 @@ class Converter {
         if (!spawnToUse) {
             return false;
         }
-        name = spawnToUse.createCreep(body, `converter-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "converter", home: room.name, attack: toRoom});
+        name = spawnToUse.createCreep(body, `downgrader-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "downgrader", home: room.name, attack: toRoom});
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
         return typeof name !== "number";
@@ -99,7 +118,7 @@ class Converter {
 
     static assignTasks(room) {
         var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].converter || []),
+            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].downgrader || []),
             assigned = [];
 
         if (creepsWithNoTask.length === 0) {
@@ -123,7 +142,7 @@ class Converter {
 
         // Attack the controller.
         _.forEach(creepsWithNoTask, (creep) => {
-            var task = TaskAttack.getTask(creep);
+            var task = TaskDowngrade.getTask(creep);
             if (task.canAssign(creep)) {
                 creep.say("Attacking");
                 assigned.push(creep.name);
@@ -145,6 +164,6 @@ class Converter {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Converter, "RoleConverter");
+    require("screeps-profiler").registerObject(RoleDowngrader, "RoleDowngrader");
 }
-module.exports = Converter;
+module.exports = RoleDowngrader;

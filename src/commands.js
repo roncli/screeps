@@ -49,34 +49,6 @@ class Commands {
         }
     }
 
-    //        #     #                #     ###                      ##                #                ##    ##                
-    //        #     #                #     #  #                    #  #               #                 #     #                
-    //  ###  ###   ###    ###   ##   # #   #  #   ##    ##   # #   #      ##   ###   ###   ###    ##    #     #     ##   ###   
-    // #  #   #     #    #  #  #     ##    ###   #  #  #  #  ####  #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
-    // # ##   #     #    # ##  #     # #   # #   #  #  #  #  #  #  #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
-    //  # #    ##    ##   # #   ##   #  #  #  #   ##    ##   #  #   ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
-    /**
-     * Attacks the controller in a room.
-     * @param {string} fromRoomName The name of the room to spawn the converter from.
-     * @param {string} toRoomName The name of the room to attack the controller in.
-     * @param {bool} attack Whether to attack the room's controller or not.
-     */
-    static attackRoomController(fromRoomName, toRoomName, attack) {
-        if (!Memory.maxCreeps.converter) {
-            Memory.maxCreeps.converter = {};
-        }
-
-        if (!Memory.maxCreeps.converter[fromRoomName]) {
-            Memory.maxCreeps.converter[fromRoomName] = {};
-        }
-        
-        if (attack) {
-            Memory.maxCreeps.converter[fromRoomName][toRoomName] = true;
-        } else {
-            delete Memory.maxCreeps.converter[fromRoomName][toRoomName];
-        }
-    }
-
     //                    #       #  ###                     
     //                            #  #  #                    
     //  ###  # #    ##   ##     ###  #  #   ##    ##   # #   
@@ -216,6 +188,35 @@ class Commands {
         Memory.dismantle[roomName].push({x: x, y: y});
     }
 
+    //    #                                         #        ###                      ##                #                ##    ##                
+    //    #                                         #        #  #                    #  #               #                 #     #                
+    //  ###   ##   #  #  ###    ###  ###    ###   ###   ##   #  #   ##    ##   # #   #      ##   ###   ###   ###    ##    #     #     ##   ###   
+    // #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  # ##  ###   #  #  #  #  ####  #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
+    // #  #  #  #  ####  #  #   ##   #     # ##  #  #  ##    # #   #  #  #  #  #  #  #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
+    //  ###   ##   ####  #  #  #     #      # #   ###   ##   #  #   ##    ##   #  #   ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
+    //                          ###                                                                                                              
+    /**
+     * Downgrades the controller in a room.
+     * @param {string} fromRoomName The name of the room to spawn the downgrader from.
+     * @param {string} toRoomName The name of the room to downgrade the controller in.
+     * @param {bool} downgarde Whether to downgrade the room's controller or not.
+     */
+    static downgradeRoomController(fromRoomName, toRoomName, downgrade) {
+        if (!Memory.maxCreeps.downgrader) {
+            Memory.maxCreeps.downgrader = {};
+        }
+
+        if (!Memory.maxCreeps.downgrader[fromRoomName]) {
+            Memory.maxCreeps.downgrader[fromRoomName] = {};
+        }
+        
+        if (downgrade) {
+            Memory.maxCreeps.downgrader[fromRoomName][toRoomName] = true;
+        } else {
+            delete Memory.maxCreeps.downgrader[fromRoomName][toRoomName];
+        }
+    }
+
     // ###    ##    ##    ##   # #    ##   ###   
     // #  #  # ##  #     #  #  # #   # ##  #  #  
     // #     ##    #     #  #  # #   ##    #     
@@ -224,7 +225,7 @@ class Commands {
      * Recover from an emergency.
      */
     static recover() {
-        _.forEach(Game.spawns, (spawn) => {spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], `storer-emerg-${spawn.room.name}-${spawn.name}`, {role: "storer", home: spawn.room.name})});
+        _.forEach(Game.spawns, (spawn) => spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], `storer-emerg-${spawn.room.name}-${spawn.name}`, {role: "storer", home: spawn.room.name}));
     }
 
     //                                      ##   ##    ##          

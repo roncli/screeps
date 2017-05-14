@@ -3,7 +3,53 @@ var Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskClaim = require("task.claim");
 
-class Claimer {
+//  ####           ##            ###    ##             #                        
+//  #   #           #           #   #    #                                      
+//  #   #   ###     #     ###   #        #     ###    ##    ## #    ###   # ##  
+//  ####   #   #    #    #   #  #        #        #    #    # # #  #   #  ##  # 
+//  # #    #   #    #    #####  #        #     ####    #    # # #  #####  #     
+//  #  #   #   #    #    #      #   #    #    #   #    #    # # #  #      #     
+//  #   #   ###    ###    ###    ###    ###    ####   ###   #   #   ###   #     
+/**
+ * Represents the claimer role.
+ */
+class RoleClaimer {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should be spawned.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var claimer = Memory.maxCreeps.claimer,
+            roomName = engine.room.name,
+            creeps = Cache.creeps[roomName],
+            claimers = creeps && creeps.claimer || [],
+            roomToClaim;
+        
+        // Loop through the room claimers to see if we need to spawn a creep.
+        if (claimer) {
+            _.forEach(claimer[roomName], (value, toRoom) => {
+                if (_.filter(claimers, (c) => c.memory.claim === toRoom).length === 0) {
+                    roomToClaim = toRoom;
+                    return false;
+                }
+            });
+        }
+
+        return {
+            spawn: !!roomToClaim,
+            max: Object.keys(claimer[roomName]).length,
+            roomToClaim: roomToClaim
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -20,28 +66,6 @@ class Claimer {
             body: [CLAIM, MOVE],
             name: "claimer"
         };
-    }
-
-    static checkSpawn(room) {
-        var claimer = Memory.maxCreeps.claimer,
-            roomName = room.name,
-            claimers = Cache.creeps[roomName] && Cache.creeps[roomName].claimer || [],
-            max = Object.keys(claimer[roomName]).length,
-            roomToClaim;
-        
-        // Loop through the room claimers to see if we need to spawn a creep.
-        if (claimer) {
-            _.forEach(claimer[roomName], (value, toRoom) => {
-                var count = _.filter(claimers, (c) => c.memory.claim === toRoom).length;
-
-                if (count === 0) {
-                    roomToClaim = toRoom;
-                    return false;
-                }
-            });
-        }
-
-        return roomToClaim;
     }
 
     static spawn(room, toRoom) {
@@ -115,6 +139,6 @@ class Claimer {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Claimer, "RoleClaimer");
+    require("screeps-profiler").registerObject(RoleClaimer, "RoleClaimer");
 }
-module.exports = Claimer;
+module.exports = RoleClaimer;

@@ -2,7 +2,38 @@ var Cache = require("cache"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally");
 
-class RemoteDismantler {
+//  ####           ##           ####                         #            ####     #                                 #      ##                 
+//  #   #           #           #   #                        #             #  #                                      #       #                 
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###    #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##  
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  # 
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####   #  #    #     ###   # # #   ####  #   #   #       #    #####  #     
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #       #  #    #        #  # # #  #   #  #   #   #  #    #    #      #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #     
+/**
+ * Represents the remote dismantler role.
+ */
+class RoleRemoteDismantler {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, max) {
+        var creeps = Cache.creeps[engine.room.name];
+
+        return {
+            spawn: _.filter(creeps && creeps.remoteDismantler || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -27,34 +58,6 @@ class RemoteDismantler {
             body: body,
             name: "remoteDismantler"
         };
-    }
-
-    static checkSpawn(room, supportRoom, max) {
-        var roomName = room.name,
-            dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [];
-
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-
-        // If there are no spawns in the support room, ignore the room.
-        if (Cache.spawnsInRoom(supportRoom).length === 0) {
-            return;
-        }
-
-        // If we don't have a remote dismantler for this room, spawn one.
-        if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            RemoteDismantler.spawn(room, supportRoom);
-        }
-
-        // Output remote dismantler count in the report.
-        if (Memory.log && (dismantlers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteDismantler",
-                count: dismantlers.length,
-                max: max
-            });
-        }        
     }
 
     static spawn(room, supportRoom) {
@@ -150,6 +153,6 @@ class RemoteDismantler {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(RemoteDismantler, "RoleRemoteDismantler");
+    require("screeps-profiler").registerObject(RoleRemoteDismantler, "RoleRemoteDismantler");
 }
-module.exports = RemoteDismantler;
+module.exports = RoleRemoteDismantler;

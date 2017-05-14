@@ -4,7 +4,71 @@ var Cache = require("cache"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
-class Worker {
+//  ####           ##           #   #                #                   
+//  #   #           #           #   #                #                   
+//  #   #   ###     #     ###   #   #   ###   # ##   #   #   ###   # ##  
+//  ####   #   #    #    #   #  # # #  #   #  ##  #  #  #   #   #  ##  # 
+//  # #    #   #    #    #####  # # #  #   #  #      ###    #####  #     
+//  #  #   #   #    #    #      ## ##  #   #  #      #  #   #      #     
+//  #   #   ###    ###    ###   #   #   ###   #      #   #   ###   #     
+/**
+ * Represents the worker role.
+ */
+class RoleWorker {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawn(engine) {
+        var room = engine.room,
+            storage = room.storage,
+            roomName = room.name,
+            creeps = Cache.creeps[roomName],
+            max, roomToSpawnFor;
+        
+        max = storage && storage.my ? 1 : 2;
+
+        if (max > 0 && _.filter(creeps && creeps.worker || [], (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length < max) {
+            roomToSpawnFor = room.name;
+        }
+
+        // Support smaller rooms in the region.
+        if (!roomToSpawnFor) {
+            _.forEach(_.filter(Game.rooms, (r) => {
+                var memory = r.memory,
+                    roomType = memory.roomType,
+                    controller = r.controller;
+
+                return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && r.name !== roomName && controller && controller.level < 6;
+            }), (otherRoom) => {
+                var otherRoomName = otherRoom.name,
+                    otherCreeps = Cache.creeps[otherRoom.name];
+                
+                if (_.filter(otherCreeps && otherCreeps.worker || [], (c) => {
+                    var memory = c.memory;
+
+                    return memory.supportRoom !== memory.home;
+                }).length === 0) {
+                    roomToSpawnFor = otherRoomName;
+                }
+            });
+        }
+
+        return {
+            spawn: !!roomToSpawnFor,
+            max: max,
+            roomToSpawnFor: roomToSpawnFor
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -45,42 +109,6 @@ class Worker {
             boosts: boosts,
             name: "worker"
         };
-    }
-
-    static checkSpawn(room, canSpawn) {
-        var roomName = room.name,
-            workers = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
-            storage = room.storage,
-            count, max;
-        
-        // If there are no energy sources, ignore the room.
-        if (room.find(FIND_SOURCES).length === 0) {
-            return;
-        }
-
-        // If we have less than max workers, spawn a worker.
-        count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length;
-        max = canSpawn ? storage && storage.my ? 1 : 2 : 0;
-
-        if (count < max) {
-            Worker.spawn(room);
-        }
-
-        // Output worker count in the report.
-        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "worker",
-                count: workers.length,
-                max: max
-            });
-        }
-
-        // Support smaller rooms in the region.
-        _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== roomName && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
-            if (_.filter(Cache.creeps[otherRoom.name] && Cache.creeps[otherRoom.name].worker || [], (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
-                Worker.spawn(otherRoom, room);
-            }
-        });
     }
 
     static spawn(room, supportRoom) {
@@ -517,6 +545,6 @@ class Worker {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Worker, "RoleWorker");
+    require("screeps-profiler").registerObject(RoleWorker, "RoleWorker");
 }
-module.exports = Worker;
+module.exports = RoleWorker;

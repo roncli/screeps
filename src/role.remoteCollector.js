@@ -3,7 +3,39 @@ var Cache = require("cache"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
 
-class RemoteCollector {
+//  ####           ##           ####                         #             ###           ##     ##                   #                  
+//  #   #           #           #   #                        #            #   #           #      #                   #                  
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #       ###     #      #     ###    ###   ####    ###   # ##  
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  #      #   #    #      #    #   #  #   #   #     #   #  ##  # 
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  #      #   #    #      #    #####  #       #     #   #  #     
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #   #  #   #    #      #    #      #   #   #  #  #   #  #     
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###    ###    ###    ###    ###    ###    ###     ##    ###   #     
+/**
+ * Represents the remote collector role.
+ */
+class RoleRemoteCollector {
+    //       #                 #      ##                            ##          #     #     #                       
+    //       #                 #     #  #                          #  #         #     #                             
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
+    //                                     #                                                            ###         
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            max = 1;
+
+        return {
+            spawn: _.filter(creeps && creeps.remoteCollector || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            max: max
+        };
+    }
+
     //                                 ##          #     #     #                       
     //                                #  #         #     #                             
     //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
@@ -28,38 +60,6 @@ class RemoteCollector {
             body: body,
             name: "remoteCollector"
         };
-    }
-
-    static checkSpawn(room, supportRoom, max) {
-        var roomName = room.name,
-            creeps = Cache.creeps[roomName],
-            collectors = creeps && creeps.remoteCollector || [];
-
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-
-        if (!max) {
-            max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? supportRoom.controller ? supportRoom.controller.level : 3 : 1;
-        }
-
-        // If there are no spawns in the support room, ignore the room.
-        if (Cache.spawnsInRoom(supportRoom).length === 0) {
-            return;
-        }
-
-        // If we don't have enough remote collectors for this room, spawn one.
-        if (_.filter(collectors, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            RemoteCollector.spawn(room, supportRoom);
-        }
-
-        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteCollector",
-                count: collectors.length,
-                max: max
-            });
-        }
     }
 
     static spawn(room, supportRoom) {
@@ -264,6 +264,6 @@ class RemoteCollector {
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(RemoteCollector, "RoleRemoteCollector");
+    require("screeps-profiler").registerObject(RoleRemoteCollector, "RoleRemoteCollector");
 }
-module.exports = RemoteCollector;
+module.exports = RoleRemoteCollector;

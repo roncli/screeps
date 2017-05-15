@@ -31,7 +31,7 @@ class RoomMine extends RoomEngine {
     // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
     //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
     /**
-     * Creates a new base room.
+     * Creates a new mine room.
      * @param {Room} room The room.
      */
     constructor(room) {
@@ -66,7 +66,7 @@ class RoomMine extends RoomEngine {
         }
 
         // If the controller is ours, convert this to a base.
-        if (controller && controller.my) {
+        if (this.type === "mine" && controller && controller.my) {
             this.convert();
             return;
         }
@@ -146,6 +146,7 @@ class RoomMine extends RoomEngine {
 
         if (!this.room.unobservable) {
             this.stage1Manage();
+            this.defend();
         }
     }
 
@@ -197,7 +198,9 @@ class RoomMine extends RoomEngine {
      * Spawns creeps while the room is in stage 1.
      */
     stage1Spawn() {
-        this.checkSpawn(RoleRemoteReserver);
+        if (this.room.controller) {
+            this.checkSpawn(RoleRemoteReserver);
+        }
         this.checkSpawn(RoleRemoteBuilder);
     }
 
@@ -215,7 +218,9 @@ class RoomMine extends RoomEngine {
     stage1AssignTasks(tasks) {
         var room = this.room;
 
-        RoleRemoteReserver.assignTasks(room, tasks);
+        if (room.controller) {
+            RoleRemoteReserver.assignTasks(room, tasks);
+        }
         RoleRemoteBuilder.assignTasks(room);
         RoleRemoteMiner.assignTasks(room, tasks);
         RoleRemoteWorker.assignTasks(room, tasks);
@@ -238,11 +243,11 @@ class RoomMine extends RoomEngine {
             roomName = room.name,
             minerals = room.find(FIND_MINERALS),
             energySources = room.find(FIND_SOURCES),
-            sources = [].concat.apply([], [energySources, /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(roomName) ? minerals : []]),
+            sources = [].concat.apply([], [energySources, /^[EW][0-9]*[4-6][NS][0-9]*[4-6]$/.test(roomName) ? minerals : []]),
             containers = Cache.containersInRoom(room),
             allSources = [].concat.apply([], [energySources, minerals]),
             creeps = Cache.creeps[roomName],
-            sites, supportRoom, armyName, army, supportRoomName;
+            sites;
 
         // Check to see if we have built containers.  If so, move to stage 2.
         if (containers.length >= sources.length) {
@@ -272,14 +277,10 @@ class RoomMine extends RoomEngine {
 
         // Check to see if we have construction sites for the containers.  If not, create them.
         sites = room.find(FIND_MY_CONSTRUCTION_SITES);
-        supportRoom = this.supportRoom;
-        armyName = `${roomName}-defense`;
-        army = Memory.army[armyName];
-        supportRoomName = supportRoom.name;
 
         if (sites.length === 0) {
             _.forEach(sources, (source) => {
-                var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
+                var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(this.supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
 
                 if (
                     _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
@@ -290,7 +291,25 @@ class RoomMine extends RoomEngine {
                 }
             });
         } 
+    }
 
+    //    #          #                  #  
+    //    #         # #                 #  
+    //  ###   ##    #     ##   ###    ###  
+    // #  #  # ##  ###   # ##  #  #  #  #  
+    // #  #  ##     #    ##    #  #  #  #  
+    //  ###   ##    #     ##   #  #   ###  
+    /**
+     * Defends the room from invaders.
+     */
+    defend() {
+        var room = this.room,
+            roomName = room.name,
+            armyName = `${roomName}-defense`,
+            army = Memory.army[armyName],
+            supportRoom = this.supportRoom,
+            supportRoomName = supportRoom.name;
+        
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
             if (!army) {
@@ -320,6 +339,8 @@ class RoomMine extends RoomEngine {
 
         // Manage room and bail if it got reset to stage 1.    
         this.stage2Manage();
+        this.defend();
+        
         if (this.stage === 1) {
             return;
         }
@@ -360,32 +381,11 @@ class RoomMine extends RoomEngine {
                 (creeps && creeps.remoteReserver || []).length === 0
             ) {
                 this.stage = 1;
-                return;
             }
         } else {
-            let sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]),
-                armyName, army, supportRoom, supportRoomName, energyCapacityAvailable;
-
             // Check to see if we lost built containers.  If so, move to stage 1.
-            if (Cache.containersInRoom(room).length < sources.length) {
+            if (Cache.containersInRoom(room).length < [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][0-9]*[4-6][NS][0-9]*[4-6]$/.test(room.name) ? room.find(FIND_MINERALS) : []]).length) {
                 this.stage = 1;
-                return;
-            }
-
-            armyName = `${roomName}-defense`;
-            army = Memory.army[armyName];
-            supportRoom = this.supportRoom;
-            supportRoomName = supportRoom.name;
-            energyCapacityAvailable = supportRoom.energyCapacityAvailable;
-            if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-                // If there are invaders in the room, spawn an army if we don't have one.
-                if (!army) {
-                    Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
-                }
-            } else if (army) {
-                // Cancel army if invaders are gone.
-                army.directive = "attack";
-                army.success = true;
             }
         }
     }
@@ -479,7 +479,9 @@ class RoomMine extends RoomEngine {
         dismantle = Memory.dismantle;
         dismantleRoom = dismantle[room.name];
         
-        this.checkSpawn(RoleRemoteReserver);
+        if (room.controller) {
+            this.checkSpawn(RoleRemoteReserver);
+        }
         this.checkSpawn(RoleRemoteMiner);
         this.checkSpawn(RoleRemoteWorker);
         this.checkSpawn(RoleRemoteStorer);
@@ -503,7 +505,9 @@ class RoomMine extends RoomEngine {
     stage2AssignTasks(tasks) {
         var room = this.room;
 
-        RoleRemoteReserver.assignTasks(room, tasks);
+        if (room.controller) {
+            RoleRemoteReserver.assignTasks(room, tasks);
+        }
         RoleRemoteMiner.assignTasks(room, tasks);
         RoleRemoteWorker.assignTasks(room, tasks);
         RoleRemoteStorer.assignTasks(room, tasks);
@@ -538,7 +542,7 @@ class RoomMine extends RoomEngine {
     /**
      * Deserializes room from an object.
      * @param {Room} room The room to deserialize from.
-     * @return {RoomCleanup} The deserialized room.
+     * @return {RoomMine} The deserialized room.
      */
     static fromObj(room) {
         return new RoomMine(room);

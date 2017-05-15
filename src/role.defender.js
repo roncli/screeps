@@ -31,7 +31,9 @@ class RoleDefender {
             max = 1;
 
         return {
+            name: "defender",
             spawn: _.filter(creeps && creeps.defender || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
             max: max
         };
     }

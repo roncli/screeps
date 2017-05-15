@@ -34,7 +34,9 @@ class RoleRemoteBuilder {
             max = 2;
 
         return {
+            name: "remoteBuilder",
             spawn: (creeps && creeps.remoteBuilder || []).length < max,
+            spawnFromRegion: true,
             max: max
         };
     }

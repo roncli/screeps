@@ -34,7 +34,12 @@ class RoleStorer {
         
         // If there are no containers or storages in the room, ignore the room.
         if (containers.length === 0 || !room.storage || !room.storage.my) {
-            return;
+            return {
+                name: "storer",
+                spawn: false,
+                max: 0,
+                spawnFromRegion: true
+            };
         }
 
         containerSource = Memory.containerSource;
@@ -73,6 +78,7 @@ class RoleStorer {
         max += Math.ceil(2 * length / (controller && rcl === 8 ? 35 : 30)) + (rcl >= 7 && army && _.filter(army, (a) => a.region === room.memory.region && a.directive === "building").length > 0 ? 1 : 0);
 
         return {
+            name: "storer",
             spawn: _.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
             max: max
         };

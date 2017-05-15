@@ -28,16 +28,11 @@ class RoleScientist {
      */
     static checkSpawnSettings(engine) {
         var room = engine.room,
-            controller = room.controller,
             creeps = Cache.creeps[room.name],
             max = 1;
-        
-        // If the room's controller is not 6 or higher, ignore the room.
-        if (!controller || controller.level < 6) {
-            return;
-        }
 
         return {
+            name: "scientist",
             spawn: _.filter(creeps && creeps.scientist || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
             max: max
         };

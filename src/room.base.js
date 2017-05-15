@@ -750,24 +750,36 @@ class RoomBase extends RoomEngine {
     spawn() {
         var room = this.room,
             storage = room.storage,
+            controller = room.controller,
+            rcl = controller.level,
             dismantle = Memory.dismantle,
-            roomName = room.name,
-            controller = room.controller;
+            roomName = room.name;
 
-        if (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0) {
-            this.checkSpawn("worker", RoleWorker.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleWorker)); // canSpawnWorkers
+        if (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0) {
+            this.checkSpawn(RoleWorker);
         }
-        this.checkSpawn("miner", RoleMiner.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleMiner));
-        this.checkSpawn("storer", RoleStorer.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleStorer));
-        this.checkSpawn("scientist", RoleScientist.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleScientist));
+
+        this.checkSpawn(RoleMiner);
+        this.checkSpawn(RoleStorer);
+
+        if (rcl < 6) {
+            this.checkSpawn(RoleScientist);
+        }
+
         if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-            this.checkSpawn("dismantler", RoleDismantler.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleDismantler));
+            this.checkSpawn(RoleDismantler);
         }
-        this.checkSpawn("collector", RoleCollector.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleCollector));
-        this.checkSpawn("claimer", RoleClaimer.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleClaimer));
-        this.checkSpawn("downgrader", RoleDowngrader.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleDowngrader));
-        if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
-            this.checkSpawn("upgrader", RoleUpgrader.checkSpawnSettings.bind(RoleWorker), this.spawnFromRegion.bind(this, RoleUpgrader));
+
+        this.checkSpawn(RoleCollector);
+        this.checkSpawn(RoleClaimer);
+        this.checkSpawn(RoleDowngrader);
+
+        if (rcl < 8 || _.filter(Game.rooms, (r) => {
+            var controller = r.controller;
+
+            return controller && controller.my && controller.level < 8;
+        }).length > 0) {
+            this.checkSpawn(RoleUpgrader);
         }
     }
 
@@ -780,26 +792,28 @@ class RoomBase extends RoomEngine {
     //                                     #                       
     /**
      * Checks whether we should spawn for the role.
-     * @param {string} role The role of the creep.
-     * @param {number} max The maximum number of creeps that should be spawned.
-     * @param {function} successCallback The callback to run on success.
+     * @param {object} Role The role of the creep.
      */
-    checkSpawn(role, max, successCallback) {
+    checkSpawn(Role) {
         var roomName = this.room.name,
-            count = _.filter(Cache.creeps[roomName] && Cache.creeps[roomName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            roomLog = Cache.log.room[roomName];
-
-        if (count < max) {
-            successCallback();
-        }
+            roomLog = Cache.log.room[roomName],
+            settings = Role.checkSpawnSettings(this),
+            creeps = Cache.creeps[roomName],
+            count = creeps && creeps[Role.name] ? creeps[Role.name].length : 0;
 
         // Output creep count in the report.
-        if (roomLog && (max > 0 || count > 0)) {
+        if (roomLog && (settings.max > 0 || count > 0)) {
             roomLog.creeps.push({
-                role: role,
+                role: Role.name,
                 count: count,
-                max: max
+                max: settings.max
             });
+        }
+
+        if (settings.spawnFromRegion) {
+            spawnFromRegion(Role, settings);
+        } else {
+            spawnFromRoom(Role, settings);
         }
     }
 

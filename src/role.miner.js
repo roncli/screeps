@@ -36,6 +36,7 @@ class RoleMiner {
         // If there are no containers or sources in the room, ignore the room.
         if (containers.length === 0 || sources.length === 0) {
             return {
+                name: "miner",
                 spawn: false,
                 max: 0
             };
@@ -71,6 +72,7 @@ class RoleMiner {
         });
 
         return {
+            name: "miner",
             spawn: !!containerIdToMineOn,
             max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
             containerIdToMineOn: containerIdToMineOn,

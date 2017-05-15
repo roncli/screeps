@@ -36,6 +36,7 @@ class RoleCollector {
         // If there is storage and containers in the room, ignore the room.
         if (Cache.containersInRoom(room).length !== 0 && storage && storage.my) {
             return {
+                name: "collector",
                 spawn: false,
                 max: 0
             };
@@ -45,6 +46,7 @@ class RoleCollector {
         sources = room.find(FIND_SOURCES);
         if (sources.length <= 1) {
             return {
+                name: "collector",
                 spawn: false,
                 max: 0
             };
@@ -71,8 +73,10 @@ class RoleCollector {
         });
 
         return {
+            name: "collector",
             spawn: !!sourceIdToCollect,
             max: max,
+            spawnFromRegion: true,
             sourceIdToCollect: sourceIdToCollect
         };
     }

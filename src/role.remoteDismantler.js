@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    RoomCleanup = require("room.cleanup"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally");
 
@@ -25,11 +26,14 @@ class RoleRemoteDismantler {
      * @param {RoomEngine} engine The room engine to check for.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine, max) {
-        var creeps = Cache.creeps[engine.room.name];
+    static checkSpawnSettings(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            max = engine instanceof RoomCleanup ? 8 : 1;
 
         return {
+            name: "remoteDismantler",
             spawn: _.filter(creeps && creeps.remoteDismantler || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
             max: max
         };
     }

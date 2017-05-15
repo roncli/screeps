@@ -27,7 +27,7 @@ class RoleWorker {
      * @param {RoomEngine} engine The room engine to check for.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawn(engine) {
+    static checkSpawnSettings(engine) {
         var room = engine.room,
             storage = room.storage,
             roomName = room.name,
@@ -63,8 +63,10 @@ class RoleWorker {
         }
 
         return {
+            name: "worker",
             spawn: !!roomToSpawnFor,
             max: max,
+            spawnFromRegion: room.controller.level < 6,
             roomToSpawnFor: roomToSpawnFor
         };
     }
@@ -129,7 +131,7 @@ class RoleWorker {
         }
 
         // Fail if all the spawns are busy.
-        if (Cache.labsInRoom(supportRoom).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
+        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
             return false;
         }
 

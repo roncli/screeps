@@ -26,7 +26,7 @@ class RoleRemoteMiner {
      * @param {RoomEngine} engine The room engine to check for.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawn(engine) {
+    static checkSpawnSettings(engine) {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
             minerals = room.find(FIND_MINERALS),
@@ -36,6 +36,7 @@ class RoleRemoteMiner {
         // If there are no containers or sources in the room, ignore the room.
         if (containers.length === 0 || sources.length === 0) {
             return {
+                name: "remoteMiner",
                 spawn: false,
                 max: 0
             };
@@ -86,8 +87,10 @@ class RoleRemoteMiner {
         });
 
         return {
+            name: "remoteMiner",
             spawn: !!containerIdToMineOn,
             max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
+            spawnFromRegion: true,
             containerIdToMineOn: containerIdToMineOn,
             isMineralHarvester: isMineralHarvester
         };

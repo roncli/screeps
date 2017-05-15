@@ -35,11 +35,12 @@ class RoleRemoteWorker {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
             spawn = false,
-            sources, lengthToContainer, creeps, workers, supportRoomName;
+            sources, lengthToContainer, creeps, workers, supportRoomName, containerIdToCollectFrom;
 
         // If there are no containers in the room, ignore the room.
         if (containers.length === 0) {
             return {
+                name: "remoteWorker",
                 spawn: false,
                 max: 0
             };
@@ -63,6 +64,7 @@ class RoleRemoteWorker {
             }
 
             if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
+                containerIdToCollectFrom = containerId;
                 spawn = true;
             }
 
@@ -71,8 +73,11 @@ class RoleRemoteWorker {
         });
 
         return {
+            name: "remoteWorker",
             spawn: spawn,
-            max: 1
+            max: 1,
+            spawnFromRegion: true,
+            containerIdToCollectFrom: containerIdToCollectFrom
         };
     }
 

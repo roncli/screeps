@@ -36,6 +36,7 @@ class RoleRemoteStorer {
         // If there are no containers in the room, ignore the room.
         if (containers.length === 0) {
             return {
+                name: "remoteStorer",
                 spawn: false,
                 max: 0
             };
@@ -88,8 +89,10 @@ class RoleRemoteStorer {
         });
 
         return {
+            name: "remoteStorer",
             spawn: !!containerIdToCollectFrom,
             max: _.sum(_.map(containers, (c) => Math.max(Math.ceil(Memory.lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0))),
+            spawnFromRegion: true,
             containerIdToCollectFrom: containerIdToCollectFrom
         };
     }

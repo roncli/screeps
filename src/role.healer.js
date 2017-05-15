@@ -31,7 +31,9 @@ class RoleHealer {
             max = 1;
         
         return {
+            name: "healer",
             spawn: _.filter(creeps && creeps.healer || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
             max: max
         };
     }

@@ -31,7 +31,9 @@ class RoleRemoteCollector {
             max = 1;
 
         return {
+            name: "remoteCollector",
             spawn: _.filter(creeps && creeps.remoteCollector || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
             max: max
         };
     }

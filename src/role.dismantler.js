@@ -33,7 +33,9 @@ class RoleDismantler {
             max = 1;
 
         return {
+            name: "dismantler",
             spawn: _.filter(creeps && creeps.dismantler || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            spawnFromRegion: true,
             max: max
         };
     }

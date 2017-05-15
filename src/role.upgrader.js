@@ -76,8 +76,10 @@ class RoleUpgrader {
         }
 
         return {
+            name: "upgrader",
             spawn: !!spawnForRoom,
             max: max,
+            spawnFromRegion: controller.level < 6,
             spawnForRoom: spawnForRoom
         };
     }

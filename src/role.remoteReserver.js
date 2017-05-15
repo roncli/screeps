@@ -36,6 +36,7 @@ class RoleRemoteReserver {
 
         if (reservation && reservation.ticksToEnd >= 4000) {
             return {
+                name: "remoteReserver",
                 spawn: false,
                 max: 0
             };
@@ -58,8 +59,10 @@ class RoleRemoteReserver {
         }
 
         return {
+            name: "remoteReserver",
             spawn: _.filter(creeps && creeps.remoteReserver || [], (c) => c.spawning || c.ticksToLive > lengthToThisController[supportRoomName]).length < max,
-            max: 0
+            max: 0,
+            spawnFromRegion: true,
         };
     }
 

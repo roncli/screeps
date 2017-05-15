@@ -479,6 +479,7 @@ class Main {
                 {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
                 {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
                 {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_OXIDE, amount: 3000},
                 {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
                 {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
                 {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
@@ -486,6 +487,7 @@ class Main {
                 {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
                 {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
                 {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_ALKALIDE, amount: 3000},
                 {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
                 {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
                 {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000},
@@ -493,6 +495,7 @@ class Main {
                 {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000},
                 {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
                 {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 15000},
+                {resource: RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, amount: 15000},
                 {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000},
                 {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000},
                 {resource: RESOURCE_POWER, amount: 3000}

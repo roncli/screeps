@@ -33,13 +33,12 @@ class RoomCleanup extends RoomEngine {
     /**
      * Creates a new cleanup room.
      * @param {Room} room The room.
-     * @param {Room} supportRoom The room this room is supporting.
      */
-    constructor(room, supportRoom) {
+    constructor(room) {
         super();
         this.type = "cleanup";
         this.room = room;
-        this.supportRoom = supportRoom;
+        this.supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom];
     }
 
     // ###   #  #  ###   
@@ -198,7 +197,7 @@ class RoomCleanup extends RoomEngine {
      * @return {RoomCleanup} The deserialized room.
      */
     static fromObj(room) {
-        return new RoomCleanup(room, Game.rooms[Memory.rooms[room.name].roomType.supportRoom]);
+        return new RoomCleanup(room);
     }
 }
 

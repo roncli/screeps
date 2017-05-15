@@ -929,6 +929,11 @@ class RoomBase extends RoomEngine {
             if (_.sum(_.filter(labs, (l) => sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
                 labQueue.status = "returning";
             }
+
+            if (labQueue.amount <= 0 && (sourceLab0.mineralAmount < 5 || sourceLab1.mineralAmount < 5)) {
+                delete memory.labQueue;
+                labQueue = undefined;
+            }
         } else if (status === "returning") {
             if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === labQueue.resource), (l) => l.mineralAmount) === 0) {
                 delete memory.labQueue;

@@ -33,8 +33,8 @@ class RoleMiner {
             sources = [].concat.apply([], [room.find(FIND_SOURCES), minerals]),
             containerSource, minerals, sources, creeps, miners, containerIdToMineOn, isMineralHarvester;
 
-        // If there are no containers or sources in the room, ignore the room.
-        if (containers.length === 0 || sources.length === 0) {
+        // If there are no containers in the room, ignore the room.
+        if (containers.length === 0) {
             return {
                 name: "miner",
                 spawn: false,

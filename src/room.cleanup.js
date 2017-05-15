@@ -11,22 +11,58 @@ var Cache = require("cache"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskPickupResource = require("task.pickupResource");
 
+//  ####                         ###    ##                                      
+//  #   #                       #   #    #                                      
+//  #   #   ###    ###   ## #   #        #     ###    ###   # ##   #   #  # ##  
+//  ####   #   #  #   #  # # #  #        #    #   #      #  ##  #  #   #  ##  # 
+//  # #    #   #  #   #  # # #  #        #    #####   ####  #   #  #   #  ##  # 
+//  #  #   #   #  #   #  # # #  #   #    #    #      #   #  #   #  #  ##  # ##  
+//  #   #   ###    ###   #   #   ###    ###    ###    ####  #   #   ## #  #     
+//                                                                        #     
+//                                                                        #     
+/**
+ * A class that represents a cleanup room.
+ */
 class RoomCleanup extends RoomEngine {
-    constructor(supportRoom) {
+    //                           #                       #                
+    //                           #                       #                
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    /**
+     * Creates a new cleanup room.
+     * @param {Room} room The room.
+     * @param {Room} supportRoom The room this room is supporting.
+     */
+    constructor(room, supportRoom) {
         super();
         this.type = "cleanup";
+        this.room = room;
         this.supportRoom = supportRoom;
     }
 
-    run(room) {
-        var roomName = room.name,
-            ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [], junk = [],
-            supportRoom, tasks;
+    // ###   #  #  ###   
+    // #  #  #  #  #  #  
+    // #     #  #  #  #  
+    // #      ###  #  #  
+    /**
+     * Run the room.
+     */
+    run() {
+        var supportRoom = this.supportRoom,
+            room, roomName, ramparts, structures, junk, tasks;
 
         // Can't see the support room, we have bigger problems, so just bail.
-        if (!(supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom])) {
+        if (!supportRoom) {
             return;
         }
+
+        room = this.room;
+        roomName = room.name;
+        ramparts = [];
+        structures = [];
+        junk = [];
 
         // Get the tasks needed for this room.
         tasks = {
@@ -56,9 +92,13 @@ class RoomCleanup extends RoomEngine {
             }
         };
 
-        if (!room.unobservable) {
-            if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
-                _.forEach(Memory.dismantle[room.name], (pos) => {
+        if (!this.room.unobservable) {
+            let noEnergyStructures, energyStructures;
+
+            if (Memory.dismantle && Memory.dismantle[roomName] && Memory.dismantle[roomName].length > 0) {
+                let completed = [];
+
+                _.forEach(Memory.dismantle[roomName], (pos) => {
                     var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
                     if (structures.length === 0) {
                         completed.push(pos);
@@ -91,46 +131,74 @@ class RoomCleanup extends RoomEngine {
             tasks.remoteDismantle.cleanupTasks = [].concat.apply([], [TaskDismantle.getCleanupTasks(noEnergyStructures), TaskDismantle.getCleanupTasks(ramparts), TaskDismantle.getCleanupTasks(junk)]);
 
             if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
+                let creeps = Cache.creeps[roomName];
+
                 // Notify that the room is cleaned up.
-                Game.notify(`Cleanup Room ${room.name} is squeaky clean!`);
+                Game.notify(`Cleanup Room ${roomName} is squeaky clean!`);
                 
                 // No longer need remote collectors.
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [], (creep) => {
-                    creep.memory.role = "storer";
-                    creep.memory.home = supportRoom.name;
+                _.forEach(creeps && creeps.remoteCollector || [], (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "storer";
+                    memory.home = supportRoom.name;
                 });
 
                 // No longer need dismantlers.
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [], (creep) => {
-                    creep.memory.role = "upgrader";
-                    creep.memory.home = supportRoom.name;
+                _.forEach(creeps && creeps.remoteDismantler || [], (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "upgrader";
+                    memory.home = supportRoom.name;
                 });
 
                 // Eliminate the room from memory.
-                Commands.setRoomType(room.name);
+                Commands.setRoomType(roomName);
             }
         }
 
         // Spawn new creeps.
         if (room.unobservable || structures.length > 0 || ramparts.length > 0 || junk.length > 0) {
-            RoleRemoteDismantler.checkSpawn(room, supportRoom, Math.min(structures.length + ramparts.length + junk.length, 8));
+            this.checkSpawn(RoleRemoteDismantler);
         }
-        RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1);
+        this.checkSpawn(RoleRemoteCollector);
 
         // Assign tasks to creeps.                    
         RoleRemoteDismantler.assignTasks(room, tasks);
         RoleRemoteCollector.assignTasks(room, tasks);
     }
 
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
+    //  #           ##   #       #   
+    //  #          #  #  #           
+    // ###    ##   #  #  ###     #   
+    //  #    #  #  #  #  #  #    #   
+    //  #    #  #  #  #  #  #    #   
+    //   ##   ##    ##   ###   # #   
+    //                          #    
+    /**
+     * Serialize the room to an object.
+     */
+    toObj() {
+        Memory.rooms[this.room.name].roomType = {
             type: this.type,
-            supportRoom: this.supportRoom
+            supportRoom: this.supportRoom.name
         };
     }
 
-    static fromObj(roomMemory) {
-        return new RoomCleanup(roomMemory.roomType.supportRoom);
+    //   #                      ##   #       #   
+    //  # #                    #  #  #           
+    //  #    ###    ##   # #   #  #  ###     #   
+    // ###   #  #  #  #  ####  #  #  #  #    #   
+    //  #    #     #  #  #  #  #  #  #  #    #   
+    //  #    #      ##   #  #   ##   ###   # #   
+    //                                      #    
+    /**
+     * Deserializes room from an object.
+     * @param {Room} room The room to deserialize from.
+     * @return {RoomCleanup} The deserialized room.
+     */
+    static fromObj(room) {
+        return new RoomCleanup(room, Game.rooms[Memory.rooms[room.name].roomType.supportRoom]);
     }
 }
 

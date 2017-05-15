@@ -1,4 +1,5 @@
 var Cache = require("cache"),
+    RoomCleanup = require("room.cleanup"),
     Utilities = require("utilities"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally");
@@ -28,7 +29,7 @@ class RoleRemoteCollector {
      */
     static checkSpawnSettings(engine) {
         var creeps = Cache.creeps[engine.room.name],
-            max = 1;
+            max = engine instanceof RoomCleanup ? 3 : 1;
 
         return {
             name: "remoteCollector",

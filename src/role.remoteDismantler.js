@@ -27,8 +27,9 @@ class RoleRemoteDismantler {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine) {
-        var creeps = Cache.creeps[engine.room.name],
-            max = engine instanceof RoomCleanup ? 8 : 1;
+        var room = engine.room,
+            creeps = Cache.creeps[room.name],
+            max = !room.unobservable && engine instanceof RoomCleanup ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1;
 
         return {
             name: "remoteDismantler",

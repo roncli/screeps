@@ -49,11 +49,11 @@ class RoleDismantler {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine) {
-        var energy = Math.min(engine.room.energyCapacityAvailable, 3300),
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             body = [];
@@ -64,62 +64,12 @@ class RoleDismantler {
 
         return {
             body: body,
-            name: "dismantler"
+            memory: {
+                role: "dismantler",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
         };
-    }
-
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Get the total energy in the room, limited to 3300.
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-
-        // Create the body based on the energy.
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-        }
-
-        if (remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `dismantler-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "dismantler", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room, tasks) {

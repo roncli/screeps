@@ -105,91 +105,32 @@ class RoleRemoteMiner {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
-     * @param {bool} isMineralHarvester Whether this creep will be harvesting minerals or not.
-     * @param {bool} isSourceRoom Whether this creep will be harvesting in a source keeper room or not.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine, isMineralHarvester, isSourceRoom) {
+    static spawnSettings(checkSettings) {
         var body = [];
 
-        if (isMineralHarvester) {
-            let energy = Math.min(engine.room.energyCapacityAvailable, 4500),
+        if (checkSettings.isMineralHarvester) {
+            let energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
                 units = Math.floor(energy / 450),
                 remainder = energy % 450;
             
             body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
             body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
         } else {
-            body = isSourceRoom ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK];
+            body = checkSettings.isSourceRoom ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK];
         }
 
         return {
             body: body,
-            name: "remoteMiner"
+            memory: {
+                role: "remoteMiner",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                container: checkSettings.containerIdToMineOn
+            }
         };
-    }
-
-    static spawn(room, supportRoom, id) {
-        var body = room.memory && room.memory.roomType && room.memory.roomType.type === "source" || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Do something different for minerals.
-        if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Game.getObjectById(id))[0] instanceof Mineral) {
-            body = [];
-
-            // Get the energy available, limiting to 4500.
-            energy = Math.min(supportRoom.energyCapacityAvailable, 4500);
-            units = Math.floor(energy / 450);
-            remainder = energy % 450;
-
-            // Create the body based on the energy.
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-            }
-
-            if (remainder >= 150) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 250) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 350) {
-                body.push(WORK);
-            }
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteMiner-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteMiner", home: roomName, supportRoom: supportRoomName, container: id});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room) {

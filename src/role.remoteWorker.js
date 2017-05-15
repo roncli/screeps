@@ -90,11 +90,11 @@ class RoleRemoteWorker {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine) {
-        var energy = Math.min(engine.room.energyCapacityAvailable, 3300),
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(Math.min(energy, 2000) / 200),
             secondUnits = Math.floor(Math.max((energy - 2000), 0) / 150),
             remainder = Math.min(energy, 2000) % 200,
@@ -107,81 +107,13 @@ class RoleRemoteWorker {
 
         return {
             body: body,
-            name: "remoteWorker"
+            memory: {
+                role: "remoteWorker",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                container: checkSettings.containerIdToCollectFrom
+            }
         };
-    }
-
-    static spawn(room, supportRoom, id) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, secondUnits, remainder, secondRemainder, count, spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Get the total energy in the room, limited to 3000.
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3000);
-        units = Math.floor(energy / 200);
-        secondUnits = Math.floor((energy - 2000) / 150);
-        remainder = energy % 200;
-        secondRemainder = (energy - 2000) % 150;
-
-        // Create the body based on the energy.
-        for (count = 0; count < units && count < 10; count++) {
-            body.push(WORK);
-        }
-
-        if (energy < 2000 && remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units && count < 10; count++) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < secondUnits; count++) {
-            body.push(CARRY);
-            body.push(CARRY);
-        }
-
-        if (energy < 2000 && remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        if (energy > 2000 && secondRemainder >= 100) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units && count < 10; count++) {
-            body.push(MOVE);
-        }
-
-        for (count = 0; count < secondUnits; count++) {
-            body.push(MOVE);
-        }
-
-        if (energy < 2000 && remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        if (energy > 2000 && secondRemainder >= 50) {
-            body.push(MOVE);
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteWorker-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteWorker", home: roomName, supportRoom: supportRoomName, container: id});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room, tasks) {

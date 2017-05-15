@@ -89,15 +89,14 @@ class RoleMiner {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
-     * @param {bool} isMineralHarvester Whether this creep will be harvesting minerals or not.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine, isMineralHarvester) {
+    static spawnSettings(checkSettings) {
         var body = [];
 
-        if (isMineralHarvester) {
-            let energy = Math.min(engine.room.energyCapacityAvailable, 4500),
+        if (checkSettings.isMineralHarvester) {
+            let energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
                 units = Math.floor(energy / 450),
                 remainder = energy % 450;
             
@@ -109,67 +108,12 @@ class RoleMiner {
 
         return {
             body: body,
-            name: "miner"
+            memory: {
+                role: "miner",
+                home: checkSettings.home,
+                container: checkSettings.containerIdToMineOn
+            }
         };
-    }
-
-    static spawn(room, id) {
-        var spawns = Cache.spawnsInRoom(room),
-            body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-            roomName = room.name,
-            energy, units, remainder, count, spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Get the energy available, limiting to 4500.
-        energy = Math.min(room.energyCapacityAvailable, 4500);
-        units = Math.floor(energy / 450);
-        remainder = energy % 450;
-
-        // Do something different for minerals.
-        if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Game.getObjectById(id))[0] instanceof Mineral) {
-            body = [];
-
-            // Create the body based on the energy.
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-            }
-
-            if (remainder >= 150) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 250) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 350) {
-                body.push(WORK);
-            }
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `miner-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "miner", home: roomName, container: id});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        return typeof name !== "number";
     }
 
     static assignTasks(room) {

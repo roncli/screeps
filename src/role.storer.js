@@ -80,7 +80,8 @@ class RoleStorer {
         return {
             name: "storer",
             spawn: _.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
-            max: max
+            max: max,
+            rcl: rcl
         };
     }
 
@@ -93,13 +94,13 @@ class RoleStorer {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine) {
+    static spawnSettings(checkSettings) {
         var body;
 
-        switch (engine.room.controller.level) {
+        switch (checkSettings.rcl) {
             case 7:
                 body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
@@ -113,41 +114,11 @@ class RoleStorer {
 
         return {
             body: body,
-            name: "storer"
+            memory: {
+                role: "storer",
+                home: checkSettings.home
+            }
         };
-    }
-
-    static spawn(room) {
-        var spawns = Cache.spawnsInRoom(room),
-            roomName = room.name,
-            body, spawnToUse, name;
-
-        switch (room.controller.level) {
-            case 7:
-                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
-                break;
-            case 8:
-                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
-                break;
-            default:
-                body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
-                break;
-        }
-
-        // Fail if all the spawns are busy.
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `storer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "storer", home: roomName});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room, tasks) {

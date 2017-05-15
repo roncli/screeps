@@ -31,7 +31,7 @@ class RoleCollector {
         var room = engine.room,
             storage = room.storage,
             maxPerSource = 3,
-            sources, creeps, collectors, max, sourceIdToCollect;
+            sources, creeps, collectors, max, sourceIdToCollectFrom;
         
         // If there is storage and containers in the room, ignore the room.
         if (Cache.containersInRoom(room).length !== 0 && storage && storage.my) {
@@ -67,17 +67,17 @@ class RoleCollector {
 
             sourceId = source.id;
             if (_.filter(collectors, (c) => c.memory.homeSource === sourceId).length < maxPerSource) {
-                sourceIdToCollect = sourceId;
+                sourceIdToCollectFrom = sourceId;
                 return false;
             }
         });
 
         return {
             name: "collector",
-            spawn: !!sourceIdToCollect,
+            spawn: !!sourceIdToCollectFrom,
             max: max,
             spawnFromRegion: true,
-            sourceIdToCollect: sourceIdToCollect
+            sourceIdToCollectFrom: sourceIdToCollectFrom
         };
     }
 
@@ -90,11 +90,11 @@ class RoleCollector {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine) {
-        var energy = Math.min(engine.room.energyCapacityAvailable, 3300),
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             body = [];
@@ -105,61 +105,12 @@ class RoleCollector {
 
         return {
             body: body,
-            name: "collector"
+            memory: {
+                role: "collector",
+                home: checkSettings.home,
+                homeSource: checkSettings.sourceIdToCollectFrom
+            }
         };
-    }
-
-    static spawn(room, id) {
-        var body = [],
-            roomName = room.name,
-            energy, units, remainder, count, spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Get the total energy in the room, limited to 3300.
-        energy = Math.min(room.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-
-        // Create the body based on the energy.
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-        }
-
-        if (remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `collector-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "collector", home: roomName, homeSource: id});
-        if (spawnToUse.room.name === roomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room, tasks) {

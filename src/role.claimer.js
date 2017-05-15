@@ -60,34 +60,18 @@ class RoleClaimer {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings() {
+    static spawnSettings(checkSettings) {
         return {
             body: [CLAIM, MOVE],
-            name: "claimer"
+            memory: {
+                role: "claimer",
+                home: checkSettings.home,
+                claim: checkSettings.roomToClaim
+            }
         };
-    }
-
-    static spawn(room, toRoom) {
-        var spawns = Cache.spawnsInRoom(room),
-            body = [CLAIM, MOVE],
-            spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `claimer-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "claimer", home: room.name, claim: toRoom});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room) {

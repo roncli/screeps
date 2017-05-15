@@ -47,11 +47,11 @@ class RoleScientist {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine) {
-        var energy = Math.min(engine.room.energyCapacityAvailable, 2500),
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 2500),
             units = Math.floor(energy / 150),
             remainder = energy % 150,
             body = [];
@@ -61,53 +61,11 @@ class RoleScientist {
 
         return {
             body: body,
-            name: "scientist"
+            memory: {
+                role: "scientist",
+                home: checkSettings.home
+            }
         };
-    }
-
-    static spawn(room) {
-        var spawns = Cache.spawnsInRoom(room),
-            body = [],
-            roomName = room.name,
-            energy, units, remainder, count, spawnToUse, name;
-
-        // Fail if all the spawns are busy.
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Get the total energy in the room, limited to 2500.
-        energy = Math.min(room.energyCapacityAvailable, 2500);
-        units = Math.floor(energy / 150);
-        remainder = energy % 150;
-
-        // Create the body based on the energy.
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `scientist-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room, tasks) {

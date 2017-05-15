@@ -80,28 +80,31 @@ class RoleWorker {
     //        #                                                            ###         
     /**
      * Gets the settings for spawning a creep.
-     * @param {RoomEngine} engine The room engine to spawn for.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
-    static spawnSettings(engine) {
-        var room = engine.room,
+    static spawnSettings(checkSettings) {
+        var room = Game.rooms[checkSettings.home],
             energy = Math.min(room.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             storage = room.storage,
+            storage = room.storage,
+            store = storage.store,
+            spawns = Cache.spawnsInRoom(room),
             body = [],
-            boosts;
+            boosts = {};
 
         body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
         body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
         body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
         if (storage && Cache.labsInRoom(room).length > 0) {
-            if (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+            if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
                 boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
-            } else if (storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {
+            } else if (store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {
                 boosts[RESOURCE_LEMERGIUM_ACID] = units;
-            } else if (storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+            } else if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
                 boosts[RESOURCE_LEMERGIUM_HYDRIDE] = units;
             }
         }
@@ -109,94 +112,13 @@ class RoleWorker {
         return {
             body: body,
             boosts: boosts,
-            name: "worker"
+            memory: {
+                role: "worker",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                homeSource: spawns ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0]
+            }
         };
-    }
-
-    static spawn(room, supportRoom) {
-        var body = [],
-            workCount = 0,
-            canBoost = false,
-            roomName = room.name,
-            supportRoomName, spawns, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
-
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-        supportRoomName = supportRoom.name;
-        spawns = Cache.spawnsInRoom(supportRoom);
-        storage = supportRoom.storage;
-        if (spawns.length === 0) {
-            return;
-        }
-
-        // Fail if all the spawns are busy.
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        // Get the total energy in the room, limited to 3300.
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-
-        // Create the body based on the energy.
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-            workCount++;
-        }
-
-        if (remainder >= 150) {
-            body.push(WORK);
-            workCount++;
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        if ((roomName === supportRoomName || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) && workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0) >= 30 * workCount) {
-            canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
-        }
-
-        // Create the creep from the first listed spawn that is available.
-        if (Cache.labsInRoom(supportRoom).length < 3) {
-            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        } else {
-            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        }
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `worker-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "worker", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && canBoost) {
-            // Set the lab to be in use.
-            labToBoostWith.creepToBoost = name;
-            labToBoostWith.resource = storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount ? RESOURCE_CATALYZED_LEMERGIUM_ACID : storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE;
-            labToBoostWith.amount = 30 * workCount;
-            supportRoom.memory.labsInUse.push(labToBoostWith);
-
-            // If anything is coming to fill the lab, stop it.
-            _.forEach(_.filter(Cache.creeps[supportRoom.name] && Cache.creeps[supportRoom.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
-                delete creep.memory.currentTask;
-            });
-        }
-
-        return typeof name !== "number";
     }
 
     static assignTasks(room, tasks) {

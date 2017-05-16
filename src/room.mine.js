@@ -524,8 +524,8 @@ class RoomMine extends RoomEngine {
     /**
      * Serialize the room to an object.
      */
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
+    toObj() {
+        Memory.rooms[this.room.name].roomType = {
             type: this.type,
             supportRoom: this.supportRoom.name,
             stage: this.stage

@@ -486,7 +486,7 @@ class RoomBase extends RoomEngine {
             } else {
                 // Transfer what we have in excess to rooms in need if we have the minimum credits.
                 // TODO: Transfer the first excess mineral to the room that needs it the most.
-                if (Cache.credits >= Memory.minimumCredits && Memory.buy) {
+                if (Cache.credits >= Memory.minimumCredits) {
                     _.forEach(_.filter(Game.rooms, (r) => {
                         var memory = r.memory,
                             roomType = memory.roomType,

@@ -1,6 +1,6 @@
 var Cache = require("cache"),
     Commands = require("commands"),
-    RoomEngine = require("room.engine"),
+    RoomEngine = require("roomEngine"),
     Utilities = require("utilities"),
     RoleDismantler = require("role.dismantler"),
     RoleRemoteBuilder = require("role.remoteBuilder"),

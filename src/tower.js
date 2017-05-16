@@ -20,12 +20,10 @@ class Tower {
     //                            ###                                        
     /**
      * Assigns tasks to the tower.
-     * @param {RoomEngine} engine The room engine to get tasks from.
+     * @param {Room} room The room to get tasks from.
      * @param {object} tasks The tasks to assign to the tower.
      */
-    static assignTasks(engine, tasks) {
-        var room = engine.room;
-
+    static assignTasks(room, tasks) {
         // Find hostiles to attack.
         if (tasks.rangedAttack.tasks.length > 0) {
             _.forEach(Cache.towersInRoom(room), (tower) => {

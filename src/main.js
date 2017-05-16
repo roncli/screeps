@@ -823,11 +823,11 @@ class Main {
         // Loop through each room in memory to deserialize their type and find rooms that aren't observable.
         _.forEach(Memory.rooms, (roomMemory, name) => {
             if (!Game.rooms[name]) {
-                unobservableRooms[name]({
+                unobservableRooms[name] = {
                     name: name,
                     unobservable: true,
                     memory: roomMemory
-                });
+                };
             }
 
             if (roomMemory.roomType) {

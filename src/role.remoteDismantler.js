@@ -1,5 +1,4 @@
 var Cache = require("cache"),
-    RoomCleanup = require("room.cleanup"),
     Utilities = require("utilities"),
     TaskRally = require("task.rally");
 
@@ -29,7 +28,7 @@ class RoleRemoteDismantler {
     static checkSpawnSettings(engine) {
         var room = engine.room,
             creeps = Cache.creeps[room.name],
-            max = !room.unobservable && engine instanceof RoomCleanup ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1;
+            max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1;
 
         return {
             name: "remoteDismantler",

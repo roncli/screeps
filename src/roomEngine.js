@@ -79,7 +79,7 @@ class RoomEngine {
         spawnSettings = Role.spawnSettings(checkSettings);
 
         // Add labs to the spawn settings.
-        if (Cache.labsInRoom(supportRoom).length > 0) {
+        if (spawnSettings.boosts && Cache.labsInRoom(supportRoom).length > 0) {
             canBoost = !!(labsToBoostWith = Utilities.getLabToBoostWith(supportRoom, Object.keys(spawnSettings.boosts).length));
         }
 
@@ -89,7 +89,7 @@ class RoomEngine {
         name = spawnToUse.createCreep(spawnSettings.body, `${checkSettings.name}-${checkSettings.roomToSpawnFor || roomName}-${Game.time.toFixed(0).substring(4)}`, spawnSettings.memory);
         Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
-        if (typeof name !== "number") {
+        if (canBoost && typeof name !== "number") {
             // Set the labs to be in use.
             let labIndex = 0,
                 labsInUse = supportRoom.memory.labsInUse;

@@ -39,7 +39,7 @@ class RoomEngine {
     checkSpawn(Role) {
         var room = this.room,
             roomName = room.name,
-            roomLog = Cache.log.room[roomName],
+            roomLog = Cache.log.rooms[roomName],
             checkSettings = Role.checkSpawnSettings(this),
             creeps = Cache.creeps[roomName],
             count = creeps && creeps[Role.name] ? creeps[Role.name].length : 0,

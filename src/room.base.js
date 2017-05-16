@@ -432,12 +432,16 @@ class RoomBase extends RoomEngine {
         }
         
         if (terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
-            let buyResource = buyQueue.resource,
-                reserveMinerals = Memory.reserveMinerals;
+            let reserveMinerals = Memory.reserveMinerals,
+                buyResource;
 
-            if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) > (reserveMinerals[buyResource] || 0))) {
-                delete memory.buyQueue;
-                buyQueue = undefined;
+            if (memory.buyQueue) {
+                let buyResource = buyQueue.resource;
+                
+                if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) > (reserveMinerals[buyResource] || 0)) {
+                    delete memory.buyQueue;
+                    buyQueue = undefined;
+                }
             }
 
             if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {

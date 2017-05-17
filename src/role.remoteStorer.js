@@ -31,6 +31,7 @@ class RoleRemoteStorer {
     static checkSpawnSettings(engine) {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
+            max = 0,
             containerSource, sources, foundFirstSource, lengthToContainer, supportRoom, supportRoomName, supportRoomRcl, creeps, remoteStorers, containerIdToCollectFrom;
 
         // If there are no containers in the room, ignore the room.
@@ -80,18 +81,18 @@ class RoleRemoteStorer {
 
             // Calculate number of storers needed.
             count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0);
+            max += count;
 
             // If we don't have enough remote storers for this container, spawn one.
-            if (_.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
+            if (!containerIdToCollectFrom && _.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
                 containerIdToCollectFrom = containerId;
-                return false;
             }
         });
 
         return {
             name: "remoteStorer",
             spawn: !!containerIdToCollectFrom,
-            max: _.sum(_.map(containers, (c) => lengthToContainer[c.id] ? Math.max(Math.ceil(lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0) : 0)) - 1,
+            max: max,
             spawnFromRegion: true,
             containerIdToCollectFrom: containerIdToCollectFrom,
             supportRoomRcl: supportRoomRcl

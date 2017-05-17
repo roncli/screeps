@@ -91,7 +91,7 @@ class RoleRemoteStorer {
         return {
             name: "remoteStorer",
             spawn: !!containerIdToCollectFrom,
-            max: _.sum(_.map(containers, (c) => Math.max(Math.ceil(Memory.lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0))),
+            max: _.sum(_.map(containers, (c) => lengthToContainer[c.id] ? Math.max(Math.ceil(lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0) : 0)),
             spawnFromRegion: true,
             containerIdToCollectFrom: containerIdToCollectFrom,
             supportRoomRcl: supportRoomRcl

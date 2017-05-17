@@ -781,7 +781,7 @@ class RoomBase extends RoomEngine {
             });
         } else {
             _.forEach(creeps && creeps.dismantler || [], (creep) => {
-                creep.memory.role = "remoteWorker";
+                creep.memory.role = "worker";
                 creep.memory.container = Cache.containersInRoom(room)[0].id;
             });
         }

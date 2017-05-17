@@ -138,7 +138,7 @@ class RoleRemoteStorer {
                 role: "remoteStorer",
                 home: checkSettings.home,
                 supportRoom: checkSettings.supportRoom,
-                containerIdToCollectFrom: checkSettings.containerIdToCollectFrom
+                container: checkSettings.containerIdToCollectFrom
             }
         };
     }

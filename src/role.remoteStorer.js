@@ -31,7 +31,6 @@ class RoleRemoteStorer {
     static checkSpawnSettings(engine) {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
-            count = 0,
             containerSource, sources, foundFirstSource, lengthToContainer, supportRoom, supportRoomName, supportRoomRcl, creeps, remoteStorers, containerIdToCollectFrom;
 
         // If there are no containers in the room, ignore the room.
@@ -55,7 +54,8 @@ class RoleRemoteStorer {
 
         // Loop through containers to see if we have anything we need to spawn.
         _.forEach(containers, (container) => {
-            var containerId = container.id,
+            var count = 0,
+                containerId = container.id,
                 source, length;
 
             if (!containerSource[containerId]) {
@@ -91,7 +91,7 @@ class RoleRemoteStorer {
         return {
             name: "remoteStorer",
             spawn: !!containerIdToCollectFrom,
-            max: _.sum(_.map(containers, (c) => lengthToContainer[c.id] ? Math.max(Math.ceil(lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0) : 0)),
+            max: _.sum(_.map(containers, (c) => lengthToContainer[c.id] ? Math.max(Math.ceil(lengthToContainer[c.id][supportRoomName] / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0) : 0)) - 1,
             spawnFromRegion: true,
             containerIdToCollectFrom: containerIdToCollectFrom,
             supportRoomRcl: supportRoomRcl

@@ -52,7 +52,7 @@ class RoomEngine {
         }
 
         checkSettings.max = canSpawn ? checkSettings.max : 0;
-        checkSettings.spawn &= canSpawn;
+        checkSettings.spawn = checkSettings.spawn && canSpawn;
 
         // Output creep count in the report.
         if (roomLog && (checkSettings.max > 0 || count > 0)) {

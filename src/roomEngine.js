@@ -80,7 +80,7 @@ class RoomEngine {
             return;
         }
 
-        supportRoomName = checkSettings.supportRoom || roomName;
+        supportRoomName = checkSettings.supportRoom || (room.memory.roomType && room.memory.roomType.supportRoom ? room.memory.roomType.supportRoom : roomName);
         supportRoom = Game.rooms[supportRoomName];
 
         // Set additional settings.

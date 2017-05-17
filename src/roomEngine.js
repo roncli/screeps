@@ -68,18 +68,6 @@ class RoomEngine {
             return;
         }
 
-        // Get the spawn to use.
-        if (checkSettings.spawnFromRegion) {
-            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
-        } else {
-            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.name === roomName)[0];
-        }
-
-        // Bail if a spawn is not available.
-        if (!spawnToUse) {
-            return;
-        }
-
         supportRoomName = checkSettings.supportRoom || (room.memory.roomType && room.memory.roomType.supportRoom ? room.memory.roomType.supportRoom : roomName);
         supportRoom = Game.rooms[supportRoomName];
 
@@ -94,6 +82,18 @@ class RoomEngine {
         // Add labs to the spawn settings.
         if (spawnSettings.boosts && supportRoom && Cache.labsInRoom(supportRoom).length > 0) {
             canBoost = !!(labsToBoostWith = Utilities.getLabToBoostWith(supportRoom, Object.keys(spawnSettings.boosts).length));
+        }
+
+        // Get the spawn to use.
+        if (checkSettings.spawnFromRegion) {
+            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === room.memory.region && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body)).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
+        } else {
+            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.name === roomName && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body))[0];
+        }
+
+        // Bail if a spawn is not available.
+        if (!spawnToUse) {
+            return;
         }
 
         spawnSettings.labs = canBoost ? _.map(labsToBoostWith, (l) => l.id) : [];

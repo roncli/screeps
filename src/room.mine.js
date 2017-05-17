@@ -481,7 +481,7 @@ class RoomMine extends RoomEngine {
         this.checkSpawn(RoleRemoteMiner);
         this.checkSpawn(RoleRemoteWorker);
         this.checkSpawn(RoleRemoteStorer);
-        this.checkSpawn(RoleDismantler, dismantle && dismantleRoom && dismantleRoom.length > 0);
+        this.checkSpawn(RoleDismantler, !!(dismantle && dismantleRoom && dismantleRoom.length > 0));
     }
 
     //         #                       ##    ##                  #                ###                #            

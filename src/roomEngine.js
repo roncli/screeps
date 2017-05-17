@@ -59,7 +59,7 @@ class RoomEngine {
             roomLog.creeps.push({
                 role: checkSettings.name,
                 count: count,
-                max: canSpawn ? checkSettings.max : 0
+                max: checkSettings.max
             });
         }
 

@@ -809,7 +809,7 @@ class RoomBase extends RoomEngine {
         this.checkSpawn(RoleMiner);
         this.checkSpawn(RoleStorer);
         this.checkSpawn(RoleScientist, rcl >= 6);
-        this.checkSpawn(RoleDismantler, dismantle && dismantle[roomName] && dismantle[roomName].length > 0);
+        this.checkSpawn(RoleDismantler, !!(dismantle && dismantle[roomName] && dismantle[roomName].length > 0));
         this.checkSpawn(RoleCollector);
         this.checkSpawn(RoleClaimer);
         this.checkSpawn(RoleDowngrader);

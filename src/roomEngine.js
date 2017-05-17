@@ -42,7 +42,7 @@ class RoomEngine {
             roomLog = Cache.log.rooms[roomName],
             checkSettings = Role.checkSpawnSettings(this),
             creeps = Cache.creeps[roomName],
-            count = creeps && creeps[Role.name] ? creeps[Role.name].length : 0,
+            count = creeps && creeps[checkSettings.name] ? creeps[checkSettings.name].length : 0,
             canBoost = false,
             spawnToUse, supportRoomName, supportRoom, spawnSettings, labsToBoostWith, name;
 

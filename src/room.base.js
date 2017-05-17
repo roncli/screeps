@@ -589,7 +589,7 @@ class RoomBase extends RoomEngine {
                         var sellOrder, buyOrder;
 
                         // Only flip what we are full on.
-                        if (!storageStore || storageStore[resource] < reserveMinerals[resource]) {
+                        if (!storageStore || (storageStore[resource] || 0) < reserveMinerals[resource]) {
                             return;
                         }
 

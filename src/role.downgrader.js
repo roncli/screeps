@@ -48,7 +48,7 @@ class RoleDowngrader {
         return {
             name: "downgrader",
             spawn: !!roomToDowngrade,
-            max: downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0,
+            max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0,
             roomToClaim: roomToDowngrade
         };
     }

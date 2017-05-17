@@ -74,7 +74,7 @@ class RoomEngine {
         // Set additional settings.
         checkSettings.home = checkSettings.roomToSpawnFor || roomName;
         checkSettings.supportRoom = supportRoomName;
-        checkSettings.energyCapacityAvailable = room.energyCapacityAvailable;
+        checkSettings.energyCapacityAvailable = supportRoom.energyCapacityAvailable;
 
         // Get the spawn settings from the role.
         spawnSettings = Role.spawnSettings(checkSettings);

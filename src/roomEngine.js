@@ -45,7 +45,7 @@ class RoomEngine {
             count = creeps && creeps[checkSettings.name] ? creeps[checkSettings.name].length : 0,
             canBoost = false,
             spawnToUse, supportRoomName, supportRoom, spawnSettings, labsToBoostWith, name;
-console.log(JSON.stringify(checkSettings));
+
         // Output creep count in the report.
         if (roomLog && (checkSettings.max > 0 || count > 0)) {
             roomLog.creeps.push({

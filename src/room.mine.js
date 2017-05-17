@@ -198,9 +198,7 @@ class RoomMine extends RoomEngine {
      * Spawns creeps while the room is in stage 1.
      */
     stage1Spawn() {
-        if (this.room.controller) {
-            this.checkSpawn(RoleRemoteReserver);
-        }
+        this.checkSpawn(RoleRemoteReserver, this.room.controller);
         this.checkSpawn(RoleRemoteBuilder);
     }
 
@@ -479,16 +477,11 @@ class RoomMine extends RoomEngine {
         dismantle = Memory.dismantle;
         dismantleRoom = dismantle[room.name];
         
-        if (room.controller) {
-            this.checkSpawn(RoleRemoteReserver);
-        }
+        this.checkSpawn(RoleRemoteReserver, room.controller);
         this.checkSpawn(RoleRemoteMiner);
         this.checkSpawn(RoleRemoteWorker);
         this.checkSpawn(RoleRemoteStorer);
-
-        if (dismantle && dismantleRoom && dismantleRoom.length > 0) {
-            this.checkSpawn(RoleDismantler);
-        }
+        this.checkSpawn(RoleDismantler, dismantle && dismantleRoom && dismantleRoom.length > 0);
     }
 
     //         #                       ##    ##                  #                ###                #            

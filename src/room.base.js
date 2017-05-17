@@ -805,32 +805,19 @@ class RoomBase extends RoomEngine {
             dismantle = Memory.dismantle,
             roomName = room.name;
 
-        if (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0) {
-            this.checkSpawn(RoleWorker);
-        }
-
+        this.checkSpawn(RoleWorker, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
         this.checkSpawn(RoleMiner);
         this.checkSpawn(RoleStorer);
-
-        if (rcl >= 6) {
-            this.checkSpawn(RoleScientist);
-        }
-
-        if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-            this.checkSpawn(RoleDismantler);
-        }
-
+        this.checkSpawn(RoleScientist, rcl >= 6);
+        this.checkSpawn(RoleDismantler, dismantle && dismantle[roomName] && dismantle[roomName].length > 0);
         this.checkSpawn(RoleCollector);
         this.checkSpawn(RoleClaimer);
         this.checkSpawn(RoleDowngrader);
-
-        if (rcl < 8 || _.filter(Game.rooms, (r) => {
+        this.checkSpawn(RoleUpgrader, rcl < 8 || _.filter(Game.rooms, (r) => {
             var controller = r.controller;
 
             return controller && controller.my && controller.level < 8;
-        }).length > 0) {
-            this.checkSpawn(RoleUpgrader);
-        }
+        }).length > 0);
     }
 
     //                      #                ###                #            

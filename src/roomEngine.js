@@ -35,8 +35,9 @@ class RoomEngine {
     /**
      * Checks whether we should spawn a creep for the role.
      * @param {object} Role The role of the creep.
+     * @param {bool} [canSpawn] Whether the creep can be spawned. Defaults to true.
      */
-    checkSpawn(Role) {
+    checkSpawn(Role, canSpawn) {
         var room = this.room,
             roomName = room.name,
             roomLog = Cache.log.rooms[roomName],
@@ -46,12 +47,19 @@ class RoomEngine {
             canBoost = false,
             spawnToUse, supportRoomName, supportRoom, spawnSettings, labsToBoostWith, name;
 
+        if (canSpawn === undefined) {
+            canSpawn = true;
+        }
+
+        checkSettings.max = canSpawn ? checkSettings.max : 0;
+        checkSettings.spawn &= canSpawn;
+
         // Output creep count in the report.
         if (roomLog && (checkSettings.max > 0 || count > 0)) {
             roomLog.creeps.push({
                 role: checkSettings.name,
                 count: count,
-                max: checkSettings.max
+                max: canSpawn ? checkSettings.max : 0
             });
         }
 

@@ -804,7 +804,7 @@ class RoomBase extends RoomEngine {
             rcl = controller.level,
             dismantle = Memory.dismantle,
             roomName = room.name;
-
+console.log(`Spawn for ${roomName}`);
         if (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0) {
             this.checkSpawn(RoleWorker);
         }

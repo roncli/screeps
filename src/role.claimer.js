@@ -46,7 +46,7 @@ class RoleClaimer {
         return {
             name: "claimer",
             spawn: !!roomToClaim,
-            max: Object.keys(claimer[roomName]).length,
+            max: claimer[roomName] ? Object.keys(claimer[roomName]).length : 0,
             roomToClaim: roomToClaim
         };
     }

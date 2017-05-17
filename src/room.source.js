@@ -122,7 +122,7 @@ class RoomSource extends RoomMine {
     stage2Spawn() {
         var creeps = Cache.creeps[this.room.name],
             defenders = creeps.defender;
-console.log(`Source Spawn for ${this.room.name}`);        
+
         this.checkSpawn(RoleDefender);
         this.checkSpawn(RoleHealer);
 

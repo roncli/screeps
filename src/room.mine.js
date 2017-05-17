@@ -470,7 +470,7 @@ class RoomMine extends RoomEngine {
     stage2Spawn() {
         var room = this.room,
             dismantle, dismantleRoom;
-console.log(`Mine Spawn for ${room.name}`);        
+
         // Bail if there are hostiles.
         if (Cache.hostilesInRoom(room).length > 0) {
             return;

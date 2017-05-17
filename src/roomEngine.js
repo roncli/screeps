@@ -92,7 +92,7 @@ class RoomEngine {
         spawnSettings = Role.spawnSettings(checkSettings);
 
         // Add labs to the spawn settings.
-        if (spawnSettings.boosts && Cache.labsInRoom(supportRoom).length > 0) {
+        if (spawnSettings.boosts && supportRoom && Cache.labsInRoom(supportRoom).length > 0) {
             canBoost = !!(labsToBoostWith = Utilities.getLabToBoostWith(supportRoom, Object.keys(spawnSettings.boosts).length));
         }
 

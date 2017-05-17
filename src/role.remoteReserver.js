@@ -30,10 +30,19 @@ class RoleRemoteReserver {
     static checkSpawnSettings(engine) {
         var room = engine.room,
             controller = room.controller,
-            reservation = controller.reservation,
             max = 1,
-            lengthToController, controllerId, supportRoom, supportRoomName, creeps, lengthToThisController;
+            reservation, lengthToController, controllerId, supportRoom, supportRoomName, creeps, lengthToThisController;
 
+        if (!controller) {
+            return {
+                name: "remoteReserver",
+                spawn: false,
+                max: 0
+            };
+        }
+
+        reservation = controller.reservation;
+        
         if (reservation && reservation.ticksToEnd >= 4000) {
             return {
                 name: "remoteReserver",

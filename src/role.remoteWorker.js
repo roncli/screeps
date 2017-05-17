@@ -94,7 +94,7 @@ class RoleRemoteWorker {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3000),
             units = Math.floor(Math.min(energy, 2000) / 200),
             secondUnits = Math.floor(Math.max((energy - 2000), 0) / 150),
             remainder = Math.min(energy, 2000) % 200,

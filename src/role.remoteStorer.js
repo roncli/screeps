@@ -76,7 +76,7 @@ class RoleRemoteStorer {
             }
 
             // Calculate the length the storers need to travel.
-            length = lengthToContainer[containerId] ? lengthToContainer[containerId][supportRoomName]) : 0;
+            length = lengthToContainer[containerId] ? lengthToContainer[containerId][supportRoomName] : 0;
 
             // Calculate number of storers needed.
             count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0);

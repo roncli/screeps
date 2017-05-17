@@ -62,9 +62,9 @@ console.log(JSON.stringify(checkSettings));
 
         // Get the spawn to use.
         if (checkSettings.spawnFromRegion) {
-            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === this.room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
+            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
         } else {
-            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.name === this.room.name)[0];
+            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.name === roomName)[0];
         }
 
         // Bail if a spawn is not available.

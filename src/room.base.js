@@ -99,7 +99,7 @@ class RoomBase extends RoomEngine {
         tasks = this.tasks();
 
         // Spawn new creeps if there are available spawns in the region.
-        if (_.filter(Game.spawns, (s) => !s.spawning && s.region === memory.region).length > 0) {
+        if (_.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === memory.region).length > 0) {
             this.spawn(tasks);
         }
 

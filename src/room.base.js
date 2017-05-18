@@ -867,7 +867,7 @@ class RoomBase extends RoomEngine {
             let labsInUse = memory.labsInUse,
                 labs = Cache.labsInRoom(room);
             
-            if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
+            if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => _.filter(labsInUse, (u) => u.id === l.id).length === 0 && l.mineralAmount > 0).length === 0) {
                 labQueue.status = "moving";
             }
         } else if (status === "moving") {

@@ -49,8 +49,8 @@ class RoomSource extends RoomMine {
         var creeps = Cache.creeps[this.room.name],
             defenders = creeps.defender;
         
-        this.checkSpawn(RoleDefender);
-        this.checkSpawn(RoleHealer);
+        this.checkSpawn(RoleDefender, true);
+        this.checkSpawn(RoleHealer, true);
 
         if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
             return;
@@ -123,8 +123,8 @@ class RoomSource extends RoomMine {
         var creeps = Cache.creeps[this.room.name],
             defenders = creeps.defender;
 
-        this.checkSpawn(RoleDefender);
-        this.checkSpawn(RoleHealer);
+        this.checkSpawn(RoleDefender, true);
+        this.checkSpawn(RoleHealer, true);
 
         if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
             return;
@@ -133,7 +133,7 @@ class RoomSource extends RoomMine {
         // Call original method.
         super.stage2Spawn();
 
-        this.checkSpawn(RoleRemoteCollector);
+        this.checkSpawn(RoleRemoteCollector, true);
     }
 
     //         #                       ##    ##                  #                ###                #            

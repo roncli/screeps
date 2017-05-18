@@ -25,16 +25,25 @@ class RoleWorker {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
             storage = room.storage,
-            roomName = room.name,
-            creeps = Cache.creeps[roomName],
-            max, roomToSpawnFor;
-        
-        max = storage && storage.my ? 1 : 2;
+            max = storage && storage.my ? 1 : 2,
+            roomName, creeps, roomToSpawnFor;
+
+        if (!canSpawn) {
+            return {
+                name: "worker",
+                spawn: false,
+                max: max
+            };
+        }
+
+        roomName = room.name;
+        creeps = Cache.creeps[roomName];
 
         if (max > 0 && _.filter(creeps && creeps.worker || [], (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length < max) {
             roomToSpawnFor = room.name;

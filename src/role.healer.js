@@ -24,12 +24,23 @@ class RoleHealer {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
-        var creeps = Cache.creeps[engine.room.name],
-            max = 1;
-        
+    static checkSpawnSettings(engine, canSpawn) {
+        var max = 1,
+            creeps;
+
+        if (!canSpawn) {
+            return {
+                name: "healer",
+                spawn: false,
+                max: max
+            };
+        }
+
+        var creeps = Cache.creeps[engine.room.name];
+
         return {
             name: "healer",
             spawn: _.filter(creeps && creeps.healer || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,

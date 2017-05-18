@@ -24,12 +24,23 @@ class RoleScientist {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
-            creeps = Cache.creeps[room.name],
-            max = 1;
+            max = 1,
+            creeps;
+
+        if (!canSpawn) {
+            return {
+                name: "scientist",
+                spawn: false,
+                max: max
+            };
+        }
+
+        creeps = Cache.creeps[room.name];
 
         return {
             name: "scientist",

@@ -26,14 +26,24 @@ class RoleDowngrader {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var downgrader = Memory.maxCreeps.downgrader,
             roomName = engine.room.name,
-            creeps = Cache.creeps[roomName],
-            downgraders = creeps && creeps.downgrader || [],
-            roomToDowngrade;
+            creeps, downgraders, roomToDowngrade;
+
+        if (!canSpawn) {
+            return {
+                name: "downgrader",
+                spawn: false,
+                max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0
+            };
+        }
+
+        creeps = Cache.creeps[roomName];
+        downgraders = creeps && creeps.downgrader || [];
         
         // Loop through the room downgraders to see if we need to spawn a creep.
         if (downgrader) {
@@ -49,7 +59,7 @@ class RoleDowngrader {
             name: "downgrader",
             spawn: !!roomToDowngrade,
             max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0,
-            roomToClaim: roomToDowngrade
+            roomToDowngrade: roomToDowngrade
         };
     }
 
@@ -78,7 +88,7 @@ class RoleDowngrader {
             memory: {
                 role: "downgrader",
                 home: checkSettings.home,
-                attack: checkSettings.roomToClaim
+                attack: checkSettings.roomToDowngrade
             }
         };
     }

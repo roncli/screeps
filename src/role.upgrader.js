@@ -28,17 +28,15 @@ class RoleUpgrader {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
-            storage = room.storage,
             roomName = room.name,
-            controller = room.controller,
-            creeps = Cache.creeps[roomName],
-            storageEnergy, max, spawnForRoom;
-
-        storageEnergy = storage ? storage.store[RESOURCE_ENERGY] : 0;
+            storage = room.storage,
+            storageEnergy = storage ? storage.store[RESOURCE_ENERGY] : 0,
+            max, controller, creeps, spawnForRoom;
 
         if (roomName === Memory.rushRoom) {
             max = 1;
@@ -47,6 +45,17 @@ class RoleUpgrader {
         } else {
             max = 1;
         }
+
+        if (!canSpawn) {
+            return {
+                name: "upgrader",
+                spawn: false,
+                max: max
+            };
+        }
+
+        controller = room.controller;
+        creeps = Cache.creeps[roomName];
 
         if (max > 0 && (controller && controller.level < 8 && storage && storageEnergy > 900000 || _.filter(creeps && creeps.upgrader || [], (c) => c.spawning || c.ticksToLive >= 150).length < max)) {
             spawnForRoom = roomName;

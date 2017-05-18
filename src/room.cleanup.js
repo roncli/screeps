@@ -158,7 +158,7 @@ class RoomCleanup extends RoomEngine {
 
         // Spawn new creeps.
         this.checkSpawn(RoleRemoteDismantler, room.unobservable || structures.length > 0 || ramparts.length > 0 || junk.length > 0);
-        this.checkSpawn(RoleRemoteCollector);
+        this.checkSpawn(RoleRemoteCollector, true);
 
         // Assign tasks to creeps.                    
         RoleRemoteDismantler.assignTasks(room, tasks);

@@ -29,11 +29,13 @@ class RoleRemoteWorker {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
+            max = 1,
             spawn = false,
             sources, lengthToContainer, creeps, workers, supportRoomName, containerIdToCollectFrom;
 
@@ -43,6 +45,14 @@ class RoleRemoteWorker {
                 name: "remoteWorker",
                 spawn: false,
                 max: 0
+            };
+        }
+
+        if (!canSpawn) {
+            return {
+                name: "remoteWorker",
+                spawn: false,
+                max: max
             };
         }
 
@@ -75,7 +85,7 @@ class RoleRemoteWorker {
         return {
             name: "remoteWorker",
             spawn: spawn,
-            max: 1,
+            max: max,
             spawnFromRegion: true,
             containerIdToCollectFrom: containerIdToCollectFrom
         };

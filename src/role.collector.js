@@ -25,9 +25,10 @@ class RoleCollector {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
             storage = room.storage,
             maxPerSource = 3,
@@ -52,9 +53,18 @@ class RoleCollector {
             };
         }
 
+        max = maxPerSource * (sources.length - 1);
+
+        if (!canSpawn) {
+            return {
+                name: "collector",
+                spawn: false,
+                max: max
+            };
+        }
+
         creeps = Cache.creeps[room.name];
         collectors = creeps && creeps.collector || [];
-        max = maxPerSource * (sources.length - 1);
 
         // Loop through sources to see if we have anything we need to spawn.
         _.forEach(Utilities.objectsClosestToObj(sources, Cache.spawnsInRoom(room)[0]), (source, index) => {

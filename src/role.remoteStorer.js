@@ -26,9 +26,10 @@ class RoleRemoteStorer {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
             max = 0,
@@ -84,10 +85,18 @@ class RoleRemoteStorer {
             max += count;
 
             // If we don't have enough remote storers for this container, spawn one.
-            if (!containerIdToCollectFrom && _.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
+            if (canSpawn && !containerIdToCollectFrom && _.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
                 containerIdToCollectFrom = containerId;
             }
         });
+
+        if (!canSpawn) {
+            return {
+                name: "remoteStorer",
+                spawn: false,
+                max: max
+            };
+        }
 
         return {
             name: "remoteStorer",

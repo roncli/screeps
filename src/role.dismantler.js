@@ -26,11 +26,22 @@ class RoleDismantler {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
-        var creeps = Cache.creeps[engine.room.name],
-            max = 1;
+    static checkSpawnSettings(engine, canSpawn) {
+        var max = 1,
+            creeps;
+
+        if (!canSpawn) {
+            return {
+                name: "dismantler",
+                spawn: false,
+                max: max
+            };
+        }
+
+        creeps = Cache.creeps[engine.room.name];
 
         return {
             name: "dismantler",

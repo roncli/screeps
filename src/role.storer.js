@@ -23,9 +23,10 @@ class RoleStorer {
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var room = engine.room,
             containers = Cache.containersInRoom(room),
             length = 0,
@@ -37,8 +38,7 @@ class RoleStorer {
             return {
                 name: "storer",
                 spawn: false,
-                max: 0,
-                spawnFromRegion: true
+                max: 0
             };
         }
 
@@ -76,6 +76,14 @@ class RoleStorer {
         });
 
         max += Math.ceil(2 * length / (controller && rcl === 8 ? 35 : 30)) + (rcl >= 7 && army && _.filter(army, (a) => a.region === room.memory.region && a.directive === "building").length > 0 ? 1 : 0);
+
+        if (!canSpawn) {
+            return {
+                name: "storer",
+                spawn: false,
+                max: max
+            };
+        }
 
         return {
             name: "storer",

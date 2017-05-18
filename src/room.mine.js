@@ -199,7 +199,7 @@ class RoomMine extends RoomEngine {
      */
     stage1Spawn() {
         this.checkSpawn(RoleRemoteReserver, this.room.controller);
-        this.checkSpawn(RoleRemoteBuilder);
+        this.checkSpawn(RoleRemoteBuilder, true);
     }
 
     //         #                       #     ##                  #                ###                #            
@@ -478,9 +478,9 @@ class RoomMine extends RoomEngine {
         dismantleRoom = dismantle[room.name];
         
         this.checkSpawn(RoleRemoteReserver, room.controller);
-        this.checkSpawn(RoleRemoteMiner);
-        this.checkSpawn(RoleRemoteWorker);
-        this.checkSpawn(RoleRemoteStorer);
+        this.checkSpawn(RoleRemoteMiner, true);
+        this.checkSpawn(RoleRemoteWorker, true);
+        this.checkSpawn(RoleRemoteStorer, true);
         this.checkSpawn(RoleDismantler, !!(dismantle && dismantleRoom && dismantleRoom.length > 0));
     }
 

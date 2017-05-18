@@ -24,14 +24,24 @@ class RoleClaimer {
     /**
      * Gets the settings for checking whether a creep should be spawned.
      * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
      * @return {object} The settings to use for checking spawns.
      */
-    static checkSpawnSettings(engine) {
+    static checkSpawnSettings(engine, canSpawn) {
         var claimer = Memory.maxCreeps.claimer,
             roomName = engine.room.name,
-            creeps = Cache.creeps[roomName],
-            claimers = creeps && creeps.claimer || [],
-            roomToClaim;
+            creeps, claimers, roomToClaim;
+
+        if (!canSpawn) {
+            return {
+                name: "claimer",
+                spawn: false,
+                max: claimer && claimer[roomName] ? Object.keys(claimer[roomName]).length : 0
+            };
+        }
+
+        creeps = Cache.creeps[roomName];
+        claimers = creeps && creeps.claimer || [];
         
         // Loop through the room claimers to see if we need to spawn a creep.
         if (claimer) {

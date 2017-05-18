@@ -42,15 +42,15 @@ class RoomEngine {
             roomName = room.name,
             roomLog = Cache.log.rooms[roomName],
             creeps = Cache.creeps[roomName],
-            count = creeps && creeps[checkSettings.name] ? creeps[checkSettings.name].length : 0,
             canBoost = false,
-            checkSettings, spawnToUse, supportRoomName, supportRoom, spawnSettings, labsToBoostWith, name;
+            checkSettings, count, spawnToUse, supportRoomName, supportRoom, spawnSettings, labsToBoostWith, name;
 
         if (canSpawn === undefined) {
             canSpawn = true;
         }
 
         checkSettings = Role.checkSpawnSettings(this, canSpawn);
+        count = creeps && creeps[checkSettings.name] ? creeps[checkSettings.name].length : 0;
 
         // Output creep count in the report.
         if (roomLog && (checkSettings.max > 0 || count > 0)) {

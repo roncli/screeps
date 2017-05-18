@@ -434,7 +434,7 @@ class RoomBase extends RoomEngine {
                 buyResource;
 
             if (memory.buyQueue) {
-                let buyResource = buyQueue.resource;
+                buyResource = buyQueue.resource;
                 
                 if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) > (reserveMinerals[buyResource] || 0)) {
                     delete memory.buyQueue;

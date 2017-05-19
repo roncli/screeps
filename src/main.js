@@ -1306,7 +1306,7 @@ class Main {
 
         // Loop through each creep to run its current task, prioritizing most energy being carried first, and then serialize it.
         _.forEach(Game.creeps, (creep) => {
-            let ttl, creepMemory, army, creepRoom, creepTasks;
+            let ttl, creepMemory, army, creepRoom, creepTask;
 
             // Don't do anything if the creep is spawning or stopped.
             if (creep.spawning || creep.memory.stop) {
@@ -1317,7 +1317,7 @@ class Main {
             creepMemory = creep.memory;
             army = creepMemory.army;
             creepRoom = creep.room.name;
-            creepTasks = Cache.creepTasks[creep.name];
+            creepTask = Cache.creepTasks[creep.name];
             
             // Countdown to death!
             if (ttl <= 150 || ttl < 500 && ttl % 10 === 1 || ttl % 100 === 1) {
@@ -1382,7 +1382,7 @@ class Main {
                     break;
             }
 
-            if (creepMemory.currentTask && creepTasks) {
+            if (creepMemory.currentTask && creepTask) {
                 // Ensure creeps try to move off of the sides of the room if they're not moving anywhere else this turn.
                 if (creep.pos.x === 0) {
                     switch (Math.floor(Math.random() * 3)) {
@@ -1441,17 +1441,17 @@ class Main {
                 }
 
                 // Run creeps.
-                creepTasks.run(creep);
+                creepTask.run(creep);
 
                 // Purge current task if the creep is in a new room.
-                if (creepMemory.lastRoom && creepMemory.lastRoom !== creepRoom && (!creepTasks || !creepTasks.force)) {
+                if (creepMemory.lastRoom && creepMemory.lastRoom !== creepRoom && (!creepTask || !creepTask.force)) {
                     delete creepMemory.currentTask;
                 }
                 creepMemory.lastRoom = creepRoom;
 
                 // Only serialize if the task wasn't completed.
-                if (creepMemory.currentTask && creepTasks) {
-                    creepTasks.toObj(creep);
+                if (creepMemory.currentTask && creepTask && creepMemory.currentTask.type === creepTask.type) {
+                    creepTask.toObj(creep);
                 }
 
                 // If the creep has a work part, try to repair any road that may be under it.
@@ -1462,7 +1462,7 @@ class Main {
                 }
 
                 // Suicide a rallying creep if necessary.
-                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "downgrader", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creepMemory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "downgrader", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                     creep.suicide();
                 }
             } else {

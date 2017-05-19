@@ -94,7 +94,7 @@ class RoomEngine {
             return;
         }
 
-        spawnSettings.labs = canBoost ? _.map(labsToBoostWith, (l) => l.id) : [];
+        spawnSettings.memory.labs = canBoost ? _.map(labsToBoostWith, (l) => l.id) : [];
 
         // Spawn the creep.
         name = spawnToUse.createCreep(spawnSettings.body, `${checkSettings.name}-${checkSettings.roomToSpawnFor || roomName}-${Game.time.toFixed(0).substring(4)}`, spawnSettings.memory);

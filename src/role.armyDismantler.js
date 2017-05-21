@@ -40,7 +40,7 @@ class RoleArmyDismantler {
             boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
             boosts[RESOURCE_CATALYZED_ZYNTHIUM_ACID] = units;
             if (army.super) {
-                boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10
+                boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;
             }
         }
 
@@ -94,6 +94,10 @@ class RoleArmyDismantler {
         var creeps = creeps = Cache.creeps[army.name],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning);
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // If not yet boosted, go get boosts.
         Assign.getBoost(creepsWithNoTask, "Boosting");
         
@@ -118,10 +122,15 @@ class RoleArmyDismantler {
      * @param {Army} army The army to assign tasks to.
      */
     static assignStagingTasks(army) {
-        var creeps = creeps = Cache.creeps[army.name];
+        var creeps = creeps = Cache.creeps[army.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning);
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
 
         // Rally to army's staging location.
-        Assign.moveToRoom(_.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning), army.stageRoom, "Staging");
+        Assign.moveToRoom(_.filter(creepsWithNoTask, (c) => !c.spawning), army.stageRoom, "Staging");
     }
 
     //                      #                ###    #                              #    ##          ###                #            
@@ -141,6 +150,10 @@ class RoleArmyDismantler {
             dismantlerCreeps = creeps && creeps.armyDismantler || [],
             attackRoomName = army.attackRoom,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning);
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
 
         // Run to a healer, or return to army's staging location if under 80% health.
         Assign.retreatArmyUnitOrMoveToHealer(dismantlerCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
@@ -180,6 +193,10 @@ class RoleArmyDismantler {
             attackRoomName = army.attackRoom,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning),
             restPosition;
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
 
         // Return to army's staging location if under 80% health.
         Assign.retreatArmyUnit(dismantlerCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");

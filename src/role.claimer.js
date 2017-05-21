@@ -1,7 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskRally = require("task.rally"),
-    TaskClaim = require("task.claim");
+var Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##            ###    ##             #                        
 //  #   #           #           #   #    #                                      
@@ -84,52 +83,27 @@ class RoleClaimer {
         };
     }
 
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {Room} room The room to assign tasks for.
+     */
     static assignTasks(room) {
-        var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].claimer || []),
-            assigned = [];
+        var creeps = Cache.creeps[room.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
-        // If the creeps are not in the room, rally them.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.claim), (creep) => {
-            var task = TaskRally.getClaimerTask(creep);
-            if (task.canAssign(creep)) {
-                assigned.push(creep.name);
-            }
-        });
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // Claim the controller.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = TaskClaim.getTask(creep);
-            if (task.canAssign(creep)) {
-                creep.say("Claiming");
-                assigned.push(creep.name);
-            }
-        });
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // If we have claimed, set the room as a base, stop trying to claim the room, and suicide any remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            if (creep.room.name === creep.memory.claim && creep.room.controller.my) {
-                creep.suicide();
-            }
-        });
+        // Claim controller.
+        Assign.claimController(creepsWithNoTask, "Claiming");
     }
 }
 

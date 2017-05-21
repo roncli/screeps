@@ -40,7 +40,7 @@ class RoleArmyRanged {
             boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
             boosts[RESOURCE_CATALYZED_UTRIUM_ACID] = units;
             if (army.super) {
-                boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10
+                boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;
             }
         }
 
@@ -94,6 +94,10 @@ class RoleArmyRanged {
         var creeps = Cache.creeps[army.name],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // If not yet boosted, go get boosts.
         Assign.getBoost(creepsWithNoTask, "Boosting");
         
@@ -129,6 +133,10 @@ class RoleArmyRanged {
         var creeps = Cache.creeps[army.name],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // Attack hostile units.
         Assign.rangedAttack(creepsWithNoTask, army.hostiles, "Attacking");
 
@@ -158,6 +166,10 @@ class RoleArmyRanged {
             attackRoomName = army.attackRoom,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning),
             dismantle;
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
 
         // Run to a healer, or return to army's staging location if under 80% health.
         Assign.retreatArmyUnitOrMoveToHealer(rangedCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");
@@ -206,6 +218,10 @@ class RoleArmyRanged {
             attackRoomName = army.attackRoom,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning),
             restPosition;
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
 
         // Return to army's staging location if under 80% health.
         Assign.retreatArmyUnit(rangedCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.8, "Ouch!");

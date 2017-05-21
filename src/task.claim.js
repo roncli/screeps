@@ -2,12 +2,24 @@ var Cache = require("cache"),
     Pathing = require("pathing");
 
 class Claim {
-    constructor() {
+    constructor(controllerId, x, y, roomName) {
+        this.controller = Game.getObjectById(controllerId);
+        if (this.controller) {
+            let pos = this.controller.pos;
+
+            this.x = pos.x;
+            this.y = pos.y;
+            this.roomName = pos.roomName;
+        } else {
+            this.x = x;
+            this.y = y;
+            this.roomName = roomName;
+        }
         this.type = "claim";
     }
 
     canAssign(creep) {
-        var controller = creep.room.controller;
+        var controller = this.controller;
 
         if (creep.spawning || creep.memory.role !== "claimer" || !controller || controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
             return false;
@@ -25,28 +37,24 @@ class Claim {
         }
 
         // Move towards the controller and claim it.    
-        Pathing.moveTo(creep, creep.room.controller, 1);
+        Pathing.moveTo(creep, new RoomPosition(this.x, this.y, this.roomName), 1);
         creep.claimController(creep.room.controller);
     }
 
     toObj(creep) {
-        if (creep.room.controller) {
-            creep.memory.currentTask = {
-                type: this.type
-            };
-        } else {
-            delete creep.memory.currentTask;
-        }
+        creep.memory.currentTask = {
+            controllerId: this.controller.id,
+            x: this.x,
+            y: this.y,
+            roomName: this.roomName,
+            type: this.type
+        };
     }
     
     static fromObj(creep) {
-        return new Claim();
-    }
+        var task = creep.memory.currentTask;
 
-    static getTask(creep) {
-        if (creep.room.controller) {
-            return new Claim();
-        }
+        return new Claim(task.controllerId, task.x, task.y, task.roomName);
     }
 }
 

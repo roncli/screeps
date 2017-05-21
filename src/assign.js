@@ -1,8 +1,9 @@
 const Cache = require("cache"),
     Utilities = require("utilities"),
-    TaskMeleeAttack = require("task.meleeAttack"),
+    TaskClaim = require("task.claim"),
     TaskDismantle = require("task.dismantle"),
     TaskHeal = require("task.heal"),
+    TaskMeleeAttack = require("task.meleeAttack"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack");
 
@@ -62,6 +63,43 @@ class Assign {
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
+            }
+        });
+    }
+
+    //       ##           #           ##                #                ##    ##                
+    //        #                      #  #               #                 #     #                
+    //  ##    #     ###  ##    # #   #      ##   ###   ###   ###    ##    #     #     ##   ###   
+    // #      #    #  #   #    ####  #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
+    // #      #    # ##   #    #  #  #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
+    //  ##   ###    # #  ###   #  #   ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
+    /**
+     * Assigns creeps to claim a controller from their memory.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static claimController(creeps, say) {
+        _.forEach(creeps, (creep) => {
+            var roomName = creep.memory.claim,
+                room = Game.rooms[roomName];
+            
+            if (room) {
+                let controller = room.controller;
+
+                // If there is no controller in the room or we have already claimed it, remove the key from memory and suicide the creep.
+                if (!controller || controller.my) {
+                    delete Memory.maxCreeps.claimer[roomName];
+                    creep.suicide();
+                    return;
+                }
+
+                // We've found the controller, let's go claim it.
+                if (new TaskClaim(controller.id).canAssign(creep)) {
+                    creep.say(say);
+                }
+            } else {
+                // We can't see the room, so move the creep towards it.
+                this.moveToRoom([creep], roomName, say);
             }
         });
     }

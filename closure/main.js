@@ -49,7 +49,7 @@ function __getDirname(path) {
 	return require("path").resolve(__dirname + "/" + path + "/../");
 }
 /********** End of header **********/
-/********** Start module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
+/********** Start module 0: H:\dev\git\github\screeps\src\main.js **********/
 __modules[0] = function(module, exports) {
 const profiler = __require(1,0),
     Army = __require(2,0),
@@ -58,40 +58,40 @@ const profiler = __require(1,0),
     Drawing = __require(5,0),
     Market = __require(6,0),
     Minerals = __require(7,0),
-    Utilities = __require(8,0),
-    RoleArmyDismantler = __require(9,0),
-    RoleArmyHealer = __require(10,0),
-    RoleArmyMelee = __require(11,0),
-    RoleArmyRanged = __require(12,0),
-    RoleClaimer = __require(13,0),
-    RoleCollector = __require(14,0),
-    RoleConverter = __require(15,0),
+    Tower = __require(8,0),
+    Utilities = __require(9,0),
+    RoleArmyDismantler = __require(10,0),
+    RoleArmyHealer = __require(11,0),
+    RoleArmyMelee = __require(12,0),
+    RoleArmyRanged = __require(13,0),
+    RoleClaimer = __require(14,0),
+    RoleCollector = __require(15,0),
     RoleDefender = __require(16,0),
     RoleDismantler = __require(17,0),
-    RoleHealer = __require(18,0),
-    RoleMiner = __require(19,0),
-    RoleRemoteBuilder = __require(20,0),
-    RoleRemoteCollector = __require(21,0),
-    RoleRemoteDismantler = __require(22,0),
-    RoleRemoteMiner = __require(23,0),
-    RoleRemoteReserver = __require(24,0),
-    RoleRemoteStorer = __require(25,0),
-    RoleRemoteWorker = __require(26,0),
-    RoleScientist = __require(27,0),
-    RoleStorer = __require(28,0),
-    RoleTower = __require(29,0),
+    RoleDowngrader = __require(18,0),
+    RoleHealer = __require(19,0),
+    RoleMiner = __require(20,0),
+    RoleRemoteBuilder = __require(21,0),
+    RoleRemoteCollector = __require(22,0),
+    RoleRemoteDismantler = __require(23,0),
+    RoleRemoteMiner = __require(24,0),
+    RoleRemoteReserver = __require(25,0),
+    RoleRemoteStorer = __require(26,0),
+    RoleRemoteWorker = __require(27,0),
+    RoleScientist = __require(28,0),
+    RoleStorer = __require(29,0),
     RoleUpgrader = __require(30,0),
     RoleWorker = __require(31,0),
     RoomBase = __require(32,0),
     RoomCleanup = __require(33,0),
     RoomMine = __require(34,0),
     RoomSource = __require(35,0),
-    TaskAttack = __require(36,0),
-    TaskBuild = __require(37,0),
-    TaskClaim = __require(38,0),
-    TaskCollectEnergy = __require(39,0),
-    TaskCollectMinerals = __require(40,0),
-    TaskDismantle = __require(41,0),
+    TaskBuild = __require(36,0),
+    TaskClaim = __require(37,0),
+    TaskCollectEnergy = __require(38,0),
+    TaskCollectMinerals = __require(39,0),
+    TaskDismantle = __require(40,0),
+    TaskDowngrade = __require(41,0),
     TaskFillEnergy = __require(42,0),
     TaskFillMinerals = __require(43,0),
     TaskHarvest = __require(44,0),
@@ -294,9 +294,9 @@ class Main {
                 ArmyRanged: RoleArmyRanged,
                 Claimer: RoleClaimer,
                 Collector: RoleCollector,
-                Converter: RoleConverter,
                 Defender: RoleDefender,
                 Dismantler: RoleDismantler,
+                Downgrader: RoleDowngrader,
                 Healer: RoleHealer,
                 Miner: RoleMiner,
                 RemoteBuilder: RoleRemoteBuilder,
@@ -308,7 +308,6 @@ class Main {
                 RemoteWorker: RoleRemoteWorker,
                 Scientist: RoleScientist,
                 Storer: RoleStorer,
-                Tower: RoleTower,
                 Upgrader: RoleUpgrader,
                 Worker: RoleWorker
             },
@@ -318,6 +317,7 @@ class Main {
                 Mine: RoomMine,
                 Source: RoomSource
             },
+            Tower: Tower,
             Utilities: Utilities
         };
         if (!Memory.maxCreeps) {
@@ -339,6 +339,12 @@ class Main {
             Memory.paths = {};
         }
         
+        if (!Memory.lengthToController) {
+            Memory.lengthToController = {};
+        }
+        if (!Memory.lengthToContainer) {
+            Memory.lengthToContainer = {};
+        }
         if (!Memory.lengthToStorage) {
             Memory.lengthToStorage = {};
         }
@@ -446,7 +452,7 @@ class Main {
         var mineralOrders = {},
             minerals, sellOrder;
 
-        if (Game.cpu.bucket >= Memory.marketBucket) {
+        if (Game.time % 10 === 0 || Game.cpu.bucket >= Memory.marketBucket) {
             minerals = [
                 {resource: RESOURCE_HYDROGEN, amount: 3000},
                 {resource: RESOURCE_OXYGEN, amount: 3000},
@@ -464,6 +470,7 @@ class Main {
                 {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 3000},
                 {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 3000},
                 {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_OXIDE, amount: 3000},
                 {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 3000},
                 {resource: RESOURCE_GHODIUM_OXIDE, amount: 3000},
                 {resource: RESOURCE_UTRIUM_ACID, amount: 3000},
@@ -471,6 +478,7 @@ class Main {
                 {resource: RESOURCE_LEMERGIUM_ACID, amount: 3000},
                 {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 3000},
                 {resource: RESOURCE_ZYNTHIUM_ACID, amount: 3000},
+                {resource: RESOURCE_ZYNTHIUM_ALKALIDE, amount: 3000},
                 {resource: RESOURCE_GHODIUM_ACID, amount: 3000},
                 {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 3000},
                 {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000},
@@ -478,6 +486,7 @@ class Main {
                 {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000},
                 {resource: RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE, amount: 15000},
                 {resource: RESOURCE_CATALYZED_ZYNTHIUM_ACID, amount: 15000},
+                {resource: RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, amount: 15000},
                 {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000},
                 {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000},
                 {resource: RESOURCE_POWER, amount: 3000}
@@ -689,9 +698,6 @@ class Main {
         _.forEach(Game.creeps, (creep) => {
             if (creep.memory.currentTask) {
                 switch (creep.memory.currentTask.type) {
-                    case "attack":
-                        creepTasks[creep.name] = TaskAttack.fromObj(creep);
-                        break;
                     case "build":
                         creepTasks[creep.name] = TaskBuild.fromObj(creep);
                         break;
@@ -706,6 +712,9 @@ class Main {
                         break;
                     case "dismantle":
                         creepTasks[creep.name] = TaskDismantle.fromObj(creep);
+                        break;
+                    case "downgrade":
+                        creepTasks[creep.name] = TaskDowngrade.fromObj(creep);
                         break;
                     case "fillEnergy":
                         creepTasks[creep.name] = TaskFillEnergy.fromObj(creep);
@@ -751,33 +760,36 @@ class Main {
      * Deserialize rooms from memory into room objects.
      */
     static deserializeRooms() {
-        var rooms = Cache.rooms;
-        this.unobservableRooms = [];
+        var rooms = Cache.rooms,
+            unobservableRooms = {};
         _.forEach(Memory.rooms, (roomMemory, name) => {
+            if (!Game.rooms[name]) {
+                unobservableRooms[name] = {
+                    name: name,
+                    unobservable: true,
+                    memory: roomMemory
+                };
+            }
+
             if (roomMemory.roomType) {
                 switch (roomMemory.roomType.type) {
                     case "base":
-                        rooms[name] = RoomBase.fromObj(roomMemory);
+                        rooms[name] = RoomBase.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
                     case "cleanup":
-                        rooms[name] = RoomCleanup.fromObj(roomMemory);
+                        rooms[name] = RoomCleanup.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
                     case "mine":
-                        rooms[name] = RoomMine.fromObj(roomMemory);
+                        rooms[name] = RoomMine.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
                     case "source":
-                        rooms[name] = RoomSource.fromObj(roomMemory);
+                        rooms[name] = RoomSource.fromObj(Game.rooms[name] || unobservableRooms[name]);
                         break;
-                }
-
-                if (!Game.rooms[name]) {
-                    this.unobservableRooms.push({
-                        name: name,
-                        unobservable: true
-                    });
                 }
             }
         });
+
+        this.unobservableRooms = _.values(unobservableRooms);
     }
     /**
      * Deserializes armies from memory into army objects.
@@ -1028,10 +1040,10 @@ class Main {
             
             if (rooms && roomMemory && (roomType = roomMemory.roomType)) {
                 if (roomsToAlwaysRun.indexOf(roomType.type) !== -1 || runRooms) {
-                    rooms.run(room);
+                    rooms.run();
                 }
                 if (roomType.type === rooms.type) {
-                    rooms.toObj(room);
+                    rooms.toObj();
                 }
             }
             
@@ -1177,7 +1189,7 @@ class Main {
     static creeps() {
         var time = Game.time;
         _.forEach(Game.creeps, (creep) => {
-            let ttl, creepMemory, army, creepRoom, creepTasks;
+            let ttl, creepMemory, army, creepRoom, creepTask;
             if (creep.spawning || creep.memory.stop) {
                 return;
             }
@@ -1186,7 +1198,7 @@ class Main {
             creepMemory = creep.memory;
             army = creepMemory.army;
             creepRoom = creep.room.name;
-            creepTasks = Cache.creepTasks[creep.name];
+            creepTask = Cache.creepTasks[creep.name];
             if (ttl <= 150 || ttl < 500 && ttl % 10 === 1 || ttl % 100 === 1) {
                 switch (ttl - 1) {
                     case 3:
@@ -1245,7 +1257,7 @@ class Main {
                     break;
             }
 
-            if (creepMemory.currentTask && creepTasks) {
+            if (creepMemory.currentTask && creepTask) {
                 if (creep.pos.x === 0) {
                     switch (Math.floor(Math.random() * 3)) {
                         case 0:
@@ -1301,25 +1313,25 @@ class Main {
                             break;
                     }
                 }
-                creepTasks.run(creep);
-                if (creepMemory.lastRoom && creepMemory.lastRoom !== creepRoom && (!creepTasks || !creepTasks.force)) {
+                creepTask.run(creep);
+                if (creepMemory.lastRoom && creepMemory.lastRoom !== creepRoom && (!creepTask || !creepTask.force)) {
                     delete creepMemory.currentTask;
                 }
                 creepMemory.lastRoom = creepRoom;
-                if (creepMemory.currentTask && creepTasks) {
-                    creepTasks.toObj(creep);
+                if (creepMemory.currentTask && creepTask && creepMemory.currentTask.type === creepTask.type) {
+                    creepTask.toObj(creep);
                 }
                 if (creep.carry[RESOURCE_ENERGY] > 0 && creep.getActiveBodyparts(WORK) > 0) {
                     _.forEach(_.filter(creep.pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax), (structure) => {
                         creep.repair(structure);
                     });
                 }
-                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creep.memory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && (!creepMemory.currentTask || creepMemory.currentTask.type === "rally") && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "downgrader", "defender", "healer", "remoteReserver"].indexOf(creep.memory.role) === -1) {
                     creep.suicide();
                 }
             } else {
                 delete creepMemory.currentTask;
-                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "converter", "defender", "healer", "remoteReserver"].indexOf(creepMemory.role) === -1) {
+                if (!creep.spawning && ttl < 150 && _.sum(creep.carry) === 0 && ["armyDismantler", "armyHealer", "armyMelee", "armyRanged", "claimer", "downgrader", "defender", "healer", "remoteReserver"].indexOf(creepMemory.role) === -1) {
                     creep.suicide();
                 } else {
                     creep.say("Idle");
@@ -1409,8 +1421,8 @@ module.exports = Main;
 
 return module.exports;
 }
-/********** End of module 0: /Users/roncli/dev/git/github/screeps/src/main.js **********/
-/********** Start module 1: ../src/screeps-profiler.js **********/
+/********** End of module 0: H:\dev\git\github\screeps\src\main.js **********/
+/********** Start module 1: ..\src\screeps-profiler.js **********/
 __modules[1] = function(module, exports) {
 Array.prototype.forEach = function(callback, thisArg) {
     var arr = this;
@@ -1711,15 +1723,15 @@ module.exports = {
 };
 return module.exports;
 }
-/********** End of module 1: ../src/screeps-profiler.js **********/
-/********** Start module 2: ../src/army.js **********/
+/********** End of module 1: ..\src\screeps-profiler.js **********/
+/********** Start module 2: ..\src\army.js **********/
 __modules[2] = function(module, exports) {
 const Cache = __require(3,2),
-    Utilities = __require(8,2),
-    RoleArmyDismantler = __require(9,2),
-    RoleArmyHealer = __require(10,2),
-    RoleArmyMelee = __require(11,2),
-    RoleArmyRanged = __require(12,2);
+    Utilities = __require(9,2),
+    RoleArmyDismantler = __require(10,2),
+    RoleArmyHealer = __require(11,2),
+    RoleArmyMelee = __require(12,2),
+    RoleArmyRanged = __require(13,2);
 /**
  * Represents an army.
  */
@@ -1961,8 +1973,8 @@ module.exports = Army;
 
 return module.exports;
 }
-/********** End of module 2: ../src/army.js **********/
-/********** Start module 3: ../src/cache.js **********/
+/********** End of module 2: ..\src\army.js **********/
+/********** Start module 3: ..\src\cache.js **********/
 __modules[3] = function(module, exports) {
 //   ###                 #            
 /**
@@ -2212,8 +2224,8 @@ module.exports = Cache;
 
 return module.exports;
 }
-/********** End of module 3: ../src/cache.js **********/
-/********** Start module 4: ../src/commands.js **********/
+/********** End of module 3: ..\src\cache.js **********/
+/********** Start module 4: ..\src\commands.js **********/
 __modules[4] = function(module, exports) {
 const Cache = __require(3,4);
 /**
@@ -2240,27 +2252,6 @@ class Commands {
             Memory.signs[roomName] = text;
         } else {
             delete Memory.signs[roomName];
-        }
-    }
-    /**
-     * Attacks the controller in a room.
-     * @param {string} fromRoomName The name of the room to spawn the converter from.
-     * @param {string} toRoomName The name of the room to attack the controller in.
-     * @param {bool} attack Whether to attack the room's controller or not.
-     */
-    static attackRoomController(fromRoomName, toRoomName, attack) {
-        if (!Memory.maxCreeps.converter) {
-            Memory.maxCreeps.converter = {};
-        }
-
-        if (!Memory.maxCreeps.converter[fromRoomName]) {
-            Memory.maxCreeps.converter[fromRoomName] = {};
-        }
-        
-        if (attack) {
-            Memory.maxCreeps.converter[fromRoomName][toRoomName] = true;
-        } else {
-            delete Memory.maxCreeps.converter[fromRoomName][toRoomName];
         }
     }
     /**
@@ -2359,10 +2350,31 @@ class Commands {
         Memory.dismantle[roomName].push({x: x, y: y});
     }
     /**
+     * Downgrades the controller in a room.
+     * @param {string} fromRoomName The name of the room to spawn the downgrader from.
+     * @param {string} toRoomName The name of the room to downgrade the controller in.
+     * @param {bool} downgarde Whether to downgrade the room's controller or not.
+     */
+    static downgradeRoomController(fromRoomName, toRoomName, downgrade) {
+        if (!Memory.maxCreeps.downgrader) {
+            Memory.maxCreeps.downgrader = {};
+        }
+
+        if (!Memory.maxCreeps.downgrader[fromRoomName]) {
+            Memory.maxCreeps.downgrader[fromRoomName] = {};
+        }
+        
+        if (downgrade) {
+            Memory.maxCreeps.downgrader[fromRoomName][toRoomName] = true;
+        } else {
+            delete Memory.maxCreeps.downgrader[fromRoomName][toRoomName];
+        }
+    }
+    /**
      * Recover from an emergency.
      */
     static recover() {
-        _.forEach(Game.spawns, (spawn) => {spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], `storer-emerg-${spawn.room.name}-${spawn.name}`, {role: "storer", home: spawn.room.name})});
+        _.forEach(Game.spawns, (spawn) => spawn.createCreep([MOVE, MOVE, CARRY, CARRY, CARRY, CARRY], `storer-emerg-${spawn.room.name}-${spawn.name}`, {role: "storer", home: spawn.room.name}));
     }
     /**
      * Removes an ally.
@@ -2438,8 +2450,8 @@ module.exports = Commands;
 
 return module.exports;
 }
-/********** End of module 4: ../src/commands.js **********/
-/********** Start module 5: ../src/drawing.js **********/
+/********** End of module 4: ..\src\commands.js **********/
+/********** Start module 5: ..\src\drawing.js **********/
 __modules[5] = function(module, exports) {
 //  ####                          #                 
 /**
@@ -2728,11 +2740,11 @@ module.exports = Drawing;
 
 return module.exports;
 }
-/********** End of module 5: ../src/drawing.js **********/
-/********** Start module 6: ../src/market.js **********/
+/********** End of module 5: ..\src\drawing.js **********/
+/********** Start module 6: ..\src\market.js **********/
 __modules[6] = function(module, exports) {
 const Cache = __require(3,6),
-    Utilities = __require(8,6);
+    Utilities = __require(9,6);
 /**
  * A class for dealing with and caching market data.
  */
@@ -2810,8 +2822,8 @@ module.exports = Market;
 
 return module.exports;
 }
-/********** End of module 6: ../src/market.js **********/
-/********** Start module 7: ../src/minerals.js **********/
+/********** End of module 6: ..\src\market.js **********/
+/********** Start module 7: ..\src\minerals.js **********/
 __modules[7] = function(module, exports) {
 var Minerals = {};
 
@@ -2861,10 +2873,52 @@ module.exports = Minerals;
 
 return module.exports;
 }
-/********** End of module 7: ../src/minerals.js **********/
-/********** Start module 8: ../src/utilities.js **********/
+/********** End of module 7: ..\src\minerals.js **********/
+/********** Start module 8: ..\src\tower.js **********/
 __modules[8] = function(module, exports) {
 var Cache = __require(3,8);
+/**
+ * Represents a tower.
+ */
+class Tower {
+    /**
+     * Assigns tasks to the tower.
+     * @param {Room} room The room to get tasks from.
+     * @param {object} tasks The tasks to assign to the tower.
+     */
+    static assignTasks(room, tasks) {
+        if (tasks.rangedAttack.tasks.length > 0) {
+            _.forEach(Cache.towersInRoom(room), (tower) => {
+                tower.attack(tasks.rangedAttack.tasks[0].enemy);
+            });
+            return;
+        }
+        if (tasks.repair.towerTasks.length > 0) {
+            _.forEach(Cache.towersInRoom(room), (tower) => {
+                tower.repair(tasks.repair.towerTasks[0].structure);
+            });
+            return;
+        }
+        if (tasks.heal.tasks.length > 0) {
+            _.forEach(Cache.towersInRoom(room), (tower) => {
+                tower.heal(tasks.heal.tasks[0].ally);
+            });
+            return;
+        }
+    }
+}
+
+if (Memory.profiling) {
+    __require(1,8).registerObject(Tower, "Tower");
+}
+module.exports = Tower;
+
+return module.exports;
+}
+/********** End of module 8: ..\src\tower.js **********/
+/********** Start module 9: ..\src\utilities.js **********/
+__modules[9] = function(module, exports) {
+var Cache = __require(3,9);
 
 class Utilities {
     static nest(seq, keys) {
@@ -3080,7 +3134,7 @@ class Utilities {
                 labToUse = {
                     id: _.filter(sourceLabs, (l) => _.map(room.memory.labsInUse, (liu) => liu.id).indexOf(l) === -1 && _.map(labs, (liu) => liu.id).indexOf(l) === -1)[0],
                     pause: true
-                }
+                };
                 
                 if (!labToUse.id) {
                     return false;
@@ -3118,18 +3172,18 @@ class Utilities {
 }
 
 if (Memory.profiling) {
-    __require(1,8).registerObject(Utilities, "Utilities");
+    __require(1,9).registerObject(Utilities, "Utilities");
 }
 module.exports = Utilities;
 
 return module.exports;
 }
-/********** End of module 8: ../src/utilities.js **********/
-/********** Start module 9: ../src/role.armyDismantler.js **********/
-__modules[9] = function(module, exports) {
-const Assign = __require(54,9),
-    Cache = __require(3,9),
-    Utilities = __require(8,9);
+/********** End of module 9: ..\src\utilities.js **********/
+/********** Start module 10: ..\src\role.armyDismantler.js **********/
+__modules[10] = function(module, exports) {
+const Assign = __require(54,10),
+    Cache = __require(3,10),
+    Utilities = __require(9,10);
 /**
  * Represents the dismantler role in the army.
  */
@@ -3268,18 +3322,18 @@ class RoleArmyDismantler {
 }
 
 if (Memory.profiling) {
-    __require(1,9).registerObject(RoleArmyDismantler, "RoleArmyDismantler");
+    __require(1,10).registerObject(RoleArmyDismantler, "RoleArmyDismantler");
 }
 module.exports = RoleArmyDismantler;
 
 return module.exports;
 }
-/********** End of module 9: ../src/role.armyDismantler.js **********/
-/********** Start module 10: ../src/role.armyHealer.js **********/
-__modules[10] = function(module, exports) {
-const Assign = __require(54,10),
-    Cache = __require(3,10),
-    Utilities = __require(8,10);
+/********** End of module 10: ..\src\role.armyDismantler.js **********/
+/********** Start module 11: ..\src\role.armyHealer.js **********/
+__modules[11] = function(module, exports) {
+const Assign = __require(54,11),
+    Cache = __require(3,11),
+    Utilities = __require(9,11);
 /**
  * Represents the healer role in the army.
  */
@@ -3450,18 +3504,18 @@ class RoleArmyHealer {
 }
 
 if (Memory.profiling) {
-    __require(1,10).registerObject(RoleArmyHealer, "RoleArmyHealer");
+    __require(1,11).registerObject(RoleArmyHealer, "RoleArmyHealer");
 }
 module.exports = RoleArmyHealer;
 
 return module.exports;
 }
-/********** End of module 10: ../src/role.armyHealer.js **********/
-/********** Start module 11: ../src/role.armyMelee.js **********/
-__modules[11] = function(module, exports) {
-const Assign = __require(54,11),
-    Cache = __require(3,11),
-    Utilities = __require(8,11);
+/********** End of module 11: ..\src\role.armyHealer.js **********/
+/********** Start module 12: ..\src\role.armyMelee.js **********/
+__modules[12] = function(module, exports) {
+const Assign = __require(54,12),
+    Cache = __require(3,12),
+    Utilities = __require(9,12);
 /**
  * Represents the melee role in the army.
  */
@@ -3620,30 +3674,23 @@ class RoleArmyMelee {
 }
 
 if (Memory.profiling) {
-    __require(1,11).registerObject(RoleArmyMelee, "RoleArmyMelee");
+    __require(1,12).registerObject(RoleArmyMelee, "RoleArmyMelee");
 }
 module.exports = RoleArmyMelee;
 
 return module.exports;
 }
-/********** End of module 11: ../src/role.armyMelee.js **********/
-/********** Start module 12: ../src/role.armyRanged.js **********/
-__modules[12] = function(module, exports) {
-const Assign = __require(54,12),
-    Cache = __require(3,12),
-    Utilities = __require(8,12);
+/********** End of module 12: ..\src\role.armyMelee.js **********/
+/********** Start module 13: ..\src\role.armyRanged.js **********/
+__modules[13] = function(module, exports) {
+const Assign = __require(54,13),
+    Cache = __require(3,13),
+    Utilities = __require(9,13);
 /**
  * Represents the ranged role in the army.
  */
 class RoleArmyRanged {
     /**
-                                    ##          #     #     #                       
-                                   #  #         #     #                             
-     ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-      ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-           #                                                            ###         
      * Gets the settings for spawning a creep.
      * @param {Army} army The army to spawn the creep for.
      * @return {object} The settings for spawning a creep.
@@ -3671,15 +3718,7 @@ class RoleArmyRanged {
             name: "armyRanged"
         };
     }
-
     /**
-                         #                ###                #            
-                                           #                 #            
-     ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-     # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-                               ###                                        
      * Assign tasks to creeps of this role.
      * @param {Army} army The army to assign tasks to.
      */
@@ -3805,67 +3844,77 @@ class RoleArmyRanged {
 }
 
 if (Memory.profiling) {
-    __require(1,12).registerObject(RoleArmyRanged, "RoleArmyRanged");
+    __require(1,13).registerObject(RoleArmyRanged, "RoleArmyRanged");
 }
 module.exports = RoleArmyRanged;
 
 return module.exports;
 }
-/********** End of module 12: ../src/role.armyRanged.js **********/
-/********** Start module 13: ../src/role.claimer.js **********/
-__modules[13] = function(module, exports) {
-var Cache = __require(3,13),
-    Commands = __require(4,13),
-    Utilities = __require(8,13),
-    TaskRally = __require(49,13),
-    TaskClaim = __require(38,13);
-
-class Claimer {
-    static checkSpawn(room) {
+/********** End of module 13: ..\src\role.armyRanged.js **********/
+/********** Start module 14: ..\src\role.claimer.js **********/
+__modules[14] = function(module, exports) {
+var Cache = __require(3,14),
+    Utilities = __require(9,14),
+    TaskRally = __require(49,14),
+    TaskClaim = __require(37,14);
+/**
+ * Represents the claimer role.
+ */
+class RoleClaimer {
+    /**
+     * Gets the settings for checking whether a creep should be spawned.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
         var claimer = Memory.maxCreeps.claimer,
-            roomName = room.name,
-            claimers = Cache.creeps[roomName] && Cache.creeps[roomName].claimer || [],
-            num = 0,
-            max = 0;
+            roomName = engine.room.name,
+            creeps, claimers, roomToClaim;
+
+        if (!canSpawn) {
+            return {
+                name: "claimer",
+                spawn: false,
+                max: claimer && claimer[roomName] ? Object.keys(claimer[roomName]).length : 0
+            };
+        }
+
+        creeps = Cache.creeps[roomName];
+        claimers = creeps && creeps.claimer || [];
         if (claimer) {
             _.forEach(claimer[roomName], (value, toRoom) => {
-                var count = _.filter(claimers, (c) => c.memory.claim === toRoom).length;
-
-                num += count;
-                max += 1;
-
-                if (count === 0) {
-                    Claimer.spawn(room, toRoom);
+                if (_.filter(claimers, (c) => c.memory.claim === toRoom).length === 0) {
+                    roomToClaim = toRoom;
+                    return false;
                 }
             });
         }
-        if (Memory.log && (claimers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
+
+        return {
+            name: "claimer",
+            spawn: !!roomToClaim,
+            max: claimer && claimer[roomName] ? Object.keys(claimer[roomName]).length : 0,
+            roomToClaim: roomToClaim
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        return {
+            body: [CLAIM, MOVE],
+            memory: {
                 role: "claimer",
-                count: claimers.length,
-                max: max
-            });
-        }        
+                home: checkSettings.home,
+                claim: checkSettings.roomToClaim
+            }
+        };
     }
 
-    static spawn(room, toRoom) {
-        var spawns = Cache.spawnsInRoom(room),
-            body = [CLAIM, MOVE],
-            spawnToUse, name;
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `claimer-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "claimer", home: room.name, claim: toRoom});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        return typeof name !== "number";
-    }
-
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].claimer || []),
             assigned = [];
@@ -3909,103 +3958,107 @@ class Claimer {
 }
 
 if (Memory.profiling) {
-    __require(1,13).registerObject(Claimer, "RoleClaimer");
+    __require(1,14).registerObject(RoleClaimer, "RoleClaimer");
 }
-module.exports = Claimer;
+module.exports = RoleClaimer;
 
 return module.exports;
 }
-/********** End of module 13: ../src/role.claimer.js **********/
-/********** Start module 14: ../src/role.collector.js **********/
-__modules[14] = function(module, exports) {
-var Cache = __require(3,14),
-    Utilities = __require(8,14),
-    TaskHarvest = __require(44,14),
-    TaskPickupResource = __require(48,14),
-    TaskRally = __require(49,14);
-
-class Collector {
-    static checkSpawn(room) {
-        var spawns = Cache.spawnsInRoom(room),
-            max = 0,
-            roomName = room.name,
-            collectors = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
-            count, sources, capacity, adjustment;
-        if (Cache.containersInRoom(room).length !== 0 && room.storage && room.storage.my) {
-            return;
+/********** End of module 14: ..\src\role.claimer.js **********/
+/********** Start module 15: ..\src\role.collector.js **********/
+__modules[15] = function(module, exports) {
+var Cache = __require(3,15),
+    Utilities = __require(9,15),
+    TaskHarvest = __require(44,15),
+    TaskPickupResource = __require(48,15),
+    TaskRally = __require(49,15);
+/**
+ * Represents the collector role.
+ */
+class RoleCollector {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
+            storage = room.storage,
+            maxPerSource = 3,
+            sources, creeps, collectors, max, sourceIdToCollectFrom;
+        if (Cache.containersInRoom(room).length !== 0 && storage && storage.my) {
+            return {
+                name: "collector",
+                spawn: false,
+                max: 0
+            };
         }
-        if (spawns.length === 0) {
-            return;
-        }
-        sources = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0]);
+        sources = room.find(FIND_SOURCES);
         if (sources.length <= 1) {
-            return;
+            return {
+                name: "collector",
+                spawn: false,
+                max: 0
+            };
         }
-        adjustment = Math.max((2500 - room.energyCapacityAvailable) / 2500, 0.1);
-        _.forEach(sources, (source, index) => {
-            var sourceId = source.id;
+
+        max = maxPerSource * (sources.length - 1);
+
+        if (!canSpawn) {
+            return {
+                name: "collector",
+                spawn: false,
+                max: max
+            };
+        }
+
+        creeps = Cache.creeps[room.name];
+        collectors = creeps && creeps.collector || [];
+        _.forEach(Utilities.objectsClosestToObj(sources, Cache.spawnsInRoom(room)[0]), (source, index) => {
+            var sourceId;
             if (index === 0) {
                 return;
             }
 
-            max += Math.ceil(3 * adjustment);
-            count = _.filter(collectors, (c) => c.memory.homeSource === sourceId).length;
-            if (count < 3 * adjustment) {
-                Collector.spawn(room, sourceId);
+            sourceId = source.id;
+            if (_.filter(collectors, (c) => c.memory.homeSource === sourceId).length < maxPerSource) {
+                sourceIdToCollectFrom = sourceId;
+                return false;
             }
         });
-        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "collector",
-                count: collectors.length,
-                max: max
-            });
-        }        
+
+        return {
+            name: "collector",
+            spawn: !!sourceIdToCollectFrom,
+            max: max,
+            spawnFromRegion: true,
+            sourceIdToCollectFrom: sourceIdToCollectFrom
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            body = [];
 
-    static spawn(room, id) {
-        var body = [],
-            roomName = room.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(room.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-        }
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
-        if (remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `collector-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "collector", home: roomName, homeSource: id});
-        if (spawnToUse.room.name === roomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "collector",
+                home: checkSettings.home,
+                homeSource: checkSettings.sourceIdToCollectFrom
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -4231,189 +4284,80 @@ class Collector {
 }
 
 if (Memory.profiling) {
-    __require(1,14).registerObject(Collector, "RoleCollector");
+    __require(1,15).registerObject(RoleCollector, "RoleCollector");
 }
-module.exports = Collector;
+module.exports = RoleCollector;
 
 return module.exports;
 }
-/********** End of module 14: ../src/role.collector.js **********/
-/********** Start module 15: ../src/role.converter.js **********/
-__modules[15] = function(module, exports) {
-var Cache = __require(3,15),
-    Commands = __require(4,15),
-    Utilities = __require(8,15),
-    TaskRally = __require(49,15),
-    TaskAttack = __require(36,15);
-
-class Converter {
-    static checkSpawn(room) {
-        var converter = Memory.maxCreeps.converter,
-            roomName = room.name,
-            converters = Cache.creeps[roomName] && Cache.creeps[roomName].converter || [],
-            num = 0,
-            max = 0;
-        if (converter) {
-            _.forEach(converter[roomName], (value, toRoom) => {
-                var count = _.filter(converters, (c) => c.memory.attack === toRoom).length;
-
-                num += count;
-                max += 1;
-
-                if (count === 0) {
-                    Converter.spawn(room, toRoom);
-                }
-            });
-        }
-        if (Memory.log && (converters.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "converter",
-                count: converters.length,
-                max: max
-            });
-        }        
-    }
-
-    static spawn(room, toRoom) {
-        var body = [],
-            roomName = room.name,
-            spawns = Cache.spawnsInRoom(room),
-            supportRoomName = supportRoom.name,
-            energy, units, count, spawnToUse, name;
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 24400);
-        units = Math.floor(energy / 3050);
-        for (count = 0; count < units; count++) {
-            body.push(CLAIM);
-            body.push(CLAIM);
-            body.push(CLAIM);
-            body.push(CLAIM);
-            body.push(CLAIM);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `converter-${toRoom}-${Game.time.toFixed(0).substring(4)}`, {role: "converter", home: room.name, attack: toRoom});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        return typeof name !== "number";
-    }
-
-    static assignTasks(room, tasks) {
-        var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].converter || []),
-            assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.attack), (creep) => {
-            var task = TaskRally.getClaimerTask(creep);
-            if (task.canAssign(creep)) {
-                assigned.push(creep.name);
-            }
-        });
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = TaskAttack.getTask(creep);
-            if (task.canAssign(creep)) {
-                creep.say("Attacking");
-                assigned.push(creep.name);
-            }
-        });
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-        _.forEach(creepsWithNoTask, (creep) => {
-            creep.suicide();
-        });
-    }
-}
-
-if (Memory.profiling) {
-    __require(1,15).registerObject(Converter, "RoleConverter");
-}
-module.exports = Converter;
-
-return module.exports;
-}
-/********** End of module 15: ../src/role.converter.js **********/
-/********** Start module 16: ../src/role.defender.js **********/
+/********** End of module 15: ..\src\role.collector.js **********/
+/********** Start module 16: ..\src\role.defender.js **********/
 __modules[16] = function(module, exports) {
 var Cache = __require(3,16),
-    Utilities = __require(8,16),
+    Utilities = __require(9,16),
     TaskRally = __require(49,16),
     TaskMeleeAttack = __require(46,16);
+/**
+ * Represents the defender role.
+ */
+class RoleDefender {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var max = 1,
+            creeps;
 
-class Defender {
+        if (!canSpawn) {
+            return {
+                name: "defender",
+                spawn: false,
+                max: max
+            };
+        }
+
+        creeps = Cache.creeps[engine.room.name];
+
+        return {
+            name: "defender",
+            spawn: _.filter(creeps && creeps.defender || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
+            max: max
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        return {
+            body: [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, HEAL, HEAL, HEAL, HEAL],
+            memory: {
+                role: "defender",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
+    }
+
     static checkQuadrant(pos, quadrant) {
         switch (quadrant) {
             case 0:
                 return pos.x < 25 && pos.y < 25;
             case 1:
-                return pos.x < 25 && pos.y > 25;
+                return pos.x < 25 && pos.y >= 25;
             case 2:
-                return pos.x > 25 && pos.y > 25;
+                return pos.x >= 25 && pos.y >= 25;
             case 3:
-                return pos.x > 25 && pos.y < 25;
+                return pos.x >= 25 && pos.y < 25;
         }
     }
 
-    static checkSpawn(room) {
-        var roomName = room.name,
-            defenders = Cache.creeps[roomName] && Cache.creeps[roomName].defender || [],
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            max = 1;
-        if (_.filter(defenders, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            Defender.spawn(room, supportRoom);
-        }
-        if (Memory.log && (defenders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "defender",
-                count: defenders.length,
-                max: max
-            });
-        }
-    }
-
-    static spawn(room, supportRoom) {
-        var body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, HEAL, HEAL, HEAL, HEAL, HEAL],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `defender-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "defender", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
-    }
-
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].defender || []), (c) => !c.spawning),
             hostiles, keepers;
@@ -4455,90 +4399,75 @@ class Defender {
 }
 
 if (Memory.profiling) {
-    __require(1,16).registerObject(Defender, "RoleDefender");
+    __require(1,16).registerObject(RoleDefender, "RoleDefender");
 }
-module.exports = Defender;
+module.exports = RoleDefender;
 
 return module.exports;
 }
-/********** End of module 16: ../src/role.defender.js **********/
-/********** Start module 17: ../src/role.dismantler.js **********/
+/********** End of module 16: ..\src\role.defender.js **********/
+/********** Start module 17: ..\src\role.dismantler.js **********/
 __modules[17] = function(module, exports) {
 var Cache = __require(3,17),
-    Utilities = __require(8,17),
-    TaskBuild = __require(37,17),
+    Utilities = __require(9,17),
+    TaskBuild = __require(36,17),
     TaskPickupResource = __require(48,17),
     TaskRally = __require(49,17),
     TaskRepair = __require(51,17);
-
-class Dismantler {
-    static checkSpawn(room, supportRoom) {
+/**
+ * Represents the dismantler role.
+ */
+class RoleDismantler {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
         var max = 1,
-            roomName = room.name,
-            dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [];
+            creeps;
 
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable) {
-            return;
-        }
-        if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 150).length === 0) {
-            Dismantler.spawn(room, supportRoom);
-        }
-        if (Memory.log && (dismantlers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "dismantler",
-                count: dismantlers.length,
+        if (!canSpawn) {
+            return {
+                name: "dismantler",
+                spawn: false,
                 max: max
-            });
-        }        
+            };
+        }
+
+        creeps = Cache.creeps[engine.room.name];
+
+        return {
+            name: "dismantler",
+            spawn: _.filter(creeps && creeps.dismantler || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            spawnFromRegion: true,
+            max: max
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            body = [];
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-        }
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
-        if (remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `dismantler-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "dismantler", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "dismantler",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -4682,69 +4611,193 @@ class Dismantler {
 }
 
 if (Memory.profiling) {
-    __require(1,17).registerObject(Dismantler, "RoleDismantler");
+    __require(1,17).registerObject(RoleDismantler, "RoleDismantler");
 }
-module.exports = Dismantler;
+module.exports = RoleDismantler;
 
 return module.exports;
 }
-/********** End of module 17: ../src/role.dismantler.js **********/
-/********** Start module 18: ../src/role.healer.js **********/
+/********** End of module 17: ..\src\role.dismantler.js **********/
+/********** Start module 18: ..\src\role.downgrader.js **********/
 __modules[18] = function(module, exports) {
 var Cache = __require(3,18),
-    Utilities = __require(8,18),
-    TaskHeal = __require(45,18),
-    TaskRally = __require(49,18);
+    Utilities = __require(9,18),
+    TaskRally = __require(49,18),
+    TaskDowngrade = __require(41,18);
+/**
+ * Represents the downgrader role.
+ */
+class RoleDowngrader {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var downgrader = Memory.maxCreeps.downgrader,
+            roomName = engine.room.name,
+            creeps, downgraders, roomToDowngrade;
 
-class Healer {
-    static checkSpawn(room) {
-        var roomName = room.name,
-            healers = Cache.creeps[roomName] && Cache.creeps[roomName].healer || [],
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            max = 1;
-        if (_.filter(healers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            Healer.spawn(room, supportRoom);
+        if (!canSpawn) {
+            return {
+                name: "downgrader",
+                spawn: false,
+                max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0
+            };
         }
-        if (Memory.log && (healers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "healer",
-                count: healers.length,
-                max: max
+
+        creeps = Cache.creeps[roomName];
+        downgraders = creeps && creeps.downgrader || [];
+        if (downgrader) {
+            _.forEach(downgrader[roomName], (value, toRoom) => {
+                if (_.filter(downgraders, (c) => c.memory.attack === toRoom).length === 0) {
+                    roomToDowngrade = toRoom;
+                    return false;
+                }
             });
-        }        
+        }
+
+        return {
+            name: "downgrader",
+            spawn: !!roomToDowngrade,
+            max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0,
+            roomToDowngrade: roomToDowngrade
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 24400),
+            units = Math.floor(energy / 3050),
+            body = [];
+
+        body.push(...Array(units * 5).fill(CLAIM));
+        body.push(...Array(units).fill(MOVE));
+
+        return {
+            body: body,
+            memory: {
+                role: "downgrader",
+                home: checkSettings.home,
+                attack: checkSettings.roomToDowngrade
+            }
+        };
     }
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 7500);
-        units = Math.floor(energy / 300);
+    static assignTasks(room) {
+        var roomName = room.name,
+            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].downgrader || []),
+            assigned = [];
 
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.attack), (creep) => {
+            var task = TaskRally.getClaimerTask(creep);
+            if (task.canAssign(creep)) {
+                assigned.push(creep.name);
+            }
+        });
+
+        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+        assigned = [];
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        _.forEach(creepsWithNoTask, (creep) => {
+            var task = TaskDowngrade.getTask(creep);
+            if (task.canAssign(creep)) {
+                creep.say("Attacking");
+                assigned.push(creep.name);
+            }
+        });
+
+        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
+        assigned = [];
+
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+        _.forEach(creepsWithNoTask, (creep) => {
+            creep.suicide();
+        });
+    }
+}
+
+if (Memory.profiling) {
+    __require(1,18).registerObject(RoleDowngrader, "RoleDowngrader");
+}
+module.exports = RoleDowngrader;
+
+return module.exports;
+}
+/********** End of module 18: ..\src\role.downgrader.js **********/
+/********** Start module 19: ..\src\role.healer.js **********/
+__modules[19] = function(module, exports) {
+var Cache = __require(3,19),
+    Utilities = __require(9,19),
+    TaskHeal = __require(45,19),
+    TaskRally = __require(49,19);
+/**
+ * Represents the healer role.
+ */
+class RoleHealer {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var max = 1,
+            creeps;
+
+        if (!canSpawn) {
+            return {
+                name: "healer",
+                spawn: false,
+                max: max
+            };
         }
 
-        for (count = 0; count < units; count++) {
-            body.push(HEAL);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `healer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "healer", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
+        var creeps = Cache.creeps[engine.room.name];
 
-        return typeof name !== "number";
+        return {
+            name: "healer",
+            spawn: _.filter(creeps && creeps.healer || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
+            max: max
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 7500),
+            units = Math.floor(energy / 300),
+            body = [];
+
+        body.push(...Array(units).fill(MOVE));
+        body.push(...Array(units).fill(HEAL));
+
+        return {
+            body: body,
+            memory: {
+                role: "healer",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
     }
 
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].healer || []), (c) => !c.spawning),
             assigned = [];
@@ -4790,108 +4843,112 @@ class Healer {
 }
 
 if (Memory.profiling) {
-    __require(1,18).registerObject(Healer, "RoleHealer");
+    __require(1,19).registerObject(RoleHealer, "RoleHealer");
 }
-module.exports = Healer;
+module.exports = RoleHealer;
 
 return module.exports;
 }
-/********** End of module 18: ../src/role.healer.js **********/
-/********** Start module 19: ../src/role.miner.js **********/
-__modules[19] = function(module, exports) {
-var Cache = __require(3,19),
-    Utilities = __require(8,19),
-    TaskMine = __require(47,19),
-    TaskRally = __require(49,19);
-
-class Miner {
-    static checkSpawn(room) {
-        var roomName = room.name,
+/********** End of module 19: ..\src\role.healer.js **********/
+/********** Start module 20: ..\src\role.miner.js **********/
+__modules[20] = function(module, exports) {
+var Cache = __require(3,20),
+    Utilities = __require(9,20),
+    TaskMine = __require(47,20),
+    TaskRally = __require(49,20);
+/**
+ * Represents the miner role.
+ */
+class RoleMiner {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             containers = Cache.containersInRoom(room),
-            max = 0,
-            miners;
-        if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0) {
-            return;
+            minerals = room.find(FIND_MINERALS),
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), minerals]),
+            containerSource, minerals, sources, creeps, miners, containerIdToMineOn, isMineralHarvester;
+        if (containers.length === 0) {
+            return {
+                name: "miner",
+                spawn: false,
+                max: 0
+            };
         }
-        
-        miners = Cache.creeps[roomName] && Cache.creeps[roomName].miner || [];
+
+        if (!canSpawn) {
+            return {
+                name: "miner",
+                spawn: false,
+                max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length
+            };
+        }
+
+        containerSource = Memory.containerSource;
+        creeps = Cache.creeps[room.name];
+        miners = creeps && creeps.miner || [];
         _.forEach(containers, (container) => {
             var containerId = container.id,
-                source;
+                source, isMineral;
 
-            if (!Memory.containerSource[containerId]) {
-                Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
             }
 
-            source = Game.getObjectById(Memory.containerSource[containerId]);
-            if (source instanceof Mineral && source.mineralAmount === 0) {
+            source = Game.getObjectById(containerSource[containerId]);
+            isMineral = source instanceof Mineral;
+            if (isMineral && source.mineralAmount === 0) {
                 return;
             }
-
-            max += 1;
             if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150) && c.memory.container === containerId).length === 0) {
-                Miner.spawn(room, containerId);
+                containerIdToMineOn = containerId;
+                isMineralHarvester = isMineral;
+                return false;
             }
         });
-        if (Memory.log && (miners.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
+
+        return {
+            name: "miner",
+            spawn: !!containerIdToMineOn,
+            max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
+            containerIdToMineOn: containerIdToMineOn,
+            isMineralHarvester: isMineralHarvester
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var body = [];
+
+        if (checkSettings.isMineralHarvester) {
+            let energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
+                units = Math.floor(energy / 450),
+                remainder = energy % 450;
+            
+            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
+            body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
+        } else {
+            body = [MOVE, WORK, WORK, WORK, WORK, WORK];
+        }
+
+        return {
+            body: body,
+            memory: {
                 role: "miner",
-                count: miners.length,
-                max: max
-            });
-        }        
+                home: checkSettings.home,
+                container: checkSettings.containerIdToMineOn
+            }
+        };
     }
 
-    static spawn(room, id) {
-        var spawns = Cache.spawnsInRoom(room),
-            body = [MOVE, WORK, WORK, WORK, WORK, WORK],
-            roomName = room.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(room.energyCapacityAvailable, 4500);
-        units = Math.floor(energy / 450);
-        remainder = energy % 450;
-        if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Game.getObjectById(id))[0] instanceof Mineral) {
-            body = [];
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-            }
-
-            if (remainder >= 150) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 250) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 350) {
-                body.push(WORK);
-            }
-        }
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `miner-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "miner", home: roomName, container: id});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        return typeof name !== "number";
-    }
-
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].miner || []),
             assigned = [];
@@ -4921,88 +4978,76 @@ class Miner {
 }
 
 if (Memory.profiling) {
-    __require(1,19).registerObject(Miner, "RoleMiner");
+    __require(1,20).registerObject(RoleMiner, "RoleMiner");
 }
-module.exports = Miner;
+module.exports = RoleMiner;
 
 return module.exports;
 }
-/********** End of module 19: ../src/role.miner.js **********/
-/********** Start module 20: ../src/role.remoteBuilder.js **********/
-__modules[20] = function(module, exports) {
-var Cache = __require(3,20),
-    Utilities = __require(8,20),
-    TaskBuild = __require(37,20),
-    TaskHarvest = __require(44,20),
-    TaskPickupResource = __require(48,20),
-    TaskRally = __require(49,20),
-    TaskRepair = __require(51,20);
+/********** End of module 20: ..\src\role.miner.js **********/
+/********** Start module 21: ..\src\role.remoteBuilder.js **********/
+__modules[21] = function(module, exports) {
+var Cache = __require(3,21),
+    Utilities = __require(9,21),
+    TaskBuild = __require(36,21),
+    TaskHarvest = __require(44,21),
+    TaskPickupResource = __require(48,21),
+    TaskRally = __require(49,21),
+    TaskRepair = __require(51,21);
+/**
+ * Represents the remote builder role.
+ */
+class RoleRemoteBuilder {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var max = 2,
+            creeps;
 
-class Builder {
-    static checkSpawn(room) {
-        var roomName = room.name,
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            max = 2,
-            num;
-        if (Cache.spawnsInRoom(supportRoom).length === 0) {
-            return;
-        }
-        if ((num = (Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || []).length) < max) {
-            Builder.spawn(room, supportRoom);
-        }
-        if (Memory.log && (num > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteBuilder",
-                count: num,
+        if (!canSpawn) {
+            return {
+                name: "remoteBuilder",
+                spawn: false,
                 max: max
-            });
+            };
         }
+
+        creeps = Cache.creeps[engine.room.name];
+
+        return {
+            name: "remoteBuilder",
+            spawn: (creeps && creeps.remoteBuilder || []).length < max,
+            spawnFromRegion: true,
+            max: max
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            body = [];
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-        }
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
-        if (remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteBuilder-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteBuilder", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "remoteBuilder",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
     }
 
     static assignTasks(room) {
@@ -5118,77 +5163,71 @@ class Builder {
 }
 
 if (Memory.profiling) {
-    __require(1,20).registerObject(Builder, "RoleRemoteBuilder");
+    __require(1,21).registerObject(RoleRemoteBuilder, "RoleRemoteBuilder");
 }
-module.exports = Builder;
+module.exports = RoleRemoteBuilder;
 
 return module.exports;
 }
-/********** End of module 20: ../src/role.remoteBuilder.js **********/
-/********** Start module 21: ../src/role.remoteCollector.js **********/
-__modules[21] = function(module, exports) {
-var Cache = __require(3,21),
-    Utilities = __require(8,21),
-    TaskPickupResource = __require(48,21),
-    TaskRally = __require(49,21);
+/********** End of module 21: ..\src\role.remoteBuilder.js **********/
+/********** Start module 22: ..\src\role.remoteCollector.js **********/
+__modules[22] = function(module, exports) {
+var Cache = __require(3,22),
+    Utilities = __require(9,22),
+    TaskPickupResource = __require(48,22),
+    TaskRally = __require(49,22);
+/**
+ * Represents the remote collector role.
+ */
+class RoleRemoteCollector {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var max = engine.type === "cleanup" ? 3 : 1,
+            creeps;
 
-class RemoteCollector {
-    static checkSpawn(room, supportRoom, max) {
-        var roomName = room.name,
-            creeps = Cache.creeps[roomName],
-            collectors = creeps && creeps.remoteCollector || [];
-
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-
-        if (!max) {
-            max = room.memory.roomType && room.memory.roomType.type === "cleanup" ? supportRoom.controller ? supportRoom.controller.level : 3 : 1;
-        }
-        if (Cache.spawnsInRoom(supportRoom).length === 0) {
-            return;
-        }
-        if (_.filter(collectors, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            RemoteCollector.spawn(room, supportRoom);
-        }
-
-        if (Memory.log && (collectors.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteCollector",
-                count: collectors.length,
+        if (!canSpawn) {
+            return {
+                name: "remoteCollector",
+                spawn: false,
                 max: max
-            });
+            };
         }
+
+        creeps = Cache.creeps[engine.room.name];
+
+        return {
+            name: "remoteCollector",
+            spawn: _.filter(creeps && creeps.remoteCollector || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
+            max: max
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 2400),
+            units = Math.floor(energy / 150),
+            body = [];
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, spawnToUse, name, count;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 2400);
-        units = Math.floor(energy / 150);
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-            body.push(CARRY);
-        }
+        body.push(...Array(units * 2).fill(CARRY));
+        body.push(...Array(units).fill(MOVE));
 
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteCollector-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteCollector", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "remoteCollector",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -5340,72 +5379,71 @@ class RemoteCollector {
 }
 
 if (Memory.profiling) {
-    __require(1,21).registerObject(RemoteCollector, "RoleRemoteCollector");
+    __require(1,22).registerObject(RoleRemoteCollector, "RoleRemoteCollector");
 }
-module.exports = RemoteCollector;
+module.exports = RoleRemoteCollector;
 
 return module.exports;
 }
-/********** End of module 21: ../src/role.remoteCollector.js **********/
-/********** Start module 22: ../src/role.remoteDismantler.js **********/
-__modules[22] = function(module, exports) {
-var Cache = __require(3,22),
-    Utilities = __require(8,22),
-    TaskBuild = __require(37,22),
-    TaskPickupResource = __require(48,22),
-    TaskRally = __require(49,22);
+/********** End of module 22: ..\src\role.remoteCollector.js **********/
+/********** Start module 23: ..\src\role.remoteDismantler.js **********/
+__modules[23] = function(module, exports) {
+var Cache = __require(3,23),
+    Utilities = __require(9,23),
+    TaskRally = __require(49,23);
+/**
+ * Represents the remote dismantler role.
+ */
+class RoleRemoteDismantler {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
+            max = max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1,
+            creeps;
 
-class RemoteDismantler {
-    static checkSpawn(room, supportRoom, max) {
-        var roomName = room.name,
-            dismantlers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [];
-
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-        if (Cache.spawnsInRoom(supportRoom).length === 0) {
-            return;
-        }
-        if (_.filter(dismantlers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            RemoteDismantler.spawn(room, supportRoom);
-        }
-        if (Memory.log && (dismantlers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteDismantler",
-                count: dismantlers.length,
+        if (!canSpawn) {
+            return {
+                name: "remoteDismantler",
+                spawn: false,
                 max: max
-            });
-        }        
+            };
+        }
+
+        creeps = Cache.creeps[room.name];
+
+        return {
+            name: "remoteDismantler",
+            spawn: _.filter(creeps && creeps.remoteDismantler || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: true,
+            max: max
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3750),
+            units = Math.floor(energy / 150),
+            body = [];
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3750);
-        units = Math.floor(energy / 150);
-        remainder = energy % 150;
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-        }
+        body.push(...Array(units).fill(WORK));
+        body.push(...Array(units).fill(MOVE));
 
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteDismantler-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteDismantler", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "remoteDismantler",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -5458,120 +5496,127 @@ class RemoteDismantler {
 }
 
 if (Memory.profiling) {
-    __require(1,22).registerObject(RemoteDismantler, "RoleRemoteDismantler");
+    __require(1,23).registerObject(RoleRemoteDismantler, "RoleRemoteDismantler");
 }
-module.exports = RemoteDismantler;
+module.exports = RoleRemoteDismantler;
 
 return module.exports;
 }
-/********** End of module 22: ../src/role.remoteDismantler.js **********/
-/********** Start module 23: ../src/role.remoteMiner.js **********/
-__modules[23] = function(module, exports) {
-var Cache = __require(3,23),
-    Utilities = __require(8,23),
-    TaskMine = __require(47,23),
-    TaskRally = __require(49,23);
-
-class Miner {
-    static checkSpawn(room) {
-        var roomName = room.name,
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            supportRoomName = supportRoom.name,
-            miners = Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || [],
+/********** End of module 23: ..\src\role.remoteDismantler.js **********/
+/********** Start module 24: ..\src\role.remoteMiner.js **********/
+__modules[24] = function(module, exports) {
+var Cache = __require(3,24),
+    Utilities = __require(9,24),
+    TaskMine = __require(47,24),
+    TaskRally = __require(49,24);
+/**
+ * Represents the remote miner role.
+ */
+class RoleRemoteMiner {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             containers = Cache.containersInRoom(room),
-            max = 0;
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
-            return;
+            minerals = room.find(FIND_MINERALS),
+            sources = [].concat.apply([], [room.find(FIND_SOURCES), minerals]),
+            lengthToContainer, containerSource, supportRoom, supportRoomName, spawnsInRoom, creeps, miners, containerIdToMineOn, isMineralHarvester;
+        if (containers.length === 0 || sources.length === 0) {
+            return {
+                name: "remoteMiner",
+                spawn: false,
+                max: 0
+            };
         }
-        if (!Memory.lengthToContainer) {
-            Memory.lengthToContainer = {};
+
+        if (!canSpawn) {
+            return {
+                name: "remoteMiner",
+                spawn: false,
+                max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length
+            };
         }
+
+        lengthToContainer = Memory.lengthToContainer,
+        supportRoom = engine.supportRoom,
+        supportRoomName = supportRoom.name,
+        spawnsInRoom = Cache.spawnsInRoom(supportRoom),
+        containerSource = Memory.containerSource,
+        creeps = Cache.creeps[room.name],
+        miners = creeps && creeps.remoteMiner || [];
         _.forEach(containers, (container) => {
             var containerId = container.id,
-                source;
-            if (!Memory.lengthToContainer[containerId]) {
-                Memory.lengthToContainer[containerId] = {};
-            }
-            if (!Memory.lengthToContainer[containerId][supportRoomName]) {
-                Memory.lengthToContainer[containerId][supportRoomName] = PathFinder.search(container.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+                lengthToThisContainer, source, isMineral;
+            if (!lengthToContainer[containerId]) {
+                lengthToContainer[containerId] = {};
             }
 
-            if (!Memory.containerSource[containerId]) {
-                Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+            lengthToThisContainer = lengthToContainer[containerId];
+
+            if (!lengthToThisContainer[supportRoomName]) {
+                lengthToThisContainer[supportRoomName] = PathFinder.search(container.pos, {pos: spawnsInRoom[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
             }
 
-            source = Game.getObjectById(Memory.containerSource[containerId]);
-            if (source instanceof Mineral && (source.mineralAmount === 0 || room.controller && (!room.controller.my || room.controller.level < 6))) {
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
+            }
+
+            source = Game.getObjectById(containerSource[containerId]);
+            isMineral = source instanceof Mineral;
+            if (isMineral && source.mineralAmount === 0) {
                 return;
             }
-
-            max += 1;
-            if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150 + Memory.lengthToContainer[containerId][supportRoomName] * 3) && c.memory.container === containerId).length === 0) {
-                Miner.spawn(room, supportRoom, containerId);
+            if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150 + lengthToThisContainer[supportRoomName] * 3) && c.memory.container === containerId).length === 0) {
+                containerIdToMineOn = containerId;
+                isMineralHarvester = isMineral;
+                return false;
             }
         });
-        if (Memory.log && (miners.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
+
+        return {
+            name: "remoteMiner",
+            spawn: !!containerIdToMineOn,
+            max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
+            spawnFromRegion: true,
+            containerIdToMineOn: containerIdToMineOn,
+            isMineralHarvester: isMineralHarvester
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var body = [];
+
+        if (checkSettings.isMineralHarvester) {
+            let energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
+                units = Math.floor(energy / 450),
+                remainder = energy % 450;
+            
+            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
+            body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
+        } else {
+            body = checkSettings.isSourceRoom ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK];
+        }
+
+        return {
+            body: body,
+            memory: {
                 role: "remoteMiner",
-                count: miners.length,
-                max: max
-            });
-        }        
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                container: checkSettings.containerIdToMineOn
+            }
+        };
     }
 
-    static spawn(room, supportRoom, id) {
-        var body = room.memory && room.memory.roomType && room.memory.roomType.type === "source" || /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        if (Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), Game.getObjectById(id))[0] instanceof Mineral) {
-            body = [];
-            energy = Math.min(supportRoom.energyCapacityAvailable, 4500);
-            units = Math.floor(energy / 450);
-            remainder = energy % 450;
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-                body.push(WORK);
-            }
-
-            if (remainder >= 150) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 250) {
-                body.push(WORK);
-            }
-
-            if (remainder >= 350) {
-                body.push(WORK);
-            }
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteMiner-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteMiner", home: roomName, supportRoom: supportRoomName, container: id});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
-    }
-
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []),
             assigned = [];
@@ -5603,96 +5648,109 @@ class Miner {
 }
 
 if (Memory.profiling) {
-    __require(1,23).registerObject(Miner, "RoleRemoteMiner");
+    __require(1,24).registerObject(RoleRemoteMiner, "RoleRemoteMiner");
 }
-module.exports = Miner;
+module.exports = RoleRemoteMiner;
 
 return module.exports;
 }
-/********** End of module 23: ../src/role.remoteMiner.js **********/
-/********** Start module 24: ../src/role.remoteReserver.js **********/
-__modules[24] = function(module, exports) {
-var Cache = __require(3,24),
-    Commands = __require(4,24),
-    Utilities = __require(8,24),
-    TaskRally = __require(49,24),
-    TaskReserve = __require(52,24);
-
-class Reserver {
-    static checkSpawn(room) {
-        var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
-            supportRoomName = supportRoom.name,
-            spawns = Cache.spawnsInRoom(supportRoom),
+/********** End of module 24: ..\src\role.remoteMiner.js **********/
+/********** Start module 25: ..\src\role.remoteReserver.js **********/
+__modules[25] = function(module, exports) {
+var Cache = __require(3,25),
+    Commands = __require(4,25),
+    Utilities = __require(9,25),
+    TaskRally = __require(49,25),
+    TaskReserve = __require(52,25);
+/**
+ * Represents the remote reserver role.
+ */
+class RoleRemoteReserver {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             controller = room.controller,
-            roomName = room.name,
-            reservers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || [],
-            count = 0,
-            max = 0,
-            id, reservation;
-        if (spawns.length === 0 || room.unobservable || !controller) {
-            return;
-        }
-        
-        id = controller.id;
-        reservation = controller.reservation;
-        if (!Memory.lengthToController) {
-            Memory.lengthToController = {};
-        }
-        if (!Memory.lengthToController[id]) {
-            Memory.lengthToController[id] = {};
-        }
-        if (!Memory.lengthToController[id][supportRoomName]) {
-            Memory.lengthToController[id][supportRoomName] = PathFinder.search(controller.pos, {pos: spawns[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+            max = 1,
+            reservation, lengthToController, controllerId, supportRoom, supportRoomName, creeps, lengthToThisController;
+
+        if (!controller) {
+            return {
+                name: "remoteReserver",
+                spawn: false,
+                max: 0
+            };
         }
 
-        count = _.filter(reservers, (c) => c.spawning || c.ticksToLive > Memory.lengthToController[id][supportRoomName]).length;
-
-        if (!reservation || reservation.ticksToEnd < 4000) {
-            max += 1;
-        }
-
-        if (count < max) {
-            Reserver.spawn(room, supportRoom);
-        }
-        if (Memory.log && (reservers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteReserver",
-                count: reservers.length,
+        if (!canSpawn) {
+            return {
+                name: "remoteReserver",
+                spawn: false,
                 max: max
-            });
-        }        
+            };
+        }
+
+        reservation = controller.reservation;
+        
+        if (reservation && reservation.ticksToEnd >= 4000) {
+            return {
+                name: "remoteReserver",
+                spawn: false,
+                max: 0
+            };
+        }
+
+        lengthToController = Memory.lengthToController;
+        controllerId = controller.id;
+        supportRoom = engine.supportRoom;
+        supportRoomName = supportRoom.name;
+        creeps = Cache.creeps[room.name];
+
+        if (!lengthToController[controllerId]) {
+            lengthToController[controllerId] = {};
+        }
+
+        lengthToThisController = lengthToController[controllerId];
+
+        if (!lengthToThisController[supportRoomName]) {
+            lengthToThisController[supportRoomName] = PathFinder.search(controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+        }
+
+        return {
+            name: "remoteReserver",
+            spawn: _.filter(creeps && creeps.remoteReserver || [], (c) => c.spawning || c.ticksToLive > lengthToThisController[supportRoomName]).length < max,
+            max: 0,
+            spawnFromRegion: true,
+        };
+    }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3250),
+            units = Math.floor(energy / 650),
+            body = [];
+
+        body.push(...Array(units).fill(CLAIM));
+        body.push(...Array(units).fill(MOVE));
+
+        return {
+            body: body,
+            memory: {
+                role: "remoteReserver",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom
+            }
+        };
     }
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3250);
-        units = Math.floor(energy / 650);
-        for (count = 0; count < units; count++) {
-            body.push(CLAIM);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteReserver-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteReserver", home: roomName, supportRoom: supportRoomName});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
-    }
-
-    static assignTasks(room, tasks) {
+    static assignTasks(room) {
         var roomName = room.name,
             creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []),
             assigned = [];
@@ -5740,104 +5798,133 @@ class Reserver {
 }
 
 if (Memory.profiling) {
-    __require(1,24).registerObject(Reserver, "RoleRemoteReserver");
+    __require(1,25).registerObject(RoleRemoteReserver, "RoleRemoteReserver");
 }
-module.exports = Reserver;
+module.exports = RoleRemoteReserver;
 
 return module.exports;
 }
-/********** End of module 24: ../src/role.remoteReserver.js **********/
-/********** Start module 25: ../src/role.remoteStorer.js **********/
-__modules[25] = function(module, exports) {
-var Cache = __require(3,25),
-    Utilities = __require(8,25),
-    TaskCollectEnergy = __require(39,25),
-    TaskCollectMinerals = __require(40,25),
-    TaskPickupResource = __require(48,25),
-    TaskRally = __require(49,25);
-
-class Storer {
-    static checkSpawn(room) {
-        var supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom],
+/********** End of module 25: ..\src\role.remoteReserver.js **********/
+/********** Start module 26: ..\src\role.remoteStorer.js **********/
+__modules[26] = function(module, exports) {
+var Cache = __require(3,26),
+    Utilities = __require(9,26),
+    TaskCollectEnergy = __require(38,26),
+    TaskCollectMinerals = __require(39,26),
+    TaskPickupResource = __require(48,26),
+    TaskRally = __require(49,26);
+/**
+ * Represents the remote storer role.
+ */
+class RoleRemoteStorer {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             containers = Cache.containersInRoom(room),
-            roomName = room.name,
-            storers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || [],
             max = 0,
-            foundFirstSource = false;
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
-            return;
+            containerSource, sources, foundFirstSource, lengthToContainer, supportRoom, supportRoomName, supportRoomRcl, creeps, remoteStorers, containerIdToCollectFrom;
+        if (containers.length === 0) {
+            return {
+                name: "remoteStorer",
+                spawn: false,
+                max: 0
+            };
         }
+
+        containerSource = Memory.containerSource;
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
+        foundFirstSource = false;
+        lengthToContainer = Memory.lengthToContainer;
+        supportRoom = engine.supportRoom;
+        supportRoomName = supportRoom.name;
+        supportRoomRcl = supportRoom.controller.level;
+        creeps = Cache.creeps[room.name];
+        remoteStorers = creeps && creeps.remoteStorer;
         _.forEach(containers, (container) => {
             var count = 0,
-                id = container.id,
+                containerId = container.id,
                 source, length;
 
-            if (!Memory.containerSource[id]) {
-                Memory.containerSource[id] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
             }
 
-            source = Game.getObjectById(Memory.containerSource[id]);
+            source = Game.getObjectById(containerSource[containerId]);
+            
             if (source instanceof Mineral) {
                 if (source.mineralAmount === 0) {
                     return;
                 }
-            } else {
-                count = foundFirstSource ? 0 : -1;
+            } else if (!foundFirstSource) {
+                count = -1;
                 foundFirstSource = true;
             }
-            length = Memory.lengthToContainer[id][supportRoom.name];
-            count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoom.controller.level]), 0);
+            length = lengthToContainer[containerId] ? lengthToContainer[containerId][supportRoomName] : 0;
+            count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0);
             max += count;
-            if (_.filter(storers, (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === id).length < count) {
-                Storer.spawn(room, supportRoom, id);
+            if (canSpawn && !containerIdToCollectFrom && _.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
+                containerIdToCollectFrom = containerId;
             }
         });
 
-        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteStorer",
-                count: storers.length,
+        if (!canSpawn) {
+            return {
+                name: "remoteStorer",
+                spawn: false,
                 max: max
-            });
+            };
         }
+
+        return {
+            name: "remoteStorer",
+            spawn: !!containerIdToCollectFrom,
+            max: max,
+            spawnFromRegion: true,
+            containerIdToCollectFrom: containerIdToCollectFrom,
+            supportRoomRcl: supportRoomRcl
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var body;
 
-    static spawn(room, supportRoom, id) {
-        var roomName = room.name,
-            supportRoomName = supportRoom.name,
-            body = [], spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-
-        switch (supportRoom.controller.level) {
+        switch (checkSettings.supportRoomRcl) {
             case 3:
-                body =  [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
             case 4:
-                body =  [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
             case 5:
-                body =  [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
             case 6:
-                body =  [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
             case 7:
             case 8:
-                body =  [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
+                body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
         }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteStorer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteStorer", home: roomName, supportRoom: supportRoomName, container: id});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
 
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "remoteStorer",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                container: checkSettings.containerIdToCollectFrom
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -5984,121 +6071,109 @@ class Storer {
 }
 
 if (Memory.profiling) {
-    __require(1,25).registerObject(Storer, "RoleRemoteStorer");
+    __require(1,26).registerObject(RoleRemoteStorer, "RoleRemoteStorer");
 }
-module.exports = Storer;
+module.exports = RoleRemoteStorer;
 
 return module.exports;
 }
-/********** End of module 25: ../src/role.remoteStorer.js **********/
-/********** Start module 26: ../src/role.remoteWorker.js **********/
-__modules[26] = function(module, exports) {
-var Cache = __require(3,26),
-    Utilities = __require(8,26),
-    TaskBuild = __require(37,26),
-    TaskCollectEnergy = __require(39,26),
-    TaskHarvest = __require(44,26),
-    TaskPickupResource = __require(48,26),
-    TaskRally = __require(49,26),
-    TaskRepair = __require(51,26);
-
-class Worker {
-    static checkSpawn(room) {
-        var roomName = room.name,
-            supportRoom = Game.rooms[Memory.rooms[roomName].roomType.supportRoom],
-            supportRoomName = supportRoom.name,
+/********** End of module 26: ..\src\role.remoteStorer.js **********/
+/********** Start module 27: ..\src\role.remoteWorker.js **********/
+__modules[27] = function(module, exports) {
+var Cache = __require(3,27),
+    Utilities = __require(9,27),
+    TaskBuild = __require(36,27),
+    TaskCollectEnergy = __require(38,27),
+    TaskHarvest = __require(44,27),
+    TaskPickupResource = __require(48,27),
+    TaskRally = __require(49,27),
+    TaskRepair = __require(51,27);
+/**
+ * Represents the remote worker role.
+ */
+class RoleRemoteWorker {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             containers = Cache.containersInRoom(room),
-            workers = Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || [],
-            max = 0;
-        if (Cache.spawnsInRoom(supportRoom).length === 0 || room.unobservable || containers.length === 0) {
-            return;
+            max = 1,
+            spawn = false,
+            sources, lengthToContainer, creeps, workers, supportRoomName, containerIdToCollectFrom;
+        if (containers.length === 0) {
+            return {
+                name: "remoteWorker",
+                spawn: false,
+                max: 0
+            };
         }
+
+        if (!canSpawn) {
+            return {
+                name: "remoteWorker",
+                spawn: false,
+                max: max
+            };
+        }
+
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
+        lengthToContainer = Memory.lengthToContainer;
+        creeps = Cache.creeps[room.name];
+        workers = creeps && creeps.remoteWorker || [];
+        supportRoomName = engine.supportRoom.name;
         _.forEach(containers, (container) => {
-            var source = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0],
-                containerId = container.id;
+            var source = Utilities.objectsClosestToObj(sources, container)[0],
+                containerId = container.id,
+                lengthToThisAContainer = lengthToContainer[containerId];
             if (source instanceof Mineral) {
                 return;
             }
 
-            max += 1;
-
-            if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (Memory.lengthToContainer && Memory.lengthToContainer[containerId] && Memory.lengthToContainer[containerId][supportRoomName] ? Memory.lengthToContainer[containerId][supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
-                Worker.spawn(room, supportRoom, containerId);
+            if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
+                containerIdToCollectFrom = containerId;
+                spawn = true;
             }
             return false;
         });
-        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "remoteWorker",
-                count: workers.length,
-                max: max
-            });
-        }
+
+        return {
+            name: "remoteWorker",
+            spawn: spawn,
+            max: max,
+            spawnFromRegion: true,
+            containerIdToCollectFrom: containerIdToCollectFrom
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 3000),
+            units = Math.floor(Math.min(energy, 2000) / 200),
+            secondUnits = Math.floor(Math.max((energy - 2000), 0) / 150),
+            remainder = Math.min(energy, 2000) % 200,
+            secondRemainder = Math.max((energy - 2000), 0) % 150,
+            body = [];
 
-    static spawn(room, supportRoom, id) {
-        var body = [],
-            roomName = room.name,
-            supportRoomName = supportRoom.name,
-            energy, units, secondUnits, remainder, secondRemainder, count, spawnToUse, name;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3000);
-        units = Math.floor(energy / 200);
-        secondUnits = Math.floor((energy - 2000) / 150);
-        remainder = energy % 200;
-        secondRemainder = (energy - 2000) % 150;
-        for (count = 0; count < units && count < 10; count++) {
-            body.push(WORK);
-        }
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + secondUnits * 2 + (remainder >= 100 && remainder < 150 ? 1 : 0) + (secondRemainder > 100 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + secondUnits + (remainder >= 50 ? 1 : 0) + (secondRemainder >= 50 ? 1 : 0)).fill(MOVE));
 
-        if (energy < 2000 && remainder >= 150) {
-            body.push(WORK);
-        }
-
-        for (count = 0; count < units && count < 10; count++) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < secondUnits; count++) {
-            body.push(CARRY);
-            body.push(CARRY);
-        }
-
-        if (energy < 2000 && remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        if (energy > 2000 && secondRemainder >= 100) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units && count < 10; count++) {
-            body.push(MOVE);
-        }
-
-        for (count = 0; count < secondUnits; count++) {
-            body.push(MOVE);
-        }
-
-        if (energy < 2000 && remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        if (energy > 2000 && secondRemainder >= 50) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `remoteWorker-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "remoteWorker", home: roomName, supportRoom: supportRoomName, container: id});
-        if (spawnToUse.room.name === supportRoomName) {
-            Cache.spawning[spawnToUse.id] = typeof name !== "number";
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "remoteWorker",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                container: checkSettings.containerIdToCollectFrom
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -6285,80 +6360,71 @@ class Worker {
 }
 
 if (Memory.profiling) {
-    __require(1,26).registerObject(Worker, "RoleRemoteWorker");
+    __require(1,27).registerObject(RoleRemoteWorker, "RoleRemoteWorker");
 }
-module.exports = Worker;
+module.exports = RoleRemoteWorker;
 
 return module.exports;
 }
-/********** End of module 26: ../src/role.remoteWorker.js **********/
-/********** Start module 27: ../src/role.scientist.js **********/
-__modules[27] = function(module, exports) {
-var Cache = __require(3,27),
-    Utilities = __require(8,27),
-    TaskCollectEnergy = __require(39,27),
-    TaskPickupResource = __require(48,27),
-    TaskRally = __require(49,27);
-
-class Scientist {
-    static checkSpawn(room) {
-        var controller = room.controller,
-            roomName = room.name,
-            scientists = Cache.creeps[roomName] && Cache.creeps[roomName].scientist || [],
+/********** End of module 27: ..\src\role.remoteWorker.js **********/
+/********** Start module 28: ..\src\role.scientist.js **********/
+__modules[28] = function(module, exports) {
+var Cache = __require(3,28),
+    Utilities = __require(9,28),
+    TaskPickupResource = __require(48,28),
+    TaskRally = __require(49,28);
+/**
+ * Represents the scientist role.
+ */
+class RoleScientist {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             max = 1,
-            count;
-        if (!controller || controller.level < 6) {
-            return;
-        }
-        count = _.filter(scientists, (c) => c.spawning || c.ticksToLive >= 150).length;
+            creeps;
 
-        if (count < max) {
-            Scientist.spawn(room);
-        }
-        if (Memory.log && (scientists.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[room.name].creeps.push({
-                role: "scientist",
-                count: scientists.length,
+        if (!canSpawn) {
+            return {
+                name: "scientist",
+                spawn: false,
                 max: max
-            });
+            };
         }
+
+        creeps = Cache.creeps[room.name];
+
+        return {
+            name: "scientist",
+            spawn: _.filter(creeps && creeps.scientist || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            max: max
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var energy = Math.min(checkSettings.energyCapacityAvailable, 2500),
+            units = Math.floor(energy / 150),
+            remainder = energy % 150,
+            body = [];
 
-    static spawn(room) {
-        var spawns = Cache.spawnsInRoom(room),
-            body = [],
-            roomName = room.name,
-            energy, units, remainder, count, spawnToUse, name;
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(room.energyCapacityAvailable, 2500);
-        units = Math.floor(energy / 150);
-        remainder = energy % 150;
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-            body.push(CARRY);
-        }
+        body.push(...Array(units * 2 + (remainder >= 100 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
-        if (remainder >= 100) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-        spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `scientist-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "scientist", home: roomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "scientist",
+                home: checkSettings.home
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -6706,47 +6772,59 @@ class Scientist {
 }
 
 if (Memory.profiling) {
-    __require(1,27).registerObject(Scientist, "RoleScientist");
+    __require(1,28).registerObject(RoleScientist, "RoleScientist");
 }
-module.exports = Scientist;
+module.exports = RoleScientist;
 
 return module.exports;
 }
-/********** End of module 27: ../src/role.scientist.js **********/
-/********** Start module 28: ../src/role.storer.js **********/
-__modules[28] = function(module, exports) {
-var Cache = __require(3,28),
-    Utilities = __require(8,28),
-    TaskRally = __require(49,28);
-
-class Storer {
-    static checkSpawn(room) {
-        var containers = Cache.containersInRoom(room),
-            roomName = room.name,
+/********** End of module 28: ..\src\role.scientist.js **********/
+/********** Start module 29: ..\src\role.storer.js **********/
+__modules[29] = function(module, exports) {
+var Cache = __require(3,29),
+    Utilities = __require(9,29),
+    TaskRally = __require(49,29);
+/**
+ * Represents the storer role.
+ */
+class RoleStorer {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
+            containers = Cache.containersInRoom(room),
             length = 0,
             max = 0,
-            controller, army, storers, lengthToStorage;
-        if (Cache.spawnsInRoom(room).length === 0 || containers.length === 0 || !room.storage || !room.storage.my) {
-            return;
+            containerSource, sources, lengthToStorage, controller, rcl, army, creeps, storers;
+        if (containers.length === 0 || !room.storage || !room.storage.my) {
+            return {
+                name: "storer",
+                spawn: false,
+                max: 0
+            };
         }
 
-        controller = room.controller;
-        army = Memory.army;
-        storers = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [];
-        if (!Memory.lengthToStorage) {
-            Memory.lengthToStorage = {};
-        }
-
+        containerSource = Memory.containerSource;
+        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
         lengthToStorage = Memory.lengthToStorage;
+        controller = room.controller;
+        rcl = controller.level;
+        army = Memory.army;
+        creeps = Cache.creeps[room.name];
+        storers = creeps && creeps.storer || [];
         _.forEach(containers, (container) => {
             var containerId = container.id,
                 closest;
 
-            if (!Memory.containerSource[containerId]) {
-                Memory.containerSource[containerId] = Utilities.objectsClosestToObj([].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]), container)[0].id;
+            if (!containerSource[containerId]) {
+                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
             }
 
-            closest = Game.getObjectById(Memory.containerSource[containerId]);
+            closest = Game.getObjectById(containerSource[containerId]);
 
             if (closest instanceof Mineral) {
                 if (closest.mineralAmount > 0) {
@@ -6760,25 +6838,33 @@ class Storer {
                 length += lengthToStorage[container.id];
             }
         });
-        max += Math.ceil(2 * length / (controller && controller.level === 8 ? 35 : 30)) + (controller.level >= 7 && army && _.filter(army, (a) => a.region === room.memory.region).length > 0 ? 1 : 0);
-        if (_.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max) {
-            Storer.spawn(room);
-        }
-        if (Memory.log && (storers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "storer",
-                count: storers.length,
+
+        max += Math.ceil(2 * length / (controller && rcl === 8 ? 35 : 30)) + (rcl >= 7 && army && _.filter(army, (a) => a.region === room.memory.region && a.directive === "building").length > 0 ? 1 : 0);
+
+        if (!canSpawn) {
+            return {
+                name: "storer",
+                spawn: false,
                 max: max
-            });
-        }        
+            };
+        }
+
+        return {
+            name: "storer",
+            spawn: _.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            max: max,
+            rcl: rcl
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var body;
 
-    static spawn(room) {
-        var spawns = Cache.spawnsInRoom(room),
-            roomName = room.name,
-            body, spawnToUse, name;
-
-        switch (room.controller.level) {
+        switch (checkSettings.rcl) {
             case 7:
                 body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
@@ -6789,17 +6875,14 @@ class Storer {
                 body = [MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY];
                 break;
         }
-        if (_.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === room.memory.region).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `storer-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "storer", home: roomName});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
 
-        return typeof name !== "number";
+        return {
+            body: body,
+            memory: {
+                role: "storer",
+                home: checkSettings.home
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -7006,73 +7089,38 @@ class Storer {
 }
 
 if (Memory.profiling) {
-    __require(1,28).registerObject(Storer, "RoleStorer");
+    __require(1,29).registerObject(RoleStorer, "RoleStorer");
 }
-module.exports = Storer;
+module.exports = RoleStorer;
 
 return module.exports;
 }
-/********** End of module 28: ../src/role.storer.js **********/
-/********** Start module 29: ../src/role.tower.js **********/
-__modules[29] = function(module, exports) {
-var Cache = __require(3,29);
-
-class Tower {
-    static assignTasks(room, tasks) {
-        if (tasks.rangedAttack.tasks.length > 0) {
-            _.forEach(Cache.towersInRoom(room), (tower) => {
-                tower.attack(tasks.rangedAttack.tasks[0].enemy);
-            });
-            return;
-        }
-        if (tasks.repair.towerTasks.length > 0) {
-            _.forEach(Cache.towersInRoom(room), (tower) => {
-                tower.repair(tasks.repair.towerTasks[0].structure);
-            });
-            return;
-        }
-        if (tasks.heal.tasks.length > 0) {
-            _.forEach(Cache.towersInRoom(room), (tower) => {
-                tower.heal(tasks.heal.tasks[0].ally);
-            });
-            return;
-        }
-    }
-}
-
-if (Memory.profiling) {
-    __require(1,29).registerObject(Tower, "RoleTower");
-}
-module.exports = Tower;
-
-return module.exports;
-}
-/********** End of module 29: ../src/role.tower.js **********/
-/********** Start module 30: ../src/role.upgrader.js **********/
+/********** End of module 29: ..\src\role.storer.js **********/
+/********** Start module 30: ..\src\role.upgrader.js **********/
 __modules[30] = function(module, exports) {
 var Cache = __require(3,30),
-    Utilities = __require(8,30),
-    TaskCollectEnergy = __require(39,30),
+    Utilities = __require(9,30),
+    TaskCollectEnergy = __require(38,30),
     TaskHarvest = __require(44,30),
     TaskPickupResource = __require(48,30),
     TaskRally = __require(49,30);
-
-class Upgrader {
-    static checkSpawn(room) {
-        var roomName = room.name,
-            upgraders = Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || [],
+/**
+ * Represents the upgrader role.
+ */
+class RoleUpgrader {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
+            roomName = room.name,
             storage = room.storage,
-            controller = room.controller,
-            storageEnergy, count, max;
-        if (Cache.spawnsInRoom(room).length === 0) {
-            return;
-        }
+            storageEnergy = storage ? storage.store[RESOURCE_ENERGY] : 0,
+            max, controller, creeps, spawnForRoom;
 
-        if (storage) {
-            storageEnergy = storage.store[RESOURCE_ENERGY];
-        }
-
-        count = _.filter(upgraders, (c) => c.spawning || c.ticksToLive >= 150).length;
         if (roomName === Memory.rushRoom) {
             max = 1;
         } else if (!storage || storageEnergy < Memory.upgradeEnergy) {
@@ -7081,123 +7129,108 @@ class Upgrader {
             max = 1;
         }
 
-        if (count < max || controller && controller.level < 8 && storage && storageEnergy > 900000) {
-            Upgrader.spawn(room);
-        }
-        if (Memory.log && (upgraders.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "upgrader",
-                count: upgraders.length,
+        if (!canSpawn) {
+            return {
+                name: "upgrader",
+                spawn: false,
                 max: max
+            };
+        }
+
+        controller = room.controller;
+        creeps = Cache.creeps[roomName];
+
+        if (max > 0 && (controller && controller.level < 8 && storage && storageEnergy > 900000 || _.filter(creeps && creeps.upgrader || [], (c) => c.spawning || c.ticksToLive >= 150).length < max)) {
+            spawnForRoom = roomName;
+        }
+        if (!spawnForRoom) {
+            _.forEach(_.filter(Game.rooms, (r) => {
+                var memory = r.memory,
+                    roomType = memory.roomType,
+                    controller = r.controller;
+
+                return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && r.name !== room.name && controller && controller.level < 7;
+            }), (otherRoom) => {
+                var otherRoomName = otherRoom.name,
+                    otherCreeps = Cache.creeps[otherRoomName];
+                
+                if (_.filter(otherCreeps && otherCreeps.upgrader || [], (c) => {
+                    var memory = c.memory;
+
+                    return memory.supportRoom !== memory.home;
+                }).length === 0) {
+                    spawnForRoom = otherRoomName;
+                    return false;
+                }
             });
         }
-        _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== room.name && r.controller && r.controller.my && r.controller.level < 7), (otherRoom) => {
-            if (_.filter(Cache.creeps[otherRoom.name] && Cache.creeps[otherRoom.name].upgrader || [], (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
-                Upgrader.spawn(otherRoom, room);
-            }
-        });
+
+        return {
+            name: "upgrader",
+            spawn: !!spawnForRoom,
+            max: max,
+            spawnFromRegion: controller.level < 6,
+            spawnForRoom: spawnForRoom
+        };
     }
-
-    static spawn(room, supportRoom) {
-        var body = [],
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var room = Game.rooms[checkSettings.home],
+            links = Cache.linksInRoom(room),
             controller = room.controller,
-            workCount = 0,
-            canBoost = false,
-            roomName = room.name,
-            supportRoomName, spawns, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+            energy = room.energyCapacityAvailable,
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            storage = room.storage,
+            store = storage.store,
+            spawns = Cache.spawnsInRoom(room),
+            body = [],
+            boosts = {};
+        if (links >= 2 && Utilities.objectsClosestToObj(links, controller)[0].pos.getRangeTo(controller) <= 2) {
+            let carryUnits;
 
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-        supportRoomName = supportRoom.name;
-        spawns = Cache.spawnsInRoom(supportRoom);
-        storage = supportRoom.storage;
-        if (_.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        if (Cache.linksInRoom(room).length >= 2 && Utilities.objectsClosestToObj(Cache.linksInRoom(room), controller)[0].pos.getRangeTo(controller) <= 2) {
-            energy = Math.min(supportRoom.energyCapacityAvailable, controller.level === 8 ? 1950 : 4100);
-            units = Math.floor((energy - Math.ceil(energy / 3200) * 50) / 250);
-            remainder = (energy - Math.ceil(energy / 3200) * 50) % 250;
-            for (count = 0; count < units; count++) {
-                body.push(WORK);
-                body.push(WORK);
-                workCount += 2;
-            }
+            energy = Math.min(energy, controller.level === 8 ? 1950 : 4100);
+            carryUnits = Math.ceil(energy / 3200);
+            units = Math.floor((energy - carryUnits * 50) / 250);
+            remainder = (energy - carryUnits * 50) % 250;
 
-            if (remainder >= 150) {
-                body.push(WORK);
-                workCount++;
-            }
-
-            for (count = 0; count < Math.ceil(energy / 3200); count++) {
-                body.push(CARRY);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
-            }
+            body.push(...Array(units * 2 + (remainder >= 150 ? 1 : 0)).fill(WORK));
+            body.push(...Array(carryUnits).fill(CARRY));
+            body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
         } else {
-            energy = Math.min(supportRoom.energyCapacityAvailable, controller.level === 8 ? 3000 : 3300);
+            energy = Math.min(energy, controller.level === 8 ? 3000 : 3300);
             units = Math.floor(energy / 200);
             remainder = energy % 200;
-            for (count = 0; count < units; count++) {
-                body.push(WORK);
-                workCount++;
-            }
 
-            if (remainder >= 150) {
-                body.push(WORK);
-                workCount++;
-            }
+            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+            body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+            body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+        }
 
-            for (count = 0; count < units; count++) {
-                body.push(CARRY);
-            }
-
-            if (remainder >= 100 && remainder < 150) {
-                body.push(CARRY);
-            }
-
-            for (count = 0; count < units; count++) {
-                body.push(MOVE);
-            }
-
-            if (remainder >= 50) {
-                body.push(MOVE);
+        if (storage && Cache.labsInRoom(room).length > 0) {
+            if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
+            } else if (store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_LEMERGIUM_ACID] = units;
+            } else if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_LEMERGIUM_HYDRIDE] = units;
             }
         }
 
-        if (workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && Math.max(storage.store[RESOURCE_GHODIUM_HYDRIDE] || 0, storage.store[RESOURCE_GHODIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] || 0) >= 30 * workCount) {
-            canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
-        }
-        if (Cache.labsInRoom(supportRoom).length < 3) {
-            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        } else {
-            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        }
-
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `upgrader-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "upgrader", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && canBoost) {
-            labToBoostWith.creepToBoost = name;
-            labToBoostWith.resource = storage.store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workCount ? RESOURCE_CATALYZED_GHODIUM_ACID : storage.store[RESOURCE_GHODIUM_ACID] >= 30 * workCount ? RESOURCE_GHODIUM_ACID : RESOURCE_GHODIUM_HYDRIDE;
-            labToBoostWith.amount = 30 * workCount;
-            supportRoom.memory.labsInUse.push(labToBoostWith);
-            _.forEach(_.filter(Cache.creeps[supportRoomName] && Cache.creeps[supportRoomName].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
-                delete creep.memory.currentTask;
-            });
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            memory: {
+                role: "upgrader",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                homeSource: spawns ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0]
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -7314,123 +7347,120 @@ class Upgrader {
 }
 
 if (Memory.profiling) {
-    __require(1,30).registerObject(Upgrader, "RoleUpgrader");
+    __require(1,30).registerObject(RoleUpgrader, "RoleUpgrader");
 }
-module.exports = Upgrader;
+module.exports = RoleUpgrader;
 
 return module.exports;
 }
-/********** End of module 30: ../src/role.upgrader.js **********/
-/********** Start module 31: ../src/role.worker.js **********/
+/********** End of module 30: ..\src\role.upgrader.js **********/
+/********** Start module 31: ..\src\role.worker.js **********/
 __modules[31] = function(module, exports) {
 var Cache = __require(3,31),
-    Utilities = __require(8,31),
+    Utilities = __require(9,31),
     TaskHarvest = __require(44,31),
     TaskPickupResource = __require(48,31),
     TaskRally = __require(49,31);
-
-class Worker {
-    static checkSpawn(room, canSpawn) {
-        var roomName = room.name,
-            workers = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
+/**
+ * Represents the worker role.
+ */
+class RoleWorker {
+    /**
+     * Gets the settings for checking whether a creep should spawn.
+     * @param {RoomEngine} engine The room engine to check for.
+     * @param {bool} canSpawn Whether we can spawn a creep.
+     * @return {object} The settings to use for checking spawns.
+     */
+    static checkSpawnSettings(engine, canSpawn) {
+        var room = engine.room,
             storage = room.storage,
-            count, max;
-        if (room.find(FIND_SOURCES).length === 0) {
-            return;
-        }
-        count = _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length;
-        max = canSpawn ? storage && storage.my ? 1 : 2 : 0;
+            max = storage && storage.my ? 1 : 2,
+            roomName, creeps, roomToSpawnFor;
 
-        if (count < max) {
-            Worker.spawn(room);
-        }
-        if (Memory.log && (workers.length > 0 || max > 0) && Cache.log.rooms[roomName]) {
-            Cache.log.rooms[roomName].creeps.push({
-                role: "worker",
-                count: workers.length,
+        if (!canSpawn) {
+            return {
+                name: "worker",
+                spawn: false,
                 max: max
+            };
+        }
+
+        roomName = room.name;
+        creeps = Cache.creeps[roomName];
+
+        if (max > 0 && _.filter(creeps && creeps.worker || [], (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length < max) {
+            roomToSpawnFor = room.name;
+        }
+        if (!roomToSpawnFor) {
+            _.forEach(_.filter(Game.rooms, (r) => {
+                var memory = r.memory,
+                    roomType = memory.roomType,
+                    controller = r.controller;
+
+                return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && r.name !== roomName && controller && controller.level < 6;
+            }), (otherRoom) => {
+                var otherRoomName = otherRoom.name,
+                    otherCreeps = Cache.creeps[otherRoom.name];
+                
+                if (_.filter(otherCreeps && otherCreeps.worker || [], (c) => {
+                    var memory = c.memory;
+
+                    return memory.supportRoom !== memory.home;
+                }).length === 0) {
+                    roomToSpawnFor = otherRoomName;
+                }
             });
         }
-        _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.memory.region === room.memory.region && r.name !== roomName && r.controller && r.controller.my && r.controller.level < 6), (otherRoom) => {
-            if (_.filter(Cache.creeps[otherRoom.name] && Cache.creeps[otherRoom.name].worker || [], (c) => c.memory.supportRoom !== c.memory.home).length === 0) {
-                Worker.spawn(otherRoom, room);
-            }
-        });
+
+        return {
+            name: "worker",
+            spawn: !!roomToSpawnFor,
+            max: max,
+            spawnFromRegion: room.controller.level < 6,
+            roomToSpawnFor: roomToSpawnFor
+        };
     }
+    /**
+     * Gets the settings for spawning a creep.
+     * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
+     * @return {object} The settings for spawning a creep.
+     */
+    static spawnSettings(checkSettings) {
+        var room = Game.rooms[checkSettings.home],
+            energy = Math.min(room.energyCapacityAvailable, 3300),
+            units = Math.floor(energy / 200),
+            remainder = energy % 200,
+            storage = room.storage,
+            storage = room.storage,
+            store = storage.store,
+            spawns = Cache.spawnsInRoom(room),
+            body = [],
+            boosts = {};
 
-    static spawn(room, supportRoom) {
-        var body = [],
-            workCount = 0,
-            canBoost = false,
-            roomName = room.name,
-            supportRoomName, spawns, storage, energy, units, remainder, count, spawnToUse, name, labToBoostWith;
+        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
+        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
+        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
-        if (!supportRoom) {
-            supportRoom = room;
-        }
-        supportRoomName = supportRoom.name;
-        spawns = Cache.spawnsInRoom(supportRoom);
-        storage = supportRoom.storage;
-        if (spawns.length === 0) {
-            return;
-        }
-        if (Cache.labsInRoom(supportRoom).length >= 3 && _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id]).length === 0) {
-            return false;
-        }
-        energy = Math.min(supportRoom.energyCapacityAvailable, 3300);
-        units = Math.floor(energy / 200);
-        remainder = energy % 200;
-        for (count = 0; count < units; count++) {
-            body.push(WORK);
-            workCount++;
-        }
-
-        if (remainder >= 150) {
-            body.push(WORK);
-            workCount++;
+        if (storage && Cache.labsInRoom(room).length > 0) {
+            if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
+            } else if (store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_LEMERGIUM_ACID] = units;
+            } else if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
+                boosts[RESOURCE_LEMERGIUM_HYDRIDE] = units;
+            }
         }
 
-        for (count = 0; count < units; count++) {
-            body.push(CARRY);
-        }
-
-        if (remainder >= 100 && remainder < 150) {
-            body.push(CARRY);
-        }
-
-        for (count = 0; count < units; count++) {
-            body.push(MOVE);
-        }
-
-        if (remainder >= 50) {
-            body.push(MOVE);
-        }
-
-        if ((roomName === supportRoomName || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0) && workCount > 0 && storage && Cache.labsInRoom(supportRoom).length > 0 && Math.max(storage.store[RESOURCE_LEMERGIUM_HYDRIDE] || 0, storage.store[RESOURCE_LEMERGIUM_ACID] || 0, storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] || 0) >= 30 * workCount) {
-            canBoost = !!(labToBoostWith = Utilities.getLabToBoostWith(supportRoom)[0]);
-        }
-        if (Cache.labsInRoom(supportRoom).length < 3) {
-            spawnToUse = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body) && s.room.memory.region === supportRoom.memory.region).sort((a, b) => (a.room.name === supportRoomName ? 0 : 1) - (b.room.name === supportRoomName ? 0 : 1))[0];
-        } else {
-            spawnToUse = _.filter(spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(body))[0];
-        }
-        if (!spawnToUse) {
-            return false;
-        }
-        name = spawnToUse.createCreep(body, `worker-${roomName}-${Game.time.toFixed(0).substring(4)}`, {role: "worker", home: roomName, supportRoom: supportRoomName, homeSource: Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id, labs: canBoost ? [labToBoostWith.id] : []});
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
-
-        if (typeof name !== "number" && canBoost) {
-            labToBoostWith.creepToBoost = name;
-            labToBoostWith.resource = storage.store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * workCount ? RESOURCE_CATALYZED_LEMERGIUM_ACID : storage.store[RESOURCE_LEMERGIUM_ACID] >= 30 * workCount ? RESOURCE_LEMERGIUM_ACID : RESOURCE_LEMERGIUM_HYDRIDE;
-            labToBoostWith.amount = 30 * workCount;
-            supportRoom.memory.labsInUse.push(labToBoostWith);
-            _.forEach(_.filter(Cache.creeps[supportRoom.name] && Cache.creeps[supportRoom.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && c.memory.currentTask.id === labToBoostWith.id), (creep) => {
-                delete creep.memory.currentTask;
-            });
-        }
-
-        return typeof name !== "number";
+        return {
+            body: body,
+            boosts: boosts,
+            memory: {
+                role: "worker",
+                home: checkSettings.home,
+                supportRoom: checkSettings.supportRoom,
+                homeSource: spawns ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0]
+            }
+        };
     }
 
     static assignTasks(room, tasks) {
@@ -7745,48 +7775,101 @@ class Worker {
 }
 
 if (Memory.profiling) {
-    __require(1,31).registerObject(Worker, "RoleWorker");
+    __require(1,31).registerObject(RoleWorker, "RoleWorker");
 }
-module.exports = Worker;
+module.exports = RoleWorker;
 
 return module.exports;
 }
-/********** End of module 31: ../src/role.worker.js **********/
-/********** Start module 32: ../src/room.base.js **********/
+/********** End of module 31: ..\src\role.worker.js **********/
+/********** Start module 32: ..\src\room.base.js **********/
 __modules[32] = function(module, exports) {
 var Cache = __require(3,32),
     Commands = __require(4,32),
     Market = __require(6,32),
     Minerals = __require(7,32),
-    Utilities = __require(8,32),
-    RoleClaimer = __require(13,32),
-    RoleCollector = __require(14,32),
-    RoleConverter = __require(15,32),
+    RoomEngine = __require(55,32),
+    Tower = __require(8,32),
+    Utilities = __require(9,32),
+    RoleClaimer = __require(14,32),
+    RoleCollector = __require(15,32),
     RoleDismantler = __require(17,32),
-    RoleMiner = __require(19,32),
-    RoleScientist = __require(27,32),
-    RoleStorer = __require(28,32),
-    RoleTower = __require(29,32),
+    RoleDowngrader = __require(18,32),
+    RoleMiner = __require(20,32),
+    RoleScientist = __require(28,32),
+    RoleStorer = __require(29,32),
     RoleUpgrader = __require(30,32),
     RoleWorker = __require(31,32),
-    TaskBuild = __require(37,32),
-    TaskCollectEnergy = __require(39,32),
-    TaskCollectMinerals = __require(40,32),
-    TaskDismantle = __require(41,32),
+    TaskBuild = __require(36,32),
+    TaskCollectEnergy = __require(38,32),
+    TaskCollectMinerals = __require(39,32),
+    TaskDismantle = __require(40,32),
     TaskFillEnergy = __require(42,32),
     TaskFillMinerals = __require(43,32),
     TaskHeal = __require(45,32),
     TaskRangedAttack = __require(50,32),
     TaskRepair = __require(51,32),
     TaskUpgradeController = __require(53,32);
-
-class Base {
-    constructor() {
+/**
+ * A class that represents a base room.
+ */
+class RoomBase extends RoomEngine {
+    /**
+     * Creates a new base room.
+     * @param {Room} room The room.
+     */
+    constructor(room) {
+        super();
         this.type = "base";
+        this.room = room;
     }
+    /**
+     * Run the room.
+     */
+    run() {
+        var room = this.room,
+            roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
 
-    manage(room) {
-        var controller = room.controller,
+        if (room.unobservable) {
+            Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
+            return;
+        }
+
+        roomName = room.name;
+        spawns = Cache.spawnsInRoom(room);
+        terminal = room.terminal;
+        storage = room.storage;
+        memory = room.memory;
+        labQueue = memory.labQueue;
+        labsInUse = memory.labsInUse;
+        if (Game.time % 100 === 0 && spawns.length > 0) {
+            this.manage();
+        }
+        this.defend();
+        if (spawns.length > 0) {
+            this.transferEnergy();
+        }
+        if (terminal && !terminal.cooldown) {
+            this.terminal();
+        }
+        tasks = this.tasks();
+        this.spawn(tasks, _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === memory.region).length > 0);
+        this.assignTasks(tasks);
+        if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
+            this.labQueue();
+        }
+        if (labsInUse) {
+            this.labsInUse();
+        }
+        
+        this.processPower();
+    }
+    /**
+     * Manage the room's layout.
+     */
+    manage() {
+        var room = this.room,
+            controller = room.controller,
             rcl = controller.level,
             sites = room.find(FIND_MY_CONSTRUCTION_SITES),
             spawn = Cache.spawnsInRoom(room)[0],
@@ -7795,9 +7878,6 @@ class Base {
             minerals = room.find(FIND_MINERALS),
             roomName = room.name,
             extensionsToBuild;
-        if (!controller || rcl === 0) {
-            return;
-        }
         if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][rcl - 1] - (Cache.extensionsInRoom(room).length + _.filter(sites, (c) => c.structureType === STRUCTURE_EXTENSION).length)) > 0) {
             Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, spawn);
         }
@@ -7818,6 +7898,7 @@ class Base {
                     _.forEach(_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
                         structure.destroy();
                     });
+
                     room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
                 }
             });
@@ -7856,6 +7937,7 @@ class Base {
                     _.forEach(_.filter(structures, (s) => [STRUCTURE_ROAD, STRUCTURE_WALL].indexOf(s.structureType) !== -1), (structure) => {
                         structure.destroy();
                     });
+
                     room.createConstructionSite(x, y, STRUCTURE_CONTAINER);
                 }
             });
@@ -7879,14 +7961,27 @@ class Base {
             });
         }
     }
-    defend(room) {
-        var roomName = room.name,
-            roomMemory = room.memory,
+    /**
+     * Defend the room.
+     * Basic philosophy: We want to respond appropriately to incoming threats, but we also don't want to overdo it.
+     * 0-50 ticks - Enemy is being annoying, let towers deal with them.
+     * 50-500 ticks - Enemy is proving to be at least a basic threat, deal with them using a standard army.
+     * 500-2000 ticks - Light threat.  Use boosts with the standard army.
+     * 2000-2500 ticks - Moderate threat.  All bases in the region should send an army to any rooms identified as a threat.
+     * 2500+ ticks - Massive sustained threat.  Use boosts with all armies.
+     * NYI - Casualties taken? - Create an army of similar size that respects the base matrixes.  If a base matrix has not yet been created, queue one for creation.
+     * Enemy spending a lot of time on 0/49 tiles? - Create an army of similar size that goes after creeps in the border room they are trying to drain from.
+     */
+    defend() {
+        var room = this.room,
             hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
+            roomName = room.name,
             armyName = `${roomName}-defense`,
-            armySize, attackTicks, exits;
+            roomMemory = room.memory;
 
         if (hostiles.length > 0) {
+            let threats, edgeTicks, armySize;
+
             roomMemory.lastHostile = Game.time;
             if (!roomMemory.currentAttack) {
                 roomMemory.currentAttack = Game.time;
@@ -7902,57 +7997,69 @@ class Base {
                     7: 0
                 };
             }
+
+            threats = roomMemory.threats;
+            edgeTicks = roomMemory.edgeTicks;
             
             _.forEach(_.filter(_.map(hostiles, (h) => ({id: h.id, threat: _.filter(h.body, (b) => [ATTACK, RANGED_ATTACK, HEAL].indexOf(b) !== -1).length}))), (hostile) => {
-                roomMemory.threats[hostile.id] = hostile.threat;
+                threats[hostile.id] = hostile.threat;
             });
-            armySize = Math.min(Math.ceil(_.sum(roomMemory.threats) / 20), 3);
+            armySize = Math.min(Math.ceil(_.sum(threats) / 20), 3);
 
             if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
-                roomMemory.edgeTicks[TOP]++;
+                edgeTicks[TOP]++;
             }
 
             if (_.filter(hostiles, (h) => h.pos.x === 49).length > 0) {
-                roomMemory.edgeTicks[BOTTOM]++;
+                edgeTicks[BOTTOM]++;
             }
 
             if (_.filter(hostiles, (h) => h.pos.y === 0).length > 0) {
-                roomMemory.edgeTicks[LEFT]++;
+                edgeTicks[LEFT]++;
             }
 
             if (_.filter(hostiles, (h) => h.pos.y === 49).length > 0) {
-                roomMemory.edgeTicks[RIGHT]++;
+                edgeTicks[RIGHT]++;
             }
 
             if (armySize > 0) {
                 if (!Memory.army[armyName]) {
                     Game.notify(`Warning! ${roomName} is under attack!`);
-                    Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-                    Memory.army[armyName].creepCount = 0;
+                    Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}, creepCount: 0});
                 } else {
-                    attackTicks = Game.time - roomMemory.currentAttack;
+                    let attackTicks = Game.time - roomMemory.currentAttack,
+                        exits = Game.map.describeExits(roomName);
 
-                    if (attackTicks >= 500 && attackTicks < 2000) {
+                    if (attackTicks >= 500) {
                         Memory.army[armyName].boostRoom = roomName;
-                    } else if (attackTicks >= 2000 && attackTicks < 2500) {
-                        _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                            var remoteArmyName = `${remoteRoom.name}-defense-for-${roomName}`;
-                            if (!Memory.army[`${remoteRoom.name}-defense`] && !Memory.army[remoteArmyName]) {
-                                Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+
+                        if (attackTicks >= 2000) {
+                            let rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region);
+
+                            _.forEach(rooms, (remoteRoom) => {
+                                var remoteRoomName = remoteRoom.name,
+                                    remoteArmyName = `${remoteRoomName}-defense-for-${roomName}`;
+
+                                if (!Memory.army[`${remoteRoomName}-defense`] && !Memory.army[remoteArmyName]) {
+                                    Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+                                }
+                            });
+
+                            if (attackTicks >= 2500) {
+                                _.forEach(rooms, (remoteRoom) => {
+                                    var remoteRoomName = remoteRoom.name,
+                                        remoteArmyName = `${remoteRoomName}-defense-for-${roomName}`;
+
+                                    if (Memory.army[remoteArmyName]) {
+                                        Memory.army[remoteArmyName].boostRoom = remoteRoomName;
+                                    }
+                                });
                             }
-                        });
-                    } else if (attackTicks >= 2500) {
-                        _.forEach(_.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region), (remoteRoom) => {
-                            var remoteArmyName = `${remoteRoom.name}-defense-for-${roomName}`;
-                            if (Memory.army[remoteArmyName]) {
-                                Memory.army[remoteArmyName].boostRoom = remoteRoom.name;
-                            }
-                        });
+                        }
                     }
-                    exits = Game.map.describeExits(roomName);
                     _.forEach(_.keys(exits), (dir) => {
                         var dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
-                        if (!Memory.army[dirArmyName] && roomMemory.edgeTicks[dir] >= 50) {
+                        if (!Memory.army[dirArmyName] && edgeTicks[dir] >= 50) {
                             Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                         }
                     });
@@ -7960,20 +8067,30 @@ class Base {
             }
         } else if (Memory.army[armyName]) {
             if (roomMemory.lastHostile + 50 < Game.time) {
-                if (Memory.army[armyName]) {
-                    Memory.army[armyName].directive = "attack";
-                    Memory.army[armyName].success = true;
+                let army = Memory.army[armyName];
+
+                if (army) {
+                    army.directive = "attack";
+                    army.success = true;
                 }
                 delete roomMemory.lastHostile;
                 delete roomMemory.currentAttack;
                 delete roomMemory.threats;
                 delete roomMemory.edgeTicks;
             }
+        } else {
+            delete roomMemory.lastHostile;
+            delete roomMemory.currentAttack;
+            delete roomMemory.threats;
+            delete roomMemory.edgeTicks;
         }
     }
-
-    transferEnergy(room) {
-        var links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
+    /**
+     * Transfers energy from links closest to the first spawn to remote links.
+     */
+    transferEnergy() {
+        var room = this.room,
+            links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
             firstLink = links[0];
 
         _.forEach(links, (link, index) => {
@@ -7986,9 +8103,13 @@ class Base {
             }
         });
     }
-
-    terminal(room, terminal) {
-        var terminalStore = terminal.store,
+    /**
+     * Make resource deals in the terminal.
+     */
+    terminal() {
+        var room = this.room,
+            terminal = room.terminal,
+            terminalStore = terminal.store,
             terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
             storage = room.storage,
             roomName = room.name,
@@ -7998,34 +8119,46 @@ class Base {
             flips = [],
             storageStore = {},
             market = Game.market,
-            maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my), (r) => (r.storage && r.storage.my) ? r.storage.store[RESOURCE_ENERGY] : 0)),
-            bases, terminalMinerals, bestOrder, transCost, amount;
+            maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my), (r) => (r.storage && r.storage.my) ? r.storage.store[RESOURCE_ENERGY] : 0));
             
         if (storage) {
             storageStore = storage.store;
         }
         
-        if (!terminal.cooldown && terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
-            if (memory.buyQueue && (Cache.credits < Memory.minimumCredits || (storageStore[buyQueue.resource] || 0) + (terminalStore[buyQueue.resource] || 0) > (Memory.reserveMinerals[buyQueue.resource] || 0))) {
-                delete memory.buyQueue;
-                buyQueue = undefined;
+        if (terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
+            let reserveMinerals = Memory.reserveMinerals,
+                buyResource;
+
+            if (memory.buyQueue) {
+                buyResource = buyQueue.resource;
+                
+                if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) > (reserveMinerals[buyResource] || 0)) {
+                    delete memory.buyQueue;
+                    buyQueue = undefined;
+                }
             }
 
             if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {
-                bestOrder = (Market.getFilteredOrders().sell[buyQueue.resource] || [])[0];
+                let bestOrder = (Market.getFilteredOrders().sell[buyResource] || [])[0];
+
                 if (bestOrder) {
-                    if (bestOrder.price > buyQueue.price) {
+                    let bestPrice = bestOrder.price;
+
+                    if (bestPrice > buyQueue.price) {
                         delete memory.buyQueue;
                         buyQueue = undefined;
                     } else {
-                        transCost = market.calcTransactionCost(Math.min(buyQueue.amount, bestOrder.amount), roomName, bestOrder.roomName);
-                            if (terminalEnergy > transCost && Cache.credits >= buyQueue.amount * bestOrder.price) {
-                            Market.deal(bestOrder.id, Math.min(buyQueue.amount, bestOrder.amount), roomName);
+                        let bestAmount = bestOrder.amount,
+                            transCost = market.calcTransactionCost(Math.min(buyQueue.amount, bestAmount), roomName, bestOrder.roomName);
+                        
+                        if (terminalEnergy > transCost && Cache.credits >= buyQueue.amount * bestPrice) {
+                            Market.deal(bestOrder.id, Math.min(buyQueue.amount, bestAmount), roomName);
                             dealMade = true;
-                            buyQueue.amount -= Math.min(buyQueue.amount, bestOrder.amount);
+                            buyQueue.amount -= Math.min(buyQueue.amount, bestAmount);
                         } else {
                             if (terminalEnergy > 0) {
-                                amount = Math.min(Math.floor(Math.min(buyQueue.amount, bestOrder.amount) * terminalEnergy / transCost), Math.floor(Cache.credits / bestOrder.price));
+                                let amount = Math.min(Math.floor(Math.min(buyQueue.amount, bestAmount) * terminalEnergy / transCost), Math.floor(Cache.credits / bestPrice));
+
                                 if (amount > 0) {
                                     Market.deal(bestOrder.id, amount, roomName);
                                     dealMade = true;
@@ -8044,28 +8177,42 @@ class Base {
                     buyQueue = undefined;
                 }
             } else {
-                if (Cache.credits >= Memory.minimumCredits && Memory.buy) {
-                    bases = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.terminal && r.terminal.my);
-                    _.forEach(bases, (otherRoom) => {
-                        var otherRoomName = otherRoom.name;
+                if (Cache.credits >= Memory.minimumCredits) {
+                    _.forEach(_.filter(Game.rooms, (r) => {
+                        var memory = r.memory,
+                            roomType = memory.roomType,
+                            terminal = r.terminal;
+                        
+                        return memory && roomType && roomType.type === "base" && terminal && terminal.my;
+                    }), (otherRoom) => {
+                        var otherRoomName = otherRoom.name,
+                            otherRoomStorage = otherRoom.storage;
 
                         dealMade = false;
-                        if (roomName === otherRoom.name) {
+                        if (roomName === otherRoomName) {
                             return;
                         }
 
                         _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
                             resource: k,
-                            amount: Math.min(Memory.reserveMinerals ? s + storageStore[k] - (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) : 0, s),
-                            otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoom.storage && otherRoom.storage.store[k] || 0),
-                            needed: Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0
-                        })), (r) => Memory.reserveMinerals[r.resource] && r.otherRoomAmount < r.needed && r.amount > 0 && r.needed - r.otherRoomAmount > 0 && Math.min(r.amount, r.needed - r.otherRoomAmount) >= 100), (resource) => {
-                            var amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount);
+                            amount: Math.min(reserveMinerals ? s + storageStore[k] - (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) : 0, s),
+                            otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoomStorage && otherRoomStorage.store[k] || 0),
+                            needed: reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0
+                        })), (r) => {
+                            var otherRoomAmount = r.otherRoomAmount,
+                                needed = r.needed,
+                                amount = r.amount;
 
-                            transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
+                            return reserveMinerals[r.resource] && otherRoomAmount < needed && amount > 0 && needed - otherRoomAmount > 0 && Math.min(amount, needed - otherRoomAmount) >= 100;
+                        }), (resource) => {
+                            var amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount),
+                                resourceResource = resource.resource;
+
+                            let transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
+
                             if (terminalEnergy > transCost) {
-                                if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                    Cache.log.events.push(`Sending ${amount} ${resource.resource} from ${roomName} to ${otherRoomName}`);
+                                if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
+                                    Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
                                     dealMade = true;
                                     return false;
                                 }
@@ -8073,8 +8220,8 @@ class Base {
                                 if (terminalEnergy > 0) {
                                     amount = Math.floor(amount * terminalEnergy / transCost);
                                     if (amount > 0) {
-                                        if (room.terminal.send(resource.resource, amount, otherRoomName) === OK) {
-                                            Cache.log.events.push(`Sending ${amount} ${resource.resource} from ${roomName} to ${otherRoomName}`);
+                                        if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
+                                            Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
                                             dealMade = true;
                                             return false;
                                         }
@@ -8087,19 +8234,21 @@ class Base {
                     });
                 }
                 if (!dealMade) {
-                    terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
-                        return {resource: k, amount: Math.min(s, s - (Memory.reserveMinerals ? (k.startsWith("X") && k.length === 5 ? Memory.reserveMinerals[k] - 5000 : Memory.reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))};
+                    let terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
+                        return {resource: k, amount: Math.min(s, s - (reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))};
                     }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
                     if (terminalMinerals.length > 0) {
                         _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
-                            var resource = topResource.resource;
-
-                            bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || (!Memory.minimumSell[resource] && !Memory.flipPrice[resource]) || (Memory.minimumSell[resource] && o.price >= Memory.minimumSell[resource]) || (Memory.flipPrice[resource] && o.price >= Memory.flipPrice[resource].price) || (Memory.flipPrice[resource] && Game.time > Memory.flipPrice[resource].expiration))[0];
+                            var resource = topResource.resource,
+                                bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || (!Memory.minimumSell[resource] && !Memory.flipPrice[resource]) || (Memory.minimumSell[resource] && o.price >= Memory.minimumSell[resource]) || (Memory.flipPrice[resource] && o.price >= Memory.flipPrice[resource].price) || (Memory.flipPrice[resource] && Game.time > Memory.flipPrice[resource].expiration))[0];
+                            
                             if (bestOrder) {
-                                transCost = market.calcTransactionCost(Math.min(topResource.amount, bestOrder.amount), roomName, bestOrder.roomName);
+                                let bestAmount = bestOrder.amount,
+                                    transCost = market.calcTransactionCost(Math.min(topResource.amount, bestAmount), roomName, bestOrder.roomName);
+                                
                                 if (terminalEnergy > transCost) {
-                                    Market.deal(bestOrder.id, Math.min(topResource.amount, bestOrder.amount), roomName);
+                                    Market.deal(bestOrder.id, Math.min(topResource.amount, bestAmount), roomName);
                                     dealMade = true;
                                     if (topResource.amount < 5005) {
                                         delete Memory.minimumSell[bestOrder.resourceType];
@@ -8107,7 +8256,8 @@ class Base {
                                     return false;
                                 } else {
                                     if (terminalEnergy > 0) {
-                                        amount = Math.floor(Math.min(topResource.amount, bestOrder.amount) * terminalEnergy / transCost);
+                                        let amount = Math.floor(Math.min(topResource.amount, bestAmount) * terminalEnergy / transCost);
+
                                         if (amount > 0) {
                                             Market.deal(bestOrder.id, amount, roomName);
                                             dealMade = true;
@@ -8120,16 +8270,18 @@ class Base {
                     }
                 }
                 if (!dealMade && storage && maxEnergy > Memory.marketEnergy) {
+                    let filteredOrders = Market.getFilteredOrders();
+
                     _.forEach(Minerals, (children, resource) => {
                         var sellOrder, buyOrder;
-                        if (!storageStore || storageStore[resource] < Memory.reserveMinerals[resource]) {
+                        if (!storageStore || (storageStore[resource] || 0) < reserveMinerals[resource]) {
                             return;
                         }
                         if ([RESOURCE_ENERGY, SUBSCRIPTION_TOKEN].indexOf(resource) !== -1) {
                             return;
                         }
-                        sellOrder = (Market.getFilteredOrders().sell[resource] || [])[0];
-                        buyOrder = (Market.getFilteredOrders().buy[resource] || [])[0];
+                        sellOrder = (filteredOrders.sell[resource] || [])[0];
+                        buyOrder = (filteredOrders.buy[resource] || [])[0];
 
                         if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < Cache.credits) {
                             flips.push({resource: resource, buy: buyOrder, sell: sellOrder});
@@ -8137,21 +8289,23 @@ class Base {
                     });
 
                     _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
-                        var buy = flip.buy,
-                            sell = flip.sell;
-
-                        amount = Math.min(buy.amount, sell.amount);
-                        if (amount * sell.price > Cache.credits) {
-                            amount = Math.floor(Cache.credits / sell.price);
+                        var sell = flip.sell,
+                            sellPrice = sell.price,
+                            buy = flip.buy,
+                            amount = Math.min(buy.amount, sell.amount),
+                            transCost;
+                        
+                        if (amount * sellPrice > Cache.credits) {
+                            amount = Math.floor(Cache.credits / sellPrice);
                         }
 
                         if (index === 0) {
-                            Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sell.price.toFixed(2)} to ${buy.price.toFixed(2)}`);
+                            Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`);
                         }
                         transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
                         if (terminalEnergy > transCost) {
                             Market.deal(sell.id, amount, roomName);
-                            Memory.flipPrice[flip.resource] = {price: sell.price, expiration: Game.time + 100};
+                            Memory.flipPrice[flip.resource] = {price: sellPrice, expiration: Game.time + 100};
                             dealMade = true;
                             return false;
                         }
@@ -8160,7 +8314,7 @@ class Base {
                             amount = Math.floor(amount * terminalEnergy / transCost);
                             if (amount > 0) {
                                 Market.deal(sell.id, amount, roomName);
-                                Memory.flipPrice[flip.resource] = {price: sell.price, expiration: Game.time + 100};
+                                Memory.flipPrice[flip.resource] = {price: sellPrice, expiration: Game.time + 100};
                                 dealMade = true;
                                 return false;
                             }
@@ -8170,39 +8324,44 @@ class Base {
             }
         }
     }
-
-    tasks(room) {
-        var terminal = room.terminal,
-            dismantle = Memory.dismantle,
+    /**
+     * Compile the tasks available for this room.
+     * @return {object} The list of available tasks.
+     */
+    tasks() {
+        var room = this.room,
             roomName = room.name,
+            creeps = Cache.creeps[roomName],
+            terminal = room.terminal,
+            dismantle = Memory.dismantle,
             terminalEnergy = 0,
             storageEnergy = 0,
             terminalId,
 
-            workerList = Cache.creeps[roomName] && Cache.creeps[roomName].worker || [],
+            workerList = creeps && creeps.worker || [],
             workersWithEnergy = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
             workersWithMinerals = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)).length > 0,
             workersWithNothing = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
 
-            collectorList = Cache.creeps[roomName] && Cache.creeps[roomName].collector || [],
+            collectorList = creeps && creeps.collector || [],
             collectorsWithEnergy = _.filter(collectorList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
             collectorsWithNothing = _.filter(collectorList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
             
-            storerList = Cache.creeps[roomName] && Cache.creeps[roomName].storer || [],
+            storerList = creeps && creeps.storer || [],
             storersWithEnergy = _.filter(storerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
             storersWithMinerals = _.filter(storerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)).length > 0,
             storersWithNothing = _.filter(storerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
 
-            scientistList = Cache.creeps[roomName] && Cache.creeps[roomName].scientist || [],
+            scientistList = creeps && creeps.scientist || [],
             scientistsWithEnergy = _.filter(scientistList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
             scientistsWithMinerals = _.filter(scientistList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] !== _.sum(c.carry)).length > 0,
             scientistsWithNothing = _.filter(scientistList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
 
-            upgraderList = Cache.creeps[roomName] && Cache.creeps[roomName].upgrader || [],
+            upgraderList = creeps && creeps.upgrader || [],
             upgradersWithEnergy = _.filter(upgraderList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
             upgradersWithNothing = _.filter(upgraderList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && _.sum(c.carry) === 0).length > 0,
 
-            dismantlers = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || []).length > 0,
+            dismantlers = Utilities.creepsWithNoTask(creeps && creeps.dismantler || []).length > 0,
             noWorkers = Game.time % 10 === 0 && workerList.length + collectorList.length === 0,
             tasks = {
                 build: {
@@ -8293,36 +8452,48 @@ class Base {
                 _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
             });
         } else {
-            _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
-                creep.memory.role = "remoteWorker";
+            _.forEach(creeps && creeps.dismantler || [], (creep) => {
+                creep.memory.role = "worker";
                 creep.memory.container = Cache.containersInRoom(room)[0].id;
             });
         }
 
         return tasks;
     }
+    /**
+     * Spawns needed creeps.
+     * @param {object} tasks The tasks to assign to creeps.
+     * @param {canSpawn} bool Whether to spawn creeps this turn.
+     */
+    spawn(tasks, canSpawn) {
+        var room = this.room,
+            storage = room.storage,
+            controller = room.controller,
+            rcl = controller.level,
+            dismantle = Memory.dismantle,
+            roomName = room.name;
 
-    spawn(room, canSpawnWorkers) {
-        var dismantle = Memory.dismantle,
-            roomName = room.name,
-            controller = room.controller;
+        this.checkSpawn(RoleWorker, canSpawn && (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0));
+        this.checkSpawn(RoleMiner, canSpawn);
+        this.checkSpawn(RoleStorer, canSpawn);
+        this.checkSpawn(RoleScientist, canSpawn && rcl >= 6);
+        this.checkSpawn(RoleDismantler, canSpawn && (!!(dismantle && dismantle[roomName] && dismantle[roomName].length > 0)));
+        this.checkSpawn(RoleCollector, canSpawn);
+        this.checkSpawn(RoleClaimer, canSpawn);
+        this.checkSpawn(RoleDowngrader, canSpawn);
+        this.checkSpawn(RoleUpgrader, canSpawn && (rcl < 8 || _.filter(Game.rooms, (r) => {
+            var controller = r.controller;
 
-        RoleWorker.checkSpawn(room, canSpawnWorkers);
-        RoleMiner.checkSpawn(room);
-        RoleStorer.checkSpawn(room);
-        RoleScientist.checkSpawn(room);
-        if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-            RoleDismantler.checkSpawn(room);
-        }
-        RoleCollector.checkSpawn(room);
-        RoleClaimer.checkSpawn(room);
-        RoleConverter.checkSpawn(room);
-        if (controller && (controller.level < 8 || _.filter(Game.rooms, (r) => r.controller && r.controller.my && r.controller.level < 8).length > 0)) {
-            RoleUpgrader.checkSpawn(room);
-        }
+            return controller && controller.my && controller.level < 8;
+        }).length > 0));
     }
+    /**
+     * Assigns tasks to creeps.
+     * @param {object} tasks The tasks to assign.
+     */
+    assignTasks(tasks) {
+        var room = this.room;
 
-    assignTasks(room, tasks) {
         RoleWorker.assignTasks(room, tasks);
         RoleMiner.assignTasks(room, tasks);
         RoleStorer.assignTasks(room, tasks);
@@ -8330,118 +8501,129 @@ class Base {
         RoleDismantler.assignTasks(room, tasks);
         RoleCollector.assignTasks(room, tasks);
         RoleClaimer.assignTasks(room, tasks);
-        RoleConverter.assignTasks(room, tasks);
+        RoleDowngrader.assignTasks(room, tasks);
         RoleUpgrader.assignTasks(room, tasks);
 
-        RoleTower.assignTasks(room, tasks);
+        Tower.assignTasks(room, tasks);
     }
-
-    labQueue(room, labQueue) {
-        var memory = room.memory,
-            labs = Cache.labsInRoom(room),
-            labsInUse = memory.labsInUse,
-            sourceLabs = labQueue.sourceLabs || [],
-            children = labQueue.children || [],
-            sourceLab0 = Game.getObjectById(sourceLabs[0]),
-            sourceLab1 = Game.getObjectById(sourceLabs[1]),
-            resource = labQueue.resource;
+    /**
+     * Processes the lab queue.
+     */
+    labQueue() {
+        var room = this.room,
+            memory = room.memory,
+            labQueue = memory.labQueue,
+            status = labQueue.status;
         
-        switch (labQueue.status) {
-            case "clearing":
-                if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => labsInUse.indexOf(l.id) === -1 && l.mineralAmount > 0).length === 0) {
-                    labQueue.status = "moving";
-                }
-                break;
-            case "moving":
-                if (!labQueue.start || labQueue.start + 500 < Game.time) {
-                    delete memory.labQueue;
-                    labQueue = undefined;
-                } else {
-                    let moved = true;
-                    _.forEach(children, (resource) => {
-                        if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
-                            moved = false;
-                            return false;
-                        }
-                    });
-
-                    if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
-                        _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                            if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
-                                labQueue.amount -= 5;
-                            }
-                        });
-                    }
-
-                    if (moved) {
-                        labQueue.status = "creating";
-                    }
-                }
-                break;
-            case "creating":
-                _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
-                    if (lab.mineralAmount === LAB_MINERAL_CAPACITY) {
-                        labQueue.status = "returning";
-                    }
-                    if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
-                        labQueue.amount -= 5;
+        if (status === "clearing") {
+            let labsInUse = memory.labsInUse,
+                labs = Cache.labsInRoom(room);
+            
+            if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => _.filter(labsInUse, (u) => u.id === l.id).length === 0 && l.mineralAmount > 0).length === 0) {
+                labQueue.status = "moving";
+            }
+        } else if (status === "moving") {
+            if (!labQueue.start || labQueue.start + 500 < Game.time) {
+                delete memory.labQueue;
+                labQueue = undefined;
+            } else {
+                let moved = true,
+                    children = labQueue.children || [],
+                    labs = Cache.labsInRoom(room),
+                    sourceLabs = labQueue.sourceLabs || [],
+                    sourceLab0 = Game.getObjectById(sourceLabs[0]),
+                    sourceLab1 = Game.getObjectById(sourceLabs[1]),
+                    labsInUse = memory.labsInUse;
+                
+                _.forEach(children, (resource) => {
+                    if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
+                        moved = false;
+                        return false;
                     }
                 });
 
-                if (_.sum(_.filter(labs, (l) => sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
+                if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
+                    _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                        if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
+                            labQueue.amount -= 5;
+                        }
+                    });
+                }
+
+                if (moved) {
+                    labQueue.status = "creating";
+                }
+            }
+        } else if (status === "creating") {
+            let labs = Cache.labsInRoom(room),
+                sourceLabs = labQueue.sourceLabs || [],
+                labsInUse = memory.labsInUse,
+                sourceLab0 = Game.getObjectById(sourceLabs[0]),
+                sourceLab1 = Game.getObjectById(sourceLabs[1]);
+            
+            _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                if (lab.mineralAmount === LAB_MINERAL_CAPACITY) {
                     labQueue.status = "returning";
                 }
-                break;
-            case "returning":
-                if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) === 0) {
-                    delete memory.labQueue;
-                    labQueue = undefined;
+                if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
+                    labQueue.amount -= 5;
                 }
-                break;
-            default:
-                labQueue.status = "clearing";
-                labQueue.sourceLabs = Utilities.getSourceLabs(room);
-                break;
+            });
+
+            if (_.sum(_.filter(labs, (l) => sourceLabs.indexOf(l.id) !== -1), (l) => l.mineralAmount) === 0) {
+                labQueue.status = "returning";
+            }
+
+            if (labQueue.amount <= 0 && (sourceLab0.mineralAmount < 5 || sourceLab1.mineralAmount < 5)) {
+                delete memory.labQueue;
+                labQueue = undefined;
+            }
+        } else if (status === "returning") {
+            if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === labQueue.resource), (l) => l.mineralAmount) === 0) {
+                delete memory.labQueue;
+                labQueue = undefined;
+            }
+        } else {
+            labQueue.status = "clearing";
+            labQueue.sourceLabs = Utilities.getSourceLabs(room);
         }
     }
-
-    labsInUse(room, labsInUse) {
-        var boosted = [];
+    /**
+     * Checks for labs in use and updates the queue with what needs to be done with them.
+     */
+    labsInUse() {
+        var labsInUse = this.room.memory.labsInUse,
+            boosted = [];
 
         _.forEach(labsInUse, (queue) => {
-            var lab = Game.getObjectById(queue.id);
+            var status = queue.status,
+                lab = Game.getObjectById(queue.id);
             
-            switch (queue.status) {
-                case "emptying":
-                    if (lab.mineralAmount === 0) {
-                        queue.status = "filling";
-                    }
-                    break;
-                case "filling":
-                    if (lab.mineralAmount === queue.amount && lab.mineralType === queue.resource) {
-                        queue.status = "waiting";
-                    }
-                    break;
-                case "waiting":
-                default:
-                    let creep = Game.creeps[queue.creepToBoost];
-                    
-                    if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
-                        if (lab.boostCreep(creep) === OK) {
-                            _.remove(creep.memory.labs, (l) => l === queue.id);
-                            if (!queue.status || queue.oldAmount === 0) {
-                                boosted.push(queue);
-                            } else {
-                                queue.status = "refilling";
-                            }
+            if (status === "emptying") {
+                if (lab.mineralAmount === 0) {
+                    queue.status = "filling";
+                }
+            } else if (status === "filling") {
+                if (lab.mineralAmount === queue.amount && lab.mineralType === queue.resource) {
+                    queue.status = "waiting";
+                }
+            } else if (status === "refilling") {
+                if (lab.mineralAmount === queue.oldAmount && lab.mineralType === queue.oldResource) {
+                    boosted.push(queue);
+                }
+            } else {
+                let creep = Game.creeps[queue.creepToBoost];
+                
+                if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
+                    if (lab.boostCreep(creep) === OK) {
+                        _.remove(creep.memory.labs, (l) => l === queue.id);
+                        if (!status || queue.oldAmount === 0) {
+                            boosted.push(queue);
+                        } else {
+                            queue.status = "refilling";
                         }
                     }
-                    break;
-                case "refilling":
-                    if (lab.mineralAmount === queue.oldAmount && lab.mineralType === queue.oldResource) {
-                        boosted.push(queue);
-                    }
-                    break;
+                }
             }
         });
 
@@ -8449,98 +8631,85 @@ class Base {
             _.remove(labsInUse, (l) => l.id === queue.id);
         });
     }
-
-    processPower(room) {
-        _.forEach(Cache.powerSpawnsInRoom(room), (spawn) => {
+    /**
+     * Processes power in the room.
+     */
+    processPower() {
+        _.forEach(Cache.powerSpawnsInRoom(this.room), (spawn) => {
             if (spawn.power >= 1 && spawn.energy >= 50) {
                 spawn.processPower();
             }
         });
     }
-
-    run(room) {
-        var roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
-        if (room.unobservable) {
-            Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
-            return;
-        }
-
-        roomName = room.name;
-        spawns = Cache.spawnsInRoom(room);
-        terminal = room.terminal;
-        storage = room.storage;
-        memory = room.memory;
-        labQueue = memory.labQueue;
-        labsInUse = memory.labsInUse;
-        if (Game.time % 100 === 0 && spawns.length > 0) {
-            this.manage(room);
-        }
-        this.defend(room);
-        if (spawns.length > 0) {
-            this.transferEnergy(room);
-        }
-        if (terminal) {
-            this.terminal(room, terminal);
-        }
-        tasks = this.tasks(room);
-        this.spawn(room, !storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || room.controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0);
-        this.assignTasks(room, tasks);
-        if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
-            this.labQueue(room, labQueue);
-        }
-        if (labsInUse) {
-            this.labsInUse(room, labsInUse);
-        }
-        
-        this.processPower(room);
-    }
-
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
+    /**
+     * Serialize the room to an object.
+     */
+    toObj() {
+        Memory.rooms[this.room.name].roomType = {
             type: this.type
         };
     }
-
-    static fromObj(roomMemory) {
-        return new Base();
+    /**
+     * Deserializes room from an object.
+     * @param {Room} room The room to deserialize from.
+     * @return {RoomBase} The deserialized room.
+     */
+    static fromObj(room) {
+        return new RoomBase(room);
     }
 }
 
 if (Memory.profiling) {
-    __require(1,32).registerObject(Base, "RoomBase");
+    __require(1,32).registerObject(RoomBase, "RoomBase");
 }
-module.exports = Base;
+module.exports = RoomBase;
 
 return module.exports;
 }
-/********** End of module 32: ../src/room.base.js **********/
-/********** Start module 33: ../src/room.cleanup.js **********/
+/********** End of module 32: ..\src\room.base.js **********/
+/********** Start module 33: ..\src\room.cleanup.js **********/
 __modules[33] = function(module, exports) {
 var Cache = __require(3,33),
     Commands = __require(4,33),
-    Utilities = __require(8,33),
-    RoleRemoteDismantler = __require(22,33),
-    RoleRemoteCollector = __require(21,33),
-    TaskCollectEnergy = __require(39,33),
-    TaskCollectMinerals = __require(40,33),
-    TaskDismantle = __require(41,33),
+    RoomEngine = __require(55,33),
+    Utilities = __require(9,33),
+    RoleRemoteDismantler = __require(23,33),
+    RoleRemoteCollector = __require(22,33),
+    TaskCollectEnergy = __require(38,33),
+    TaskCollectMinerals = __require(39,33),
+    TaskDismantle = __require(40,33),
     TaskFillEnergy = __require(42,33),
     TaskFillMinerals = __require(43,33),
     TaskPickupResource = __require(48,33);
-
-class Cleanup {
-    constructor(supportRoom) {
+/**
+ * A class that represents a cleanup room.
+ */
+class RoomCleanup extends RoomEngine {
+    /**
+     * Creates a new cleanup room.
+     * @param {Room} room The room.
+     */
+    constructor(room) {
+        super();
         this.type = "cleanup";
-        this.supportRoom = supportRoom;
+        this.room = room;
+        this.supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom];
     }
-
-    run(room) {
-        var roomName = room.name,
-            ramparts = [], structures = [], noEnergyStructures = [], energyStructures = [], completed = [], junk = [],
-            supportRoom, tasks;
-        if (!(supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom])) {
+    /**
+     * Run the room.
+     */
+    run() {
+        var supportRoom = this.supportRoom,
+            room, roomName, ramparts, structures, junk, tasks;
+        if (!supportRoom) {
             return;
         }
+
+        room = this.room;
+        roomName = room.name;
+        ramparts = [];
+        structures = [];
+        junk = [];
         tasks = {
             collectEnergy: {
                 cleanupTasks: []
@@ -8568,9 +8737,13 @@ class Cleanup {
             }
         };
 
-        if (!room.unobservable) {
-            if (Memory.dismantle && Memory.dismantle[room.name] && Memory.dismantle[room.name].length > 0) {
-                _.forEach(Memory.dismantle[room.name], (pos) => {
+        if (!this.room.unobservable) {
+            let noEnergyStructures, energyStructures;
+
+            if (Memory.dismantle && Memory.dismantle[roomName] && Memory.dismantle[roomName].length > 0) {
+                let completed = [];
+
+                _.forEach(Memory.dismantle[roomName], (pos) => {
                     var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
                     if (structures.length === 0) {
                         completed.push(pos);
@@ -8593,384 +8766,170 @@ class Cleanup {
             tasks.remoteDismantle.cleanupTasks = [].concat.apply([], [TaskDismantle.getCleanupTasks(noEnergyStructures), TaskDismantle.getCleanupTasks(ramparts), TaskDismantle.getCleanupTasks(junk)]);
 
             if (energyStructures.length === 0 && tasks.remoteDismantle.cleanupTasks.length === 0 && tasks.pickupResource.tasks.length === 0) {
-                Game.notify(`Cleanup Room ${room.name} is squeaky clean!`);
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteCollector || [], (creep) => {
-                    creep.memory.role = "storer";
-                    creep.memory.home = supportRoom.name;
+                let creeps = Cache.creeps[roomName];
+                Game.notify(`Cleanup Room ${roomName} is squeaky clean!`);
+                _.forEach(creeps && creeps.remoteCollector || [], (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "storer";
+                    memory.home = supportRoom.name;
                 });
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || [], (creep) => {
-                    creep.memory.role = "upgrader";
-                    creep.memory.home = supportRoom.name;
+                _.forEach(creeps && creeps.remoteDismantler || [], (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "upgrader";
+                    memory.home = supportRoom.name;
                 });
-                Commands.setRoomType(room.name);
+                Commands.setRoomType(roomName);
             }
         }
-        if (room.unobservable || structures.length > 0 || ramparts.length > 0 || junk.length > 0) {
-            RoleRemoteDismantler.checkSpawn(room, supportRoom, Math.min(structures.length + ramparts.length + junk.length, 8));
-        }
-        RoleRemoteCollector.checkSpawn(room, supportRoom, (tasks.collectEnergy.cleanupTasks > 0 || tasks.collectMinerals.cleanupTasks) ? (supportRoom.controller ? supportRoom.controller.level : 3) : 1);
+        this.checkSpawn(RoleRemoteDismantler, room.unobservable || structures.length > 0 || ramparts.length > 0 || junk.length > 0);
+        this.checkSpawn(RoleRemoteCollector, true);
         RoleRemoteDismantler.assignTasks(room, tasks);
         RoleRemoteCollector.assignTasks(room, tasks);
     }
-
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
+    /**
+     * Serialize the room to an object.
+     */
+    toObj() {
+        Memory.rooms[this.room.name].roomType = {
             type: this.type,
-            supportRoom: this.supportRoom
+            supportRoom: this.supportRoom.name
         };
     }
-
-    static fromObj(roomMemory) {
-        return new Cleanup(roomMemory.roomType.supportRoom);
+    /**
+     * Deserializes room from an object.
+     * @param {Room} room The room to deserialize from.
+     * @return {RoomCleanup} The deserialized room.
+     */
+    static fromObj(room) {
+        return new RoomCleanup(room);
     }
 }
 
 if (Memory.profiling) {
-    __require(1,33).registerObject(Cleanup, "RoomCleanup");
+    __require(1,33).registerObject(RoomCleanup, "RoomCleanup");
 }
-module.exports = Cleanup;
+module.exports = RoomCleanup;
 
 return module.exports;
 }
-/********** End of module 33: ../src/room.cleanup.js **********/
-/********** Start module 34: ../src/room.mine.js **********/
+/********** End of module 33: ..\src\room.cleanup.js **********/
+/********** Start module 34: ..\src\room.mine.js **********/
 __modules[34] = function(module, exports) {
 var Cache = __require(3,34),
     Commands = __require(4,34),
-    Utilities = __require(8,34),
+    RoomEngine = __require(55,34),
+    Utilities = __require(9,34),
     RoleDismantler = __require(17,34),
-    RoleRemoteBuilder = __require(20,34),
-    RoleRemoteMiner = __require(23,34),
-    RoleRemoteReserver = __require(24,34),
-    RoleRemoteStorer = __require(25,34),
-    RoleRemoteWorker = __require(26,34),
-    TaskBuild = __require(37,34),
-    TaskDismantle = __require(41,34),
+    RoleRemoteBuilder = __require(21,34),
+    RoleRemoteMiner = __require(24,34),
+    RoleRemoteReserver = __require(25,34),
+    RoleRemoteStorer = __require(26,34),
+    RoleRemoteWorker = __require(27,34),
+    TaskBuild = __require(36,34),
+    TaskDismantle = __require(40,34),
     TaskFillEnergy = __require(42,34),
     TaskFillMinerals = __require(43,34);
+/**
+ * A class that represents a mine room.
+ */
+class RoomMine extends RoomEngine {
+    /**
+     * Creates a new mine room.
+     * @param {Room} room The room.
+     */
+    constructor(room) {
+        var roomType = Memory.rooms[room.name].roomType;
 
-class Mine {
-    constructor(supportRoom, stage) {
+        super();
         this.type = "mine";
-        this.supportRoom = supportRoom;
-        this.stage = stage || 1;
+        this.room = room;
+        this.supportRoom = Game.rooms[roomType.supportRoom];
+        this.stage = roomType.stage || 1;
     }
-
-    convert(room, supportRoom) {
-        var roomName = room.name,
-            memory = Memory.rooms[roomName],
-            oldRoomType = memory.roomType.type;
-
-        Commands.setRoomType(roomName, {type: "base", region: memory.region});
-        Commands.claimRoom(this.supportRoom, roomName, false);
-        
-        switch (oldRoomType) {
-            case "mine":
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].all || [], (creep) => {
-                    var creepMemory = creep.memory;
-                    
-                    switch (creepMemory.role) {
-                        case "remoteBuilder":
-                        case "remoteWorker":
-                            creepMemory.role = "worker";
-                            creepMemory.home = roomName;
-                            creepMemory.homeSource = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), creep)[0].id;
-                            break;
-                        case "remoteReserver":
-                            creep.suicide();
-                            break;
-                        case "remoteStorer":
-                            creepMemory.role = "storer";
-                            creepMemory.home = this.supportRoom;
-                            break;
-                        case "dismantler":
-                            creepMemory.home = roomName;
-                            creepMemory.supportRoom = roomName;
-                            break;
-                    }
-                });
-        }
-        return;
-    }
-
-    stage1Tasks(room, supportRoom) {
-        var tasks = {
-            fillEnergy: {
-                storageTasks: TaskFillEnergy.getStorageTasks(supportRoom),
-                containerTasks: TaskFillEnergy.getContainerTasks(supportRoom)
-            },
-            fillMinerals: {
-                storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
-                terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
-            },
-            dismantle: {
-                tasks: []
-            }
-        };
-        
-        if (!room.unobservable) {
-            tasks.build = {
-                tasks: TaskBuild.getTasks(room)
-            };
-        }
-        
-        return tasks;
-    }
-
-    stage1Spawn(room) {
-        RoleRemoteReserver.checkSpawn(room);
-        RoleRemoteBuilder.checkSpawn(room);
-    }
-
-    stage1AssignTasks(room, tasks) {
-        RoleRemoteReserver.assignTasks(room, tasks);
-        RoleRemoteBuilder.assignTasks(room);
-        RoleRemoteMiner.assignTasks(room, tasks);
-        RoleRemoteWorker.assignTasks(room, tasks);
-        RoleRemoteStorer.assignTasks(room, tasks);
-        RoleDismantler.assignTasks(room, tasks);
-    }
-
-    stage1Manage(room, supportRoom) {
-        var supportRoomName = supportRoom.name,
-            sources, containers, roomName, armyName, sites;
-        
-        if (!room.unobservable) {
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
-            containers = Cache.containersInRoom(room);
-            roomName = room.name;
-            if (containers.length >= sources.length) {
-                this.stage = 2;
-                _.forEach(containers, (container) => {
-                    var source = Utilities.objectsClosestToObj([].concat.apply([], [sources, room.find(FIND_MINERALS)]), container)[0];
-                    if (source instanceof Mineral) {
-                        return;
-                    }
-                    _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || [], (creep) => {
-                        creep.memory.role = "remoteWorker";
-                        creep.memory.container = Utilities.objectsClosestToObj(containers, source)[0].id;
-                    });
-                    return false;
-                });
-
-                return;
-            }
-            sites = room.find(FIND_MY_CONSTRUCTION_SITES);
-            if (sites.length === 0) {
-                _.forEach(sources, (source) => {
-                    var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
-
-                    if (
-                        _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
-                        _.filter(sites, (s) => s.pos.x === location.x && s.pos.y === location.y && s.structureType === STRUCTURE_CONTAINER).length === 0
-                    ) {
-                        room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
-                    }
-                });
-            } 
-
-            armyName = `${roomName}-defense`;
-            if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-                if (!Memory.army[armyName]) {
-                    Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
-                }
-            } else if (Memory.army[armyName]) {
-                Memory.army[armyName].directive = "attack";
-                Memory.army[armyName].success = true;
-            }
-        }
-    }
-
-    stage1(room, supportRoom) {
-        var tasks = this.stage1Tasks(room, supportRoom);
-        this.stage1Spawn(room);
-        this.stage1AssignTasks(room, tasks);
-
-        this.stage1Manage(room, supportRoom);
-    }
-
-    stage2Manage(room, supportRoom) {
-        var roomName = room.name,
-            supportRoomName = supportRoom.name,
-            sources, armyName;
-        if (room.unobservable) {
-            if (
-                (Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []).length === 0 &&
-                (Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length === 0 &&
-                (Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length === 0 &&
-                (Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []).length === 0
-            ) {
-                this.stage = 1;
-                return;
-            }
-        } else {
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][1-9][0-9]*5[NS][1-9][0-9]*5$/.test(room.name) ? room.find(FIND_MINERALS) : []]);
-            if (Cache.containersInRoom(room).length < sources.length) {
-                this.stage = 1;
-                return;
-            }
-
-            armyName = `${roomName}-defense`;
-            if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-                if (!Memory.army[armyName]) {
-                    Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((supportRoom.energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
-                }
-            } else if (Memory.army[armyName]) {
-                Memory.army[armyName].directive = "attack";
-                Memory.army[armyName].success = true;
-            }
-        }
-    }
-
-    stage2Spawn(room, supportRoom) {
-        var dismantle = Memory.dismantle;
-        if (Cache.hostilesInRoom(room).length > 0) {
-            return;
-        }
-        
-        RoleRemoteReserver.checkSpawn(room);
-        RoleRemoteMiner.checkSpawn(room);
-        RoleRemoteWorker.checkSpawn(room);
-        RoleRemoteStorer.checkSpawn(room);
-        if (dismantle && dismantle[room.name] && dismantle[room.name].length > 0) {
-            RoleDismantler.checkSpawn(room, supportRoom);
-        }
-    }
-
-    stage2Tasks(room, supportRoom) {
-        var roomName = room.name,
-            creeps = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []).length > 0,
-            tasks = {
-                fillEnergy: {
-                    storageTasks: creeps ? TaskFillEnergy.getStorageTasks(supportRoom) : [],
-                    containerTasks: creeps ? TaskFillEnergy.getContainerTasks(supportRoom) : []
-                },
-                fillMinerals: {
-                    storageTasks: creeps ? TaskFillMinerals.getStorageTasks(supportRoom) : [],
-                    terminalTasks: creeps ? TaskFillMinerals.getTerminalTasks(supportRoom) : []
-                }
-            };
-        if (!room.unobservable) {
-            let dismantle = Memory.dismantle;
-            tasks.dismantle = {
-                tasks: []
-            };
-
-            if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-                let completed = [];
-                
-                _.forEach(dismantle[roomName], (pos) => {
-                    var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
-                    if (structures.length === 0) {
-                        completed.push(pos);
-                    } else {
-                        tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
-                    }
-                });
-                _.forEach(completed, (complete) => {
-                    _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
-                });
-            } else {
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
-                    creep.memory.role = "remoteWorker";
-                    creep.memory.container = Cache.containersInRoom(room)[0].id;
-                });
-            }
-        }
-        
-        return tasks;
-    }
-
-    stage2AssignTasks(room, tasks) {
-        RoleRemoteReserver.assignTasks(room, tasks);
-        RoleRemoteMiner.assignTasks(room, tasks);
-        RoleRemoteWorker.assignTasks(room, tasks);
-        RoleRemoteStorer.assignTasks(room, tasks);
-        RoleDismantler.assignTasks(room, tasks);
-    }
-
-    stage2(room, supportRoom) {
-        var tasks;
-        this.stage2Manage(room, supportRoom);
-        if (this.stage === 1) {
-            return;
-        }
-        if (!room.unobservable) {
-            this.stage2Spawn(room, supportRoom);
-        }
-        tasks = this.stage2Tasks(room, supportRoom);
-        this.stage2AssignTasks(room, tasks);
-    }
-
-    run(room) {
-        var supportRoom;
+    /**
+     * Runs the room.
+     */
+    run() {
+        var room = this.room,
+            controller = room.controller;
         if (!room.unobservable && room.find(FIND_SOURCES).length === 0) {
             return;
         }
-        if (!(supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom])) {
+        if (!Game.rooms[Memory.rooms[room.name].roomType.supportRoom]) {
             return;
         }
-        if (room.controller && room.controller.my) {
-            this.convert(room, supportRoom);
+        if (this.type === "mine" && controller && controller.my) {
+            this.convert();
             return;
         }
 
         if (this.stage === 1) {
-            this.stage1(room, supportRoom);
+            this.stage1();
         }
 
         if (this.stage === 2) {
-            this.stage2(room, supportRoom);
+            this.stage2();
         }
     }
+    /**
+     * Converts the mine to a base.
+     */
+    convert() {
+        var supportRoomName = this.supportRoom.name,
+            room = this.room,
+            roomName = room.name,
+            memory = Memory.rooms[roomName],
+            creeps = Cache.creeps[roomName];
 
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
-            type: this.type,
-            supportRoom: this.supportRoom,
-            stage: this.stage
-        };
+        Commands.claimRoom(supportRoomName, roomName, false);
+        Commands.setRoomType(roomName, {type: "base", region: memory.region});
+        
+        _.forEach(creeps && creeps.all || [], (creep) => {
+            var creepMemory = creep.memory;
+            
+            switch (creepMemory.role) {
+                case "remoteBuilder":
+                case "remoteWorker":
+                    creepMemory.role = "worker";
+                    creepMemory.home = roomName;
+                    creepMemory.homeSource = Utilities.objectsClosestToObj(room.find(FIND_SOURCES), creep)[0].id;
+                    break;
+                case "remoteReserver":
+                    creep.suicide();
+                    break;
+                case "remoteStorer":
+                    creepMemory.role = "storer";
+                    creepMemory.home = supportRoomName;
+                    break;
+                case "dismantler":
+                    creepMemory.home = roomName;
+                    creepMemory.supportRoom = roomName;
+                    break;
+            }
+        });
     }
+    /**
+     * Runs the room while it is in stage 1.
+     */
+    stage1() {
+        var tasks = this.stage1Tasks();
+        this.stage1Spawn();
+        this.stage1AssignTasks(tasks);
 
-    static fromObj(roomMemory) {
-        return new Mine(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
+        if (!this.room.unobservable) {
+            this.stage1Manage();
+            this.defend();
+        }
     }
-}
+    /**
+     * Tasks to perform while the room is in stage 1.
+     */
+    stage1Tasks() {
+        var supportRoom = this.supportRoom,
+            room = this.room;
 
-if (Memory.profiling) {
-    __require(1,34).registerObject(Mine, "RoomMine");
-}
-module.exports = Mine;
-
-return module.exports;
-}
-/********** End of module 34: ../src/room.mine.js **********/
-/********** Start module 35: ../src/room.source.js **********/
-__modules[35] = function(module, exports) {
-var Cache = __require(3,35),
-    Commands = __require(4,35),
-    Utilities = __require(8,35),
-    RoleDefender = __require(16,35),
-    RoleDismantler = __require(17,35),
-    RoleHealer = __require(18,35),
-    RoleRemoteBuilder = __require(20,35),
-    RoleRemoteCollector = __require(21,35),
-    RoleRemoteMiner = __require(23,35),
-    RoleRemoteStorer = __require(25,35),
-    RoleRemoteWorker = __require(26,35),
-    TaskBuild = __require(37,35),
-    TaskDismantle = __require(41,35),
-    TaskFillEnergy = __require(42,35),
-    TaskFillMinerals = __require(43,35);
-
-class Source {
-    constructor(supportRoom, stage) {
-        this.type = "source";
-        this.supportRoom = supportRoom;
-        this.stage = stage || 1;
-    }
-    
-    stage1Tasks(room, supportRoom) {
         var tasks = {
             fillEnergy: {
                 storageTasks: TaskFillEnergy.getStorageTasks(supportRoom),
@@ -8993,163 +8952,171 @@ class Source {
         
         return tasks;
     }
-
-    stage1Spawn(room) {
-        var roomName = room.name;
-
-        RoleDefender.checkSpawn(room);
-        RoleHealer.checkSpawn(room);
-
-        if (!Cache.creeps[roomName] || !Cache.creeps[roomName].defender || _.filter(Cache.creeps[roomName].defender, (c) => !c.spawning).length === 0) {
-            return;
-        }
-
-        RoleRemoteBuilder.checkSpawn(room);
+    /**
+     * Spawns creeps while the room is in stage 1.
+     */
+    stage1Spawn() {
+        this.checkSpawn(RoleRemoteReserver, this.room.controller);
+        this.checkSpawn(RoleRemoteBuilder, true);
     }
+    /**
+     * Assigns tasks to creeps while the room is in stage 1.
+     * @param {object} tasks 
+     */
+    stage1AssignTasks(tasks) {
+        var room = this.room;
 
-    stage1AssignTasks(room, tasks) {
-        RoleDefender.assignTasks(room, tasks);
-        RoleHealer.assignTasks(room, tasks);
+        if (room.controller) {
+            RoleRemoteReserver.assignTasks(room, tasks);
+        }
         RoleRemoteBuilder.assignTasks(room);
         RoleRemoteMiner.assignTasks(room, tasks);
         RoleRemoteWorker.assignTasks(room, tasks);
         RoleRemoteStorer.assignTasks(room, tasks);
-        RoleRemoteCollector.assignTasks(room, tasks);
         RoleDismantler.assignTasks(room, tasks);
     }
-
-    stage1Manage(room, supportRoom) {
-        var supportRoomName = supportRoom.name,
-            sources, containers, roomName, armyName, sites;
-        
-        if (!room.unobservable) {
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
-            containers = Cache.containersInRoom(room);
-            roomName = room.name;
-            if (containers.length === sources.length) {
-                this.stage = 2;
-                _.forEach(containers, (container) => {
-                    var source = Utilities.objectsClosestToObj([].concat.apply([], [sources, room.find(FIND_MINERALS)]), container)[0];
-                    if (source instanceof Mineral) {
-                        return;
-                    }
-                    _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || [], (creep) => {
-                        creep.memory.role = "remoteWorker";
-                        creep.memory.container = Utilities.objectsClosestToObj(containers, source)[0].id;
-                    });
-                    return false;
-                });
-
-                return;
-            }
-            sites = room.find(FIND_MY_CONSTRUCTION_SITES);
-            if (sites.length === 0) {
-                _.forEach(sources, (source) => {
-                    var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
-
-                    if (
-                        _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
-                        _.filter(sites, (s) => s.pos.x === location.x && s.pos.y === location.y && s.structureType === STRUCTURE_CONTAINER).length === 0
-                    ) {
-                        room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
-                    }
-                });
-            }
-
-            armyName = `${roomName}-defense`;
-            if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-                if (!Memory.army[armyName]) {
-                    Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+    /**
+     * Manages the room while it is in stage 1.
+     */
+    stage1Manage() {
+        var room = this.room,
+            roomName = room.name,
+            minerals = room.find(FIND_MINERALS),
+            energySources = room.find(FIND_SOURCES),
+            sources = [].concat.apply([], [energySources, /^[EW][0-9]*[4-6][NS][0-9]*[4-6]$/.test(roomName) ? minerals : []]),
+            containers = Cache.containersInRoom(room),
+            allSources = [].concat.apply([], [energySources, minerals]),
+            creeps = Cache.creeps[roomName],
+            sites;
+        if (containers.length >= sources.length) {
+            this.stage = 2;
+            _.forEach(containers, (container) => {
+                var source = Utilities.objectsClosestToObj(allSources, container)[0];
+                if (source instanceof Mineral) {
+                    return;
                 }
-            } else if (Memory.army[armyName]) {
-                Memory.army[armyName].directive = "attack";
-                Memory.army[armyName].success = true;
+                _.forEach(creeps && creeps.remoteBuilder || [], (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "remoteWorker";
+                    memory.container = Utilities.objectsClosestToObj(containers, source)[0].id;
+                });
+                return false;
+            });
+
+            return;
+        }
+        sites = room.find(FIND_MY_CONSTRUCTION_SITES);
+
+        if (sites.length === 0) {
+            _.forEach(sources, (source) => {
+                var location = PathFinder.search(source.pos, {pos: Cache.spawnsInRoom(this.supportRoom)[0].pos, range: 1}, {swampCost: 1}).path[0];
+
+                if (
+                    _.filter(location.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
+                    _.filter(sites, (s) => s.pos.x === location.x && s.pos.y === location.y && s.structureType === STRUCTURE_CONTAINER).length === 0
+                ) {
+                    room.createConstructionSite(location.x, location.y, STRUCTURE_CONTAINER);
+                }
+            });
+        } 
+    }
+    /**
+     * Defends the room from invaders.
+     */
+    defend() {
+        var room = this.room,
+            roomName = room.name,
+            armyName = `${roomName}-defense`,
+            army = Memory.army[armyName],
+            supportRoom = this.supportRoom,
+            supportRoomName = supportRoom.name;
+        
+        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+            if (!army) {
+                let energyCapacityAvailable = supportRoom.energyCapacityAvailable;
+
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
             }
+        } else if (army) {
+            army.directive = "attack";
+            army.success = true;
         }
     }
-
-    stage1(room, supportRoom) {
-        var tasks = this.stage1Tasks(room, supportRoom);
-        this.stage1Spawn(room);
-        this.stage1AssignTasks(room, tasks);
-
-        this.stage1Manage(room, supportRoom);
+    /**
+     * Runs the room while it is in stage 2.
+     */
+    stage2() {
+        var tasks;
+        this.stage2Manage();
+        this.defend();
+        
+        if (this.stage === 1) {
+            return;
+        }
+        tasks = this.stage2Tasks();
+        if (!this.room.unobservable) {
+            this.stage2Spawn();
+        }
+        this.stage2AssignTasks(tasks);
     }
-    
-    stage2Manage(room, supportRoom) {
-        var roomName = room.name,
-            supportRoomName = supportRoom.name,
-            creeps = Cache.creeps[roomName],
-            armyName;
+    /**
+     * Manages the room while it is in stage 2.
+     */
+    stage2Manage() {
+        var room = this.room,
+            roomName = room.name,
+            creeps = Cache.creeps[roomName];
         if (room.unobservable) {
             if (
                 (creeps && creeps.remoteMiner || []).length === 0 &&
                 (creeps && creeps.remoteWorker || []).length === 0 &&
-                (creeps && creeps.remoteStorer || []).length === 0
+                (creeps && creeps.remoteStorer || []).length === 0 &&
+                (creeps && creeps.remoteReserver || []).length === 0
             ) {
                 this.stage = 1;
             }
         } else {
-            let sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]);
-            if (Cache.containersInRoom(room).length !== sources.length) {
+            if (Cache.containersInRoom(room).length < [].concat.apply([], [room.find(FIND_SOURCES), /^[EW][0-9]*[4-6][NS][0-9]*[4-6]$/.test(room.name) ? room.find(FIND_MINERALS) : []]).length) {
                 this.stage = 1;
             }
-
-            armyName = `${roomName}-defense`;
-            if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-                if (!Memory.army[armyName]) {
-                    Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-                }
-            } else if (Memory.army[armyName]) {
-                Memory.army[armyName].directive = "attack";
-                Memory.army[armyName].success = true;
-            }
         }
     }
-
-    stage2Spawn(room, supportRoom) {
-        var roomName = room.name,
-            dismantle = Memory.dismantle;
-
-        RoleDefender.checkSpawn(room);
-        RoleHealer.checkSpawn(room);
-
-        if (!Cache.creeps[roomName] || !Cache.creeps[roomName].defender || _.filter(Cache.creeps[roomName].defender, (c) => !c.spawning).length === 0) {
-            return;
-        }
-
-        RoleRemoteMiner.checkSpawn(room);
-        RoleRemoteWorker.checkSpawn(room);
-        RoleRemoteStorer.checkSpawn(room);
-        RoleRemoteCollector.checkSpawn(room, supportRoom);
-        if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
-            RoleDismantler.checkSpawn(room, supportRoom);
-        }
-    }
-
-    stage2Tasks(room, supportRoom) {
-        var roomName = room.name,
-            creeps = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteWorker || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteStorer || []).length > 0 || Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []).length > 0,
+    /**
+     * Tasks to perform while the room is in stage 1.
+     */
+    stage2Tasks() {
+        var room = this.room,
+            roomName = room.name,
+            supportRoom = this.supportRoom,
+            creeps = Cache.creeps[roomName],
+            carryCreeps =
+                Utilities.creepsWithNoTask(creeps && creeps.remoteWorker || []).length > 0 ||
+                Utilities.creepsWithNoTask(creeps && creeps.remoteStorer || []).length > 0 ||
+                Utilities.creepsWithNoTask(creeps && creeps.remoteDismantler || []).length > 0,
             tasks = {
                 fillEnergy: {
-                    storageTasks: creeps ? TaskFillEnergy.getStorageTasks(supportRoom) : [],
-                    containerTasks: creeps ? TaskFillEnergy.getContainerTasks(supportRoom) : []
+                    storageTasks: carryCreeps ? TaskFillEnergy.getStorageTasks(supportRoom) : [],
+                    containerTasks: carryCreeps ? TaskFillEnergy.getContainerTasks(supportRoom) : []
                 },
                 fillMinerals: {
-                    storageTasks: creeps ? TaskFillMinerals.getStorageTasks(supportRoom) : [],
-                    terminalTasks: creeps ? TaskFillMinerals.getTerminalTasks(supportRoom) : []
+                    storageTasks: carryCreeps ? TaskFillMinerals.getStorageTasks(supportRoom) : [],
+                    terminalTasks: carryCreeps ? TaskFillMinerals.getTerminalTasks(supportRoom) : []
                 }
             };
+
         if (!room.unobservable) {
-            let dismantle = Memory.dismantle;
+            let dismantle = Memory.dismantle,
+                dismantleRoom = dismantle[roomName];
+
             tasks.dismantle = {
                 tasks: []
             };
 
-            if (dismantle && dismantle[roomName] && dismantle[roomName].length > 0) {
+            if (dismantle && dismantleRoom && dismantleRoom.length > 0) {
                 let completed = [];
                 
-                _.forEach(dismantle[roomName], (pos) => {
+                _.forEach(dismantleRoom, (pos) => {
                     var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
                     if (structures.length === 0) {
                         completed.push(pos);
@@ -9158,148 +9125,203 @@ class Source {
                     }
                 });
                 _.forEach(completed, (complete) => {
-                    _.remove(dismantle[roomName], (d) => d.x === complete.x && d.y === complete.y);
+                    _.remove(dismantleRoom, (d) => d.x === complete.x && d.y === complete.y);
                 });
             } else {
-                _.forEach(Cache.creeps[roomName] && Cache.creeps[roomName].dismantler || [], (creep) => {
-                    creep.memory.role = "remoteWorker";
-                    creep.memory.container = Cache.containersInRoom(room)[0].id;
+                let containerId = Cache.containersInRoom(room)[0].id;
+
+                _.forEach(creeps && creeps.dismantler || [], (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "remoteWorker";
+                    memory.container = containerId;
                 });
             }
         }
+        
         return tasks;
     }
+    /**
+     * Spawns creeps while the room is in stage 2.
+     */
+    stage2Spawn() {
+        var room = this.room,
+            dismantle, dismantleRoom;
+        if (Cache.hostilesInRoom(room).length > 0) {
+            return;
+        }
 
-    stage2AssignTasks(room, tasks) {
-        RoleDefender.assignTasks(room, tasks);
-        RoleHealer.assignTasks(room, tasks);
+        dismantle = Memory.dismantle;
+        dismantleRoom = dismantle[room.name];
+        
+        this.checkSpawn(RoleRemoteReserver, room.controller);
+        this.checkSpawn(RoleRemoteMiner, true);
+        this.checkSpawn(RoleRemoteWorker, true);
+        this.checkSpawn(RoleRemoteStorer, true);
+        this.checkSpawn(RoleDismantler, !!(dismantle && dismantleRoom && dismantleRoom.length > 0));
+    }
+    /**
+     * Assigns tasks to creeps while the room is in stage 2.
+     * @param {object} tasks 
+     */
+    stage2AssignTasks(tasks) {
+        var room = this.room;
+
+        if (room.controller) {
+            RoleRemoteReserver.assignTasks(room, tasks);
+        }
         RoleRemoteMiner.assignTasks(room, tasks);
         RoleRemoteWorker.assignTasks(room, tasks);
         RoleRemoteStorer.assignTasks(room, tasks);
-        RoleRemoteCollector.assignTasks(room, tasks);
         RoleDismantler.assignTasks(room, tasks);
     }
-
-    stage2(room, supportRoom) {
-        var tasks;
-        this.stage2Manage(room, supportRoom);
-        if (this.stage === 1) {
-            return;
-        }
-        if (!room.unobservable) {
-            this.stage2Spawn(room, supportRoom);
-        }
-        tasks = this.stage2Tasks(room, supportRoom);
-        this.stage2AssignTasks(room, tasks);
-    }
-
-    run(room) {
-        var supportRoom;
-        if (!room.unobservable && room.find(FIND_SOURCES).length === 0) {
-            return;
-        }
-        if (!(supportRoom = Game.rooms[Memory.rooms[room.name].roomType.supportRoom])) {
-            return;
-        }
-        if (room.controller && room.controller.my) {
-            this.convert(room, supportRoom);
-            return;
-        }
-
-        if (this.stage === 1) {
-            this.stage1(room, supportRoom);
-        }
-
-        if (this.stage === 2) {
-            this.stage2(room, supportRoom);
-        }
-    }
-
-    toObj(room) {
-        Memory.rooms[room.name].roomType = {
+    /**
+     * Serialize the room to an object.
+     */
+    toObj() {
+        Memory.rooms[this.room.name].roomType = {
             type: this.type,
-            supportRoom: this.supportRoom,
+            supportRoom: this.supportRoom.name,
             stage: this.stage
         };
     }
-
-    static fromObj(roomMemory) {
-        return new Source(roomMemory.roomType.supportRoom, roomMemory.roomType.stage);
+    /**
+     * Deserializes room from an object.
+     * @param {Room} room The room to deserialize from.
+     * @return {RoomMine} The deserialized room.
+     */
+    static fromObj(room) {
+        return new RoomMine(room);
     }
 }
 
 if (Memory.profiling) {
-    __require(1,35).registerObject(Source, "RoomSource");
+    __require(1,34).registerObject(RoomMine, "RoomMine");
 }
-module.exports = Source;
+module.exports = RoomMine;
 
 return module.exports;
 }
-/********** End of module 35: ../src/room.source.js **********/
-/********** Start module 36: ../src/task.attack.js **********/
-__modules[36] = function(module, exports) {
-var Cache = __require(3,36),
-    Pathing = __require(55,36);
+/********** End of module 34: ..\src\room.mine.js **********/
+/********** Start module 35: ..\src\room.source.js **********/
+__modules[35] = function(module, exports) {
+var Cache = __require(3,35),
+    Commands = __require(4,35),
+    RoomMine = __require(34,35),
+    RoleDefender = __require(16,35),
+    RoleHealer = __require(19,35),
+    RoleRemoteCollector = __require(22,35);
+/**
+ * A class that represents a source room.
+ */
+class RoomSource extends RoomMine {
+    /**
+     * Creates a new source room.
+     * @param {Room} room The room.
+     */
+    constructor(room) {
+        super(room);
 
-class Attack {
-    constructor() {
-        this.type = "attack";
+        this.type = "source";
+        delete this.convert;
     }
-
-    canAssign(creep) {
-        var controller = creep.room.controller;
-
-        if (creep.spawning || creep.memory.role !== "converter" || !controller || controller.level === 0 || creep.getActiveBodyparts(CLAIM) === 0) {
-            return false;
-        }
+    /**
+     * Spawns creeps while the room is in stage 1.
+     */
+    stage1Spawn() {
+        var creeps = Cache.creeps[this.room.name],
+            defenders = creeps.defender;
         
-        Cache.creepTasks[creep.name] = this;
-        this.toObj(creep);
-        return true;
-    }
+        this.checkSpawn(RoleDefender, true);
+        this.checkSpawn(RoleHealer, true);
 
-    run(creep) {
-        if (!creep.room.controller || creep.room.controller.level === 0 || !creep.getActiveBodyparts(CLAIM) === 0) {
-            delete creep.memory.currentTask;
+        if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
             return;
         }
-        Pathing.moveTo(creep, creep.room.controller, 1);
-        creep.attackController(creep.room.controller);
+        super.stage1Spawn();
     }
+    /**
+     * Assigns tasks to creeps while the room is in stage 1.
+     * @param {object} tasks 
+     */
+    stage1AssignTasks(tasks) {
+        var room = this.room;
 
-    toObj(creep) {
-        if (creep.room.controller) {
-            creep.memory.currentTask = {
-                type: this.type
-            };
-        } else {
-            delete creep.memory.currentTask;
+        RoleDefender.assignTasks(room, tasks);
+        RoleHealer.assignTasks(room, tasks);
+        super.stage1AssignTasks(tasks);
+    }
+    /**
+     * Defends the room from invaders.
+     */
+    defend() {
+        var room = this.room,
+            roomName = room.name,
+            armyName = `${roomName}-defense`,
+            army = Memory.army[armyName],
+            supportRoomName = this.supportRoom.name;
+        
+        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+            if (!army) {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+            }
+        } else if (army) {
+            army.directive = "attack";
+            army.success = true;
         }
     }
+    /**
+     * Spawns creeps while the room is in stage 2.
+     */
+    stage2Spawn() {
+        var creeps = Cache.creeps[this.room.name],
+            defenders = creeps.defender;
 
-    static fromObj(creep) {
-        return new Attack();
-    }
+        this.checkSpawn(RoleDefender, true);
+        this.checkSpawn(RoleHealer, true);
 
-    static getTask(creep) {
-        if (creep.room.controller) {
-            return new Attack();
+        if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
+            return;
         }
+        super.stage2Spawn();
+
+        this.checkSpawn(RoleRemoteCollector, true);
+    }
+    /**
+     * Assigns tasks to creeps while the room is in stage 2.
+     * @param {object} tasks 
+     */
+    stage2AssignTasks(tasks) {
+        var room = this.room;
+
+        RoleDefender.assignTasks(room, tasks);
+        RoleHealer.assignTasks(room, tasks);
+        super.stage2AssignTasks(tasks);
+
+        RoleRemoteCollector.assignTasks(room, tasks);
+    }
+    /**
+     * Deserializes room from an object.
+     * @param {Room} room The room to deserialize from.
+     * @return {RoomSource} The deserialized room.
+     */
+    static fromObj(room) {
+        return new RoomSource(room);
     }
 }
 
 if (Memory.profiling) {
-    __require(1,36).registerObject(Attack, "TaskAttack");
+    __require(1,35).registerObject(RoomSource, "RoomSource");
 }
-module.exports = Attack;
+module.exports = RoomSource;
 
 return module.exports;
 }
-/********** End of module 36: ../src/task.attack.js **********/
-/********** Start module 37: ../src/task.build.js **********/
-__modules[37] = function(module, exports) {
-var Cache = __require(3,37),
-    Pathing = __require(55,37);
+/********** End of module 35: ..\src\room.source.js **********/
+/********** Start module 36: ..\src\task.build.js **********/
+__modules[36] = function(module, exports) {
+var Cache = __require(3,36),
+    Pathing = __require(56,36);
 
 class Build {
     constructor(id) {
@@ -9359,17 +9381,17 @@ class Build {
 }
 
 if (Memory.profiling) {
-    __require(1,37).registerObject(Build, "TaskBuild");
+    __require(1,36).registerObject(Build, "TaskBuild");
 }
 module.exports = Build;
 
 return module.exports;
 }
-/********** End of module 37: ../src/task.build.js **********/
-/********** Start module 38: ../src/task.claim.js **********/
-__modules[38] = function(module, exports) {
-var Cache = __require(3,38),
-    Pathing = __require(55,38);
+/********** End of module 36: ..\src\task.build.js **********/
+/********** Start module 37: ..\src\task.claim.js **********/
+__modules[37] = function(module, exports) {
+var Cache = __require(3,37),
+    Pathing = __require(56,37);
 
 class Claim {
     constructor() {
@@ -9419,17 +9441,17 @@ class Claim {
 }
 
 if (Memory.profiling) {
-    __require(1,38).registerObject(Claim, "TaskClaim");
+    __require(1,37).registerObject(Claim, "TaskClaim");
 }
 module.exports = Claim;
 
 return module.exports;
 }
-/********** End of module 38: ../src/task.claim.js **********/
-/********** Start module 39: ../src/task.collectEnergy.js **********/
-__modules[39] = function(module, exports) {
-var Cache = __require(3,39),
-    Pathing = __require(55,39);
+/********** End of module 37: ..\src\task.claim.js **********/
+/********** Start module 38: ..\src\task.collectEnergy.js **********/
+__modules[38] = function(module, exports) {
+var Cache = __require(3,38),
+    Pathing = __require(56,38);
 
 class CollectEnergy {
     constructor(id) {
@@ -9530,18 +9552,18 @@ class CollectEnergy {
 }
 
 if (Memory.profiling) {
-    __require(1,39).registerObject(CollectEnergy, "TaskCollectEnergy");
+    __require(1,38).registerObject(CollectEnergy, "TaskCollectEnergy");
 }
 module.exports = CollectEnergy;
 
 return module.exports;
 }
-/********** End of module 39: ../src/task.collectEnergy.js **********/
-/********** Start module 40: ../src/task.collectMinerals.js **********/
-__modules[40] = function(module, exports) {
-var Cache = __require(3,40),
-    Pathing = __require(55,40),
-    Utilities = __require(8,40);
+/********** End of module 38: ..\src\task.collectEnergy.js **********/
+/********** Start module 39: ..\src\task.collectMinerals.js **********/
+__modules[39] = function(module, exports) {
+var Cache = __require(3,39),
+    Pathing = __require(56,39),
+    Utilities = __require(9,39);
 
 class CollectMinerals {
     constructor(id, resource, amount) {
@@ -9777,17 +9799,17 @@ class CollectMinerals {
 }
 
 if (Memory.profiling) {
-    __require(1,40).registerObject(CollectMinerals, "TaskCollectMinerals");
+    __require(1,39).registerObject(CollectMinerals, "TaskCollectMinerals");
 }
 module.exports = CollectMinerals;
 
 return module.exports;
 }
-/********** End of module 40: ../src/task.collectMinerals.js **********/
-/********** Start module 41: ../src/task.dismantle.js **********/
-__modules[41] = function(module, exports) {
-var Cache = __require(3,41),
-    Pathing = __require(55,41);
+/********** End of module 39: ..\src\task.collectMinerals.js **********/
+/********** Start module 40: ..\src\task.dismantle.js **********/
+__modules[40] = function(module, exports) {
+var Cache = __require(3,40),
+    Pathing = __require(56,40);
 
 class Dismantle {
     constructor(id) {
@@ -9847,18 +9869,78 @@ class Dismantle {
 }
 
 if (Memory.profiling) {
-    __require(1,41).registerObject(Dismantle, "TaskDismantle");
+    __require(1,40).registerObject(Dismantle, "TaskDismantle");
 }
 module.exports = Dismantle;
 
 return module.exports;
 }
-/********** End of module 41: ../src/task.dismantle.js **********/
-/********** Start module 42: ../src/task.fillEnergy.js **********/
+/********** End of module 40: ..\src\task.dismantle.js **********/
+/********** Start module 41: ..\src\task.downgrade.js **********/
+__modules[41] = function(module, exports) {
+var Cache = __require(3,41),
+    Pathing = __require(56,41);
+
+class Downgrade {
+    constructor() {
+        this.type = "downgrade";
+    }
+
+    canAssign(creep) {
+        var controller = creep.room.controller;
+
+        if (creep.spawning || creep.memory.role !== "downgrader" || !controller || controller.level === 0 || creep.getActiveBodyparts(CLAIM) === 0) {
+            return false;
+        }
+        
+        Cache.creepTasks[creep.name] = this;
+        this.toObj(creep);
+        return true;
+    }
+
+    run(creep) {
+        if (!creep.room.controller || creep.room.controller.level === 0 || !creep.getActiveBodyparts(CLAIM) === 0) {
+            delete creep.memory.currentTask;
+            return;
+        }
+        Pathing.moveTo(creep, creep.room.controller, 1);
+        creep.attackController(creep.room.controller);
+    }
+
+    toObj(creep) {
+        if (creep.room.controller) {
+            creep.memory.currentTask = {
+                type: this.type
+            };
+        } else {
+            delete creep.memory.currentTask;
+        }
+    }
+
+    static fromObj() {
+        return new Downgrade();
+    }
+
+    static getTask(creep) {
+        if (creep.room.controller) {
+            return new Downgrade();
+        }
+    }
+}
+
+if (Memory.profiling) {
+    __require(1,41).registerObject(Downgrade, "TaskDowngrade");
+}
+module.exports = Downgrade;
+
+return module.exports;
+}
+/********** End of module 41: ..\src\task.downgrade.js **********/
+/********** Start module 42: ..\src\task.fillEnergy.js **********/
 __modules[42] = function(module, exports) {
 var Cache = __require(3,42),
-    Pathing = __require(55,42),
-    Utilities = __require(8,42);
+    Pathing = __require(56,42),
+    Utilities = __require(9,42);
 
 class FillEnergy {
     constructor(id) {
@@ -10005,12 +10087,12 @@ module.exports = FillEnergy;
 
 return module.exports;
 }
-/********** End of module 42: ../src/task.fillEnergy.js **********/
-/********** Start module 43: ../src/task.fillMinerals.js **********/
+/********** End of module 42: ..\src\task.fillEnergy.js **********/
+/********** Start module 43: ..\src\task.fillMinerals.js **********/
 __modules[43] = function(module, exports) {
 var Cache = __require(3,43),
-    Pathing = __require(55,43),
-    Utilities = __require(8,43);
+    Pathing = __require(56,43),
+    Utilities = __require(9,43);
 
 class FillMinerals {
     constructor(id, resources) {
@@ -10210,11 +10292,11 @@ module.exports = FillMinerals;
 
 return module.exports;
 }
-/********** End of module 43: ../src/task.fillMinerals.js **********/
-/********** Start module 44: ../src/task.harvest.js **********/
+/********** End of module 43: ..\src\task.fillMinerals.js **********/
+/********** Start module 44: ..\src\task.harvest.js **********/
 __modules[44] = function(module, exports) {
 var Cache = __require(3,44),
-    Pathing = __require(55,44);
+    Pathing = __require(56,44);
 
 class Harvest {
     constructor(failIn, source) {
@@ -10283,11 +10365,11 @@ module.exports = Harvest;
 
 return module.exports;
 }
-/********** End of module 44: ../src/task.harvest.js **********/
-/********** Start module 45: ../src/task.heal.js **********/
+/********** End of module 44: ..\src\task.harvest.js **********/
+/********** Start module 45: ..\src\task.heal.js **********/
 __modules[45] = function(module, exports) {
 var Cache = __require(3,45),
-    Pathing = __require(55,45);
+    Pathing = __require(56,45);
 
 class Heal {
     constructor(id) {
@@ -10363,11 +10445,11 @@ module.exports = Heal;
 
 return module.exports;
 }
-/********** End of module 45: ../src/task.heal.js **********/
-/********** Start module 46: ../src/task.meleeAttack.js **********/
+/********** End of module 45: ..\src\task.heal.js **********/
+/********** Start module 46: ..\src\task.meleeAttack.js **********/
 __modules[46] = function(module, exports) {
 var Cache = __require(3,46),
-    Pathing = __require(55,46);
+    Pathing = __require(56,46);
 
 class Melee {
     constructor(id) {
@@ -10439,12 +10521,12 @@ module.exports = Melee;
 
 return module.exports;
 }
-/********** End of module 46: ../src/task.meleeAttack.js **********/
-/********** Start module 47: ../src/task.mine.js **********/
+/********** End of module 46: ..\src\task.meleeAttack.js **********/
+/********** Start module 47: ..\src\task.mine.js **********/
 __modules[47] = function(module, exports) {
 var Cache = __require(3,47),
-    Pathing = __require(55,47),
-    Utilities = __require(8,47);
+    Pathing = __require(56,47),
+    Utilities = __require(9,47);
 
 class Mine {
     constructor(id) {
@@ -10526,13 +10608,13 @@ module.exports = Mine;
 
 return module.exports;
 }
-/********** End of module 47: ../src/task.mine.js **********/
-/********** Start module 48: ../src/task.pickupResource.js **********/
+/********** End of module 47: ..\src\task.mine.js **********/
+/********** Start module 48: ..\src\task.pickupResource.js **********/
 __modules[48] = function(module, exports) {
 var Cache = __require(3,48),
-    TaskCollectEnergy = __require(39,48),
-    Utilities = __require(8,48),
-    Pathing = __require(55,48);
+    TaskCollectEnergy = __require(38,48),
+    Utilities = __require(9,48),
+    Pathing = __require(56,48);
 
 class Pickup {
     constructor(id) {
@@ -10603,11 +10685,11 @@ module.exports = Pickup;
 
 return module.exports;
 }
-/********** End of module 48: ../src/task.pickupResource.js **********/
-/********** Start module 49: ../src/task.rally.js **********/
+/********** End of module 48: ..\src\task.pickupResource.js **********/
+/********** Start module 49: ..\src\task.rally.js **********/
 __modules[49] = function(module, exports) {
 var Cache = __require(3,49),
-    Pathing = __require(55,49);
+    Pathing = __require(56,49);
 
 class Rally {
     constructor(id, creep) {
@@ -10737,11 +10819,11 @@ module.exports = Rally;
 
 return module.exports;
 }
-/********** End of module 49: ../src/task.rally.js **********/
-/********** Start module 50: ../src/task.rangedAttack.js **********/
+/********** End of module 49: ..\src\task.rally.js **********/
+/********** Start module 50: ..\src\task.rangedAttack.js **********/
 __modules[50] = function(module, exports) {
 var Cache = __require(3,50),
-    Pathing = __require(55,50);
+    Pathing = __require(56,50);
 
 class Ranged {
     constructor(id) {
@@ -10822,11 +10904,11 @@ module.exports = Ranged;
 
 return module.exports;
 }
-/********** End of module 50: ../src/task.rangedAttack.js **********/
-/********** Start module 51: ../src/task.repair.js **********/
+/********** End of module 50: ..\src\task.rangedAttack.js **********/
+/********** Start module 51: ..\src\task.repair.js **********/
 __modules[51] = function(module, exports) {
 var Cache = __require(3,51),
-    Pathing = __require(55,51);
+    Pathing = __require(56,51);
 
 class Repair {
     constructor(id) {
@@ -10903,11 +10985,11 @@ module.exports = Repair;
 
 return module.exports;
 }
-/********** End of module 51: ../src/task.repair.js **********/
-/********** Start module 52: ../src/task.reserve.js **********/
+/********** End of module 51: ..\src\task.repair.js **********/
+/********** Start module 52: ..\src\task.reserve.js **********/
 __modules[52] = function(module, exports) {
 var Cache = __require(3,52),
-    Pathing = __require(55,52);
+    Pathing = __require(56,52);
 
 class Reserve {
     constructor(id) {
@@ -10974,12 +11056,12 @@ module.exports = Reserve;
 
 return module.exports;
 }
-/********** End of module 52: ../src/task.reserve.js **********/
-/********** Start module 53: ../src/task.upgradeController.js **********/
+/********** End of module 52: ..\src\task.reserve.js **********/
+/********** Start module 53: ..\src\task.upgradeController.js **********/
 __modules[53] = function(module, exports) {
 var Cache = __require(3,53),
-    Pathing = __require(55,53),
-    Utilities = __require(8,53);
+    Pathing = __require(56,53),
+    Utilities = __require(9,53);
 
 class Upgrade {
     constructor(room) {
@@ -11088,13 +11170,13 @@ module.exports = Upgrade;
 
 return module.exports;
 }
-/********** End of module 53: ../src/task.upgradeController.js **********/
-/********** Start module 54: ../src/assign.js **********/
+/********** End of module 53: ..\src\task.upgradeController.js **********/
+/********** Start module 54: ..\src\assign.js **********/
 __modules[54] = function(module, exports) {
 const Cache = __require(3,54),
-    Utilities = __require(8,54),
+    Utilities = __require(9,54),
     TaskMeleeAttack = __require(46,54),
-    TaskDismantle = __require(41,54),
+    TaskDismantle = __require(40,54),
     TaskHeal = __require(45,54),
     TaskRally = __require(49,54),
     TaskRangedAttack = __require(50,54);
@@ -11434,9 +11516,102 @@ module.exports = Assign;
 
 return module.exports;
 }
-/********** End of module 54: ../src/assign.js **********/
-/********** Start module 55: ../src/pathing.js **********/
+/********** End of module 54: ..\src\assign.js **********/
+/********** Start module 55: ..\src\roomEngine.js **********/
 __modules[55] = function(module, exports) {
+const Cache = __require(3,55),
+    Utilities = __require(9,55);
+/**
+ * A class representing a room engine.
+ */
+class RoomEngine {
+    /**
+     * Creates a new room engine.
+     */
+    constructor() {}
+    /**
+     * Checks whether we should spawn a creep for the role.
+     * @param {object} Role The role of the creep.
+     * @param {bool} [canSpawn] Whether the creep can be spawned. Defaults to true.
+     */
+    checkSpawn(Role, canSpawn) {
+        var room = this.room,
+            roomName = room.name,
+            roomLog = Cache.log.rooms[roomName],
+            creeps = Cache.creeps[roomName],
+            canBoost = false,
+            checkSettings, count, spawnToUse, supportRoomName, supportRoom, spawnSettings, labsToBoostWith, name;
+
+        if (canSpawn === undefined) {
+            canSpawn = true;
+        }
+
+        checkSettings = Role.checkSpawnSettings(this, canSpawn);
+        count = creeps && creeps[checkSettings.name] ? creeps[checkSettings.name].length : 0;
+        if (roomLog && (checkSettings.max > 0 || count > 0)) {
+            roomLog.creeps.push({
+                role: checkSettings.name,
+                count: count,
+                max: checkSettings.max
+            });
+        }
+        if (!checkSettings.spawn) {
+            return;
+        }
+
+        supportRoomName = checkSettings.supportRoom || (room.memory.roomType && room.memory.roomType.supportRoom ? room.memory.roomType.supportRoom : roomName);
+        supportRoom = Game.rooms[supportRoomName];
+        checkSettings.home = checkSettings.roomToSpawnFor || roomName;
+        checkSettings.supportRoom = supportRoomName;
+        checkSettings.energyCapacityAvailable = supportRoom.energyCapacityAvailable;
+        spawnSettings = Role.spawnSettings(checkSettings);
+        if (spawnSettings.boosts && supportRoom && Cache.labsInRoom(supportRoom).length > 0) {
+            canBoost = !!(labsToBoostWith = Utilities.getLabToBoostWith(supportRoom, Object.keys(spawnSettings.boosts).length));
+        }
+        if (checkSettings.spawnFromRegion) {
+            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === room.memory.region && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body)).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1))[0];
+        } else {
+            spawnToUse = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.name === roomName && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body))[0];
+        }
+        if (!spawnToUse) {
+            return;
+        }
+
+        spawnSettings.memory.labs = canBoost ? _.map(labsToBoostWith, (l) => l.id) : [];
+        name = spawnToUse.createCreep(spawnSettings.body, `${checkSettings.name}-${checkSettings.roomToSpawnFor || roomName}-${Game.time.toFixed(0).substring(4)}`, spawnSettings.memory);
+        Cache.spawning[spawnToUse.id] = typeof name !== "number";
+
+        if (canBoost && typeof name !== "number") {
+            let labIndex = 0,
+                labsInUse = supportRoom.memory.labsInUse;
+            
+            _.forEach(spawnSettings.boosts, (amount, resource) => {
+                labsToBoostWith[labIndex].creepToBoost = name;
+                labsToBoostWith[labIndex].resource = resource;
+                labsToBoostWith[labIndex].amount = 30 * amount;
+                labsInUse.push(labsToBoostWith[labIndex]);
+
+                labIndex++;
+            });
+            if (Cache.creeps[supportRoomName]) {
+                _.forEach(_.filter(Cache.creeps[supportRoomName].all, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillMinerals" && _.map(labsToBoostWith, (l) => l.id).indexOf(c.memory.currentTask.id) !== -1), (creep) => {
+                    delete creep.memory.currentTask;
+                });
+            }
+        }
+    }
+}
+
+if (Memory.profiling) {
+    __require(1,55).registerObject(RoomEngine, "RoomEngine");
+}
+module.exports = RoomEngine;
+
+return module.exports;
+}
+/********** End of module 55: ..\src\roomEngine.js **********/
+/********** Start module 56: ..\src\pathing.js **********/
+__modules[56] = function(module, exports) {
 const direction = {
     1: {dx: 0, dy: -1},
     2: {dx: 1, dy: -1},
@@ -11447,7 +11622,7 @@ const direction = {
     7: {dx: -1, dy: 0},
     8: {dx: -1, dy: -1}
 },
-    Cache = __require(3,55); //,
+    Cache = __require(3,56); //,
 /**
  * A class for efficient creep pathing.
  */
@@ -11747,13 +11922,13 @@ class Pathing {
 }
 
 if (Memory.profiling) {
-    __require(1,55).registerObject(Pathing, "Pathing");
+    __require(1,56).registerObject(Pathing, "Pathing");
 }
 module.exports = Pathing;
 
 return module.exports;
 }
-/********** End of module 55: ../src/pathing.js **********/
+/********** End of module 56: ..\src\pathing.js **********/
 /********** Footer **********/
 if(typeof module === "object")
 	module.exports = __require(0);

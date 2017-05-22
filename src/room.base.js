@@ -784,6 +784,16 @@ class RoomBase extends RoomEngine {
             });
         }
 
+        // New code below!
+        var extensionEnergyCapacity = EXTENSION_ENERGY_CAPACITY[room.controller.level],
+            towerCapacity = TOWER_CAPACITY * 0.8;
+
+        this.tasks = {
+            extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
+            spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
+            towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < towerCapacity)
+        };
+
         return tasks;
     }
 

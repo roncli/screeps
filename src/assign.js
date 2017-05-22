@@ -2,10 +2,12 @@ const Cache = require("cache"),
     Utilities = require("utilities"),
     TaskClaim = require("task.claim"),
     TaskDismantle = require("task.dismantle"),
+    TaskFillEnergy = require("task.fillEnergy"),
     TaskHeal = require("task.heal"),
     TaskMeleeAttack = require("task.meleeAttack"),
     TaskRally = require("task.rally"),
-    TaskRangedAttack = require("task.rangedAttack");
+    TaskRangedAttack = require("task.rangedAttack"),
+    TaskUpgradeController = require("task.upgradeController");
 
 //    #                    #                 
 //   # #                                     
@@ -186,6 +188,98 @@ class Assign {
             } else {
                 creep.say(say);
             }
+        });
+    }
+
+    //   #    #    ##    ##    ####         #                        #                       
+    //  # #         #     #    #            #                                                
+    //  #    ##     #     #    ###   #  #  ###    ##   ###    ###   ##     ##   ###    ###   
+    // ###    #     #     #    #      ##    #    # ##  #  #  ##      #    #  #  #  #  ##     
+    //  #     #     #     #    #      ##    #    ##    #  #    ##    #    #  #  #  #    ##   
+    //  #    ###   ###   ###   ####  #  #    ##   ##   #  #  ###    ###    ##   #  #  ###    
+    /**
+     * Assigns creeps to fill extensions.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {number} rcl The room controller level.
+     * @param {StructureExtension[]} extensions The extensions to fill.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillExtensions(creeps, allCreeps, rcl, extensions, say) {
+        if (extensions.length === 0) {
+            return;
+        }
+
+        _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] >= EXTENSION_ENERGY_CAPACITY[rcl]), (creep) => {
+            _.forEach(extensions.sort((a, b) => a.pos.getRangeTo(creep) - b.pos.getRangeTo(creep)), (extension) => {
+                if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === extension.id).length === 0) {
+                    if (new TaskFillEnergy(extension.id).canAssign(creep)) {
+                        creep.say(say);
+                        return false;
+                    }
+                }
+            });
+        });
+    }
+
+    //   #    #    ##    ##     ##                                  
+    //  # #         #     #    #  #                                 
+    //  #    ##     #     #     #    ###    ###  #  #  ###    ###   
+    // ###    #     #     #      #   #  #  #  #  #  #  #  #  ##     
+    //  #     #     #     #    #  #  #  #  # ##  ####  #  #    ##   
+    //  #    ###   ###   ###    ##   ###    # #  ####  #  #  ###    
+    //                               #                              
+    /**
+     * Assigns creeps to fill spawns.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {StructureSpawn[]} spawns The spawns to fill.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillSpawns(creeps, allCreeps, spawns, say) {
+        if (spawns.length === 0) {
+            return;
+        }
+
+        _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+            _.forEach(spawns.sort((a, b) => a.pos.getRangeTo(creep) - b.pos.getRangeTo(creep)), (spawn) => {
+                if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === spawn.id).length === 0) {
+                    if (new TaskFillEnergy(spawn.id).canAssign(creep)) {
+                        creep.say(say);
+                        return false;
+                    }
+                }
+            });
+        });
+    }
+
+    //   #    #    ##    ##    ###                                  
+    //  # #         #     #     #                                   
+    //  #    ##     #     #     #     ##   #  #   ##   ###    ###   
+    // ###    #     #     #     #    #  #  #  #  # ##  #  #  ##     
+    //  #     #     #     #     #    #  #  ####  ##    #       ##   
+    //  #    ###   ###   ###    #     ##   ####   ##   #     ###    
+    /**
+     * Assings creeps to fill towers.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {StructureTower[]} towers The towers to fill.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillTowers(creeps, allCreeps, towers, say) {
+        if (towers.length === 0) {
+            return;
+        }
+
+        _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+            _.forEach(towers.sort((a, b) => a.energy - b.energy), (tower) => {
+                if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === tower.id).length === 0) {
+                    if (new TaskFillEnergy(tower.id).canAssign(creep)) {
+                        creep.say(say);
+                        return false;
+                    }
+                }
+            });
         });
     }
 
@@ -487,7 +581,7 @@ class Assign {
     /**
      * Assign creeps to stomp out hostile construction sites.
      * @param {Creep[]} creeps The creeps to assign this task to.
-     * @param {ConstructionSite[]} sites 
+     * @param {ConstructionSite[]} sites The list of construction sites to stomp.
      * @param {string} say Text to say on successful assignment.
      */
     static stomp(creeps, sites, say) {
@@ -525,6 +619,27 @@ class Assign {
                 return multiAssign;
             });
         });
+    }
+
+    //                                  #         ##          #     #     #                ##     ##                #                ##    ##                
+    //                                  #        #  #               #                       #    #  #               #                 #     #                
+    // #  #  ###    ###  ###    ###   ###   ##   #     ###   ##    ###   ##     ##    ###   #    #      ##   ###   ###   ###    ##    #     #     ##   ###   
+    // #  #  #  #  #  #  #  #  #  #  #  #  # ##  #     #  #   #     #     #    #     #  #   #    #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
+    // #  #  #  #   ##   #     # ##  #  #  ##    #  #  #      #     #     #    #     # ##   #    #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
+    //  ###  ###   #     #      # #   ###   ##    ##   #     ###     ##  ###    ##    # #  ###    ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
+    //       #      ###                                                                                                                                      
+    /**
+     * Assigns creeps to upgrade controllers that are critically low.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {StructureController} controller The controller to upgrade.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static upgradeCriticalController(creeps, controller, say) {
+        if (controller.my && controller.ticksToDowngrade < [0, 10000, 3500, 5000, 10000, 20000, 30000, 50000, 100000][controller.level]) {
+            if (new TaskUpgradeController(controller.room).canAssign(creeps[0])) {
+                creeps[0].say(say);
+            }
+        }
     }
 }
 

@@ -1,4 +1,5 @@
-var Cache = require("cache"),
+var Assign = require("assign"),
+    Cache = require("cache"),
     Utilities = require("utilities"),
     TaskHarvest = require("task.harvest"),
     TaskPickupResource = require("task.pickupResource"),
@@ -123,101 +124,53 @@ class RoleCollector {
         };
     }
 
-    static assignTasks(room, tasks) {
-        var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].collector || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [],
-            assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var room = engine.room,
+            roomName = room.name,
+            creeps = Cache.creeps[roomName],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.collector || []), (c) => !c.spawning),
+            allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for critical controllers to upgrade.
-        _.forEach(tasks.upgradeController.criticalTasks, (task) => {
-            if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "upgradeController" && c.memory.currentTask.room === task.room).length === 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("CritCntrlr");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+        Assign.upgradeCriticalController(creepsWithNoTask, "Crit Ctrlr");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled extensions.
-        _.forEach(creepsWithNoTask, (creep) => {
-            // Don't bother if the creep doesn't have enough energy.
-            if (creep.carry[RESOURCE_ENERGY] < (room.controller.level === 8 ? 200 : room.controller.level === 7 ? 100 : 50)) {
-                return;
-            }
-            
-            _.forEach(tasks.fillEnergy.extensionTasks.sort((a, b) => a.object.pos.getRangeTo(creep) - b.object.pos.getRangeTo(creep)), (task) => {
-                var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
-                if (energyMissing > 0) {
-                    if (task.canAssign(creep)) {
-                        creep.say("Extension");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                }
-            });
-        });
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
+        Assign.fillExtensions(creeps, allCreeps, room.controller.level, engine.tasks.extensions, "Extension");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled spawns.
-        _.forEach(tasks.fillEnergy.spawnTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
-            if (energyMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Spawn");
-                        assigned.push(creep.name);
-                        energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                        if (energyMissing <= 0) {
-                            return false;
-                        }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+        Assign.fillSpawns(creeps, allCreeps, engine.tasks.spawns, "Spawn");
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled towers.
-        _.forEach(tasks.fillEnergy.towerTasks, (task) => {
-            var energyMissing = task.object.energyCapacity - task.object.energy - _.reduce(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
-            if (energyMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Tower");
-                        assigned.push(creep.name);
-                        energyMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                        if (energyMissing <= 0) {
-                            return false;
-                        }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+        Assign.fillTowers(creeps, allCreeps, engine.tasks.towers, "Tower");
         
         if (creepsWithNoTask.length === 0) {
             return;

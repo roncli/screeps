@@ -92,11 +92,11 @@ class RoleClaimer {
     //                            ###                                        
     /**
      * Assigns tasks to creeps of this role.
-     * @param {Room} room The room to assign tasks for.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
      */
-    static assignTasks(room) {
-        var creeps = Cache.creeps[room.name],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps || []), (c) => !c.spawning);
+    static assignTasks(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.claimer || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;

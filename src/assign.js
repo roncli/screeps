@@ -1,5 +1,6 @@
 const Cache = require("cache"),
     Utilities = require("utilities"),
+    TaskBuild = require("task.build"),
     TaskClaim = require("task.claim"),
     TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
@@ -7,6 +8,7 @@ const Cache = require("cache"),
     TaskMeleeAttack = require("task.meleeAttack"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
+    TaskRepair = require("task.repair"),
     TaskUpgradeController = require("task.upgradeController");
 
 //    #                    #                 
@@ -65,6 +67,27 @@ class Assign {
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
+            }
+        });
+    }
+
+    static build(creeps, allCreeps, sites, say) {
+        if (sites.length === 0) {
+            return;
+        }
+
+        _.forEach(sites, (site) => {
+            var progressMissing = site.progressTotal - site.progress - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === site.id), (c) => c.carry[RESOURCE_ENERGY]));
+            if (progressMissing > 0) {
+                _.forEach(Utilities.objectsClosestToObj(creeps, site), (creep) => {
+                    if (new TaskBuild(site.id).canAssign(creep)) {
+                        creep.say(say);
+                        progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                        if (progressMissing <= 0) {
+                            return false;
+                        }
+                    }
+                });
             }
         });
     }
@@ -480,6 +503,37 @@ class Assign {
         });
     }
 
+    //                          #           ##    #                       #                             
+    //                                     #  #   #                       #                             
+    // ###    ##   ###    ###  ##    ###    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###   
+    // #  #  # ##  #  #  #  #   #    #  #    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##     
+    // #     ##    #  #  # ##   #    #     #  #   #    #     #  #  #      #    #  #  #     ##      ##   
+    // #      ##   ###    # #  ###   #      ##     ##  #      ###   ##     ##   ###  #      ##   ###    
+    //             #                                                                                    
+    /**
+     * Assigns creeps to repair a structure.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {Structure[]} structures The structures to repair.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static repairStructures(creeps, allCreeps, structures, say) {
+        if (structures.length === 0) {
+            return;
+        }
+
+        _.forEach(structures, (structure) => {
+            _.forEach(Utilities.objectsClosestToObj(creeps, structure), (creep) => {
+                if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === structure.id).length === 0) {
+                    if (new TaskRepair(structure.id).canAssign(creep)) {
+                        creep.say(say);
+                        return false;
+                    }
+                }
+            });
+        });
+    }
+
     //              #                       #     ##                     #  #         #     #    
     //              #                       #    #  #                    #  #               #    
     // ###    ##   ###   ###    ##    ###  ###   #  #  ###   # #   #  #  #  #  ###   ##    ###   
@@ -619,6 +673,30 @@ class Assign {
                 return multiAssign;
             });
         });
+    }
+
+    //                                  #         ##                #                ##    ##                
+    //                                  #        #  #               #                 #     #                
+    // #  #  ###    ###  ###    ###   ###   ##   #      ##   ###   ###   ###    ##    #     #     ##   ###   
+    // #  #  #  #  #  #  #  #  #  #  #  #  # ##  #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
+    // #  #  #  #   ##   #     # ##  #  #  ##    #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
+    //  ###  ###   #     #      # #   ###   ##    ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
+    //       #      ###                                                                                      
+    /**
+     * Assigns creeps to upgrade controllers.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {StructureController} controller The controller to upgrade.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static upgradeController(creeps, controller, say) {
+        if (controller.my) {
+            let task = new TaskUpgradeController(controller.room);
+            _.forEach(creeps, (creep) => {
+                if (task.canAssign(creep)) {
+                    creep.say(say);
+                }
+            });
+        }
     }
 
     //                                  #         ##          #     #     #                ##     ##                #                ##    ##                

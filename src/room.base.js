@@ -785,11 +785,15 @@ class RoomBase extends RoomEngine {
         }
 
         // New code below!
-        var extensionEnergyCapacity = EXTENSION_ENERGY_CAPACITY[room.controller.level],
+        var sortedRepairableStructures = Cache.sortedRepairableStructuresInRoom(room),
+            extensionEnergyCapacity = EXTENSION_ENERGY_CAPACITY[room.controller.level],
             towerCapacity = TOWER_CAPACITY * 0.8;
 
         this.tasks = {
+            constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES).sort((a, b) => a.progressTotal === 1 ? 0 : 1 - (b.progressTotal === 1 ? 0 : 1)),
+            criticalRepairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5),
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
+            repairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
             towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < towerCapacity)
         };

@@ -140,6 +140,7 @@ class RoleCollector {
             roomName = room.name,
             creeps = Cache.creeps[roomName],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.collector || []), (c) => !c.spawning),
+            controller = room.controller,
             allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [];
 
         if (creepsWithNoTask.length === 0) {
@@ -147,7 +148,7 @@ class RoleCollector {
         }
 
         // Check for critical controllers to upgrade.
-        Assign.upgradeCriticalController(creepsWithNoTask, "Crit Ctrlr");
+        Assign.upgradeCriticalController(creepsWithNoTask, controller, "Upgrade");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -165,6 +166,7 @@ class RoleCollector {
         // Check for unfilled spawns.
         Assign.fillSpawns(creeps, allCreeps, engine.tasks.spawns, "Spawn");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
@@ -172,92 +174,39 @@ class RoleCollector {
         // Check for unfilled towers.
         Assign.fillTowers(creeps, allCreeps, engine.tasks.towers, "Tower");
         
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for critical repairs.
-        _.forEach(tasks.repair.criticalTasks, (task) => {
-            _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
-                if (_.filter(Cache.creeps[task.structure.room.name] && Cache.creeps[task.structure.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
-                    if (task.canAssign(creep)) {
-                        creep.say("CritRepair");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                }
-            });
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
+        Assign.repairStructures(creeps, allCreeps, engine.tasks.criticalRepairableStructures, "CritRepair");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for construction sites.
-        _.forEach(tasks.build.tasks, (task) => {
-            var progressMissing = task.constructionSite.progressTotal - task.constructionSite.progress - _.reduce(_.filter(Cache.creeps[task.constructionSite.room.name] && Cache.creeps[task.constructionSite.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0);
-            if (progressMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.constructionSite), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Build");
-                        assigned.push(creep.name);
-                        progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
-                        if (progressMissing <= 0) {
-                            return false;
-                        }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+        Assign.build(creeps, allCreeps, engine.tasks.constructionSites, "Build");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for repairs.
-        _.forEach(tasks.repair.tasks, (task) => {
-            var hitsMissing = task.structure.hitsMax - task.structure.hits - _.reduce(_.filter(Cache.creeps[task.structure.room.name] && Cache.creeps[task.structure.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id), function(sum, c) {return sum + (c.carry[RESOURCE_ENERGY] || 0);}, 0) * 100,
-                taskAssigned = false;
+        Assign.repairStructures(creeps, allCreeps, engine.tasks.repairableStructures, "Repair");
 
-            if (hitsMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.structure), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Repair");
-                        assigned.push(creep.name);
-                        hitsMissing -= (creep.carry[RESOURCE_ENERGY] || 0) * 100;
-                        taskAssigned = true;
-                        if (hitsMissing <= 0) {
-                            return false;
-                        }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-            
-            return taskAssigned;
-        });
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for controllers to upgrade.
-        _.forEach(tasks.upgradeController.tasks, (task) => {
-            _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, room.controller), (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say("Controller");
-                    assigned.push(creep.name);
-                }
-            });
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
+        Assign.upgradeController(creeps, controller, "Upgrade");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }

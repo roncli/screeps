@@ -212,63 +212,31 @@ class RoleCollector {
         }
 
         // Check for dropped resources in current room if there are no hostiles.
-        if (Cache.hostilesInRoom(room).length === 0) {
-            _.forEach(creepsWithNoTask, (creep) => {
-                _.forEach(TaskPickupResource.getCollectorTasks(creep.room), (task) => {
-                    if (_.filter(Cache.creeps[task.resource.room.name] && Cache.creeps[task.resource.room.name].all || [], (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Pickup");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-            });
-        }
+        Assign.pickupResources(creeps, allCreeps, engine.tasks.resources, "Pickup");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to get energy from containers.
-        _.forEach(tasks.collectEnergy.tasks, (task) => {
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say("Collecting");
-                    assigned.push(creep.name);
-                }
-            });
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
+        Assign.collectEnergy(creeps, allCreeps, engine.tasks.structuresWithEnergy, "Collecting");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to assign harvest task to remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = new TaskHarvest();
-            if (task.canAssign(creep)) {
-                creep.say("Harvesting");
-                assigned.push(creep.name);
-            }
-        });
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
+        Assign.harvest(creeps, "Harvesting");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Rally remaining creeps.
-        _.forEach(TaskRally.getHarvesterTasks(creepsWithNoTask), (task) => {
-            task.canAssign(task.creep);
-        });
+        Assign.moveToHomeSource(creeps);
     }
 }
 

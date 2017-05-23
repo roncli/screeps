@@ -2,10 +2,13 @@ const Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
     TaskClaim = require("task.claim"),
+    TaskCollectEnergy = require("task.collectEnergy"),
     TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
+    TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
     TaskMeleeAttack = require("task.meleeAttack"),
+    TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
@@ -71,8 +74,21 @@ class Assign {
         });
     }
 
+    // #            #    ##       #  
+    // #                  #       #  
+    // ###   #  #  ##     #     ###  
+    // #  #  #  #   #     #    #  #  
+    // #  #  #  #   #     #    #  #  
+    // ###    ###  ###   ###    ###  
+    /**
+     * Assigns creeps to build structures.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {ConstructionSite[]} sites The construction sites to build.
+     * @param {string} say Text to say on successful assignment.
+     */
     static build(creeps, allCreeps, sites, say) {
-        if (sites.length === 0) {
+        if (!sites || sites.length === 0) {
             return;
         }
 
@@ -129,6 +145,41 @@ class Assign {
         });
     }
 
+    //             ##    ##                 #    ####                                
+    //              #     #                 #    #                                   
+    //  ##    ##    #     #     ##    ##   ###   ###   ###    ##   ###    ###  #  #  
+    // #     #  #   #     #    # ##  #      #    #     #  #  # ##  #  #  #  #  #  #  
+    // #     #  #   #     #    ##    #      #    #     #  #  ##    #      ##    # #  
+    //  ##    ##   ###   ###    ##    ##     ##  ####  #  #   ##   #     #       #   
+    //                                                                    ###   #    
+    /**
+     * Assigns creeps to collect energy from a structure.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {Structure[]} structures The structures to collect energy from.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static collectEnergy(creeps, allCreeps, structures, say) {
+        if (!structures || structures.length === 0) {
+            return;
+        }
+
+        _.forEach(structures, (structure) => {
+            var energy = (structure.store ? structure.store[RESOURCE_ENERGY] : structure.energy) - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "collectEnergy" && c.memory.currentTask.id === structure.id), (c) => c.carryCapacity - _.sum(c.carry)));
+            if (energy > 0) {
+                _.forEach(creeps, (creep) => {
+                    if (new TaskCollectEnergy(structure.id).canAssign(creep)) {
+                        creep.say(say);
+                        energy -= creep.carryCapacity - _.sum(creep.carry) || 0;
+                        if (energy <= 0) {
+                            return false;
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     //    #   #                              #    ##           ##                     ###                            #    
     //    #                                  #     #          #  #                     #                             #    
     //  ###  ##     ###   # #    ###  ###   ###    #     ##   #  #  ###   # #   #  #   #     ###  ###    ###   ##   ###   
@@ -144,15 +195,19 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static dismantleArmyTarget(creeps, roomName, dismantle, say) {
-        if (Game.rooms[roomName] && dismantle && dismantle.length > 0) {
-            let task = new TaskDismantle(dismantle[0]);
+        var task;
 
-            _.forEach(creeps, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say(say);
-                }
-            });
+        if (!Game.rooms[roomName] || !dismantle || dismantle.length === 0) {
+            return;
         }
+
+        task = new TaskDismantle(dismantle[0]);
+
+        _.forEach(creeps, (creep) => {
+            if (task.canAssign(creep)) {
+                creep.say(say);
+            }
+        });
     }
 
     //    #   #                              #    ##          #  #                #     #    ##           ##    #                       #                             
@@ -168,19 +223,23 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static dismantleHostileStructures(creeps, roomName, say) {
-        var room;
-        if (room = Game.rooms[roomName]) {
-            let structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
+        var room = Game.rooms[roomName],
+            structures;
+        
+        if (!room) {
+            return;
+        }
 
-            if (structures.length > 0) {
-                let task = new TaskDismantle(structures[0].id);
+        structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
 
-                _.forEach(creeps, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say(say);
-                    }
-                });
-            }
+        if (structures.length > 0) {
+            let task = new TaskDismantle(structures[0].id);
+
+            _.forEach(creeps, (creep) => {
+                if (task.canAssign(creep)) {
+                    creep.say(say);
+                }
+            });
         }
     }
     
@@ -229,7 +288,7 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static fillExtensions(creeps, allCreeps, rcl, extensions, say) {
-        if (extensions.length === 0) {
+        if (!extensions || extensions.length === 0) {
             return;
         }
 
@@ -260,7 +319,7 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static fillSpawns(creeps, allCreeps, spawns, say) {
-        if (spawns.length === 0) {
+        if (!spawns || spawns.length === 0) {
             return;
         }
 
@@ -290,7 +349,7 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static fillTowers(creeps, allCreeps, towers, say) {
-        if (towers.length === 0) {
+        if (!towers || towers.length === 0) {
             return;
         }
 
@@ -323,6 +382,26 @@ class Assign {
             var task = new TaskRally(creep.memory.labs[0]);
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+
+    // #                                     #    
+    // #                                     #    
+    // ###    ###  ###   # #    ##    ###   ###   
+    // #  #  #  #  #  #  # #   # ##  ##      #    
+    // #  #  # ##  #     # #   ##      ##    #    
+    // #  #   # #  #      #     ##   ###      ##  
+    /**
+     * Assigns creeps to harvest.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static harvest(creeps, say) {
+        _.forEach(creeps, (creep) => {
+            var task = new TaskHarvest();
+            if (task.canAssign(creep)) {
                 creep.say(say);
             }
         });
@@ -387,7 +466,23 @@ class Assign {
             }
         });
     }
-    
+
+    //                         ###         #  #                     ##                                 
+    //                          #          #  #                    #  #                                
+    // # #    ##   # #    ##    #     ##   ####   ##   # #    ##    #     ##   #  #  ###    ##    ##   
+    // ####  #  #  # #   # ##   #    #  #  #  #  #  #  ####  # ##    #   #  #  #  #  #  #  #     # ##  
+    // #  #  #  #  # #   ##     #    #  #  #  #  #  #  #  #  ##    #  #  #  #  #  #  #     #     ##    
+    // #  #   ##    #     ##    #     ##   #  #   ##   #  #   ##    ##    ##    ###  #      ##    ##   
+    /**
+     * Assigns all creeps to rally to their home source.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     */
+    static moveToHomeSource(creeps) {
+        _.forEach(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (creep) => {
+            new TaskRally(creep.memory.homeSource).canAssign(creep);
+        });
+    }
+
     //                         ###         ###                
     //                          #          #  #               
     // # #    ##   # #    ##    #     ##   #  #   ##    ###   
@@ -454,6 +549,38 @@ class Assign {
             }
         });
     }
+
+    //        #          #                 ###                                                     
+    //                   #                 #  #                                                    
+    // ###   ##     ##   # #   #  #  ###   #  #   ##    ###    ##   #  #  ###    ##    ##    ###   
+    // #  #   #    #     ##    #  #  #  #  ###   # ##  ##     #  #  #  #  #  #  #     # ##  ##     
+    // #  #   #    #     # #   #  #  #  #  # #   ##      ##   #  #  #  #  #     #     ##      ##   
+    // ###   ###    ##   #  #   ###  ###   #  #   ##   ###     ##    ###  #      ##    ##   ###    
+    // #                             #                                                             
+    /**
+     * Assigns creeps to pickup resources in the room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {Resource[]} resources The resources to pick up.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static pickupResources(creeps, allCreeps, resources, say) {
+        if (!resources || resources.length === 0) {
+            return;
+        }
+
+        _.forEach(creeps, (creep) => {
+            _.forEach(_.filter(resources, (r) => r.amount > creep.pos.getRangeTo(r)), (resource) => {
+                if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === resource.id).length > 0) {
+                    return;
+                }
+                if (new TaskPickupResource(resource.id).canAssign(creep)) {
+                    creep.say(say);
+                    return false;
+                }
+            });
+        });
+    }
     
     //                                  #   ##    #     #                #     
     //                                  #  #  #   #     #                #     
@@ -518,7 +645,7 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static repairStructures(creeps, allCreeps, structures, say) {
-        if (structures.length === 0) {
+        if (!structures || structures.length === 0) {
             return;
         }
 
@@ -665,6 +792,10 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static tasks(creeps, tasks, multiAssign, say) {
+        if (!tasks || tasks.length === 0) {
+            return;
+        }
+
         _.forEach(tasks, (task) => {
             _.forEach(creeps, (creep) => {
                 if (task.canAssign(creep)) {

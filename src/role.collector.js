@@ -153,7 +153,7 @@ class RoleCollector {
         }
 
         // Check for unfilled extensions.
-        Assign.fillExtensions(creeps, allCreeps, room.controller.level, engine.tasks.extensions, "Extension");
+        Assign.fillExtensions(creepsWithNoTask, allCreeps, room.controller.level, engine.tasks.extensions, "Extension");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -161,7 +161,7 @@ class RoleCollector {
         }
 
         // Check for unfilled spawns.
-        Assign.fillSpawns(creeps, allCreeps, engine.tasks.spawns, "Spawn");
+        Assign.fillSpawns(creepsWithNoTask, allCreeps, engine.tasks.spawns, "Spawn");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -169,7 +169,7 @@ class RoleCollector {
         }
 
         // Check for unfilled towers.
-        Assign.fillTowers(creeps, allCreeps, engine.tasks.towers, "Tower");
+        Assign.fillTowers(creepsWithNoTask, allCreeps, engine.tasks.towers, "Tower");
         
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -177,7 +177,7 @@ class RoleCollector {
         }
 
         // Check for critical repairs.
-        Assign.repairStructures(creeps, allCreeps, engine.tasks.criticalRepairableStructures, "CritRepair");
+        Assign.repairStructures(creepsWithNoTask, allCreeps, engine.tasks.criticalRepairableStructures, "CritRepair");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -185,7 +185,7 @@ class RoleCollector {
         }
 
         // Check for construction sites.
-        Assign.build(creeps, allCreeps, engine.tasks.constructionSites, "Build");
+        Assign.build(creepsWithNoTask, allCreeps, engine.tasks.constructionSites, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -193,7 +193,7 @@ class RoleCollector {
         }
 
         // Check for repairs.
-        Assign.repairStructures(creeps, allCreeps, engine.tasks.repairableStructures, "Repair");
+        Assign.repairStructures(creepsWithNoTask, allCreeps, engine.tasks.repairableStructures, "Repair");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -201,7 +201,7 @@ class RoleCollector {
         }
 
         // Check for controllers to upgrade.
-        Assign.upgradeController(creeps, controller, "Upgrade");
+        Assign.upgradeController(creepsWithNoTask, controller, "Upgrade");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -209,7 +209,7 @@ class RoleCollector {
         }
 
         // Check for dropped resources in current room if there are no hostiles.
-        Assign.pickupResources(creeps, allCreeps, engine.tasks.resources, "Pickup");
+        Assign.pickupResources(creepsWithNoTask, allCreeps, engine.tasks.resources, "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -217,7 +217,7 @@ class RoleCollector {
         }
 
         // Attempt to get energy from containers.
-        Assign.collectEnergy(creeps, allCreeps, engine.tasks.structuresWithEnergy, "Collecting");
+        Assign.collectEnergy(creepsWithNoTask, allCreeps, engine.tasks.structuresWithEnergy, "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -225,7 +225,7 @@ class RoleCollector {
         }
 
         // Attempt to assign harvest task to remaining creeps.
-        Assign.harvest(creeps, "Harvesting");
+        Assign.harvest(creepsWithNoTask, "Harvesting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -233,7 +233,7 @@ class RoleCollector {
         }
 
         // Rally remaining creeps.
-        Assign.moveToHomeSource(creeps);
+        Assign.moveToHomeSource(creepsWithNoTask);
     }
 }
 

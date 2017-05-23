@@ -183,6 +183,9 @@ class RoomMine extends RoomEngine {
                 tasks: TaskBuild.getTasks(room)
             };
         }
+
+        // New code!
+        this.tasks = {};
         
         return tasks;
     }
@@ -396,7 +399,7 @@ class RoomMine extends RoomEngine {
     // ###      ##   # #  #      ##   ####   #     # #  ###    #  #  ###    
     //                     ###                                              
     /**
-     * Tasks to perform while the room is in stage 1.
+     * Tasks to perform while the room is in stage 2.
      */
     stage2Tasks() {
         var room = this.room,
@@ -451,6 +454,9 @@ class RoomMine extends RoomEngine {
                 });
             }
         }
+
+        // New code!
+        this.tasks = {};
         
         return tasks;
     }

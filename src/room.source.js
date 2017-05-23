@@ -35,6 +35,25 @@ class RoomSource extends RoomMine {
         delete this.convert;
     }
 
+    //         #                       #    ###                #            
+    //         #                      ##     #                 #            
+    //  ###   ###    ###   ###   ##    #     #     ###   ###   # #    ###   
+    // ##      #    #  #  #  #  # ##   #     #    #  #  ##     ##    ##     
+    //   ##    #    # ##   ##   ##     #     #    # ##    ##   # #     ##   
+    // ###      ##   # #  #      ##   ###    #     # #  ###    #  #  ###    
+    //                     ###                                              
+    /**
+     * Tasks to perform while the room is in stage 1.
+     */
+    stage1Tasks() {
+        var room = this.room;
+        
+        super();
+
+        this.tasks.hostiles = Cache.hostilesInRoom(room);
+        this.tasks.keepers = Cache.sourceKeepersInRoom(room);
+    }
+
     //         #                       #     ##                           
     //         #                      ##    #  #                          
     //  ###   ###    ###   ###   ##    #     #    ###    ###  #  #  ###   
@@ -107,6 +126,25 @@ class RoomSource extends RoomMine {
             army.directive = "attack";
             army.success = true;
         }
+    }
+
+    //         #                       ##   ###                #            
+    //         #                      #  #   #                 #            
+    //  ###   ###    ###   ###   ##      #   #     ###   ###   # #    ###   
+    // ##      #    #  #  #  #  # ##    #    #    #  #  ##     ##    ##     
+    //   ##    #    # ##   ##   ##     #     #    # ##    ##   # #     ##   
+    // ###      ##   # #  #      ##   ####   #     # #  ###    #  #  ###    
+    //                     ###                                              
+    /**
+     * Tasks to perform while the room is in stage 2.
+     */
+    stage2Tasks() {
+        var room = this.room;
+        
+        super();
+
+        this.tasks.hostiles = Cache.hostilesInRoom(room);
+        this.tasks.keepers = Cache.sourceKeepersInRoom(room);
     }
 
     //         #                       ##    ##                           

@@ -1,9 +1,6 @@
-var Assign = require("assign"),
+const Assign = require("assign"),
     Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskHarvest = require("task.harvest"),
-    TaskPickupResource = require("task.pickupResource"),
-    TaskRally = require("task.rally");
+    Utilities = require("utilities");
 
 //  ####           ##            ###           ##     ##                   #                  
 //  #   #           #           #   #           #      #                   #                  

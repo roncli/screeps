@@ -58,7 +58,7 @@ class Assign {
             } else {
                 let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
                 
-                // Rally towards the most hurt creep.
+                // Rally towards the first creep.
                 task = new TaskRally(firstCreep.id);
 
                 // If there are any creeps within 1 range, attack them.
@@ -81,8 +81,45 @@ class Assign {
     // # ##   #     #    # ##  #     # #    #    #  #  ## #  #  #  # ##  #  #  #     # ##  #  #   #    
     //  # #    ##    ##   # #   ##   #  #  ###   #  #   ##    ###   # #   ###  #      # #  #  #    ##  
     //                                                    #                                            
-    static attackInQuadrant(creeps, hostiles, say) {
+    /**
+     * Assigns creeps to attack other creeps in a quadrant of a room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToAttack The list of creeps to attack.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static attackInQuadrant(creeps, creepsToAttack, say) {
+        var firstCreep;
 
+        // Bail if there are no creeps to heal.
+        if (!creepsToAttack || creepsToAttack.length === 0) {
+            return;
+        }
+        
+        _.forEach(creeps, (creep) => {
+            var task;
+
+            firstCreep = _.filter(creepsToAttack, (c) => Utilities.checkQuadrant(c.pos, creep.memory.quadrant))[0];
+            
+            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+                // Attack the first creep when in range.
+                task = new TaskMeleeAttack(firstCreep.id);
+            } else {
+                let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
+                
+                // Rally towards the first creep.
+                task = new TaskRally(firstCreep.id);
+
+                // If there are any creeps within 1 range, attack them.
+                if (closeCreeps.length > 0) {
+                    task.attack = closeCreeps[0].id;
+                }
+            }
+            
+            if (task.canAssign(creep)) {
+                creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
     }
 
     // #            #    ##       #  
@@ -533,8 +570,13 @@ class Assign {
      */
     static moveToRoom(creeps, roomName, say) {
         _.forEach(creeps, (creep) => {
-            var portals = creep.memory.portals,
-                task;
+            var portals, task;
+
+            if (creep.room.name === roomName) {
+                return;
+            }
+
+            portals = creep.memory.portals;
             
             // If the creep was trying to go through a portal and is no longer in origin room, assume the portal was successful and remove the origin room from the portals array.
             if (creep.memory.portaling && portals[0] !== creep.room.name) {
@@ -569,7 +611,16 @@ class Assign {
     // #  #   ##    #     ##    #     ##    ##    ##    ###  #      ##    ##   #  #   ##    ##   ###    ##   #     
     //                                                                                           #                 
     static moveToSourceKeeper(creeps, keepers) {
-        
+        _.creeps.forEach((creep) => {
+            _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
+                var task = new TaskRally(keeper.id, creep);
+                task.range = 1;
+                if (task.canAssign(creep)) {
+                    creep.memory.currentTask.priority = Game.time;
+                    return false;
+                }
+            });
+        });
     }
 
     //        #          #                 ###                                                     

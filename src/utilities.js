@@ -278,6 +278,20 @@ class Utilities {
         }
         return "";
     }
+
+    static checkQuadrant(pos, quadrant) {
+        switch (quadrant) {
+            case 0:
+            default:
+                return pos.x < 25 && pos.y < 25;
+            case 1:
+                return pos.x < 25 && pos.y >= 25;
+            case 2:
+                return pos.x >= 25 && pos.y >= 25;
+            case 3:
+                return pos.x >= 25 && pos.y < 25;
+        }
+    }
 }
 
 if (Memory.profiling) {

@@ -179,20 +179,76 @@ class Cache {
      * @return {Creep[]} The hostiles in the room.
      */
     static hostilesInRoom(room) {
-        var hostiles, memory;
+        var hostiles, memory, threat;
 
         if (!room || room.unobservable) {
             return [];
         }
 
         hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
-        memory = room.memory;
+        memory = room.memory,
+        threat = _.groupBy(_.map(hostiles, (h) => ({id: h.id, threat: _.reduce(h.body, (total, bodypart) => {
+            var threat,
+                boosts;
 
-        if (!memory.hostiles) {
-            memory.hostiles = [];
+            switch (bodypart.type) {
+                case ATTACK:
+                case RANGED_ATTACK:
+                case HEAL:
+                case WORK:
+                case TOUGH:
+                    threat = BODYPART_COST[bodypart.type];
+                    break;
+                default:
+                    return total;
+            }
+
+            boosts = BOOSTS[bodypart.type];
+
+            if (bodypart.boost && boosts && boosts[bodypart.boost]) {
+                let boost = boosts[bodypart.boost];
+
+                switch (bodypart.type) {
+                    case ATTACK:
+                        if (boost.attack) {
+                            threat *= boost.attack;
+                        }
+                        break;
+                    case RANGED_ATTACK:
+                        if (boost.rangedAttack) {
+                            threat *= boost.rangedAttack;
+                        }
+                        break;
+                    case HEAL:
+                        if (boost.heal) {
+                            threat *= boost.heal;
+                        }
+                        break;
+                    case WORK:
+                        if (boost.dismantle) {
+                            threat *= boost.dismantle;
+                        }
+                        break;
+                    case TOUGH:
+                        if (boost.damage) {
+                            threat /= boost.damage;
+                        }
+                        break;
+                }
+            }
+
+            return total + threat;
+        })}), 0), (value) => value.id);
+
+        hostiles.sort((a, b) => threat[b.id].threat - threat[a.id].threat);
+
+        if (memory) {
+            if (!memory.hostiles) {
+                memory.hostiles = [];
+            }
+
+            memory.hostiles = _.map(hostiles, (h) => h.id);
         }
-
-        memory.hostiles = _.map(hostiles, (h) => h.id);
 
         return hostiles;
     }

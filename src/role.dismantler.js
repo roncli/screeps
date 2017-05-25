@@ -96,14 +96,15 @@ class RoleDismantler {
             roomName = room.name,
             creeps = Cache.creeps[roomName],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.dismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            allCreeps = creeps && creeps.all || [];
+            allCreeps = creeps && creeps.all || [],
+            tasks = engine.tasks;
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for construction sites.
-        Assign.buildInRoom(creepsWithNoTask, allCreeps, engine.tasks.constructionSites, "Build");
+        Assign.buildInRoom(creepsWithNoTask, allCreeps, tasks.constructionSites, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -127,7 +128,7 @@ class RoleDismantler {
         }
 
         // Check for unfilled storage for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, room.storage, engine.tasks.storageResourcesNeeded, "Storage");
+        Assign.fillWithMinerals(creepsWithNoTask, room.storage, tasks.storageResourcesNeeded, "Storage");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -151,7 +152,7 @@ class RoleDismantler {
         }
 
         // Check for dropped resources in current room if there are no hostiles.
-        Assign.pickupResources(creepsWithNoTask, allCreeps, engine.tasks.hostiles, "Pickup");
+        Assign.pickupResources(creepsWithNoTask, allCreeps, tasks.hostiles, "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

@@ -86,10 +86,11 @@ class RoleDefender {
     static assignTasks(engine) {
         var roomName = engine.room.name,
             creeps = Cache.creeps[roomName],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.defender || []), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.defender || []), (c) => !c.spawning),
+            tasks = engine.tasks;
 
         // If there is a hostile in the quadrant, attack it.
-        Assign.attackInQuadrant(creepsWithNoTask, engine.tasks.hostiles, "Die!");
+        Assign.attackInQuadrant(creepsWithNoTask, tasks.hostiles, "Die!");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -97,7 +98,7 @@ class RoleDefender {
         }
 
         // If there is a source keeper in the quadrant under 200 ticks, move towards it.
-        Assign.moveToSourceKeeper(creepsWithNoTask, engine.tasks.keepers);
+        Assign.moveToSourceKeeper(creepsWithNoTask, tasks.keepers);
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

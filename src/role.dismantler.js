@@ -103,7 +103,7 @@ class RoleDismantler {
         }
 
         // Check for construction sites.
-        Assign.build(creepsWithNoTask, allCreeps, engine.tasks.constructionSites, "Build");
+        Assign.buildInRoom(creepsWithNoTask, allCreeps, engine.tasks.constructionSites, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -127,56 +127,25 @@ class RoleDismantler {
         }
 
         // Check for unfilled storage for minerals.
-        _.forEach(tasks.fillMinerals.storageTasks, (task) => {
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say("Storage");
-                    assigned.push(creep.name);
-                }
-            });
+        Assign.fillWithMinerals(creepsWithNoTask, room.storage, engine.tasks.storageResourcesNeeded, "Storage");
 
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled terminals for minerals.
-        _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say("Terminal");
-                    assigned.push(creep.name);
-                }
-            });
+        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, undefined, "Terminal");
 
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for structures needing dismantling.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-            _.forEach(tasks.dismantle.tasks, (task) => {
-                if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
-                    return;
-                }
-                if (task.canAssign(creep)) {
-                    creep.say("Dismantle");
-                    assigned.push(creep.name);
-                    return false;
-                }
-            });
-        });
+        Assign.dismantleTargets(creepsWithNoTask, room, "Dismantle");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }

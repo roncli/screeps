@@ -22,7 +22,7 @@ class FillMinerals {
         }
     
         // Can't assign if the creep isn't carrying any of the requested resources.
-        if (this.resources && _.intersection(_.keys(this.resources), _.filter(_.keys(creep.carry), (c) => c !== RESOURCE_ENERGY && creep.carry[c])).length === 0) {
+        if (this.resources && _.intersection(Object.keys(this.resources), _.filter(Object.keys(creep.carry), (c) => c !== RESOURCE_ENERGY && creep.carry[c])).length === 0) {
             return false;
         }
     
@@ -52,14 +52,14 @@ class FillMinerals {
         }
     
         // The container is full, complete.
-        if (obj.storeCapacity && _.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0 || (_.sum(obj.store) || 0) === obj.storeCapacity) {
+        if (obj.storeCapacity && _.filter(Object.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0 || (_.sum(obj.store) || 0) === obj.storeCapacity) {
             delete creep.memory.currentTask;
             return true;
         }
     
         if (!this.resources) {
             // Get the resource we're going to use.
-            minerals = _.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0);
+            minerals = _.filter(Object.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0);
     
             // We're out of minerals, complete task.
             if (minerals.length === 0) {
@@ -71,13 +71,13 @@ class FillMinerals {
             Pathing.moveTo(creep, obj, 1);
             if (creep.transfer(obj, minerals[0]) === OK) {
                 // If we are out of minerals, complete task.
-                if (_.filter(_.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
+                if (_.filter(Object.keys(creep.carry), (m) => m !== RESOURCE_ENERGY && creep.carry[m] > 0).length === 0) {
                     delete creep.memory.currentTask;
                 }
             }
         } else {
             // Get the resource we're going to use.
-            minerals = _.intersection(_.keys(this.resources), _.filter(_.keys(creep.carry), (c) => creep.carry[c])).sort((a, b) => {
+            minerals = _.intersection(Object.keys(this.resources), _.filter(Object.keys(creep.carry), (c) => creep.carry[c])).sort((a, b) => {
                 var ra = this.resources[a],
                     rb = this.resources[b];
                 if (ra === rb) {
@@ -168,7 +168,7 @@ class FillMinerals {
         // If the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
         if (storage && storage.my && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
             resources = {};
-            _.forEach(_.keys(Memory.reserveMinerals), (resource) => {
+            _.forEach(Object.keys(Memory.reserveMinerals), (resource) => {
                 var amount = (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - (store[resource] || 0);
                 if (amount > 0) {
                     resources[resource] = amount;

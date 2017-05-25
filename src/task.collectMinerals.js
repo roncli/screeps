@@ -66,7 +66,7 @@ class CollectMinerals {
         } else if (resource) {
             minerals = [resource];
         } else {
-            minerals = _.filter(_.keys(objStore), (m) => m !== RESOURCE_ENERGY && objStore[m] > 0);
+            minerals = _.filter(Object.keys(objStore), (m) => m !== RESOURCE_ENERGY && objStore[m] > 0);
         }
     
         // We're out of minerals, complete task.
@@ -115,7 +115,7 @@ class CollectMinerals {
     }
     
     static getStorerTasks(room) {
-        return _.map(_.filter(Cache.containersInRoom(room), (c) => _.filter(_.keys(c.store), (m) => m !== RESOURCE_ENERGY && c.store[m] >= 500).length > 0).sort((a, b) => _.sum(b.store) - _.sum(a.store)), (c) => new CollectMinerals(c.id));
+        return _.map(_.filter(Cache.containersInRoom(room), (c) => _.filter(Object.keys(c.store), (m) => m !== RESOURCE_ENERGY && c.store[m] >= 500).length > 0).sort((a, b) => _.sum(b.store) - _.sum(a.store)), (c) => new CollectMinerals(c.id));
     }
     
     static getCleanupTasks(structures) {

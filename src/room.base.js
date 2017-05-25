@@ -342,7 +342,7 @@ class RoomBase extends RoomEngine {
                     }
 
                     // Check edgeTicks, if any are over 50, spawn an army for that room, or update it if one already exists.
-                    _.forEach(_.keys(exits), (dir) => {
+                    _.forEach(Object.keys(exits), (dir) => {
                         var dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
                         if (!Memory.army[dirArmyName] && edgeTicks[dir] >= 50) {
                             Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
@@ -658,11 +658,12 @@ class RoomBase extends RoomEngine {
         var room = this.room,
             roomName = room.name,
             creeps = Cache.creeps[roomName],
+            storage = room.storage,
             terminal = room.terminal,
             dismantle = Memory.dismantle,
             terminalEnergy = 0,
             storageEnergy = 0,
-            terminalId,
+            terminalId, store,
 
             workerList = creeps && creeps.worker || [],
             workersWithEnergy = _.filter(workerList, (c) => (!c.memory.currentTask || c.memory.currentTask.unimportant) && c.carry[RESOURCE_ENERGY] > 0).length > 0,
@@ -799,6 +800,20 @@ class RoomBase extends RoomEngine {
             structuresWithEnergy: [...(room.storage ? [room.storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
             towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < towerCapacity)
         };
+
+        // If the room only has storage and no terminal, minerals go to storage.
+        // Otherwise, if the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
+        if (storage && storage.my && (!room.terminal || !room.terminal.my)) {
+            this.tasks.storageResourcesNeeded = undefined;
+        } else if (storage && storage.my && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
+            this.tasks.storageResourcesNeeded = {};
+            _.forEach(Object.keys(Memory.reserveMinerals), (resource) => {
+                var amount = (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - (store[resource] || 0);
+                if (amount > 0) {
+                    this.tasks.storageResourcesNeeded[resource] = amount;
+                }
+            });
+        }
 
         return tasks;
     }

@@ -185,7 +185,7 @@ class RoleCollector {
         }
 
         // Check for construction sites.
-        Assign.build(creepsWithNoTask, allCreeps, engine.tasks.constructionSites, "Build");
+        Assign.buildInRoom(creepsWithNoTask, allCreeps, engine.tasks.constructionSites, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

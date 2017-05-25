@@ -5,6 +5,7 @@ const Cache = require("cache"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskDismantle = require("task.dismantle"),
     TaskFillEnergy = require("task.fillEnergy"),
+    TaskFillMinerals = require("task.fillMinerals"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
     TaskMeleeAttack = require("task.meleeAttack"),
@@ -122,12 +123,12 @@ class Assign {
         });
     }
 
-    // #            #    ##       #  
-    // #                  #       #  
-    // ###   #  #  ##     #     ###  
-    // #  #  #  #   #     #    #  #  
-    // #  #  #  #   #     #    #  #  
-    // ###    ###  ###   ###    ###  
+    // #            #    ##       #  ###         ###                     
+    // #                  #       #   #          #  #                    
+    // ###   #  #  ##     #     ###   #    ###   #  #   ##    ##   # #   
+    // #  #  #  #   #     #    #  #   #    #  #  ###   #  #  #  #  ####  
+    // #  #  #  #   #     #    #  #   #    #  #  # #   #  #  #  #  #  #  
+    // ###    ###  ###   ###    ###  ###   #  #  #  #   ##    ##   #  #  
     /**
      * Assigns creeps to build structures.
      * @param {Creep[]} creeps The creeps to assign this task to.
@@ -135,7 +136,7 @@ class Assign {
      * @param {ConstructionSite[]} sites The construction sites to build.
      * @param {string} say Text to say on successful assignment.
      */
-    static build(creeps, allCreeps, sites, say) {
+    static buildInRoom(creeps, allCreeps, sites, say) {
         if (!sites || sites.length === 0) {
             return;
         }
@@ -289,6 +290,57 @@ class Assign {
                 }
             });
         }
+    }
+
+    //    #   #                              #    ##          ###                            #           
+    //    #                                  #     #           #                             #           
+    //  ###  ##     ###   # #    ###  ###   ###    #     ##    #     ###  ###    ###   ##   ###    ###   
+    // #  #   #    ##     ####  #  #  #  #   #     #    # ##   #    #  #  #  #  #  #  # ##   #    ##     
+    // #  #   #      ##   #  #  # ##  #  #   #     #    ##     #    # ##  #      ##   ##     #      ##   
+    //  ###  ###   ###    #  #   # #  #  #    ##  ###    ##    #     # #  #     #      ##     ##  ###    
+    //                                                                           ###                     
+    /**
+     * Assigns creeps to dismantle targets in a room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Room} room The room to dismantle targets in.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static dismantleTargets(creeps, room, say) {
+        var dismantle = Memory.dismantle,
+            roomName = room.name,
+            convert = () => {
+                _.forEach(creeps, (creep) => {
+                    var memory = creep.memory;
+
+                    memory.role = "worker";
+                    memory.container = Cache.containersInRoom(memory.supportRoom)[0].id;
+                    delete Cache.creepTasks[creep.name];
+                });
+            };
+
+        if (!dismantle || !dismantle[roomName] || !dismantle[roomName].length === 0) {
+            convert();
+            return;
+        }
+
+        while (dismantle[roomName].length > 0) {
+            let pos = dismantle[roomName][0],
+                structures = _.filter(room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y), (s) => s.hits);
+
+            if (structures.length === 0) {
+                dismantle[roomName].shift();
+                continue;
+            }
+
+            _.forEach(creeps, (creep) => {
+                if (new TaskDismantle(structures[0].id).canAssign(creep)) {
+                    creep.say(say);
+                }
+            });
+            return;
+        }
+
+        convert();
     }
     
     //                                 #    
@@ -490,6 +542,31 @@ class Assign {
                     return false;
                 }
             });
+        });
+    }
+
+    //   #    #    ##    ##    #  #   #     #    #     #  #   #                            ##           
+    //  # #         #     #    #  #         #    #     ####                                 #           
+    //  #    ##     #     #    #  #  ##    ###   ###   ####  ##    ###    ##   ###    ###   #     ###   
+    // ###    #     #     #    ####   #     #    #  #  #  #   #    #  #  # ##  #  #  #  #   #    ##     
+    //  #     #     #     #    ####   #     #    #  #  #  #   #    #  #  ##    #     # ##   #      ##   
+    //  #    ###   ###   ###   #  #  ###     ##  #  #  #  #  ###   #  #   ##   #      # #  ###   ###    
+    /**
+     * Assign creeps to fill a structure with minerals.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Structure} structure The structure to fill with minerals.
+     * @param {object} resourcesNeeded An object with the resources needed by the structure.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillWithMinerals(creeps, structure, resourcesNeeded, say) {
+        if (!structure) {
+            return;
+        }
+
+        _.forEach(creeps, (creep) => {
+            if (new TaskFillMinerals(structure.id, resourcesNeeded).canAssign(creep)) {
+                creep.say(say);
+            }
         });
     }
 

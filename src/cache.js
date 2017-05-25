@@ -34,6 +34,7 @@ class Cache {
         this.repairableStructures = {};
         this.resources = {};
         this.sortedRepairableStructures = {};
+        this.sortedResources = {};
         this.sourceKeepers = {};
         this.spawns = {};
         this.towers = {};
@@ -376,6 +377,29 @@ class Cache {
      */
     static sortedRepairableStructuresInRoom(room) {
         return this.sortedRepairableStructures[room.name] ? this.sortedRepairableStructures[room.name] : this.sortedRepairableStructures[room.name] = this.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
+    }
+
+    //                     #             #  ###                                                     ###         ###                     
+    //                     #             #  #  #                                                     #          #  #                    
+    //  ###    ##   ###   ###    ##    ###  #  #   ##    ###    ##   #  #  ###    ##    ##    ###    #    ###   #  #   ##    ##   # #   
+    // ##     #  #  #  #   #    # ##  #  #  ###   # ##  ##     #  #  #  #  #  #  #     # ##  ##      #    #  #  ###   #  #  #  #  ####  
+    //   ##   #  #  #      #    ##    #  #  # #   ##      ##   #  #  #  #  #     #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
+    // ###     ##   #       ##   ##    ###  #  #   ##   ###     ##    ###  #      ##    ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    /**
+     * Caches resources in a room, sorted by whether it's a mineral and then by amount.
+     * @param {Room} room The room to cache for.
+     * @return {Resource[]} The resources in the room.
+     */
+    static sortedResourcesInRoom(room) {
+        return this.sortedResources[room.name] ? this.sortedResources[room.name] : this.sortedResources[room.name] = room.room.find(FIND_DROPPED_RESOURCES).sort((a, b) => {
+            if (a.resourceType === RESOURCE_ENERGY && b.resourceType !== RESOURCE_ENERGY) {
+                return 1;
+            }
+            if (a.resourceType !== RESOURCE_ENERGY && b.resourceType === RESOURCE_ENERGY) {
+                return -1;
+            }
+            return b.amount - a.amount;
+        });
     }
 
     //                                      #  #                                       ###         ###                     

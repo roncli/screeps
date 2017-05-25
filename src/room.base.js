@@ -793,16 +793,8 @@ class RoomBase extends RoomEngine {
             constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES).sort((a, b) => a.progressTotal === 1 ? 0 : 1 - (b.progressTotal === 1 ? 0 : 1)),
             criticalRepairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5),
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
+            hostiles: Cache.hostilesInRoom(room),
             repairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
-            resources: room.find(FIND_DROPPED_RESOURCES).sort((a, b) => {
-                if (a.resourceType === RESOURCE_ENERGY && b.resourceType !== RESOURCE_ENERGY) {
-                    return 1;
-                }
-                if (a.resourceType !== RESOURCE_ENERGY && b.resourceType === RESOURCE_ENERGY) {
-                    return -1;
-                }
-                return b.amount - a.amount;
-            }),
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
             structuresWithEnergy: [...(room.storage ? [room.storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
             towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < towerCapacity)

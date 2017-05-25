@@ -383,20 +383,72 @@ class Assign {
         });
     }
 
-    //   #    #    ##    ##    ###                                  
-    //  # #         #     #     #                                   
-    //  #    ##     #     #     #     ##   #  #   ##   ###    ###   
-    // ###    #     #     #     #    #  #  #  #  # ##  #  #  ##     
-    //  #     #     #     #     #    #  #  ####  ##    #       ##   
-    //  #    ###   ###   ###    #     ##   ####   ##   #     ###    
+    //   #    #    ##    ##     ##    #                                  #  #   #     #    #     ####                                
+    //  # #         #     #    #  #   #                                  #  #         #    #     #                                   
+    //  #    ##     #     #     #    ###    ##   ###    ###   ###   ##   #  #  ##    ###   ###   ###   ###    ##   ###    ###  #  #  
+    // ###    #     #     #      #    #    #  #  #  #  #  #  #  #  # ##  ####   #     #    #  #  #     #  #  # ##  #  #  #  #  #  #  
+    //  #     #     #     #    #  #   #    #  #  #     # ##   ##   ##    ####   #     #    #  #  #     #  #  ##    #      ##    # #  
+    //  #    ###   ###   ###    ##     ##   ##   #      # #  #      ##   #  #  ###     ##  #  #  ####  #  #   ##   #     #       #   
+    //                                                        ###                                                         ###   #    
     /**
-     * Assings creeps to fill towers.
+     * Assigns creeps to fill storage with energy.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {Room} room The room to check for storage.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillStorageWithEnergy(creeps, allCreeps, room, say) {
+        if (!room || !room.storage) {
+            return;
+        }
+
+        _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+            if (new TaskFillEnergy(room.storage.id).canAssign(creep)) {
+                creep.say(say);
+            }
+        });
+    }
+
+    //   #    #    ##    ##    ###                      #                ##    
+    //  # #         #     #     #                                         #    
+    //  #    ##     #     #     #     ##   ###   # #   ##    ###    ###   #    
+    // ###    #     #     #     #    # ##  #  #  ####   #    #  #  #  #   #    
+    //  #     #     #     #     #    ##    #     #  #   #    #  #  # ##   #    
+    //  #    ###   ###   ###    #     ##   #     #  #  ###   #  #   # #  ###   
+    /**
+     * Assigns creeps to fill a terminal.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {Room} room The room to check for a terminal.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillTerminal(creeps, allCreeps, room, say) {
+        if (!room || !room.terminal) {
+            return;
+        }
+
+        _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+            if (new TaskFillEnergy(room.terminal.id).canAssign(creep)) {
+                creep.say(say);
+            }
+        });
+    }
+
+    //   #    #    ##    ##    ###                                  #  #   #     #    #     ####                                
+    //  # #         #     #     #                                   #  #         #    #     #                                   
+    //  #    ##     #     #     #     ##   #  #   ##   ###    ###   #  #  ##    ###   ###   ###   ###    ##   ###    ###  #  #  
+    // ###    #     #     #     #    #  #  #  #  # ##  #  #  ##     ####   #     #    #  #  #     #  #  # ##  #  #  #  #  #  #  
+    //  #     #     #     #     #    #  #  ####  ##    #       ##   ####   #     #    #  #  #     #  #  ##    #      ##    # #  
+    //  #    ###   ###   ###    #     ##   ####   ##   #     ###    #  #  ###     ##  #  #  ####  #  #   ##   #     #       #   
+    //                                                                                                               ###   #    
+    /**
+     * Assings creeps to fill towers with energy.
      * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {Creep[]} allCreeps All creeps.
      * @param {StructureTower[]} towers The towers to fill.
      * @param {string} say Text to say on successful assignment.
      */
-    static fillTowers(creeps, allCreeps, towers, say) {
+    static fillTowersWithEnergy(creeps, allCreeps, towers, say) {
         if (!towers || towers.length === 0) {
             return;
         }
@@ -408,6 +460,34 @@ class Assign {
                         creep.say(say);
                         return false;
                     }
+                }
+            });
+        });
+    }
+
+    //   #    #    ##    ##    #  #   #     #    #     ####                                
+    //  # #         #     #    #  #         #    #     #                                   
+    //  #    ##     #     #    #  #  ##    ###   ###   ###   ###    ##   ###    ###  #  #  
+    // ###    #     #     #    ####   #     #    #  #  #     #  #  # ##  #  #  #  #  #  #  
+    //  #     #     #     #    ####   #     #    #  #  #     #  #  ##    #      ##    # #  
+    //  #    ###   ###   ###   #  #  ###     ##  #  #  ####  #  #   ##   #     #       #   
+    //                                                                          ###   #    
+    /**
+     * Assigns creeps to fill structures with energy.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Structure[]} structures The structures to fill.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static fillWithEnergy(creeps, structures, say) {
+        if (!structures || structures.length === 0) {
+            return;
+        }
+
+        _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
+            _.forEach(structures, (structure) => {
+                if (new TaskFillEnergy(structure.id).canAssign(creep)) {
+                    creep.say(say);
+                    return false;
                 }
             });
         });
@@ -512,6 +592,22 @@ class Assign {
                 creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
             }
+        });
+    }
+
+    //                         ###         #  #                    ###                     
+    //                          #          #  #                    #  #                    
+    // # #    ##   # #    ##    #     ##   ####   ##   # #    ##   #  #   ##    ##   # #   
+    // ####  #  #  # #   # ##   #    #  #  #  #  #  #  ####  # ##  ###   #  #  #  #  ####  
+    // #  #  #  #  # #   ##     #    #  #  #  #  #  #  #  #  ##    # #   #  #  #  #  #  #  
+    // #  #   ##    #     ##    #     ##   #  #   ##   #  #   ##   #  #   ##    ##   #  #  
+    /**
+     * Assigns all creeps to rally to their home room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     */
+    static moveToHomeRoom(creeps) {
+        _.forEach(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (creep) => {
+            new TaskRally(creep.memory.home).canAssign(creep);
         });
     }
 
@@ -634,15 +730,17 @@ class Assign {
      * Assigns creeps to pickup resources in the room.
      * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {Creep[]} allCreeps All creeps.
-     * @param {Resource[]} resources The resources to pick up.
+     * @param {Creep[]} hostiles Hostile creeps.
      * @param {string} say Text to say on successful assignment.
      */
-    static pickupResources(creeps, allCreeps, resources, say) {
-        if (!resources || resources.length === 0) {
+    static pickupResources(creeps, allCreeps, hostiles, say) {
+        if (hostiles && hostiles.length > 0) {
             return;
         }
 
         _.forEach(creeps, (creep) => {
+            var resources = Cache.sortedResourcesInRoom(creep.room);
+
             _.forEach(_.filter(resources, (r) => r.amount > creep.pos.getRangeTo(r)), (resource) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === resource.id).length > 0) {
                     return;

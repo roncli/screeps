@@ -138,7 +138,7 @@ class RoleCollector {
             creeps = Cache.creeps[roomName],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.collector || []), (c) => !c.spawning),
             controller = room.controller,
-            allCreeps = Cache.creeps[roomName] && Cache.creeps[roomName].all || [];
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -209,7 +209,7 @@ class RoleCollector {
         }
 
         // Check for dropped resources in current room if there are no hostiles.
-        Assign.pickupResources(creepsWithNoTask, allCreeps, engine.tasks.resources, "Pickup");
+        Assign.pickupResources(creepsWithNoTask, allCreeps, engine.tasks.hostiles, "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

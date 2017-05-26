@@ -9,6 +9,7 @@ const Cache = require("cache"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
+    TaskMine = require("task.mine"),
     TaskMeleeAttack = require("task.meleeAttack"),
     TaskPickupResource = require("task.pickupResource"),
     TaskRally = require("task.rally"),
@@ -706,6 +707,25 @@ class Assign {
             
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
+                creep.say(say);
+            }
+        });
+    }
+
+    //        #                
+    //                         
+    // # #   ##    ###    ##   
+    // ####   #    #  #  # ##  
+    // #  #   #    #  #  ##    
+    // #  #  ###   #  #   ##   
+    /**
+     * Assigns all creeps to mine.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static mine(creeps, say) {
+        _.forEach(creeps, (creep) => {
+            if (new TaskMine().canAssign(creep)) {
                 creep.say(say);
             }
         });

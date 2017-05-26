@@ -1,7 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskMine = require("task.mine"),
-    TaskRally = require("task.rally");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           #   #    #                        
 //  #   #           #           #   #                             
@@ -125,36 +124,35 @@ class RoleMiner {
         };
     }
 
-    static assignTasks(room) {
-        var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].miner || []),
-            assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var roomName = engine.room.name,
+            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].miner || []);
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // If not yet boosted, go get boosts.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-            var task = new TaskRally(creep.memory.labs[0]);
-            task.canAssign(creep);
-            assigned.push(creep.name);
-        });
+        Assign.getBoost(creepsWithNoTask, "Boosting");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to assign mine tasks.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = new TaskMine();
-            if (task.canAssign(creep)) {
-                creep.say("Mining");
-            }
-        });
+        Assign.mine(creepsWithNoTask, "Mining");
     }
 }
 

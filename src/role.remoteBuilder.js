@@ -1,11 +1,6 @@
 const Assign = require("assign"),
     Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskBuild = require("task.build"),
-    TaskHarvest = require("task.harvest"),
-    TaskPickupResource = require("task.pickupResource"),
-    TaskRally = require("task.rally"),
-    TaskRepair = require("task.repair");
+    Utilities = require("utilities");
 
 //  ####           ##           ####                         #            ####            #     ##        #               
 //  #   #           #           #   #                        #             #  #                  #        #               
@@ -97,11 +92,9 @@ class RoleRemoteBuilder {
      * @param {RoomEngine} engine The room engine to assign tasks for.
      */
     static assignTasks(engine) {
-        var roomName = room.name,
-            creeps = Cache.creeps[roomName],
+        var creeps = Cache.creeps[engine.room.name],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            allCreeps = creeps && creeps.all || [],
-            assigned = [];
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -116,7 +109,7 @@ class RoleRemoteBuilder {
         }
 
         // Check critical repairs.
-        Assign.repairStructures(creeps, allCreeps, _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), "CritRepair");
+        Assign.repairStructures(creeps, allCreeps, engine.tasks.criticalRepairableStructures, "CritRepair");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -124,7 +117,7 @@ class RoleRemoteBuilder {
         }
 
         // Check for construction sites.
-        Assign.buildInRoom(creeps, allCreeps, _.filter(Game.constructionSites, (s) => _.map(allCreeps, (c) => c.room.name).indexOf(s.room.name) !== -1), "Build");
+        Assign.buildInCurrentRoom(creeps, allCreeps, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -132,7 +125,7 @@ class RoleRemoteBuilder {
         }
 
         // Check for dropped resources in current room.
-        Assign.pickupResources(creeps, allCreeps, , "Pickup");
+        Assign.pickupResourcesInCurrentRoom(creeps, allCreeps, "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

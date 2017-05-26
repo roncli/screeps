@@ -104,7 +104,7 @@ class RoleDismantler {
         }
 
         // Check for construction sites.
-        Assign.buildInRoom(creepsWithNoTask, allCreeps, tasks.constructionSites, "Build");
+        Assign.build(creepsWithNoTask, allCreeps, tasks.constructionSites, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

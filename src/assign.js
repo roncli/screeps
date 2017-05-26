@@ -125,12 +125,12 @@ class Assign {
         });
     }
 
-    // #            #    ##       #  ###         ###                     
-    // #                  #       #   #          #  #                    
-    // ###   #  #  ##     #     ###   #    ###   #  #   ##    ##   # #   
-    // #  #  #  #   #     #    #  #   #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #   #     #    #  #   #    #  #  # #   #  #  #  #  #  #  
-    // ###    ###  ###   ###    ###  ###   #  #  #  #   ##    ##   #  #  
+    // #            #    ##       #  
+    // #                  #       #  
+    // ###   #  #  ##     #     ###  
+    // #  #  #  #   #     #    #  #  
+    // #  #  #  #   #     #    #  #  
+    // ###    ###  ###   ###    ###  
     /**
      * Assigns creeps to build structures.
      * @param {Creep[]} creeps The creeps to assign this task to.
@@ -138,13 +138,14 @@ class Assign {
      * @param {ConstructionSite[]} sites The construction sites to build.
      * @param {string} say Text to say on successful assignment.
      */
-    static buildInRoom(creeps, allCreeps, sites, say) {
+    static build(creeps, allCreeps, sites, say) {
         if (!sites || sites.length === 0) {
             return;
         }
 
         _.forEach(sites, (site) => {
             var progressMissing = site.progressTotal - site.progress - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === site.id), (c) => c.carry[RESOURCE_ENERGY]));
+
             if (progressMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creeps, site), (creep) => {
                     if (new TaskBuild(site.id).canAssign(creep)) {
@@ -156,6 +157,44 @@ class Assign {
                     }
                 });
             }
+        });
+    }
+
+    // #            #    ##       #  ###          ##                                  #    ###                     
+    // #                  #       #   #          #  #                                 #    #  #                    
+    // ###   #  #  ##     #     ###   #    ###   #     #  #  ###   ###    ##   ###   ###   #  #   ##    ##   # #   
+    // #  #  #  #   #     #    #  #   #    #  #  #     #  #  #  #  #  #  # ##  #  #   #    ###   #  #  #  #  ####  
+    // #  #  #  #   #     #    #  #   #    #  #  #  #  #  #  #     #     ##    #  #   #    # #   #  #  #  #  #  #  
+    // ###    ###  ###   ###    ###  ###   #  #   ##    ###  #     #      ##   #  #    ##  #  #   ##    ##   #  #  
+    /**
+     * Assigns creeps to build structures in their current room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static buildInCurrentRoom(creeps, allCreeps, say) {
+        var creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
+
+        _.forEach(Object.keys(creepsByRoom), (roomName) => {
+            var sites = _.filter(Game.constructionSites, (s) => s.room.name === roomName), // TODO: Cache construction sites by room.
+                creepsInRoom = creepsByRoom[roomName];
+
+            _.forEach(sites, (site) => {
+                var progressMissing = site.progressTotal - site.progress - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === site.id), (c) => c.carry[RESOURCE_ENERGY]));
+
+                if (progressMissing > 0) {
+                    _.forEach(Utilities.objectsClosestToObj(creepsInRoom, site), (creep) => {
+                        if (new TaskBuild(site.id).canAssign(creep)) {
+                            creep.say(say);
+                            progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
+                            _.remove(creepsInRoom, (c) => c.id === creep.id);
+                            if (progressMissing <= 0) {
+                                return false;
+                            }
+                        }
+                    });
+                }
+            });
         });
     }
 

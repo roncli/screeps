@@ -186,6 +186,11 @@ class RoomMine extends RoomEngine {
 
         // New code!
         this.tasks = {};
+
+        if (!room.unobservable) {
+            this.tasks.criticalRepairableStructures = _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
+            this.tasks.shostileConstructionSites = room.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+        }
         
         return tasks;
     }
@@ -457,6 +462,11 @@ class RoomMine extends RoomEngine {
 
         // New code!
         this.tasks = {};
+
+        if (!room.unobservable) {
+            this.tasks.criticalRepairableStructures = _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
+            this.tasks.shostileConstructionSites = room.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+        }
         
         return tasks;
     }

@@ -4,6 +4,7 @@ const Cache = require("cache"),
     TaskClaim = require("task.claim"),
     TaskCollectEnergy = require("task.collectEnergy"),
     TaskDismantle = require("task.dismantle"),
+    TaskDowngrade = require("task.downgrade"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
     TaskHarvest = require("task.harvest"),
@@ -341,6 +342,44 @@ class Assign {
         }
 
         convert();
+    }
+
+    //    #                                         #         ##                #                ##    ##                
+    //    #                                         #        #  #               #                 #     #                
+    //  ###   ##   #  #  ###    ###  ###    ###   ###   ##   #      ##   ###   ###   ###    ##    #     #     ##   ###   
+    // #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  # ##  #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
+    // #  #  #  #  ####  #  #   ##   #     # ##  #  #  ##    #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
+    //  ###   ##   ####  #  #  #     #      # #   ###   ##    ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
+    //                          ###                                                                                      
+    /**
+     * Assigns creeps to downgrade a controller.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static downgradeController(creeps, say) {
+        _.forEach(creeps, (creep) => {
+            var roomName = creep.memory.downgrade,
+                room = Game.rooms[roomName];
+            
+            if (room) {
+                let controller = room.controller;
+
+                // If there is no controller in the room or it is unowned, remove the key from memory and suicide the creep.
+                if (!controller || !controller.level) {
+                    delete Memory.maxCreeps.downgrader[roomName];
+                    creep.suicide();
+                    return;
+                }
+
+                // We've found the controller, let's go downgrade it.
+                if (new TaskDowngrade(controller.id).canAssign(creep)) {
+                    creep.say(say);
+                }
+            } else {
+                // We can't see the room, so move the creep towards it.
+                this.moveToRoom([creep], roomName, say);
+            }
+        });
     }
     
     //                                 #    

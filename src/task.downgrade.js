@@ -2,14 +2,26 @@ var Cache = require("cache"),
     Pathing = require("pathing");
 
 class Downgrade {
-    constructor() {
+    constructor(controllerId, x, y, roomName) {
+        this.controller = Game.getObjectById(controllerId);
+        if (this.controller) {
+            let pos = this.controller.pos;
+
+            this.x = pos.x;
+            this.y = pos.y;
+            this.roomName = pos.roomName;
+        } else {
+            this.x = x;
+            this.y = y;
+            this.roomName = roomName;
+        }
         this.type = "downgrade";
     }
 
     canAssign(creep) {
-        var controller = creep.room.controller;
+        var controller = this.controller;
 
-        if (creep.spawning || creep.memory.role !== "downgrader" || !controller || controller.level === 0 || creep.getActiveBodyparts(CLAIM) === 0) {
+        if (creep.spawning || creep.memory.role !== "downgrader" || !controller || !controller.level || creep.getActiveBodyparts(CLAIM) === 0) {
             return false;
         }
         
@@ -19,34 +31,30 @@ class Downgrade {
     }
 
     run(creep) {
-        if (!creep.room.controller || creep.room.controller.level === 0 || !creep.getActiveBodyparts(CLAIM) === 0) {
+        if (!creep.room.controller || !creep.room.controller.level || !creep.getActiveBodyparts(CLAIM) === 0) {
             delete creep.memory.currentTask;
             return;
         }
 
         // Move towards the controller and downgrade it.    
-        Pathing.moveTo(creep, creep.room.controller, 1);
+        Pathing.moveTo(creep, new RoomPosition(this.x, this.y, this.roomName), 1);
         creep.attackController(creep.room.controller);
     }
 
     toObj(creep) {
-        if (creep.room.controller) {
-            creep.memory.currentTask = {
-                type: this.type
-            };
-        } else {
-            delete creep.memory.currentTask;
-        }
+        creep.memory.currentTask = {
+            controllerId: this.controller.id,
+            x: this.x,
+            y: this.y,
+            roomName: this.roomName,
+            type: this.type
+        };
     }
 
-    static fromObj() {
-        return new Downgrade();
-    }
+    static fromObj(creep) {
+        var task = creep.memory.currentTask;
 
-    static getTask(creep) {
-        if (creep.room.controller) {
-            return new Downgrade();
-        }
+        return new Downgrade(task.controllerId, task.x, task.y, task.roomName);
     }
 }
 

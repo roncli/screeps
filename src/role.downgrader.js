@@ -1,7 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskRally = require("task.rally"),
-    TaskDowngrade = require("task.downgrade");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           ####                                                 #               
 //  #   #           #            #  #                                                #               
@@ -48,7 +47,7 @@ class RoleDowngrader {
         // Loop through the room downgraders to see if we need to spawn a creep.
         if (downgrader) {
             _.forEach(downgrader[roomName], (value, toRoom) => {
-                if (_.filter(downgraders, (c) => c.memory.attack === toRoom).length === 0) {
+                if (_.filter(downgraders, (c) => c.memory.downgrade === toRoom).length === 0) {
                     roomToDowngrade = toRoom;
                     return false;
                 }
@@ -88,55 +87,32 @@ class RoleDowngrader {
             memory: {
                 role: "downgrader",
                 home: checkSettings.home,
-                attack: checkSettings.roomToDowngrade
+                downgrade: checkSettings.roomToDowngrade
             }
         };
     }
 
-    static assignTasks(room) {
-        var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].downgrader || []),
-            assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.downgrader || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
-        // If the creeps are not in the room, rally them.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.attack), (creep) => {
-            var task = TaskRally.getClaimerTask(creep);
-            if (task.canAssign(creep)) {
-                assigned.push(creep.name);
-            }
-        });
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // Attack the controller.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = TaskDowngrade.getTask(creep);
-            if (task.canAssign(creep)) {
-                creep.say("Attacking");
-                assigned.push(creep.name);
-            }
-        });
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // Suicide any remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            creep.suicide();
-        });
+        // Downgrade controller.
+        Assign.downgradeController(creepsWithNoTask, "Downgrade");
     }
 }
 

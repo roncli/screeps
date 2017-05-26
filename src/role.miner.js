@@ -137,7 +137,8 @@ class RoleMiner {
      */
     static assignTasks(engine) {
         var roomName = engine.room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].miner || []);
+            creeps = Cache.creeps[roomName],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.miner || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;

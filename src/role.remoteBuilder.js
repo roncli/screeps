@@ -1,4 +1,5 @@
-var Cache = require("cache"),
+const Assign = require("assign"),
+    Cache = require("cache"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
     TaskHarvest = require("task.harvest"),
@@ -84,9 +85,22 @@ class RoleRemoteBuilder {
         };
     }
 
-    static assignTasks(room) {
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
         var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            creeps = Cache.creeps[roomName],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            allCreeps = creeps && creeps.all || [],
             assigned = [];
 
         if (creepsWithNoTask.length === 0) {
@@ -94,117 +108,55 @@ class RoleRemoteBuilder {
         }
 
         // Check for enemy construction sites and rally to them.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === room.name), (creep) => {
-            if (room.find(FIND_HOSTILE_CONSTRUCTION_SITES).length > 0) {
-                var task = new TaskRally(room.find(FIND_HOSTILE_CONSTRUCTION_SITES)[0].id);
-                task.canAssign(creep);
-                creep.say("Stomping");
-                assigned.push(creep.name);
-            }
-        });
+        Assign.stomp(creeps, engine.tasks.hostileConstructionSites, "Stomping");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check critical repairs.
-        _.forEach(creepsWithNoTask, (creep) => {
-            _.forEach(TaskRepair.getCriticalTasks(creep.room), (task) => {
-                if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === task.id).length === 0) {
-                    if (task.canAssign(creep)) {
-                        creep.say("CritRepair");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                }
-            });
-        });
+        Assign.repairStructures(creeps, allCreeps, _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), "CritRepair");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for construction sites.
-        if (!room.unobservable) {
-            _.forEach(creepsWithNoTask, (creep) => {
-                var constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
-                if (constructionSites.length > 0) {
-                    var task = new TaskBuild(Utilities.objectsClosestToObj(constructionSites, creep)[0].id);
-                    if (task.canAssign(creep)) {
-                        creep.say("Build");
-                        assigned.push(creep.name);
-                    }
-                }
-            });
+        Assign.buildInRoom(creeps, allCreeps, _.filter(Game.constructionSites, (s) => _.map(allCreeps, (c) => c.room.name).indexOf(s.room.name) !== -1), "Build");
 
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-
-            if (creepsWithNoTask.length === 0) {
-                return;
-            }
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
         }
-        
+
         // Check for dropped resources in current room.
-        _.forEach(creepsWithNoTask, (creep) => {
-            if (creep.room.name === creep.memory.home) {
-                _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                    if (_.filter(task.resource.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === task.id).length > 0) {
-                        return;
-                    }
-                    if (task.canAssign(creep)) {
-                        creep.say("Pickup");
-                        assigned.push(creep.name);
-                        return false;
-                    }
-                });
-            }
-        });
+        Assign.pickupResources(creeps, allCreeps, , "Pickup");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to assign harvest task to remaining creeps.
-        if (!room.unobservable) {
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskHarvest(),
-                    sources = Utilities.objectsClosestToObj(_.filter(room.find(FIND_SOURCES), (s) => s.energy > 0), creep);
-                
-                if (sources.length === 0) {
-                    return false;
-                }
+        Assign.harvest(creepsWithNoTask, "Harvesting");
 
-                creep.memory.homeSource = sources[0].id;
-
-                if (task.canAssign(creep)) {
-                    creep.say("Harvesting");
-                    assigned.push(creep.name);
-                }
-            });
-        }
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Rally remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = new TaskRally(creep.memory.home);
-            task.canAssign(creep);
-        });
+        Assign.moveToHomeSource(creepsWithNoTask);
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Rally to room.
+        Assign.moveToHomeRoom(creepsWithNoTask);
     }
 }
 

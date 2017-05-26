@@ -1,7 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskHeal = require("task.heal"),
-    TaskRally = require("task.rally");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           #   #                 ##                 
 //  #   #           #           #   #                  #                 
@@ -79,54 +78,45 @@ class RoleHealer {
         };
     }
 
-    static assignTasks(room) {
-        var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].healer || []), (c) => !c.spawning),
-            assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var roomName = engine.room.name,
+            creeps = Cache.creeps[roomName],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.healer || []), (c) => !c.spawning),
+            tasks = engine.tasks;
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
-        // If the creeps are not in the room, rally them.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name !== c.memory.home), (creep) => {
-            var task = TaskRally.getDefenderTask(creep);
-            if (task.canAssign(creep)) {
-                assigned.push(creep.name);
-            }
-        });
+        // Find allies to heal.
+        Assign.heal(creepsWithNoTask, tasks.hurtCreeps, "Heal");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
         
-        // Find allies to heal.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = TaskHeal.getDefenderTask(creep);
-            if (task && task.canAssign(creep)) {
-                creep.say("Heal");
-                assigned.push(creep.name);
-            }
-        });
+        // If there is a source keeper in the quadrant under 200 ticks, move towards it.
+        Assign.moveToSourceKeeper(creepsWithNoTask, tasks.keepers);
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
-        // Rally the troops!
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === c.memory.home), (creep) => {
-            var task = TaskRally.getDefenderTask(creep);
-            task.range = 1;
-            if (task.canAssign(creep)) {
-                assigned.push(creep.name);
-            }
-        });
+        // Rally to the room.
+        Assign.moveToRoom(creepsWithNoTask, roomName);
     }
 }
 

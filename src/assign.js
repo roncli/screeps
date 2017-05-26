@@ -822,7 +822,16 @@ class Assign {
     // #  #  #  #  # #   ##     #    #  #  #  #  #  #  #  #  #     #     ##    # #   ##    ##    #  #  ##    #     
     // #  #   ##    #     ##    #     ##    ##    ##    ###  #      ##    ##   #  #   ##    ##   ###    ##   #     
     //                                                                                           #                 
+    /**
+     * Assigns creeps to move to a source keeper.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {StructureKeeperLair[]} keepers The source keepers to move to.
+     */
     static moveToSourceKeeper(creeps, keepers) {
+        if (!keepers || keepers.length === 0) {
+            return;
+        }
+
         _.creeps.forEach((creep) => {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
                 var task = new TaskRally(keeper.id, creep);

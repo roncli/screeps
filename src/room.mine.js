@@ -136,13 +136,13 @@ class RoomMine extends RoomEngine {
      */
     stage1() {
         // Get tasks.
-        var tasks = this.stage1Tasks();
+        this.stage1Tasks();
 
         // Spawn new creeps.
         this.stage1Spawn();
 
         // Assign tasks to creeps.
-        this.stage1AssignTasks(tasks);
+        this.stage1AssignTasks();
 
         if (!this.room.unobservable) {
             this.stage1Manage();
@@ -189,7 +189,7 @@ class RoomMine extends RoomEngine {
 
         if (!room.unobservable) {
             this.tasks.criticalRepairableStructures = _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
-            this.tasks.shostileConstructionSites = room.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+            this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
         
         return tasks;
@@ -219,19 +219,18 @@ class RoomMine extends RoomEngine {
     //                     ###                                         ###                                        
     /**
      * Assigns tasks to creeps while the room is in stage 1.
-     * @param {object} tasks 
      */
-    stage1AssignTasks(tasks) {
+    stage1AssignTasks() {
         var room = this.room;
 
         if (room.controller) {
-            RoleRemoteReserver.assignTasks(room, tasks);
+            RoleRemoteReserver.assignTasks(this);
         }
-        RoleRemoteBuilder.assignTasks(room);
-        RoleRemoteMiner.assignTasks(room, tasks);
-        RoleRemoteWorker.assignTasks(room, tasks);
-        RoleRemoteStorer.assignTasks(room, tasks);
-        RoleDismantler.assignTasks(room, tasks);
+        RoleRemoteBuilder.assignTasks(this);
+        RoleRemoteMiner.assignTasks(this);
+        RoleRemoteWorker.assignTasks(this);
+        RoleRemoteStorer.assignTasks(this);
+        RoleDismantler.assignTasks(this);
     }
 
     //         #                       #    #  #                                
@@ -341,8 +340,6 @@ class RoomMine extends RoomEngine {
      * Runs the room while it is in stage 2.
      */
     stage2() {
-        var tasks;
-
         // Manage room and bail if it got reset to stage 1.    
         this.stage2Manage();
         this.defend();
@@ -352,7 +349,7 @@ class RoomMine extends RoomEngine {
         }
         
         // Get the tasks needed for this room.
-        tasks = this.stage2Tasks();
+        this.stage2Tasks();
 
         // Spawn new creeps.
         if (!this.room.unobservable) {
@@ -360,7 +357,7 @@ class RoomMine extends RoomEngine {
         }
         
         // Assign tasks to creeps.
-        this.stage2AssignTasks(tasks);
+        this.stage2AssignTasks();
     }
 
     //         #                       ##   #  #                                
@@ -465,7 +462,7 @@ class RoomMine extends RoomEngine {
 
         if (!room.unobservable) {
             this.tasks.criticalRepairableStructures = _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
-            this.tasks.shostileConstructionSites = room.find(FIND_HOSTILE_CONSTRUCTION_SITES);
+            this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
         
         return tasks;
@@ -509,18 +506,17 @@ class RoomMine extends RoomEngine {
     //                     ###                                         ###                                        
     /**
      * Assigns tasks to creeps while the room is in stage 2.
-     * @param {object} tasks 
      */
-    stage2AssignTasks(tasks) {
+    stage2AssignTasks() {
         var room = this.room;
 
         if (room.controller) {
-            RoleRemoteReserver.assignTasks(room, tasks);
+            RoleRemoteReserver.assignTasks(this);
         }
-        RoleRemoteMiner.assignTasks(room, tasks);
-        RoleRemoteWorker.assignTasks(room, tasks);
-        RoleRemoteStorer.assignTasks(room, tasks);
-        RoleDismantler.assignTasks(room, tasks);
+        RoleRemoteMiner.assignTasks(this);
+        RoleRemoteWorker.assignTasks(this);
+        RoleRemoteStorer.assignTasks(this);
+        RoleDismantler.assignTasks(this);
     }
 
     //  #           ##   #       #   

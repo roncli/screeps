@@ -119,14 +119,6 @@ class RoleDismantler {
             return;
         }
 
-        // Check for unfilled containers.
-        Assign.fillWithEnergy(creepsWithNoTask, allCreeps, Cache.containersInRoom(room), "Container");
-
-        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
         // Check for unfilled storage for minerals.
         Assign.fillWithMinerals(creepsWithNoTask, room.storage, tasks.storageResourcesNeeded, "Storage");
 
@@ -143,6 +135,14 @@ class RoleDismantler {
             return;
         }
 
+        // Check for unfilled containers.
+        Assign.fillWithEnergy(creepsWithNoTask, allCreeps, Cache.containersInRoom(room), "Container");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // Check for structures needing dismantling.
         Assign.dismantleTargets(creepsWithNoTask, room, "Dismantle");
 
@@ -152,7 +152,7 @@ class RoleDismantler {
         }
 
         // Check for dropped resources in current room if there are no hostiles.
-        Assign.pickupResources(creepsWithNoTask, allCreeps, tasks.hostiles, "Pickup");
+        Assign.pickupResources(creepsWithNoTask, allCreeps, Cache.resourcesInRoom(room), tasks.hostiles, "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

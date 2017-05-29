@@ -1,7 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskPickupResource = require("task.pickupResource"),
-    TaskRally = require("task.rally");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           ####                         #             ###           ##     ##                   #                  
 //  #   #           #           #   #                        #            #   #           #      #                   #                  
@@ -79,166 +78,87 @@ class RoleRemoteCollector {
         };
     }
 
-    static assignTasks(room, tasks) {
-        var roomName = room.name,
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var roomName = engine.room.name,
             creeps = Cache.creeps[roomName],
             creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteCollector || []),
-            assigned = [];
+            allCreeps = creeps && creeps.all || [],
+            supportRoom = engine.supportRoom,
+            supportEngine = Cache.rooms[supportRoom.name];
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for dropped resources in current room.
-        _.forEach(creepsWithNoTask, (creep) => {
-            _.forEach(TaskPickupResource.getTasks(creep.room), (task) => {
-                if (_.sum(creeps && creeps.all || [], (c) => c.memory.currentTask && c.memory.currentTask.id === task.idG ? c.carryCapacity - _.sum(c.carry) : 0) >= task.resource.amount) {
-                    return;
-                }
-                if (task.canAssign(creep)) {
-                    creep.say("Pickup");
-                    assigned.push(creep.name);
-                    return false;
-                }
-            });
-        });
+        Assign.pickupResourcesInCurrentRoom(creepsWithNoTask, allCreeps, "Pickup");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to get minerals from containers.
-        if (tasks.collectMinerals && tasks.collectMinerals.cleanupTasks) {
-            _.forEach(tasks.collectMinerals.cleanupTasks, (task) => {
-                _.forEach(creepsWithNoTask, (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
+        Assign.collectMinerals(creepsWithNoTask, allCreeps, engine.tasks.mineralStructures, "Collecting");
 
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-            });
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
         }
 
-        if (tasks.collectEnergy && tasks.collectEnergy.cleanupTasks) {
-            // Attempt to get energy from containers.
-            _.forEach(tasks.collectEnergy.cleanupTasks, (task) => {
-                _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Collecting");
-                        assigned.push(creep.name);
-                    }
-                });
+        // Attempt to get energy from containers.
+        Assign.collectEnergy(creepsWithNoTask, allCreeps, engine.tasks.energyStructures, "Collecting");
 
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-
-                if (creepsWithNoTask.length === 0) {
-                    return;
-                }
-            });
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
         }
 
         // Check for unfilled storage.
-        _.forEach(tasks.fillEnergy.storageTasks, (task) => {
-            var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
-            if (energyMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Storage");
-                        assigned.push(creep.name);
-                        energyMissing -= _.sum(creep.carry);
-                        if (energyMissing <= 0) {
-                            return false;
-                        }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+        Assign.fillStorageWithEnergy(creepsWithNoTask, allCreeps, supportRoom, "Storage");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled storage for minerals.
-        _.forEach(tasks.fillMinerals.storageTasks, (task) => {
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say("Storage");
-                    assigned.push(creep.name);
-                }
-            });
+        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.storage, supportEngine.tasks.storageResourcesNeeded, "Storage");
 
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled terminals for minerals.
-        _.forEach(tasks.fillMinerals.terminalTasks, (task) => {
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say("Terminal");
-                    assigned.push(creep.name);
-                }
-            });
+        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.terminal, undefined, "Terminal");
 
-            _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-            assigned = [];
-        });
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for unfilled containers.
-        _.forEach(tasks.fillEnergy.containerTasks, (task) => {
-            var energyMissing = task.object.storeCapacity - _.sum(task.object.store) - _.reduce(_.filter(task.object.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && ["fillEnergy", "fillMinerals"].indexOf(c.memory.currentTask.type) && c.memory.currentTask.id === task.id), function(sum, c) {return sum + _.sum(c.carry);}, 0);
-            if (energyMissing > 0) {
-                _.forEach(Utilities.objectsClosestToObj(creepsWithNoTask, task.object), (creep) => {
-                    if (task.canAssign(creep)) {
-                        creep.say("Container");
-                        assigned.push(creep.name);
-                        energyMissing -= _.sum(creep.carry);
-                        if (energyMissing <= 0) {
-                            return false;
-                        }
-                    }
-                });
-                _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-                assigned = [];
-            }
-        });
+        Assign.fillWithEnergy(creepsWithNoTask, allCreeps, Cache.containersInRoom(supportRoom), "Container");
 
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Rally remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task;
-            
-            if (_.sum(creep.carry) > 0) {
-                task = new TaskRally(creep.memory.supportRoom);
-            } else {
-                task = new TaskRally(creep.memory.home);
-            }
-            task.canAssign(creep);
-        });
+        Assign.moveToHomeOrSupport(creepsWithNoTask);
     }
 }
 

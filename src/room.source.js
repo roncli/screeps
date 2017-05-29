@@ -89,16 +89,15 @@ class RoomSource extends RoomMine {
     //                     ###                                         ###                                        
     /**
      * Assigns tasks to creeps while the room is in stage 1.
-     * @param {object} tasks 
      */
-    stage1AssignTasks(tasks) {
+    stage1AssignTasks() {
         var room = this.room;
 
-        RoleDefender.assignTasks(room, tasks);
-        RoleHealer.assignTasks(room, tasks);
+        RoleDefender.assignTasks(this);
+        RoleHealer.assignTasks(this);
 
         // Call original method.
-        super.stage1AssignTasks(tasks);
+        super.stage1AssignTasks(this);
     }
 
     //    #          #                  #  
@@ -185,18 +184,17 @@ class RoomSource extends RoomMine {
     //                     ###                                         ###                                        
     /**
      * Assigns tasks to creeps while the room is in stage 2.
-     * @param {object} tasks 
      */
-    stage2AssignTasks(tasks) {
+    stage2AssignTasks() {
         var room = this.room;
 
-        RoleDefender.assignTasks(room, tasks);
-        RoleHealer.assignTasks(room, tasks);
+        RoleDefender.assignTasks(this);
+        RoleHealer.assignTasks(this);
 
         // Call original method.
-        super.stage2AssignTasks(tasks);
+        super.stage2AssignTasks();
 
-        RoleRemoteCollector.assignTasks(room, tasks);
+        RoleRemoteCollector.assignTasks(this);
     }
 
     //   #                      ##   #       #   

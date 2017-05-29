@@ -24,6 +24,7 @@ class Cache {
         this.costMatrixes = {};
         this.extensions = {};
         this.extractors = {};
+        this.hostileConstructionSites = {};
         this.hostiles = {};
         this.labs = {};
         this.links = {};
@@ -166,6 +167,21 @@ class Cache {
      */
     static extractorsInRoom(room) {
         return this.extractors[room.name] ? this.extractors[room.name] : this.extractors[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
+    }
+
+    // #                   #     #    ##           ##                       #                       #     #                 ##    #     #                 ###         ###                     
+    // #                   #           #          #  #                      #                       #                      #  #         #                  #          #  #                    
+    // ###    ##    ###   ###   ##     #     ##   #      ##   ###    ###   ###   ###   #  #   ##   ###   ##     ##   ###    #    ##    ###    ##    ###    #    ###   #  #   ##    ##   # #   
+    // #  #  #  #  ##      #     #     #    # ##  #     #  #  #  #  ##      #    #  #  #  #  #      #     #    #  #  #  #    #    #     #    # ##  ##      #    #  #  ###   #  #  #  #  ####  
+    // #  #  #  #    ##    #     #     #    ##    #  #  #  #  #  #    ##    #    #     #  #  #      #     #    #  #  #  #  #  #   #     #    ##      ##    #    #  #  # #   #  #  #  #  #  #  
+    // #  #   ##   ###      ##  ###   ###    ##    ##    ##   #  #  ###      ##  #      ###   ##     ##  ###    ##   #  #   ##   ###     ##   ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    /**
+     * Caches hostile construction sites in a room.  Allies are excluded.
+     * @param {Room} room The room to check for hostile construction sites in.
+     * @return {ConstructionSite[]} The hostile construction sites in the room.
+     */
+    static hostileConstructionSitesInRoom(room) {
+        return this.hostileConstructionSites[room.name] ? this.hostileConstructionSites[room.name] : this.hostileConstructionSites[room.name] = _.filter(room.find(FIND_HOSTILE_CONSTRUCTION_SITES), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
     }
 
     // #                   #     #    ##                 ###         ###                     

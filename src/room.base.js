@@ -102,7 +102,7 @@ class RoomBase extends RoomEngine {
         this.spawn(tasks, _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === memory.region).length > 0);
 
         // Assign tasks to creeps and towers.
-        this.assignTasks(tasks);
+        this.assignTasks();
 
         // Update lab queue if necessary.
         if (storage && Cache.labsInRoom(room).length >= 3 && labQueue && !Utilities.roomLabsArePaused(room)) {
@@ -860,22 +860,19 @@ class RoomBase extends RoomEngine {
     //                            ###                                        
     /**
      * Assigns tasks to creeps.
-     * @param {object} tasks The tasks to assign.
      */
-    assignTasks(tasks) {
-        var room = this.room;
+    assignTasks() {
+        RoleWorker.assignTasks(this);
+        RoleMiner.assignTasks(this);
+        RoleStorer.assignTasks(this);
+        RoleScientist.assignTasks(this);
+        RoleDismantler.assignTasks(this);
+        RoleCollector.assignTasks(this);
+        RoleClaimer.assignTasks(this);
+        RoleDowngrader.assignTasks(this);
+        RoleUpgrader.assignTasks(this);
 
-        RoleWorker.assignTasks(room, tasks);
-        RoleMiner.assignTasks(room, tasks);
-        RoleStorer.assignTasks(room, tasks);
-        RoleScientist.assignTasks(room, tasks);
-        RoleDismantler.assignTasks(room, tasks);
-        RoleCollector.assignTasks(room, tasks);
-        RoleClaimer.assignTasks(room, tasks);
-        RoleDowngrader.assignTasks(room, tasks);
-        RoleUpgrader.assignTasks(room, tasks);
-
-        Tower.assignTasks(room, tasks);
+        Tower.assignTasks(this);
     }
 
     // ##          #      ##                           

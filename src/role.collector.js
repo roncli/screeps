@@ -210,7 +210,7 @@ class RoleCollector {
         }
 
         // Check for dropped resources in current room if there are no hostiles.
-        Assign.pickupResources(creepsWithNoTask, allCreeps, tasks.hostiles, "Pickup");
+        Assign.pickupResources(creepsWithNoTask, allCreeps, Cache.resourcesInRoom(room), tasks.hostiles, "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

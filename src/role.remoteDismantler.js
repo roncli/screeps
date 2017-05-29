@@ -1,6 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskRally = require("task.rally");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           ####                         #            ####     #                                 #      ##                 
 //  #   #           #           #   #                        #             #  #                                      #       #                 
@@ -79,58 +79,45 @@ class RoleRemoteDismantler {
         };
     }
 
-    static assignTasks(room, tasks) {
-        var roomName = room.name,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteDismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var roomName = engine.room.name,
+            creeps = Cache.creeps[roomName],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteDismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning),
+            tasks = engine.tasks;
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for enemy construction sites and rally to them.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-            if (room.find(FIND_HOSTILE_CONSTRUCTION_SITES).length > 0) {
-                var task = new TaskRally(room.find(FIND_HOSTILE_CONSTRUCTION_SITES)[0].id);
-                task.canAssign(creep);
-                creep.say("Stomping");
-                assigned.push(creep.name);
-            }
-        });
+        Assign.stomp(creepsWithNoTask, tasks.hostileConstructionSites, "Stomping");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for structures needing dismantling.
-        _.forEach(_.filter(creepsWithNoTask, (c) => c.room.name === roomName), (creep) => {
-            _.forEach(tasks.remoteDismantle.cleanupTasks, (task) => {
-                if (_.filter(task.structure.room.find(FIND_MY_CREEPS), (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === task.id).length > 0) {
-                    return;
-                }
-                if (task.canAssign(creep)) {
-                    creep.say("Dismantle");
-                    assigned.push(creep.name);
-                    return false;
-                }
-            });
-        });
+        Assign.dismantleStructures(creepsWithNoTask, tasks.dismantle, "Dismantle");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Rally remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = new TaskRally(creep.memory.home);
-            task.canAssign(creep);
-        });
+        Assign.moveToHomeRoom(creepsWithNoTask);
     }
 }
 

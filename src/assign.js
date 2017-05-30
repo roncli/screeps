@@ -174,15 +174,16 @@ class Assign {
      * Assigns creeps to build structures in their current room.
      * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {Creep[]} allCreeps All creeps.
+     * @param {Creep[]} quickOnly Only build quick construction sites.
      * @param {string} say Text to say on successful assignment.
      */
-    static buildInCurrentRoom(creeps, allCreeps, say) {
+    static buildInCurrentRoom(creeps, allCreeps, quickOnly, say) {
         var creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
 
         _.forEach(Object.keys(creepsByRoom), (roomName) => {
-            var sites = _.filter(Game.constructionSites, (s) => s.room.name === roomName), // TODO: Cache construction sites by room.
+            var sites = _.filter(Game.constructionSites, (s) => s.room.name === roomName && (!quickOnly || s.progressTotal === 1)), // TODO: Cache construction sites by room.
                 creepsInRoom = creepsByRoom[roomName];
-
+            
             _.forEach(sites, (site) => {
                 var progressMissing = site.progressTotal - site.progress - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "build" && c.memory.currentTask.id === site.id), (c) => c.carry[RESOURCE_ENERGY]));
 
@@ -1151,6 +1152,37 @@ class Assign {
                 creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
             }
+        });
+    }
+
+    //                          #           ##          #     #     #                ##     ##    #                       #                             ###          ##                                  #    ###                     
+    //                                     #  #               #                       #    #  #   #                       #                              #          #  #                                 #    #  #                    
+    // ###    ##   ###    ###  ##    ###   #     ###   ##    ###   ##     ##    ###   #     #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #     #  #  ###   ###    ##   ###   ###   #  #   ##    ##   # #   
+    // #  #  # ##  #  #  #  #   #    #  #  #     #  #   #     #     #    #     #  #   #      #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  #     #  #  #  #  #  #  # ##  #  #   #    ###   #  #  #  #  ####  
+    // #     ##    #  #  # ##   #    #     #  #  #      #     #     #    #     # ##   #    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  #  #  #  #  #     #     ##    #  #   #    # #   #  #  #  #  #  #  
+    // #      ##   ###    # #  ###   #      ##   #     ###     ##  ###    ##    # #  ###    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #   ##    ###  #     #      ##   #  #    ##  #  #   ##    ##   #  #  
+    //             #                                                                                                                                                                                                                  
+    /**
+     * Assigns creeps to repair a structure in the current room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static repairCriticalStructuresInCurrentRoom(creeps, say) {
+        var creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
+
+        _.forEach(Object.keys(creepsByRoom), (roomName) => {
+            var structures = _.filter(Cache.sortedRepairableStructuresInRoom(Game.rooms[roomName]), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5),
+                creepsInRoom = creepsByRoom[roomName];
+            
+            _.forEach(structures, (structure) => {
+                _.forEach(Utilities.objectsClosestToObj(creepsInRoom, structure), (creep) => {
+                    if (new TaskRepair(structure.id).canAssign(creep)) {
+                        creep.say(say);
+                        _.remove(creepsInRoom, (c) => c.id === creep.id);
+                        return false;
+                    }
+                });
+            });
         });
     }
 

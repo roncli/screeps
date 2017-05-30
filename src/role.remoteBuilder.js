@@ -94,15 +94,14 @@ class RoleRemoteBuilder {
     static assignTasks(engine) {
         var creeps = Cache.creeps[engine.room.name],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            allCreeps = creeps && creeps.all || [],
-            tasks = engine.tasks;
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Check for enemy construction sites and rally to them.
-        Assign.stomp(creepsWithNoTask, tasks.hostileConstructionSites, "Stomping");
+        Assign.stomp(creepsWithNoTask, engine.tasks.hostileConstructionSites, "Stomping");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -110,7 +109,7 @@ class RoleRemoteBuilder {
         }
 
         // Check critical repairs.
-        Assign.repairStructures(creepsWithNoTask, allCreeps, tasks.criticalRepairableStructures, "CritRepair");
+        Assign.repairCriticalStructuresInCurrentRoom(creepsWithNoTask, "CritRepair");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -118,7 +117,7 @@ class RoleRemoteBuilder {
         }
 
         // Check for construction sites.
-        Assign.buildInCurrentRoom(creepsWithNoTask, allCreeps, "Build");
+        Assign.buildInCurrentRoom(creepsWithNoTask, allCreeps, false, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

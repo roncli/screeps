@@ -461,7 +461,6 @@ class RoomMine extends RoomEngine {
         this.tasks = {};
 
         if (!room.unobservable) {
-            this.tasks.criticalRepairableStructures = _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
             this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
         

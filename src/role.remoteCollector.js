@@ -94,8 +94,7 @@ class RoleRemoteCollector {
             creeps = Cache.creeps[roomName],
             creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteCollector || []),
             allCreeps = creeps && creeps.all || [],
-            supportRoom = engine.supportRoom,
-            supportEngine = Cache.rooms[supportRoom.name];
+            supportRoom = engine.supportRoom;
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -134,7 +133,7 @@ class RoleRemoteCollector {
         }
 
         // Check for unfilled storage for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.storage, supportEngine.tasks.storageResourcesNeeded, "Storage");
+        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.storage, Cache.rooms[supportRoom.name].tasks.storageResourcesNeeded, "Storage");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

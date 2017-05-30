@@ -791,15 +791,17 @@ class RoomBase extends RoomEngine {
             towerCapacity = TOWER_CAPACITY * 0.8;
 
         this.tasks = {
-            constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES).sort((a, b) => a.progressTotal === 1 ? 0 : 1 - (b.progressTotal === 1 ? 0 : 1)),
-            criticalRepairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5),
+            constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES),
+            criticalRepairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), // TODO: Cache critical structures to repair in current room.
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
             hostiles: Cache.hostilesInRoom(room),
-            repairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
+            repairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), // TODO: Cache structures to repair in current room.
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
             structuresWithEnergy: [...(room.storage ? [room.storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
             towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < towerCapacity)
         };
+
+        this.tasks.quickConstructionSites = _.filter(this.tasks.constructionSites, (s) => s.progressTotal === 1);
 
         // If the room only has storage and no terminal, minerals go to storage.
         // Otherwise, if the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.

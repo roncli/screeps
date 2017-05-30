@@ -1,4 +1,5 @@
 const Cache = require("cache"),
+    Commands = require("commands"),
     Utilities = require("utilities"),
     TaskBuild = require("task.build"),
     TaskClaim = require("task.claim"),
@@ -16,6 +17,8 @@ const Cache = require("cache"),
     TaskRally = require("task.rally"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
+    TaskReserve = require("task.reserve"),
+    TaskSuicide = require("task.suicide"),
     TaskUpgradeController = require("task.upgradeController");
 
 //    #                    #                 
@@ -221,7 +224,9 @@ class Assign {
                 // If there is no controller in the room or we have already claimed it, remove the key from memory and suicide the creep.
                 if (!controller || controller.my) {
                     delete Memory.maxCreeps.claimer[roomName];
-                    creep.suicide();
+                    if (new TaskSuicide().canAssign(creep)) {
+                        creep.say("RIP :(");
+                    }
                     return;
                 }
 
@@ -271,6 +276,26 @@ class Assign {
         });
     }
 
+    //             ##    ##                 #    ####                                ####                    #  #                     ##                #           #                      
+    //              #     #                 #    #                                   #                       #  #                    #  #               #                                  
+    //  ##    ##    #     #     ##    ##   ###   ###   ###    ##   ###    ###  #  #  ###   ###    ##   # #   ####   ##   # #    ##   #      ##   ###   ###    ###  ##    ###    ##   ###   
+    // #     #  #   #     #    # ##  #      #    #     #  #  # ##  #  #  #  #  #  #  #     #  #  #  #  ####  #  #  #  #  ####  # ##  #     #  #  #  #   #    #  #   #    #  #  # ##  #  #  
+    // #     #  #   #     #    ##    #      #    #     #  #  ##    #      ##    # #  #     #     #  #  #  #  #  #  #  #  #  #  ##    #  #  #  #  #  #   #    # ##   #    #  #  ##    #     
+    //  ##    ##   ###   ###    ##    ##     ##  ####  #  #   ##   #     #       #   #     #      ##   #  #  #  #   ##   #  #   ##    ##    ##   #  #    ##   # #  ###   #  #   ##   #     
+    //                                                                    ###   #                                                                                                          
+    /**
+     * Assigns creeps to collect energy from their home container.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static collectEnergyFromHomeContainer(creeps, say) {
+        _.forEach(creeps, (creep) => {
+            if (new TaskCollectEnergy(creep.memory.container).canAssign(creep)) {
+                creep.say(say);
+            }
+        });
+    }
+
     //             ##    ##                 #    #  #   #                            ##           
     //              #     #                 #    ####                                 #           
     //  ##    ##    #     #     ##    ##   ###   ####  ##    ###    ##   ###    ###   #     ###   
@@ -301,6 +326,25 @@ class Assign {
                         }
                     }
                 });
+            }
+        });
+    }
+
+    //             ##    ##                 #    #  #   #                            ##           ####                    #  #                     ##                #           #                      
+    //              #     #                 #    ####                                 #           #                       #  #                    #  #               #                                  
+    //  ##    ##    #     #     ##    ##   ###   ####  ##    ###    ##   ###    ###   #     ###   ###   ###    ##   # #   ####   ##   # #    ##   #      ##   ###   ###    ###  ##    ###    ##   ###   
+    // #     #  #   #     #    # ##  #      #    #  #   #    #  #  # ##  #  #  #  #   #    ##     #     #  #  #  #  ####  #  #  #  #  ####  # ##  #     #  #  #  #   #    #  #   #    #  #  # ##  #  #  
+    // #     #  #   #     #    ##    #      #    #  #   #    #  #  ##    #     # ##   #      ##   #     #     #  #  #  #  #  #  #  #  #  #  ##    #  #  #  #  #  #   #    # ##   #    #  #  ##    #     
+    //  ##    ##   ###   ###    ##    ##     ##  #  #  ###   #  #   ##   #      # #  ###   ###    #     #      ##   #  #  #  #   ##   #  #   ##    ##    ##   #  #    ##   # #  ###   #  #   ##   #     
+    /**
+     * Assigns creeps to collect energy from their home container.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static collectMineralsFromHomeContainer(creeps, say) {
+        _.forEach(creeps, (creep) => {
+            if (new TaskCollectMinerals(creep.memory.container).canAssign(creep)) {
+                creep.say(say);
             }
         });
     }
@@ -474,7 +518,9 @@ class Assign {
                 // If there is no controller in the room or it is unowned, remove the key from memory and suicide the creep.
                 if (!controller || !controller.level) {
                     delete Memory.maxCreeps.downgrader[roomName];
-                    creep.suicide();
+                    if (new TaskSuicide().canAssign(creep)) {
+                        creep.say("RIP :(");
+                    }
                     return;
                 }
 
@@ -1137,6 +1183,36 @@ class Assign {
                 }
             });
         });
+    }
+
+    //                                             ##                #                ##    ##                
+    //                                            #  #               #                 #     #                
+    // ###    ##    ###    ##   ###   # #    ##   #      ##   ###   ###   ###    ##    #     #     ##   ###   
+    // #  #  # ##  ##     # ##  #  #  # #   # ##  #     #  #  #  #   #    #  #  #  #   #     #    # ##  #  #  
+    // #     ##      ##   ##    #     # #   ##    #  #  #  #  #  #   #    #     #  #   #     #    ##    #     
+    // #      ##   ###     ##   #      #     ##    ##    ##   #  #    ##  #      ##   ###   ###    ##   #     
+    /**
+     * Assigns creeps to reserve a controller in a room.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Room} room The room of the controller to observe.
+     * @param {string} say Text to say on successful assignment.
+     */
+    static reserveController(creeps, room, say) {
+        if (room && !room.unobservable && room.controller) {
+            _.forEach(creeps, (creep) => {
+                // If the controller has been claimed, turn into a base and suicide the creep.
+                if (room.controller.my) {
+                    Commands.setRoomType(room.name, {type: "base"});
+                    if (new TaskSuicide().canAssign(creep)) {
+                        creep.say("RIP :(");
+                    }
+                    return;
+                }
+                if (new TaskReserve().canAssign(creep)) {
+                    creep.say(say);
+                }
+            });
+        }
     }
 
     //              #                       #     ##                     #  #         #     #    

@@ -17,6 +17,10 @@ class CollectMinerals {
         if (this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
             return false;
         }
+
+        if (obj.structureType === STRUCTURE_LAB && obj.mineralAmount === 0 || _.sum(obj.store) === obj.store[RESOURCE_ENERGY]) {
+            return false;
+        }
         
         if (this.resource && this.amount) {
             if (obj.structureType === STRUCTURE_LAB && obj.mineralType !== this.resource && obj.mineralAmount < this.amount) {

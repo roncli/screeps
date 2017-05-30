@@ -2,7 +2,7 @@ var Cache = require("cache"),
     Pathing = require("pathing");
 
 class Reserve {
-    constructor(id) {
+    constructor() {
         this.type = "reserve";
         this.force = true;
     }
@@ -45,7 +45,7 @@ class Reserve {
         };
     }
     
-    static fromObj(creep) {
+    static fromObj() {
         return new Reserve();
     }
     

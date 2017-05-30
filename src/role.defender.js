@@ -89,6 +89,10 @@ class RoleDefender {
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.defender || []), (c) => !c.spawning),
             tasks = engine.tasks;
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // If there is a hostile in the quadrant, attack it.
         Assign.attackInQuadrant(creepsWithNoTask, tasks.hostiles, "Die!");
 

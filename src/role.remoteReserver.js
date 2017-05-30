@@ -1,8 +1,6 @@
-var Cache = require("cache"),
-    Commands = require("commands"),
-    Utilities = require("utilities"),
-    TaskRally = require("task.rally"),
-    TaskReserve = require("task.reserve");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           ####                         #            ####                                                   
 //  #   #           #           #   #                        #            #   #                                                  
@@ -114,57 +112,36 @@ class RoleRemoteReserver {
         };
     }
 
-    static assignTasks(room) {
-        var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteReserver || []),
-            assigned = [];
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // If we have claimed the controller, stop trying to reserve the room and suicide any remaining creeps.
-        if (!room.unobservable) {
-            _.forEach(creepsWithNoTask, (creep) => {
-                if (creep.room.name === creep.memory.home && creep.room.controller.my) {
-                    assigned.push(creep.name);
-                    Commands.setRoomType(creep.room, {type: "base"});
-                    creep.suicide();
-                    // TODO: Assign other creeps in room to another task if possible.
-                }
-            });
-        }
-
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var room = engine.room,
+            creeps = Cache.creeps[room.name],
+            creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteReserver || []);
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Reserve the controller.
-        if (room && !room.unobservable && room.controller) {
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = TaskReserve.getRemoteTask(creep);
-                if (task.canAssign(creep)) {
-                    creep.say("Reserving");
-                    assigned.push(creep.name);
-                }
-            });
-        }
+        Assign.reserveController(creepsWithNoTask, room, "Reserving");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Rally the troops!
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = new TaskRally(creep.memory.home);
-            task.canAssign(creep);
-        });
+        Assign.moveToHomeRoom(creepsWithNoTask);
     }
 }
 

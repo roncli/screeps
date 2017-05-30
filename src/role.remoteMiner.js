@@ -1,7 +1,6 @@
-var Cache = require("cache"),
-    Utilities = require("utilities"),
-    TaskMine = require("task.mine"),
-    TaskRally = require("task.rally");
+const Assign = require("assign"),
+    Cache = require("cache"),
+    Utilities = require("utilities");
 
 //  ####           ##           ####                         #            #   #    #                        
 //  #   #           #           #   #                        #            #   #                             
@@ -142,38 +141,35 @@ class RoleRemoteMiner {
         };
     }
 
-    static assignTasks(room) {
-        var roomName = room.name,
-            creepsWithNoTask = Utilities.creepsWithNoTask(Cache.creeps[roomName] && Cache.creeps[roomName].remoteMiner || []),
-            assigned = [];
+    //                      #                ###                #            
+    //                                        #                 #            
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
+    //                            ###                                        
+    /**
+     * Assigns tasks to creeps of this role.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
+     */
+    static assignTasks(engine) {
+        var creeps = Cache.creeps[engine.room.name],
+            creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteMiner || []);
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to assign mine tasks.
-        if (!room.unobservable) {
-            _.forEach(creepsWithNoTask, (creep) => {
-                var task = new TaskMine();
-                if (task.canAssign(creep)) {
-                    creep.say("Mining");
-                    assigned.push(creep.name);
-                }
-            });
-        }
+        Assign.mine(creepsWithNoTask, "Mining");
 
-        _.remove(creepsWithNoTask, (c) => assigned.indexOf(c.name) !== -1);
-        assigned = [];
-
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Rally remaining creeps.
-        _.forEach(creepsWithNoTask, (creep) => {
-            var task = new TaskRally(creep.memory.home);
-            task.canAssign(creep);
-        });
+        Assign.moveToHomeRoom(creepsWithNoTask);
     }
 }
 

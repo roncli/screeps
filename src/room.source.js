@@ -91,8 +91,6 @@ class RoomSource extends RoomMine {
      * Assigns tasks to creeps while the room is in stage 1.
      */
     stage1AssignTasks() {
-        var room = this.room;
-
         RoleDefender.assignTasks(this);
         RoleHealer.assignTasks(this);
 
@@ -186,8 +184,6 @@ class RoomSource extends RoomMine {
      * Assigns tasks to creeps while the room is in stage 2.
      */
     stage2AssignTasks() {
-        var room = this.room;
-
         RoleDefender.assignTasks(this);
         RoleHealer.assignTasks(this);
 

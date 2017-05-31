@@ -652,6 +652,7 @@ class RoomBase extends RoomEngine {
             powerSpawn = Cache.powerSpawnsInRoom(room)[0],
             storage = room.storage,
             terminal = room.terminal,
+            terminalEnergy = terminal ? terminal.store[RESOURCE_ENERGY] : 0,
             store = storage ? storage.store : undefined,
             roomMemory = room.memory,
             labsInUse = roomMemory.labsInUse,
@@ -675,8 +676,8 @@ class RoomBase extends RoomEngine {
             repairableStructures: _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
             structuresWithEnergy: [...(storage && storage.my ? [storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
-            terminalsCollectEnergy: terminal && (!terminal.my || (terminal.store[RESOURCE_ENERGY] >= 5000 && (!roomMemory.buyQueue || !storage || store[RESOURCE_ENERGY] < Memory.marketEnergy || Cache.credits < Memory.minimumCredits))),
-            terminalsFillWithEnergy: terminal && terminal.my ? [terminal] : [],
+            terminalsCollectEnergy: terminal && (!terminal.my || (terminalEnergy >= 5000 && (!roomMemory.buyQueue || !storage || store[RESOURCE_ENERGY] < Memory.marketEnergy || Cache.credits < Memory.minimumCredits))),
+            terminalsFillWithEnergy: terminal && terminal.my && terminalEnergy < 1000 ? [terminal] : [],
             towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < TOWER_CAPACITY * 0.8)
         };
 

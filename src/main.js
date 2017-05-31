@@ -76,7 +76,6 @@ class Main {
      */
     static loop() {
         var gameCpu = Game.cpu,
-            cpu = gameCpu.getUsed(),
             bucket = gameCpu.bucket,
             logCpu = Memory.logCpu;
 
@@ -90,7 +89,7 @@ class Main {
                 lastCpu, thisCpu;
             
             if (logCpu) {
-                lastCpu = thisCpu;
+                lastCpu = gameCpu.getUsed();
                 log = `Started at ${lastCpu.toFixed(2)}`;
             }
 

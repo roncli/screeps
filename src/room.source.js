@@ -48,7 +48,7 @@ class RoomSource extends RoomMine {
     stage1Tasks() {
         var room = this.room;
         
-        super();
+        super.stage1Tasks();
 
         this.tasks.hostiles = Cache.hostilesInRoom(room);
         this.tasks.keepers = Cache.sourceKeepersInRoom(room);
@@ -139,7 +139,7 @@ class RoomSource extends RoomMine {
     stage2Tasks() {
         var room = this.room;
         
-        super();
+        super.stage2Tasks();
 
         this.tasks.hostiles = Cache.hostilesInRoom(room);
         this.tasks.keepers = Cache.sourceKeepersInRoom(room);

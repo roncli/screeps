@@ -109,7 +109,7 @@ class RoleRemoteCollector {
         }
 
         // Attempt to get minerals from containers.
-        Assign.collectMinerals(creepsWithNoTask, allCreeps, engine.tasks.mineralStructures, "Collecting");
+        Assign.collectMinerals(creepsWithNoTask, allCreeps, engine.tasks.mineralStructures, undefined, undefined, "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

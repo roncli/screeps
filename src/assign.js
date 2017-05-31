@@ -308,9 +308,11 @@ class Assign {
      * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {Creep[]} allCreeps All creeps.
      * @param {Structure[]} structures The structures to collect minerals from.
+     * @param {string} resource The resource to collect.  Leave undefined to just pick up anything.
+     * @param {number} amount The amount of resources to collect.  Leave undefined to get all.
      * @param {string} say Text to say on successful assignment.
      */
-    static CollectMinerals(creeps, allCreeps, structures, say) {
+    static collectMinerals(creeps, allCreeps, structures, resource, amount, say) {
         if (!structures || structures.length === 0) {
             return;
         }
@@ -319,7 +321,7 @@ class Assign {
             var minerals = _.sum(structure.store) - structure.store[RESOURCE_ENERGY] - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "collectMinerals" && c.memory.currentTask.id === structure.id), (c) => c.carryCapacity - _.sum(c.carry)));
             if (minerals > 0) {
                 _.forEach(creeps, (creep) => {
-                    if (new TaskCollectMinerals(structure.id).canAssign(creep)) {
+                    if (new TaskCollectMinerals(structure.id, resource, amount).canAssign(creep)) {
                         creep.say(say);
                         minerals -= creep.carryCapacity - _.sum(creep.carry) || 0;
                         if (minerals <= 0) {

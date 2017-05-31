@@ -13,17 +13,7 @@ var Cache = require("cache"),
     RoleScientist = require("role.scientist"),
     RoleStorer = require("role.storer"),
     RoleUpgrader = require("role.upgrader"),
-    RoleWorker = require("role.worker"),
-    TaskBuild = require("task.build"),
-    TaskCollectEnergy = require("task.collectEnergy"),
-    TaskCollectMinerals = require("task.collectMinerals"),
-    TaskDismantle = require("task.dismantle"),
-    TaskFillEnergy = require("task.fillEnergy"),
-    TaskFillMinerals = require("task.fillMinerals"),
-    TaskHeal = require("task.heal"),
-    TaskRangedAttack = require("task.rangedAttack"),
-    TaskRepair = require("task.repair"),
-    TaskUpgradeController = require("task.upgradeController");
+    RoleWorker = require("role.worker");
 
 //  ####                        ####                       
 //  #   #                        #  #                      
@@ -61,7 +51,7 @@ class RoomBase extends RoomEngine {
      */
     run() {
         var room = this.room,
-            roomName, spawns, terminal, storage, memory, labQueue, labsInUse, tasks;
+            roomName, spawns, terminal, storage, memory, labQueue, labsInUse;
 
         if (room.unobservable) {
             // Something is supremely wrong.  Notify and bail.
@@ -96,10 +86,10 @@ class RoomBase extends RoomEngine {
         }
 
         // Get the tasks needed for this room.
-        tasks = this.tasks();
+        this.tasks();
 
         // Spawn new creeps if there are available spawns in the region.
-        this.spawn(tasks, _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === memory.region).length > 0);
+        this.spawn(_.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === memory.region).length > 0);
 
         // Assign tasks to creeps and towers.
         this.assignTasks();
@@ -652,9 +642,9 @@ class RoomBase extends RoomEngine {
     //   ##   # #  ###    #  #  ###    
     /**
      * Compile the tasks available for this room.
-     * @return {object} The list of available tasks.
      */
     tasks() {
+/*
         var room = this.room,
             roomName = room.name,
             creeps = Cache.creeps[roomName],
@@ -784,40 +774,272 @@ class RoomBase extends RoomEngine {
                 creep.memory.container = Cache.containersInRoom(room)[0].id;
             });
         }
+*/
+        if ((storersWithNothing || scientistsWithNothing) && terminal && (!terminal.my || (terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.marketEnergy || Cache.credits < Memory.minimumCredits)))) {
+            tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
+        }
 
         // New code below!
-        var sortedRepairableStructures = Cache.sortedRepairableStructuresInRoom(room),
-            extensionEnergyCapacity = EXTENSION_ENERGY_CAPACITY[room.controller.level],
-            towerCapacity = TOWER_CAPACITY * 0.8;
+        var room = this.room,
+            sortedRepairableStructures = Cache.sortedRepairableStructuresInRoom(room),
+            controller = room.controller,
+            rcl = controller ? controller.level : undefined,
+            extensionEnergyCapacity = rcl ? EXTENSION_ENERGY_CAPACITY[rcl] : 0,
+            nuker = Cache.nukersInRoom(room)[0],
+            powerSpawn = Cache.powerSpawnsInRoom(room)[0],
+            storage = room.storage,
+            terminal = room.terminal,
+            store = storage ? storage.store : undefined,
+            roomMemory = room.memory,
+            labsInUse = roomMemory.labsInUse,
+            labQueue = roomMemory.labQueue,
+            labs = Cache.labsInRoom(room),
+            labAmount = labQueue ? labQueue.amount : undefined,
+            reserveMinerals = Memory.reserveMinerals,
+            tasks, status, sourceLabs, lab0, lab1, labsCollectMinerals;
 
         this.tasks = {
             constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES),
             criticalRepairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), // TODO: Cache critical structures to repair in current room.
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
             hostiles: Cache.hostilesInRoom(room),
+            labsCollectMinerals: [],
+            nuker: nuker,
+            powerSpawn: powerSpawn,
             repairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), // TODO: Cache structures to repair in current room.
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
-            structuresWithEnergy: [...(room.storage ? [room.storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
-            towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < towerCapacity)
+            structuresWithEnergy: [...(storage && storage.my ? [storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
+            terminalsCollectEnergy: terminal && (!terminal.my || (terminal.store[RESOURCE_ENERGY] >= 5000 && (!roomMemory.buyQueue || !storage || store[RESOURCE_ENERGY] < Memory.marketEnergy || Cache.credits < Memory.minimumCredits))),
+            terminalsFillWithEnergy: terminal && terminal.my ? [terminal] : [],
+            towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < TOWER_CAPACITY * 0.8)
         };
 
-        this.tasks.quickConstructionSites = _.filter(this.tasks.constructionSites, (s) => s.progressTotal === 1);
+        tasks = this.tasks;
 
-        // If the room only has storage and no terminal, minerals go to storage.
-        // Otherwise, if the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
-        if (storage && storage.my && (!room.terminal || !room.terminal.my)) {
-            this.tasks.storageResourcesNeeded = undefined;
-        } else if (storage && storage.my && _.sum(store = storage.store) < storage.storeCapacity && Memory.reserveMinerals) {
-            this.tasks.storageResourcesNeeded = {};
-            _.forEach(Object.keys(Memory.reserveMinerals), (resource) => {
-                var amount = (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource]) - (store[resource] || 0);
-                if (amount > 0) {
-                    this.tasks.storageResourcesNeeded[resource] = amount;
+        tasks.quickConstructionSites = _.filter(tasks.constructionSites, (s) => s.progressTotal === 1);
+
+        // storageResourcesNeeded
+        if (storage && storage.my) {
+            // If the room only has storage and no terminal, minerals go to storage.
+            // Otherwise, if the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
+            if (!terminal || !terminal.my) {
+                tasks.storageResourcesNeeded = undefined;
+            } else if (_.sum(store) < storage.storeCapacity && reserveMinerals) {
+                tasks.storageResourcesNeeded = {};
+                _.forEach(Object.keys(reserveMinerals), (resource) => {
+                    var reserveMineralsResource = reserveMinerals[resource],
+                        amount = (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) - (store[resource] || 0);
+                    if (amount > 0) {
+                        tasks.storageResourcesNeeded[resource] = amount;
+                    }
+                });
+            }
+        }
+
+        //nukerResourcesNeeded
+        if (nuker) {
+            tasks.nukerResourcesNeeded = {};
+            tasks.nukerResourcesNeeded[RESOURCE_GHODIUM] = nuker.ghodiumCapacity - nuker.ghodium;
+        }
+
+        //powerSpawnResourcesNeeded
+        if (powerSpawn / powerSpawn.power < 0.5) {
+            tasks.powerSpawnResourcesNeeded[RESOURCE_POWER] = powerSpawn.powerCapacity - powerSpawn.power;
+        }
+
+        // labsCollectMinerals
+        if (labQueue) {
+            status = labQueue.status;
+            sourceLabs = labQueue.sourceLabs;
+            lab0 = Game.getObjectById(sourceLabs[0]);
+            lab1 = Game.getObjectById(sourceLabs[1]);
+        }
+
+        labsCollectMinerals = tasks.labsCollectMinerals;
+    
+        if (labsInUse) {
+            _.forEach(labsInUse, (lab) => {
+                if (!Game.creeps[lab.creepToBoost]) {
+                    labsCollectMinerals.push(Game.getObjectById(lab.id));
+                }
+            });
+    
+            _.forEach(labsCollectMinerals, (task) => {
+                _.remove(labsInUse, (l) => l.id === task.id);
+            });
+        }
+    
+        if (storage && labQueue && status === "clearing") {
+            _.forEach(_.filter(labs, (l) => _.map(labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
+                labsCollectMinerals.push(lab);
+            });
+        }
+    
+        if (storage && labsInUse) {
+            _.forEach(_.filter(labsInUse, (l) => {
+                var lab = Game.getObjectById(l.id);
+
+                return (!l.status || l.status === "emptying") && lab && lab.mineralType && lab.mineralType !== l.resource;
+            }), (lab) => {
+                labsCollectMinerals.push(Game.getObjectById(lab.id));
+            });
+        }
+    
+        if (storage && labQueue && status === "creating" && !Utilities.roomLabsArePaused(room)) {
+            let lab0Amount = lab0.mineralAmount,
+                lab1Amount = lab1.mineralAmount;
+
+            if (lab0Amount === 0 && lab1Amount !== 0) {
+                labsCollectMinerals.push(lab1);
+            }
+            if (lab0Amount !== 0 && lab1Amount === 0) {
+                labsCollectMinerals.push(lab0);
+            }
+        }
+    
+        if (storage && labQueue && status === "returning") {
+            _.forEach(_.filter(labs, (l) => l.mineralType === labQueue.resource), (lab) => {
+                labsCollectMinerals.push(lab);
+            });
+        }
+
+        // labsFillMinerals
+        if (labsInUse) {
+            _.forEach(_.filter(labsInUse, (l) => {
+                var lab = Game.getObjectById(l.id),
+                    status = l.status;
+
+                return (!status || ["filling", "refilling"].indexOf(status) !== -1) && (!lab.mineralType || lab.mineralType === (status === "refilling" ? l.oldResource : l.resource)) && (lab.mineralAmount < (status === "refilling" ? l.oldAmount : l.amount));
+            }), (labInUse) => {
+                var status = labInUse.status,
+                    lab = Game.getObjectById(lab.id);
+
+                tasks.labsFillMinerals = lab;
+                tasks.labsFillMineralsResourcesNeeded = {};
+                tasks.labsFillMineralsResourcesNeeded[status === "refilling" ? labInUse.oldResource : labInUse.resource] = (status === "refilling" ? labInUse.oldAmount : labInUse.amount) - lab.mineralAmount;
+
+                return false;
+            });
+        }
+
+        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && labQueue.status === "moving" && !Utilities.roomLabsArePaused(room)) {
+            if (lab0.mineralAmount < labAmount) {
+                tasks.labsFillMinerals = lab0;
+                tasks.labsFillMineralsResourcesNeeded = {};
+                tasks.labsFillMineralsResourcesNeeded[labQueue.children[0]] = labAmount - lab0.mineralAmount;
+            }
+            if (!tasks.labsFillMinerals && lab1.mineralAmount < labAmount) {
+                tasks.labsFillMinerals = lab1;
+                tasks.labsFillMineralsResourcesNeeded = {};
+                tasks.labsFillMineralsResourcesNeeded[labQueue.children[1]] = labAmount - lab1.mineralAmount;
+            }
+        }
+
+        // terminalCollectMinerals
+        if (storage && terminal && reserveMinerals) {
+            _.forEach(terminal.store, (amount, resource) => {
+                var reserveMineralsResource;
+
+                if (resource === RESOURCE_ENERGY) {
+                    return;
+                }
+
+                reserveMineralsResource = reserveMinerals[resource];
+
+                if (!reserveMineralsResource) {
+                    return;
+                }
+                if (!store[resource]) {
+                    tasks.terminalCollectMinerals = [terminal];
+                    tasks.terminalCollectMineralsResource = resource;
+                    tasks.terminalCollectMineralsAmount = Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource));
+                } else if (store[resource] < (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource])) {
+                    tasks.terminalCollectMinerals = [terminal];
+                    tasks.terminalCollectMineralsResource = resource;
+                    tasks.terminalCollectMineralsAmount = Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) - store[resource])
                 }
             });
         }
 
-        return tasks;
+        // storageCollectMinerals
+        if (controller && rcl >= 6) {
+            if (storage && labsInUse) {
+                _.forEach(_.filter(labsInUse, (l) => {
+                    var status = l.status,
+                        lab = Game.getObjectById(l.id);
+
+                    return (!status || ["filling", "refilling"].indexOf(status) !== -1) && (!lab.mineralType || lab.mineralType === (status === "refilling" ? l.oldResource : l.resource));
+                }), (l) => {
+                    var status = l.status,
+                        lab = Game.getObjectById(l.id);
+
+                    if ((status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount)) > 0) {
+                        this.storageCollectMinerals = [storage];
+                        this.storageCollectMineralsResource = status === "refilling" ? l.oldResource : l.resource;
+                        this.storageCollectMineralsAmount = status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount);
+
+                        return false;
+                    }
+                });
+            }
+    
+            // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
+            if (!this.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
+                _.forEach(labQueue.children, (resource) => {
+                    var amount;
+
+                    if ((amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount)) < labAmount) {
+                        this.storageCollectMinerals = [storage];
+                        this.storageCollectMineralsResource = resource;
+                        this.storageCollectMineralsAmount = labAmount - amount;
+
+                        return false;
+                    }
+                });
+            }
+    
+            // We only need to transfer from storage to terminal when we have both storage and terminal.
+            if (!this.storageCollectMinerals && storage && terminal && reserveMinerals) {
+                _.forEach(store, (amount, resource) => {
+                    var reserveMineralsResource;
+
+                    if (resource === RESOURCE_ENERGY) {
+                        return;
+                    }
+
+                    reserveMineralsResource = reserveMinerals[resource];
+
+                    if (!reserveMineralsResource) {
+                        this.storageCollectMinerals = [storage];
+                        this.storageCollectMineralsResource = resource;
+                        this.storageCollectMineralsAmount = amount;
+
+                        return false;
+                    } else if ((resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) < amount) {
+                        this.storageCollectMinerals = [storage];
+                        this.storageCollectMineralsResource = resource;
+                        this.storageCollectMineralsAmount = amount - (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource);
+
+                        return false;
+                    }
+                });
+            }
+    
+            if (!this.storageCollectMinerals) {
+                // If we have a nuker, transfer ghodium.  If we have a power spawn, transfer power.
+                if (nuker && rcl > 8 && nuker.ghodium < nuker.ghodiumCapacity && store[RESOURCE_GHODIUM]) {
+                    this.storageCollectMinerals = [storage];
+                    this.storageCollectMineralsResource = RESOURCE_GHODIUM;
+                    this.storageCollectMineralsAmount = Math.min(nuker.ghodiumCapacity - nuker.ghodium, store[RESOURCE_GHODIUM]);
+                } else if (powerSpawn && rcl > 8 && powerSpawn.power / powerSpawn.powerCapacity < 0.5 && store[RESOURCE_POWER]) {
+                    this.storageCollectMinerals = [storage];
+                    this.storageCollectMineralsResource = RESOURCE_POWER;
+                    this.storageCollectMineralsAmount = Math.min(powerSpawn.powerCapacity - powerSpawn.power, store[RESOURCE_POWER]);
+                }
+            }
+        }
+
+        // terminalsCollectEnergy
     }
 
     //  ###   ###    ###  #  #  ###   
@@ -827,18 +1049,18 @@ class RoomBase extends RoomEngine {
     //        #                       
     /**
      * Spawns needed creeps.
-     * @param {object} tasks The tasks to assign to creeps.
      * @param {canSpawn} bool Whether to spawn creeps this turn.
      */
-    spawn(tasks, canSpawn) {
+    spawn(canSpawn) {
         var room = this.room,
             storage = room.storage,
             controller = room.controller,
+            tasks = this.tasks,
             rcl = controller.level,
             dismantle = Memory.dismantle,
             roomName = room.name;
 
-        this.checkSpawn(RoleWorker, canSpawn && (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.repair.criticalTasks && tasks.repair.criticalTasks.length > 0 || tasks.repair.tasks && _.filter(tasks.repair.tasks, (t) => (t.structure.structureType === STRUCTURE_WALL || t.structure.structureType === STRUCTURE_RAMPART) && t.structure.hits < 1000000).length > 0));
+        this.checkSpawn(RoleWorker, canSpawn && (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.criticalRepairableStructures && tasks.criticalRepairableStructures.length > 0 || tasks.repairableStructures && _.filter(tasks.repairableStructures, (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== 1 && s.hits < 1000000).length > 0));
         this.checkSpawn(RoleMiner, canSpawn);
         this.checkSpawn(RoleStorer, canSpawn);
         this.checkSpawn(RoleScientist, canSpawn && rcl >= 6);

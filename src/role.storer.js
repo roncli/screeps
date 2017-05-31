@@ -225,7 +225,7 @@ class RoleStorer {
         }
 
         // Rally to center.
-        Assign.moveToTerminalOrRoom(creepsWithNoTask);
+        Assign.moveToTerminalOrRoom(creepsWithNoTask, room);
     }
 }
 

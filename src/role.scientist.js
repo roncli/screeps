@@ -101,7 +101,7 @@ class RoleScientist {
         }
 
         // Check for unfilled towers.
-        Assign.fillTowers(creepsWithNoTask, allCreeps, tasks.towers, "Tower");
+        Assign.fillTowersWithEnergy(creepsWithNoTask, allCreeps, tasks.towers, "Tower");
         
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

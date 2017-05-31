@@ -65,14 +65,6 @@ class Heal {
             return;
         }
     }
-    
-    static getTasks(room) {
-        return _.map(_.filter(room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id));
-    }
-    
-    static getDefenderTask(creep) {
-        return _.map(_.filter(creep.room.find(FIND_MY_CREEPS), (c) => c.hits < c.hitsMax && c.id !== creep.id).sort((a, b) => a.hits - b.hits), (c) => new Heal(c.id))[0];
-    }
 }
 
 if (Memory.profiling) {

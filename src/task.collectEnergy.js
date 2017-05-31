@@ -83,28 +83,6 @@ class CollectEnergy {
             return;
         }
     }
-    
-    static getTasks(room) {
-        var structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => (s.energy > 0 || (s.store && s.store[RESOURCE_ENERGY] > 0)) && s.structureType !== STRUCTURE_NUKER);
-        
-        if (structures.length > 0) {
-            return _.map(structures, (s) => new CollectEnergy(s.id));
-        }
-    
-        if (room.storage && room.storage.store[RESOURCE_ENERGY] > 0) {
-            return [new CollectEnergy(room.storage.id)];
-        }
-    
-        return _.map(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY]), (c) => new CollectEnergy(c.id));
-    }
-    
-    static getStorerTasks(room) {
-        return _.map(_.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] && c.store[RESOURCE_ENERGY] >= 500), (c) => new CollectEnergy(c.id));
-    }
-    
-    static getCleanupTasks(structures) {
-        return _.map(_.filter(structures, (s) => s.energy || (s.store && s.store[RESOURCE_ENERGY])).sort((a, b) => (a.energy || a.store[RESOURCE_ENERGY]) - (b.energy || b.store[RESOURCE_ENERGY])), (s) => new CollectEnergy(s.id));
-    }
 }
 
 if (Memory.profiling) {

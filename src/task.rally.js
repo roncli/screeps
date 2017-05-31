@@ -117,24 +117,6 @@ class Rally {
     
         return task;
     }
-    
-    static getHarvesterTasks(creeps) {
-        return _.map(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (c) => new Rally(c.memory.homeSource));
-    }
-    
-    static getDefenderTask(creep) {
-        var source = Cache.sourceKeepersInRoom(creep.room).sort((a, b) => a.ticksToSpawn - b.ticksToSpawn)[0];
-    
-        if (source && creep.room.name === creep.memory.home) {
-            return new Rally(source.id);
-        } else {
-            return new Rally(creep.memory.home);
-        }
-    }
-    
-    static getClaimerTask(creep) {
-        return new Rally(creep.memory.claim);
-    }
 }
 
 if (Memory.profiling) {

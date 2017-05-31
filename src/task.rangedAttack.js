@@ -78,10 +78,6 @@ class Ranged {
             return;
         }
     }
-    
-    static getTasks(room) {
-        return _.map(Cache.hostilesInRoom(room).sort((a, b) => a.hits - b.hits), (h) => new Ranged(h.id));
-    }
 }
 
 if (Memory.profiling) {

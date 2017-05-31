@@ -58,10 +58,6 @@ class Dismantle {
             return;
         }
     }
-    
-    static getCleanupTasks(structures) {
-        return _.map(structures, (s) => new Dismantle(s.id));
-    }
 }
 
 if (Memory.profiling) {

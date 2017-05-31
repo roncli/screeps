@@ -62,18 +62,6 @@ class Repair {
             return;
         }
     }
-    
-    static getTowerTasks(room) {
-        return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 10000 && s.hits / s.hitsMax < 0.25), 5), (s) => new Repair(s.id));
-    }
-    
-    static getCriticalTasks(room) {
-        return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), 5), (s) => new Repair(s.id));
-    }
-    
-    static getTasks(room) {
-        return _.map(_.take(_.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), 5), (s) => new Repair(s.id));
-    }
 }
 
 if (Memory.profiling) {

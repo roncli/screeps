@@ -1,4 +1,4 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Commands = require("commands"),
     RoomEngine = require("roomEngine"),
     Utilities = require("utilities"),
@@ -7,11 +7,7 @@ var Cache = require("cache"),
     RoleRemoteMiner = require("role.remoteMiner"),
     RoleRemoteReserver = require("role.remoteReserver"),
     RoleRemoteStorer = require("role.remoteStorer"),
-    RoleRemoteWorker = require("role.remoteWorker"),
-    TaskBuild = require("task.build"),
-    TaskDismantle = require("task.dismantle"),
-    TaskFillEnergy = require("task.fillEnergy"),
-    TaskFillMinerals = require("task.fillMinerals");
+    RoleRemoteWorker = require("role.remoteWorker");
 
 //  ####                        #   #    #                 
 //  #   #                       #   #                      
@@ -161,38 +157,13 @@ class RoomMine extends RoomEngine {
      * Tasks to perform while the room is in stage 1.
      */
     stage1Tasks() {
-        var supportRoom = this.supportRoom,
-            room = this.room;
+        var room = this.room;
 
-        var tasks = {
-            fillEnergy: {
-                storageTasks: TaskFillEnergy.getStorageTasks(supportRoom),
-                containerTasks: TaskFillEnergy.getContainerTasks(supportRoom)
-            },
-            fillMinerals: {
-                storageTasks: TaskFillMinerals.getStorageTasks(supportRoom),
-                terminalTasks: TaskFillMinerals.getTerminalTasks(supportRoom)
-            },
-            dismantle: {
-                tasks: []
-            }
-        };
-        
-        if (!room.unobservable) {
-            tasks.build = {
-                tasks: TaskBuild.getTasks(room)
-            };
-        }
-
-        // New code!
         this.tasks = {};
 
         if (!room.unobservable) {
-            this.tasks.criticalRepairableStructures = _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
             this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
-        
-        return tasks;
     }
 
     //         #                       #     ##                           
@@ -404,67 +375,13 @@ class RoomMine extends RoomEngine {
      * Tasks to perform while the room is in stage 2.
      */
     stage2Tasks() {
-        var room = this.room,
-            roomName = room.name,
-            supportRoom = this.supportRoom,
-            creeps = Cache.creeps[roomName],
-            carryCreeps =
-                Utilities.creepsWithNoTask(creeps && creeps.remoteWorker || []).length > 0 ||
-                Utilities.creepsWithNoTask(creeps && creeps.remoteStorer || []).length > 0 ||
-                Utilities.creepsWithNoTask(creeps && creeps.remoteDismantler || []).length > 0,
-            tasks = {
-                fillEnergy: {
-                    storageTasks: carryCreeps ? TaskFillEnergy.getStorageTasks(supportRoom) : [],
-                    containerTasks: carryCreeps ? TaskFillEnergy.getContainerTasks(supportRoom) : []
-                },
-                fillMinerals: {
-                    storageTasks: carryCreeps ? TaskFillMinerals.getStorageTasks(supportRoom) : [],
-                    terminalTasks: carryCreeps ? TaskFillMinerals.getTerminalTasks(supportRoom) : []
-                }
-            };
+        var room = this.room;
 
-        if (!room.unobservable) {
-            let dismantle = Memory.dismantle,
-                dismantleRoom = dismantle[roomName];
-
-            tasks.dismantle = {
-                tasks: []
-            };
-
-            if (dismantle && dismantleRoom && dismantleRoom.length > 0) {
-                let completed = [];
-                
-                _.forEach(dismantleRoom, (pos) => {
-                    var structures = room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y);
-                    if (structures.length === 0) {
-                        completed.push(pos);
-                    } else {
-                        tasks.dismantle.tasks = tasks.dismantle.tasks.concat(_.map(structures, (s) => new TaskDismantle(s.id)));
-                    }
-                });
-                _.forEach(completed, (complete) => {
-                    _.remove(dismantleRoom, (d) => d.x === complete.x && d.y === complete.y);
-                });
-            } else {
-                let containerId = Cache.containersInRoom(room)[0].id;
-
-                _.forEach(creeps && creeps.dismantler || [], (creep) => {
-                    var memory = creep.memory;
-
-                    memory.role = "remoteWorker";
-                    memory.container = containerId;
-                });
-            }
-        }
-
-        // New code!
         this.tasks = {};
 
         if (!room.unobservable) {
             this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
-        
-        return tasks;
     }
 
     //         #                       ##    ##                           

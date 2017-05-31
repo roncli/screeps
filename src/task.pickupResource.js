@@ -61,14 +61,6 @@ class Pickup {
             return;
         }
     }
-    
-    static getTasks(room) {
-        return _.map(Cache.resourcesInRoom(room), (r) => new Pickup(r.id));
-    }
-
-    static getCollectorTasks(room) {
-        return _.map(_.filter(Cache.resourcesInRoom(room), (r) => r.resourceType === RESOURCE_ENERGY), (r) => new Pickup(r.id));
-    }
 }
 
 if (Memory.profiling) {

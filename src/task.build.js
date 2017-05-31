@@ -57,10 +57,6 @@ class Build {
             return;
         }
     }
-
-    static getTasks(room) {
-        return _.map(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => new Build(s.id));
-    }
 }
 
 if (Memory.profiling) {

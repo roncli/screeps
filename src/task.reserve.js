@@ -48,18 +48,6 @@ class Reserve {
     static fromObj() {
         return new Reserve();
     }
-    
-    static getTask(creep) {
-        if (creep.room.controller) {
-            return new Reserve();
-        }
-    }
-    
-    static getRemoteTask(creep) {
-        if (Game.rooms[creep.memory.home] && Game.rooms[creep.memory.home].controller) {
-            return new Reserve();
-        }
-    }
 }
 
 if (Memory.profiling) {

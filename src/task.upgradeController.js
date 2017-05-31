@@ -63,51 +63,6 @@ class Upgrade {
     static fromObj(creep) {
         return new Upgrade(creep.memory.currentTask.room);
     }
-    
-    static getCriticalTasks(room) {
-        var ttdLimit;
-        
-        if (room.controller && room.controller.my) {
-            switch (room.controller.level) {
-                case 1:
-                    ttdLimit = 10000;
-                    break;
-                case 2:
-                    ttdLimit = 3500;
-                    break;
-                case 3:
-                    ttdLimit = 5000;
-                    break;
-                case 4:
-                    ttdLimit = 10000;
-                    break;
-                case 5:
-                    ttdLimit = 20000;
-                    break;
-                case 6:
-                    ttdLimit = 30000;
-                    break;
-                case 7:
-                    ttdLimit = 50000;
-                    break;
-                case 8:
-                    ttdLimit = 100000;
-                    break;
-            }
-        
-            if (room.controller.ticksToDowngrade < ttdLimit) {
-                return [new Upgrade(room.name)];
-            }
-        }
-    
-        return [];
-    }
-    
-    static getTasks(room) {
-        if (room.controller && room.controller.my) {
-            return [new Upgrade(room.name)];
-        }
-    }
 }
 
 if (Memory.profiling) {

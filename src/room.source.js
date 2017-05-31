@@ -1,4 +1,4 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Commands = require("commands"),
     RoomMine = require("room.mine"),
     RoleDefender = require("role.defender"),

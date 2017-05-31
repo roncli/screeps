@@ -672,7 +672,9 @@ class RoomBase extends RoomEngine {
             hurtCreeps: _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),
             labsCollectMinerals: [],
             nuker: nuker,
+            nukerResourcesNeeded: {},
             powerSpawn: powerSpawn,
+            powerSpawnResourcesNeeded: {},
             repairableStructures: _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
             structuresWithEnergy: [...(storage && storage.my ? [storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
@@ -705,7 +707,6 @@ class RoomBase extends RoomEngine {
 
         //nukerResourcesNeeded
         if (nuker) {
-            tasks.nukerResourcesNeeded = {};
             tasks.nukerResourcesNeeded[RESOURCE_GHODIUM] = nuker.ghodiumCapacity - nuker.ghodium;
         }
 

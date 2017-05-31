@@ -781,7 +781,7 @@ class RoomBase extends RoomEngine {
                 return (!status || ["filling", "refilling"].indexOf(status) !== -1) && (!lab.mineralType || lab.mineralType === (status === "refilling" ? l.oldResource : l.resource)) && (lab.mineralAmount < (status === "refilling" ? l.oldAmount : l.amount));
             }), (labInUse) => {
                 var status = labInUse.status,
-                    lab = Game.getObjectById(lab.id);
+                    lab = Game.getObjectById(labInUse.id);
 
                 tasks.labsFillMinerals = lab;
                 tasks.labsFillMineralsResourcesNeeded = {};

@@ -181,7 +181,7 @@ class Assign {
         var creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
 
         _.forEach(Object.keys(creepsByRoom), (roomName) => {
-            var sites = _.filter(Game.constructionSites, (s) => s.room.name === roomName && (!quickOnly || s.progressTotal === 1)), // TODO: Cache construction sites by room.
+            var sites = _.filter(s.room.find(FIND_MY_CONSTRUCTION_SITES), (s) => !quickOnly || s.progressTotal === 1),
                 creepsInRoom = creepsByRoom[roomName];
             
             _.forEach(sites, (site) => {
@@ -1195,7 +1195,7 @@ class Assign {
         var creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
 
         _.forEach(Object.keys(creepsByRoom), (roomName) => {
-            var structures = _.filter(Cache.sortedRepairableStructuresInRoom(Game.rooms[roomName]), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5),
+            var structures = Cache.criticalRepairableStructuresInRoom(Game.rooms[roomName]),
                 creepsInRoom = creepsByRoom[roomName];
             
             _.forEach(structures, (structure) => {

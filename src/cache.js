@@ -22,6 +22,7 @@ class Cache {
         // Caches for objects.
         this.containers = {};
         this.costMatrixes = {};
+        this.criticalRepairableStructures = {};
         this.extensions = {};
         this.extractors = {};
         this.hostileConstructionSites = {};
@@ -137,6 +138,22 @@ class Cache {
         }
         
         return this.costMatrixes[roomName];
+    }
+
+    //              #     #     #                ##    ###                      #                #     ##           ##    #                       #                             ###         ###                     
+    //                    #                       #    #  #                                      #      #          #  #   #                       #                              #          #  #                    
+    //  ##   ###   ##    ###   ##     ##    ###   #    #  #   ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #   
+    // #     #  #   #     #     #    #     #  #   #    ###   # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####  
+    // #     #      #     #     #    #     # ##   #    # #   ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
+    //  ##   #     ###     ##  ###    ##    # #  ###   #  #   ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    //                                                             #                                                                                                                                                
+    /**
+     * Caches critical repairable structures in a room.
+     * @param {Room} room The room to cache for.
+     * @return {Structure[]} The structures in need of critical repairs.
+     */
+    static criticalRepairableStructuresInRoom(room) {
+        return this.criticalRepairableStructures[room.name] ? this.criticalRepairableStructures[room.name] : this.criticalRepairableStructures[room.name] = _.filter(this.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
     }
 
     //              #                        #                       ###         ###                     

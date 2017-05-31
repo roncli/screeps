@@ -645,7 +645,6 @@ class RoomBase extends RoomEngine {
      */
     tasks() {
         var room = this.room,
-            sortedRepairableStructures = Cache.sortedRepairableStructuresInRoom(room),
             controller = room.controller,
             rcl = controller ? controller.level : undefined,
             extensionEnergyCapacity = rcl ? EXTENSION_ENERGY_CAPACITY[rcl] : 0,
@@ -666,13 +665,13 @@ class RoomBase extends RoomEngine {
 
         this.tasks = {
             constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES),
-            criticalRepairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), // TODO: Cache critical structures to repair in current room.
+            criticalRepairableStructures: _.filter(Cache.criticalRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), // TODO: Cache critical structures to repair in current room.
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
             hostiles: Cache.hostilesInRoom(room),
             labsCollectMinerals: [],
             nuker: nuker,
             powerSpawn: powerSpawn,
-            repairableStructures: _.filter(sortedRepairableStructures, (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000), // TODO: Cache structures to repair in current room.
+            repairableStructures: _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
             structuresWithEnergy: [...(storage && storage.my ? [storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
             terminalsCollectEnergy: terminal && (!terminal.my || (terminal.store[RESOURCE_ENERGY] >= 5000 && (!roomMemory.buyQueue || !storage || store[RESOURCE_ENERGY] < Memory.marketEnergy || Cache.credits < Memory.minimumCredits))),

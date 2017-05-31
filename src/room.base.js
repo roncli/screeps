@@ -718,8 +718,10 @@ class RoomBase extends RoomEngine {
         if (labQueue) {
             status = labQueue.status;
             sourceLabs = labQueue.sourceLabs;
-            lab0 = Game.getObjectById(sourceLabs[0]);
-            lab1 = Game.getObjectById(sourceLabs[1]);
+            if (sourceLabs) {
+                lab0 = Game.getObjectById(sourceLabs[0]);
+                lab1 = Game.getObjectById(sourceLabs[1]);
+            }
         }
 
         labsCollectMinerals = tasks.labsCollectMinerals;
@@ -752,7 +754,7 @@ class RoomBase extends RoomEngine {
             });
         }
     
-        if (storage && labQueue && status === "creating" && !Utilities.roomLabsArePaused(room)) {
+        if (storage && labQueue && sourceLabs && status === "creating" && !Utilities.roomLabsArePaused(room)) {
             let lab0Amount = lab0.mineralAmount,
                 lab1Amount = lab1.mineralAmount;
 
@@ -789,7 +791,7 @@ class RoomBase extends RoomEngine {
             });
         }
 
-        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && labQueue.status === "moving" && !Utilities.roomLabsArePaused(room)) {
+        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && labQueue.status === "moving" && sourceLabs && !Utilities.roomLabsArePaused(room)) {
             if (lab0.mineralAmount < labAmount) {
                 tasks.labsFillMinerals = lab0;
                 tasks.labsFillMineralsResourcesNeeded = {};

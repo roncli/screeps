@@ -424,7 +424,7 @@ class Cache {
      * @return {Resource[]} The resources in the room.
      */
     static sortedResourcesInRoom(room) {
-        return this.sortedResources[room.name] ? this.sortedResources[room.name] : this.sortedResources[room.name] = room.room.find(FIND_DROPPED_RESOURCES).sort((a, b) => {
+        return this.sortedResources[room.name] ? this.sortedResources[room.name] : this.sortedResources[room.name] = room.find(FIND_DROPPED_RESOURCES).sort((a, b) => {
             if (a.resourceType === RESOURCE_ENERGY && b.resourceType !== RESOURCE_ENERGY) {
                 return 1;
             }

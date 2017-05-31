@@ -174,7 +174,9 @@ class RoleUpgrader {
         var room = engine.room,
             roomName = room.name,
             creeps = Cache.creeps[roomName],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.upgrader || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.upgrader || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            allCreeps = creeps && creeps.all || [],
+            tasks = engine.tasks;
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -189,7 +191,7 @@ class RoleUpgrader {
         }
 
         // Check for controllers to upgrade.
-        Assign.upgradeController(creepsWithNoTask, controller, "Upgrade");
+        Assign.upgradeController(creepsWithNoTask, room.controller, "Upgrade");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

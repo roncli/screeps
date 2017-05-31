@@ -45,7 +45,7 @@ class Pathing {
             creepY = creepPos.y,
             creepRoom = creepPos.roomName,
             tick = Game.time,
-            posX, posY, posRoom, wasStationary, firstPos, multiplier, key;
+            posX, posY, posRoom, wasStationary, firstPos, multiplier;
 
         if (pos instanceof RoomObject) {
             pos = pos.pos;

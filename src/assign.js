@@ -59,14 +59,16 @@ class Assign {
 
             firstCreep = creepsToAttack[0];
             
-            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+            if (!firstCreep) {
+                return;
+            } else if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.
                 task = new TaskMeleeAttack(firstCreep.id);
             } else {
                 let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
                 
                 // Rally towards the first creep.
-                task = new TaskRally(firstCreep.id);
+                task = new TaskRally(firstCreep.pos);
 
                 // If there are any creeps within 1 range, attack them.
                 if (closeCreeps.length > 0) {
@@ -116,7 +118,7 @@ class Assign {
                 let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
                 
                 // Rally towards the first creep.
-                task = new TaskRally(firstCreep.id);
+                task = new TaskRally(firstCreep.pos);
 
                 // If there are any creeps within 1 range, attack them.
                 if (closeCreeps.length > 0) {
@@ -569,7 +571,7 @@ class Assign {
             
             // Determine who to heal.  If self, rally.  If escortee, heal.
             if (escorting.hitsMax - escorting.hits === 0 || escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
-                new TaskRally(escorting.id).canAssign(creep);
+                new TaskRally(escorting.pos).canAssign(creep);
             } else {
                 creep.say(say);
             }
@@ -842,7 +844,7 @@ class Assign {
             
             if (creep.id === mostHurtCreep.id && creepsToHeal.length >= 2) {
                 // If we are the most hurt creep, Rally towards the second most hurt creep.  Healers with rally tasks heal themselves by default.
-                task = new TaskRally(creepsToHeal[1].id);
+                task = new TaskRally(creepsToHeal[1].pos);
             } else if (creep.pos.getRangeTo(mostHurtCreep) <= 3) {
                 // Heal the most hurt creep when in range.
                 task = new TaskHeal(mostHurtCreep.id);
@@ -850,7 +852,7 @@ class Assign {
                 let closeCreeps;
                 
                 // Rally towards the most hurt creep.
-                task = new TaskRally(mostHurtCreep.id);
+                task = new TaskRally(mostHurtCreep.pos);
 
                 // If we are not hurt, see if we can heal someone else.
                 if (creep.hits === creep.hitsMax) {
@@ -1007,7 +1009,7 @@ class Assign {
                 // If we're in the portal's origin room, rally to the portal.  Otherwise, rally to the origin room.
                 if (portals[0] === creep.room.name) {
                     creep.memory.portaling = true;
-                    task = new TaskRally(Cache.portalsInRoom(creep.room)[0].id);
+                    task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos);
                 } else {
                     task = new TaskRally(portals[0]);
                 }
@@ -1041,7 +1043,7 @@ class Assign {
 
         _.forEach(creeps, (creep) => {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && Utilities.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
-                var task = new TaskRally(keeper.id);
+                var task = new TaskRally(keeper.pos);
                 task.range = 1;
                 if (task.canAssign(creep)) {
                     creep.memory.currentTask.priority = Game.time;
@@ -1064,7 +1066,7 @@ class Assign {
     static moveToTerminalOrRoom(creeps, room) {
         if (room.terminal) {
             _.forEach(creeps, (creep) => {
-                new TaskRally(room.terminal.id).canAssign(creep);
+                new TaskRally(room.terminal.pos).canAssign(creep);
             });
         } else {
             _.forEach(creeps, (creep) => {
@@ -1165,14 +1167,16 @@ class Assign {
 
             firstCreep = creepsToAttack[0];
             
-            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+            if (!firstCreep) {
+                return;
+            } else if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.
                 task = new TaskRangedAttack(firstCreep.id);
             } else {
                 let closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 3);
                 
                 // Rally towards the most hurt creep.
-                task = new TaskRally(firstCreep.id);
+                task = new TaskRally(firstCreep.pos);
 
                 // If there are any creeps within 3 range, attack them.
                 if (closeCreeps.length > 0) {
@@ -1361,7 +1365,7 @@ class Assign {
 
                 // Check to see if the closest healer is further than 2 squares away, rally to it if so.
                 if (closest[0].pos.getRangeTo(creep) > 2) {
-                    task = new TaskRally(closest[0].id);
+                    task = new TaskRally(closest[0].pos);
                     if (task.canAssign(creep)) {
                         creep.memory.currentTask.priority = Game.time;
                     }
@@ -1389,7 +1393,7 @@ class Assign {
         }
 
         _.forEach(creeps, (creep) => {
-            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0]).canAssign(creep)) {
+            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0].pos).canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
                 creep.say(say);
             }

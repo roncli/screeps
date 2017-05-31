@@ -1032,7 +1032,7 @@ class Assign {
         }
 
         _.forEach(creeps, (creep) => {
-            _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
+            _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && Utilities.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
                 var task = new TaskRally(keeper.id);
                 task.range = 1;
                 if (task.canAssign(creep)) {

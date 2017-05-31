@@ -318,7 +318,8 @@ class Assign {
         }
 
         _.forEach(structures, (structure) => {
-            var minerals = _.sum(structure.store) - structure.store[RESOURCE_ENERGY] - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "collectMinerals" && c.memory.currentTask.id === structure.id), (c) => c.carryCapacity - _.sum(c.carry)));
+            var minerals = structure.store ? _.sum(structure.store) - structure.store[RESOURCE_ENERGY] - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "collectMinerals" && c.memory.currentTask.id === structure.id), (c) => c.carryCapacity - _.sum(c.carry))) : structure.mineralAmount;
+
             if (minerals > 0) {
                 _.forEach(creeps, (creep) => {
                     if (new TaskCollectMinerals(structure.id, resource, amount).canAssign(creep)) {

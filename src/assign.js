@@ -78,7 +78,9 @@ class Assign {
             
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -128,7 +130,9 @@ class Assign {
             
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -157,7 +161,9 @@ class Assign {
             if (progressMissing > 0) {
                 _.forEach(Utilities.objectsClosestToObj(creeps, site), (creep) => {
                     if (new TaskBuild(site.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                         if (progressMissing <= 0) {
                             return false;
@@ -194,7 +200,9 @@ class Assign {
                 if (progressMissing > 0) {
                     _.forEach(Utilities.objectsClosestToObj(creepsInRoom, site), (creep) => {
                         if (new TaskBuild(site.id).canAssign(creep)) {
-                            creep.say(say);
+                            if (say) {
+                                creep.say(say);
+                            }
                             progressMissing -= creep.carry[RESOURCE_ENERGY] || 0;
                             _.remove(creepsInRoom, (c) => c.id === creep.id);
                             if (progressMissing <= 0) {
@@ -237,7 +245,9 @@ class Assign {
 
                 // We've found the controller, let's go claim it.
                 if (new TaskClaim(controller.id).canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             } else {
                 // We can't see the room, so move the creep towards it.
@@ -271,7 +281,10 @@ class Assign {
             if (energy > 0) {
                 _.forEach(creeps, (creep) => {
                     if (new TaskCollectEnergy(structure.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
+
                         if (creep.memory.role === "storer") {
                             creep.memory.lastCollectEnergyWasStorage = structure.structureType === STRUCTURE_STORAGE;
                         }
@@ -301,7 +314,9 @@ class Assign {
     static collectEnergyFromHomeContainer(creeps, say) {
         _.forEach(creeps, (creep) => {
             if (new TaskCollectEnergy(creep.memory.container).canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -332,7 +347,9 @@ class Assign {
             if (minerals > 0) {
                 _.forEach(creeps, (creep) => {
                     if (new TaskCollectMinerals(structure.id, resource, amount).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         minerals -= creep.carryCapacity - _.sum(creep.carry) || 0;
                         if (minerals <= 0) {
                             return false;
@@ -387,7 +404,9 @@ class Assign {
 
         _.forEach(creeps, (creep) => {
             if (task.canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -419,7 +438,9 @@ class Assign {
 
             _.forEach(creeps, (creep) => {
                 if (task.canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             });
         }
@@ -452,7 +473,9 @@ class Assign {
             }
 
             if (task.canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -499,7 +522,9 @@ class Assign {
 
             _.forEach(creeps, (creep) => {
                 if (new TaskDismantle(structures[0].id).canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             });
             return;
@@ -539,7 +564,9 @@ class Assign {
 
                 // We've found the controller, let's go downgrade it.
                 if (new TaskDowngrade(controller.id).canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             } else {
                 // We can't see the room, so move the creep towards it.
@@ -573,7 +600,9 @@ class Assign {
             if (escorting.hitsMax - escorting.hits === 0 || escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
                 new TaskRally(escorting.pos).canAssign(creep);
             } else {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -601,7 +630,9 @@ class Assign {
             _.forEach(extensions.sort((a, b) => a.pos.getRangeTo(creep) - b.pos.getRangeTo(creep)), (extension) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === extension.id).length === 0) {
                     if (new TaskFillEnergy(extension.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         return false;
                     }
                 }
@@ -632,7 +663,9 @@ class Assign {
             _.forEach(spawns.sort((a, b) => a.pos.getRangeTo(creep) - b.pos.getRangeTo(creep)), (spawn) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === spawn.id).length === 0) {
                     if (new TaskFillEnergy(spawn.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         return false;
                     }
                 }
@@ -661,7 +694,9 @@ class Assign {
 
         _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
             if ((!room.terminal || !creep.memory.lastCollectEnergyWasStorage) && new TaskFillEnergy(room.storage.id).canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -714,7 +749,9 @@ class Assign {
             _.forEach(towers.sort((a, b) => a.energy - b.energy), (tower) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "fillEnergy" && c.memory.currentTask.id === tower.id).length === 0) {
                     if (new TaskFillEnergy(tower.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         return false;
                     }
                 }
@@ -743,7 +780,9 @@ class Assign {
         _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
             _.forEach(structures, (structure) => {
                 if (new TaskFillEnergy(structure.id).canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                     return false;
                 }
             });
@@ -770,7 +809,9 @@ class Assign {
 
         _.forEach(creeps, (creep) => {
             if (new TaskFillMinerals(structure.id, resourcesNeeded).canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -812,7 +853,9 @@ class Assign {
         _.forEach(creeps, (creep) => {
             var task = new TaskHarvest();
             if (task.canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -872,7 +915,9 @@ class Assign {
             
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -891,7 +936,9 @@ class Assign {
     static mine(creeps, say) {
         _.forEach(creeps, (creep) => {
             if (new TaskMine().canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -972,7 +1019,9 @@ class Assign {
         }
         _.forEach(creeps, (creep) => {
             if (task.canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -1019,7 +1068,9 @@ class Assign {
             
             // Assign the task.
             if (task.canAssign(creep)) {
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -1101,7 +1152,9 @@ class Assign {
                     return;
                 }
                 if (new TaskPickupResource(resource.id).canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                     return false;
                 }
             });
@@ -1133,7 +1186,9 @@ class Assign {
                         return;
                     }
                     if (new TaskPickupResource(resource.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         return false;
                     }
                 });
@@ -1186,7 +1241,9 @@ class Assign {
             
             if (task.canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -1213,7 +1270,9 @@ class Assign {
             _.forEach(structures, (structure) => {
                 _.forEach(Utilities.objectsClosestToObj(creepsInRoom, structure), (creep) => {
                     if (new TaskRepair(structure.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         _.remove(creepsInRoom, (c) => c.id === creep.id);
                         return false;
                     }
@@ -1245,7 +1304,9 @@ class Assign {
             _.forEach(Utilities.objectsClosestToObj(creeps, structure), (creep) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === structure.id).length === 0) {
                     if (new TaskRepair(structure.id).canAssign(creep)) {
-                        creep.say(say);
+                        if (say) {
+                            creep.say(say);
+                        }
                         return false;
                     }
                 }
@@ -1277,7 +1338,9 @@ class Assign {
                     return;
                 }
                 if (new TaskReserve().canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             });
         }
@@ -1313,7 +1376,9 @@ class Assign {
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
                 if (task.canAssign(creep)) {
                     creep.memory.currentTask.priority = Game.time;
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             });
         }
@@ -1351,7 +1416,9 @@ class Assign {
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
                 if (task.canAssign(creep)) {
                     creep.memory.currentTask.priority = Game.time;
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             });
         }
@@ -1395,7 +1462,9 @@ class Assign {
         _.forEach(creeps, (creep) => {
             if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0].pos).canAssign(creep)) {
                 creep.memory.currentTask.priority = Game.time;
-                creep.say(say);
+                if (say) {
+                    creep.say(say);
+                }
             }
         });
     }
@@ -1418,7 +1487,9 @@ class Assign {
             let task = new TaskUpgradeController(controller.room);
             _.forEach(creeps, (creep) => {
                 if (task.canAssign(creep)) {
-                    creep.say(say);
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             });
         }
@@ -1440,7 +1511,9 @@ class Assign {
     static upgradeCriticalController(creeps, controller, say) {
         if (controller.my && controller.ticksToDowngrade < [0, 10000, 3500, 5000, 10000, 20000, 30000, 50000, 100000][controller.level]) {
             if (new TaskUpgradeController(controller.room).canAssign(creeps[0])) {
-                creeps[0].say(say);
+                if (say) {
+                    creeps[0].say(say);
+                }
             }
         }
     }

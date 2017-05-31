@@ -1124,7 +1124,9 @@ class Main {
             
             if (rooms && roomMemory && (roomType = roomMemory.roomType)) {
                 // Run rooms.
-                rooms.run();
+                if (Game.cpu.bucket >= 9700 || Game.time % 2) {
+                    rooms.run();
+                }
 
                 if (roomType.type === rooms.type) {
                     rooms.toObj();

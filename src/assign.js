@@ -106,8 +106,10 @@ class Assign {
             var task;
 
             firstCreep = _.filter(creepsToAttack, (c) => Utilities.checkQuadrant(c.pos, creep.memory.quadrant))[0];
-            
-            if (creep.pos.getRangeTo(firstCreep) <= 1) {
+
+            if (!firstCreep) {
+                return;
+            } else if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.
                 task = new TaskMeleeAttack(firstCreep.id);
             } else {

@@ -1,4 +1,4 @@
-var Cache = require("cache");
+const Cache = require("cache");
 
 //  #####                             
 //    #                               

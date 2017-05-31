@@ -265,10 +265,15 @@ class Assign {
 
         _.forEach(structures, (structure) => {
             var energy = (structure.store ? structure.store[RESOURCE_ENERGY] : structure.energy) - _.sum(_.map(_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "collectEnergy" && c.memory.currentTask.id === structure.id), (c) => c.carryCapacity - _.sum(c.carry)));
+
             if (energy > 0) {
                 _.forEach(creeps, (creep) => {
                     if (new TaskCollectEnergy(structure.id).canAssign(creep)) {
                         creep.say(say);
+                        if (creep.memory.role === "storer") {
+                            creep.memory.lastCollectEnergyWasStorage = structure.structureType === STRUCTURE_STORAGE;
+                        }
+
                         energy -= creep.carryCapacity - _.sum(creep.carry) || 0;
                         if (energy <= 0) {
                             return false;
@@ -653,7 +658,7 @@ class Assign {
         }
 
         _.forEach(_.filter(creeps, (c) => c.carry[RESOURCE_ENERGY] > 0), (creep) => {
-            if (new TaskFillEnergy(room.storage.id).canAssign(creep)) {
+            if ((!room.terminal || !creep.memory.lastCollectEnergyWasStorage) && new TaskFillEnergy(room.storage.id).canAssign(creep)) {
                 creep.say(say);
             }
         });

@@ -20,30 +20,33 @@ class Tower {
     //                            ###                                        
     /**
      * Assigns tasks to the tower.
-     * @param {Room} room The room to get tasks from.
-     * @param {object} tasks The tasks to assign to the tower.
+     * @param {RoomEngine} engine The room engine to assign tasks for.
      */
-    static assignTasks(room, tasks) {
+    static assignTasks(engine) {
+        var tasks = engine.tasks,
+            room = engine.room,
+            towers = Cache.towersInRoom(room);
+
         // Find hostiles to attack.
-        if (tasks.rangedAttack.tasks.length > 0) {
-            _.forEach(Cache.towersInRoom(room), (tower) => {
-                tower.attack(tasks.rangedAttack.tasks[0].enemy);
+        if (tasks.hostiles.length > 0) {
+            _.forEach(towers, (tower) => {
+                tower.attack(tasks.hostiles[0]);
             });
             return;
         }
 
         // Check for tower repairs.
-        if (tasks.repair.towerTasks.length > 0) {
-            _.forEach(Cache.towersInRoom(room), (tower) => {
-                tower.repair(tasks.repair.towerTasks[0].structure);
+        if (tasks.criticalRepairableStructures.length > 0) {
+            _.forEach(towers, (tower) => {
+                tower.repair(tasks.criticalRepairableStructures[0]);
             });
             return;
         }
 
         // Check for heals.
-        if (tasks.heal.tasks.length > 0) {
-            _.forEach(Cache.towersInRoom(room), (tower) => {
-                tower.heal(tasks.heal.tasks[0].ally);
+        if (tasks.hurtCreeps.length > 0) {
+            _.forEach(towers, (tower) => {
+                tower.heal(tasks.hurtCreeps[0]);
             });
             return;
         }

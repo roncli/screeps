@@ -181,7 +181,7 @@ class Assign {
         var creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
 
         _.forEach(Object.keys(creepsByRoom), (roomName) => {
-            var sites = _.filter(s.room.find(FIND_MY_CONSTRUCTION_SITES), (s) => !quickOnly || s.progressTotal === 1),
+            var sites = _.filter(Game.rooms[roomName].find(FIND_MY_CONSTRUCTION_SITES), (s) => !quickOnly || s.progressTotal === 1),
                 creepsInRoom = creepsByRoom[roomName];
             
             _.forEach(sites, (site) => {

@@ -2,10 +2,9 @@ var Cache = require("cache"),
     Pathing = require("pathing");
 
 class Rally {
-    constructor(id, creep) {
+    constructor(id) {
         this.type = "rally";
         this.id = id;
-        this.creep = creep;
         if (id instanceof RoomPosition) {
             this.rallyPoint = new RoomPosition(id.x, id.y, id.roomName);
         } else {
@@ -120,21 +119,21 @@ class Rally {
     }
     
     static getHarvesterTasks(creeps) {
-        return _.map(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (c) => new Rally(c.memory.homeSource, c));
+        return _.map(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (c) => new Rally(c.memory.homeSource));
     }
     
     static getDefenderTask(creep) {
         var source = Cache.sourceKeepersInRoom(creep.room).sort((a, b) => a.ticksToSpawn - b.ticksToSpawn)[0];
     
         if (source && creep.room.name === creep.memory.home) {
-            return new Rally(source.id, creep);
+            return new Rally(source.id);
         } else {
-            return new Rally(creep.memory.home, creep);
+            return new Rally(creep.memory.home);
         }
     }
     
     static getClaimerTask(creep) {
-        return new Rally(creep.memory.claim, creep);
+        return new Rally(creep.memory.claim);
     }
 }
 

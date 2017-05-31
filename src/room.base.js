@@ -775,9 +775,6 @@ class RoomBase extends RoomEngine {
             });
         }
 */
-        if ((storersWithNothing || scientistsWithNothing) && terminal && (!terminal.my || (terminalEnergy >= 5000 && (!room.memory.buyQueue || storageEnergy < Memory.marketEnergy || Cache.credits < Memory.minimumCredits)))) {
-            tasks.collectEnergy.terminalTask = new TaskCollectEnergy(terminalId);
-        }
 
         // New code below!
         var room = this.room,
@@ -796,6 +793,8 @@ class RoomBase extends RoomEngine {
             labs = Cache.labsInRoom(room),
             labAmount = labQueue ? labQueue.amount : undefined,
             reserveMinerals = Memory.reserveMinerals,
+            links = Cache.linksInRoom(room),
+            spawns = Cache.spawnsInRoom(room),
             tasks, status, sourceLabs, lab0, lab1, labsCollectMinerals;
 
         this.tasks = {
@@ -956,7 +955,7 @@ class RoomBase extends RoomEngine {
                 } else if (store[resource] < (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource])) {
                     tasks.terminalCollectMinerals = [terminal];
                     tasks.terminalCollectMineralsResource = resource;
-                    tasks.terminalCollectMineralsAmount = Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) - store[resource])
+                    tasks.terminalCollectMineralsAmount = Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) - store[resource]);
                 }
             });
         }
@@ -974,9 +973,9 @@ class RoomBase extends RoomEngine {
                         lab = Game.getObjectById(l.id);
 
                     if ((status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount)) > 0) {
-                        this.storageCollectMinerals = [storage];
-                        this.storageCollectMineralsResource = status === "refilling" ? l.oldResource : l.resource;
-                        this.storageCollectMineralsAmount = status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount);
+                        links.storageCollectMinerals = [storage];
+                        links.storageCollectMineralsResource = status === "refilling" ? l.oldResource : l.resource;
+                        links.storageCollectMineralsAmount = status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount);
 
                         return false;
                     }
@@ -984,14 +983,14 @@ class RoomBase extends RoomEngine {
             }
     
             // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-            if (!this.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
+            if (!links.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
                 _.forEach(labQueue.children, (resource) => {
                     var amount;
 
                     if ((amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount)) < labAmount) {
-                        this.storageCollectMinerals = [storage];
-                        this.storageCollectMineralsResource = resource;
-                        this.storageCollectMineralsAmount = labAmount - amount;
+                        links.storageCollectMinerals = [storage];
+                        links.storageCollectMineralsResource = resource;
+                        links.storageCollectMineralsAmount = labAmount - amount;
 
                         return false;
                     }
@@ -999,7 +998,7 @@ class RoomBase extends RoomEngine {
             }
     
             // We only need to transfer from storage to terminal when we have both storage and terminal.
-            if (!this.storageCollectMinerals && storage && terminal && reserveMinerals) {
+            if (!links.storageCollectMinerals && storage && terminal && reserveMinerals) {
                 _.forEach(store, (amount, resource) => {
                     var reserveMineralsResource;
 
@@ -1010,36 +1009,39 @@ class RoomBase extends RoomEngine {
                     reserveMineralsResource = reserveMinerals[resource];
 
                     if (!reserveMineralsResource) {
-                        this.storageCollectMinerals = [storage];
-                        this.storageCollectMineralsResource = resource;
-                        this.storageCollectMineralsAmount = amount;
+                        links.storageCollectMinerals = [storage];
+                        links.storageCollectMineralsResource = resource;
+                        links.storageCollectMineralsAmount = amount;
 
                         return false;
                     } else if ((resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) < amount) {
-                        this.storageCollectMinerals = [storage];
-                        this.storageCollectMineralsResource = resource;
-                        this.storageCollectMineralsAmount = amount - (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource);
+                        links.storageCollectMinerals = [storage];
+                        links.storageCollectMineralsResource = resource;
+                        links.storageCollectMineralsAmount = amount - (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource);
 
                         return false;
                     }
                 });
             }
     
-            if (!this.storageCollectMinerals) {
+            if (!links.storageCollectMinerals) {
                 // If we have a nuker, transfer ghodium.  If we have a power spawn, transfer power.
                 if (nuker && rcl > 8 && nuker.ghodium < nuker.ghodiumCapacity && store[RESOURCE_GHODIUM]) {
-                    this.storageCollectMinerals = [storage];
-                    this.storageCollectMineralsResource = RESOURCE_GHODIUM;
-                    this.storageCollectMineralsAmount = Math.min(nuker.ghodiumCapacity - nuker.ghodium, store[RESOURCE_GHODIUM]);
+                    links.storageCollectMinerals = [storage];
+                    links.storageCollectMineralsResource = RESOURCE_GHODIUM;
+                    links.storageCollectMineralsAmount = Math.min(nuker.ghodiumCapacity - nuker.ghodium, store[RESOURCE_GHODIUM]);
                 } else if (powerSpawn && rcl > 8 && powerSpawn.power / powerSpawn.powerCapacity < 0.5 && store[RESOURCE_POWER]) {
-                    this.storageCollectMinerals = [storage];
-                    this.storageCollectMineralsResource = RESOURCE_POWER;
-                    this.storageCollectMineralsAmount = Math.min(powerSpawn.powerCapacity - powerSpawn.power, store[RESOURCE_POWER]);
+                    links.storageCollectMinerals = [storage];
+                    links.storageCollectMineralsResource = RESOURCE_POWER;
+                    links.storageCollectMineralsAmount = Math.min(powerSpawn.powerCapacity - powerSpawn.power, store[RESOURCE_POWER]);
                 }
             }
         }
 
-        // terminalsCollectEnergy
+        // links
+        if (links.length > 1 && spawns.length > 0) {
+            tasks.links = Utilities.objectsClosestToObj(links, spawns[0]);
+        }
     }
 
     //  ###   ###    ###  #  #  ###   

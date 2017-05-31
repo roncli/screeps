@@ -1033,7 +1033,7 @@ class Assign {
 
         _.creeps.forEach((creep) => {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
-                var task = new TaskRally(keeper.id, creep);
+                var task = new TaskRally(keeper.id);
                 task.range = 1;
                 if (task.canAssign(creep)) {
                     creep.memory.currentTask.priority = Game.time;
@@ -1041,6 +1041,28 @@ class Assign {
                 }
             });
         });
+    }
+
+    //                         ###         ###                      #                ##     ##         ###                     
+    //                          #           #                                         #    #  #        #  #                    
+    // # #    ##   # #    ##    #     ##    #     ##   ###   # #   ##    ###    ###   #    #  #  ###   #  #   ##    ##   # #   
+    // ####  #  #  # #   # ##   #    #  #   #    # ##  #  #  ####   #    #  #  #  #   #    #  #  #  #  ###   #  #  #  #  ####  
+    // #  #  #  #  # #   ##     #    #  #   #    ##    #     #  #   #    #  #  # ##   #    #  #  #     # #   #  #  #  #  #  #  
+    // #  #   ##    #     ##    #     ##    #     ##   #     #  #  ###   #  #   # #  ###    ##   #     #  #   ##    ##   #  #  
+    /**
+     * Assigns creeps to move to a terminal or the room if there is no terminal.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     */
+    moveToTerminalOrRoom(creeps, room) {
+        if (room.terminal) {
+            _.forEach(creeps, (creep) => {
+                new TaskRally(room.terminal.id).canAssign(creep);
+            });
+        } else {
+            _.forEach(creeps, (creep) => {
+                new TaskRally(room.name).canAssign(creep);
+            });
+        }
     }
 
     //        #          #                 ###                                                     

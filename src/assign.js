@@ -1031,7 +1031,7 @@ class Assign {
             return;
         }
 
-        _.creeps.forEach((creep) => {
+        _.forEach(creeps, (creep) => {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && this.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
                 var task = new TaskRally(keeper.id);
                 task.range = 1;

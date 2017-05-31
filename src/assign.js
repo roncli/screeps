@@ -1061,7 +1061,7 @@ class Assign {
      * Assigns creeps to move to a terminal or the room if there is no terminal.
      * @param {Creep[]} creeps The creeps to assign this task to.
      */
-    moveToTerminalOrRoom(creeps, room) {
+    static moveToTerminalOrRoom(creeps, room) {
         if (room.terminal) {
             _.forEach(creeps, (creep) => {
                 new TaskRally(room.terminal.id).canAssign(creep);

@@ -1391,34 +1391,6 @@ class Assign {
         });
     }
     
-    //  #                 #            
-    //  #                 #            
-    // ###    ###   ###   # #    ###   
-    //  #    #  #  ##     ##    ##     
-    //  #    # ##    ##   # #     ##   
-    //   ##   # #  ###    #  #  ###    
-    /**
-     * Assigns a task from a list to each creep.
-     * @param {Creep[]} creeps The creeps to assign this task to.
-     * @param {object[]} tasks The tasks to assign.
-     * @param {bool} multiAssign Assign the task to more than one creep.
-     * @param {string} say Text to say on successful assignment.
-     */
-    static tasks(creeps, tasks, multiAssign, say) {
-        if (!tasks || tasks.length === 0) {
-            return;
-        }
-
-        _.forEach(tasks, (task) => {
-            _.forEach(creeps, (creep) => {
-                if (task.canAssign(creep)) {
-                    creep.say(say);
-                }
-                return multiAssign;
-            });
-        });
-    }
-
     //                                  #         ##                #                ##    ##                
     //                                  #        #  #               #                 #     #                
     // #  #  ###    ###  ###    ###   ###   ##   #      ##   ###   ###   ###    ##    #     #     ##   ###   

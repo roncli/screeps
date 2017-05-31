@@ -1,6 +1,5 @@
 var Cache = require("cache"),
-    Pathing = require("pathing"),
-    Utilities = require("utilities");
+    Pathing = require("pathing");
 
 class CollectMinerals {
     constructor(id, resource, amount) {
@@ -18,7 +17,7 @@ class CollectMinerals {
             return false;
         }
 
-        if (obj.structureType === STRUCTURE_LAB && obj.mineralAmount === 0 || _.sum(obj.store) === obj.store[RESOURCE_ENERGY]) {
+        if (obj.structureType === STRUCTURE_LAB && obj.mineralAmount === 0 || obj.store && _.sum(obj.store) === obj.store[RESOURCE_ENERGY]) {
             return false;
         }
         
@@ -27,7 +26,7 @@ class CollectMinerals {
                 return false;
             }
     
-            if (!(obj.structureType === STRUCTURE_LAB) && (obj.store[this.resource] || 0) < this.amount) {
+            if (obj.structureType !== STRUCTURE_LAB && (obj.store[this.resource] || 0) < this.amount) {
                 return false;
             }
         }

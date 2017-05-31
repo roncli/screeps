@@ -1,6 +1,5 @@
 var Cache = require("cache"),
-    Pathing = require("pathing"),
-    Utilities = require("utilities");
+    Pathing = require("pathing");
 
 class FillEnergy {
     constructor(id) {

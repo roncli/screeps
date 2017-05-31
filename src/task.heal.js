@@ -9,7 +9,7 @@ class Heal {
         this.unimportant = true;
     }
     
-    canAssign(creep, tasks) {
+    canAssign(creep) {
         if (creep.spawning || creep.getActiveBodyparts(HEAL) === 0) {
             return false;
         }

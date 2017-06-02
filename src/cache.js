@@ -1,22 +1,23 @@
-//   ###                 #            
-//  #   #                #            
-//  #       ###    ###   # ##    ###  
-//  #          #  #   #  ##  #  #   # 
-//  #       ####  #      #   #  ##### 
-//  #   #  #   #  #   #  #   #  #     
-//   ###    ####   ###   #   #   ###  
+//   ###                 #
+//  #   #                #
+//  #       ###    ###   # ##    ###
+//  #          #  #   #  ##  #  #   #
+//  #       ####  #      #   #  #####
+//  #   #  #   #  #   #  #   #  #
+//   ###    ####   ###   #   #   ###
 /**
  * A class that caches data.
  */
 class Cache {
-    //                           #    
-    //                           #    
-    // ###    ##    ###    ##   ###   
-    // #  #  # ##  ##     # ##   #    
-    // #     ##      ##   ##     #    
-    // #      ##   ###     ##     ##  
+    //                           #
+    //                           #
+    // ###    ##    ###    ##   ###
+    // #  #  # ##  ##     # ##   #
+    // #     ##      ##   ##     #
+    // #      ##   ###     ##     ##
     /**
      * Resets the cache.
+     * @return {void}
      */
     static reset() {
         // Caches for objects.
@@ -58,23 +59,25 @@ class Cache {
             rooms: {},
             army: {}
         };
-        
+
         // Cache for credits.
-        this.credits = Game.market.credits;
+        ({market: {credits: this.credits}} = Game);
 
         // Cache the global visual and the time if we have visualizations on.
         if (Memory.visualizations) {
             this.globalVisual = new RoomVisual();
-            this.time = new Date().toLocaleString("en-US", {timeZone: "America/Los_Angeles"}).replace(",", "");
+            this.time = new Date()
+                .toLocaleString("en-US", {timeZone: "America/Los_Angeles"})
+                .replace(",", "");
         }
     }
-    
-    //                    #           #                             ###         ###                     
-    //                    #                                          #          #  #                    
-    //  ##    ##   ###   ###    ###  ##    ###    ##   ###    ###    #    ###   #  #   ##    ##   # #   
-    // #     #  #  #  #   #    #  #   #    #  #  # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    // #     #  #  #  #   #    # ##   #    #  #  ##    #       ##    #    #  #  # #   #  #  #  #  #  #  
-    //  ##    ##   #  #    ##   # #  ###   #  #   ##   #     ###    ###   #  #  #  #   ##    ##   #  #  
+
+    //                    #           #                             ###         ###
+    //                    #                                          #          #  #
+    //  ##    ##   ###   ###    ###  ##    ###    ##   ###    ###    #    ###   #  #   ##    ##   # #
+    // #     #  #  #  #   #    #  #   #    #  #  # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    // #     #  #  #  #   #    # ##   #    #  #  ##    #       ##    #    #  #  # #   #  #  #  #  #  #
+    //  ##    ##   #  #    ##   # #  ###   #  #   ##   #     ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches containers in a room.
      * @param {Room} room The room to cache for.
@@ -84,29 +87,30 @@ class Cache {
         return this.containers[room.name] ? this.containers[room.name] : this.containers[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
     }
 
-    //                     #    #  #         #           #          ####              ###                     
-    //                     #    ####         #                      #                 #  #                    
-    //  ##    ##    ###   ###   ####   ###  ###   ###   ##    #  #  ###    ##   ###   #  #   ##    ##   # #   
-    // #     #  #  ##      #    #  #  #  #   #    #  #   #     ##   #     #  #  #  #  ###   #  #  #  #  ####  
-    // #     #  #    ##    #    #  #  # ##   #    #      #     ##   #     #  #  #     # #   #  #  #  #  #  #  
-    //  ##    ##   ###      ##  #  #   # #    ##  #     ###   #  #  #      ##   #     #  #   ##    ##   #  #  
+    //                     #    #  #         #           #          ####              ###
+    //                     #    ####         #                      #                 #  #
+    //  ##    ##    ###   ###   ####   ###  ###   ###   ##    #  #  ###    ##   ###   #  #   ##    ##   # #
+    // #     #  #  ##      #    #  #  #  #   #    #  #   #     ##   #     #  #  #  #  ###   #  #  #  #  ####
+    // #     #  #    ##    #    #  #  # ##   #    #      #     ##   #     #  #  #     # #   #  #  #  #  #  #
+    //  ##    ##   ###      ##  #  #   # #    ##  #     ###   #  #  #      ##   #     #  #   ##    ##   #  #
     /**
      * Caches the cost matrix for a room.
      * @param {Room} room The room to cache for.
      * @return {CostMatrix} The cost matrix for the room.
      */
     static costMatrixForRoom(room) {
-        var roomName = room.name;
+        const {name: roomName} = room;
 
         if (!room || room.unobservable) {
             return new PathFinder.CostMatrix();
         }
 
         if (!this.costMatrixes[roomName]) {
-            let matrix = new PathFinder.CostMatrix();
+            const matrix = new PathFinder.CostMatrix();
 
             _.forEach(room.find(FIND_STRUCTURES), (structure) => {
-                var pos = structure.pos;
+                const {pos} = structure;
+
                 if (structure.structureType === STRUCTURE_ROAD) {
                     matrix.set(pos.x, pos.y, Math.max(1, matrix.get(pos.x, pos.y)));
                 } else if (structure.structureType === STRUCTURE_WALL) {
@@ -119,12 +123,14 @@ class Cache {
             });
 
             _.forEach(room.find(FIND_MY_CONSTRUCTION_SITES), (structure) => {
-                var pos = structure.pos;
+                const {pos} = structure;
+
                 matrix.set(pos.x, pos.y, Math.max(5, matrix.get(pos.x, pos.y)));
             });
-            
+
             _.forEach(this.portalsInRoom(room), (structure) => {
-                var pos = structure.pos;
+                const {pos} = structure;
+
                 matrix.set(pos.x, pos.y, 10);
             });
 
@@ -133,20 +139,20 @@ class Cache {
                     matrix.set(square.x, square.y, 255);
                 });
             }
-            
+
             this.costMatrixes[roomName] = matrix;
         }
-        
+
         return this.costMatrixes[roomName];
     }
 
-    //              #     #     #                ##    ###                      #                #     ##           ##    #                       #                             ###         ###                     
-    //                    #                       #    #  #                                      #      #          #  #   #                       #                              #          #  #                    
-    //  ##   ###   ##    ###   ##     ##    ###   #    #  #   ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #   
-    // #     #  #   #     #     #    #     #  #   #    ###   # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    // #     #      #     #     #    #     # ##   #    # #   ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    //  ##   #     ###     ##  ###    ##    # #  ###   #  #   ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #  
-    //                                                             #                                                                                                                                                
+    //              #     #     #                ##    ###                      #                #     ##           ##    #                       #                             ###         ###
+    //                    #                       #    #  #                                      #      #          #  #   #                       #                              #          #  #
+    //  ##   ###   ##    ###   ##     ##    ###   #    #  #   ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #
+    // #     #  #   #     #     #    #     #  #   #    ###   # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####
+    // #     #      #     #     #    #     # ##   #    # #   ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #
+    //  ##   #     ###     ##  ###    ##    # #  ###   #  #   ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #
+    //                                                             #
     /**
      * Caches critical repairable structures in a room.
      * @param {Room} room The room to cache for.
@@ -156,12 +162,12 @@ class Cache {
         return this.criticalRepairableStructures[room.name] ? this.criticalRepairableStructures[room.name] : this.criticalRepairableStructures[room.name] = _.filter(this.sortedRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5);
     }
 
-    //              #                        #                       ###         ###                     
-    //              #                                                 #          #  #                    
-    //  ##   #  #  ###    ##   ###    ###   ##     ##   ###    ###    #    ###   #  #   ##    ##   # #   
-    // # ##   ##    #    # ##  #  #  ##      #    #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    // ##     ##    #    ##    #  #    ##    #    #  #  #  #    ##    #    #  #  # #   #  #  #  #  #  #  
-    //  ##   #  #    ##   ##   #  #  ###    ###    ##   #  #  ###    ###   #  #  #  #   ##    ##   #  #  
+    //              #                        #                       ###         ###
+    //              #                                                 #          #  #
+    //  ##   #  #  ###    ##   ###    ###   ##     ##   ###    ###    #    ###   #  #   ##    ##   # #
+    // # ##   ##    #    # ##  #  #  ##      #    #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    // ##     ##    #    ##    #  #    ##    #    #  #  #  #    ##    #    #  #  # #   #  #  #  #  #  #
+    //  ##   #  #    ##   ##   #  #  ###    ###    ##   #  #  ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches extensions in a room.
      * @param {Room} room The room to cache for.
@@ -171,12 +177,12 @@ class Cache {
         return this.extensions[room.name] ? this.extensions[room.name] : this.extensions[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
     }
 
-    //              #                       #                       ###         ###                     
-    //              #                       #                        #          #  #                    
-    //  ##   #  #  ###   ###    ###   ##   ###    ##   ###    ###    #    ###   #  #   ##    ##   # #   
-    // # ##   ##    #    #  #  #  #  #      #    #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    // ##     ##    #    #     # ##  #      #    #  #  #       ##    #    #  #  # #   #  #  #  #  #  #  
-    //  ##   #  #    ##  #      # #   ##     ##   ##   #     ###    ###   #  #  #  #   ##    ##   #  #  
+    //              #                       #                       ###         ###
+    //              #                       #                        #          #  #
+    //  ##   #  #  ###   ###    ###   ##   ###    ##   ###    ###    #    ###   #  #   ##    ##   # #
+    // # ##   ##    #    #  #  #  #  #      #    #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    // ##     ##    #    #     # ##  #      #    #  #  #       ##    #    #  #  # #   #  #  #  #  #  #
+    //  ##   #  #    ##  #      # #   ##     ##   ##   #     ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches extractors in a room.
      * @param {Room} room The room to cache for.
@@ -186,12 +192,12 @@ class Cache {
         return this.extractors[room.name] ? this.extractors[room.name] : this.extractors[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTRACTOR});
     }
 
-    // #                   #     #    ##           ##                       #                       #     #                 ##    #     #                 ###         ###                     
-    // #                   #           #          #  #                      #                       #                      #  #         #                  #          #  #                    
-    // ###    ##    ###   ###   ##     #     ##   #      ##   ###    ###   ###   ###   #  #   ##   ###   ##     ##   ###    #    ##    ###    ##    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  #  #  ##      #     #     #    # ##  #     #  #  #  #  ##      #    #  #  #  #  #      #     #    #  #  #  #    #    #     #    # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #    ##    #     #     #    ##    #  #  #  #  #  #    ##    #    #     #  #  #      #     #    #  #  #  #  #  #   #     #    ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    // #  #   ##   ###      ##  ###   ###    ##    ##    ##   #  #  ###      ##  #      ###   ##     ##  ###    ##   #  #   ##   ###     ##   ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    // #                   #     #    ##           ##                       #                       #     #                 ##    #     #                 ###         ###
+    // #                   #           #          #  #                      #                       #                      #  #         #                  #          #  #
+    // ###    ##    ###   ###   ##     #     ##   #      ##   ###    ###   ###   ###   #  #   ##   ###   ##     ##   ###    #    ##    ###    ##    ###    #    ###   #  #   ##    ##   # #
+    // #  #  #  #  ##      #     #     #    # ##  #     #  #  #  #  ##      #    #  #  #  #  #      #     #    #  #  #  #    #    #     #    # ##  ##      #    #  #  ###   #  #  #  #  ####
+    // #  #  #  #    ##    #     #     #    ##    #  #  #  #  #  #    ##    #    #     #  #  #      #     #    #  #  #  #  #  #   #     #    ##      ##    #    #  #  # #   #  #  #  #  #  #
+    // #  #   ##   ###      ##  ###   ###    ##    ##    ##   #  #  ###      ##  #      ###   ##     ##  ###    ##   #  #   ##   ###     ##   ##   ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches hostile construction sites in a room.  Allies are excluded.
      * @param {Room} room The room to check for hostile construction sites in.
@@ -201,78 +207,77 @@ class Cache {
         return this.hostileConstructionSites[room.name] ? this.hostileConstructionSites[room.name] : this.hostileConstructionSites[room.name] = _.filter(room.find(FIND_HOSTILE_CONSTRUCTION_SITES), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
     }
 
-    // #                   #     #    ##                 ###         ###                     
-    // #                   #           #                  #          #  #                    
-    // ###    ##    ###   ###   ##     #     ##    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  #  #  ##      #     #     #    # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #    ##    #     #     #    ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    // #  #   ##   ###      ##  ###   ###    ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    // #                   #     #    ##                 ###         ###
+    // #                   #           #                  #          #  #
+    // ###    ##    ###   ###   ##     #     ##    ###    #    ###   #  #   ##    ##   # #
+    // #  #  #  #  ##      #     #     #    # ##  ##      #    #  #  ###   #  #  #  #  ####
+    // #  #  #  #    ##    #     #     #    ##      ##    #    #  #  # #   #  #  #  #  #  #
+    // #  #   ##   ###      ##  ###   ###    ##   ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches hostiles in a room.  Allies are excluded.
      * @param {Room} room The room to cache for.
      * @return {Creep[]} The hostiles in the room.
      */
     static hostilesInRoom(room) {
-        var hostiles, memory, threat;
-
         if (!room || room.unobservable) {
             return [];
         }
 
-        hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
-        memory = room.memory,
-        threat = _.groupBy(_.map(hostiles, (h) => ({id: h.id, threat: _.reduce(h.body, (total, bodypart) => {
-            var threat,
-                boosts;
+        const hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1),
+            {memory} = room,
+            threat = _.groupBy(_.map(hostiles, (h) => ({
+                id: h.id, threat: _.reduce(h.body, (total, bodypart) => {
+                    let threatValue;
 
-            switch (bodypart.type) {
-                case ATTACK:
-                case RANGED_ATTACK:
-                case HEAL:
-                case WORK:
-                case TOUGH:
-                    threat = BODYPART_COST[bodypart.type];
-                    break;
-                default:
-                    return total;
-            }
+                    switch (bodypart.type) {
+                        case ATTACK:
+                        case RANGED_ATTACK:
+                        case HEAL:
+                        case WORK:
+                        case TOUGH:
+                            ({[bodypart.type]: threatValue} = BODYPART_COST);
+                            break;
+                        default:
+                            return total;
+                    }
 
-            boosts = BOOSTS[bodypart.type];
+                    const {[bodypart.type]: boosts} = BOOSTS;
 
-            if (bodypart.boost && boosts && boosts[bodypart.boost]) {
-                let boost = boosts[bodypart.boost];
+                    if (bodypart.boost && boosts && boosts[bodypart.boost]) {
+                        const {[bodypart.boost]: boost} = boosts;
 
-                switch (bodypart.type) {
-                    case ATTACK:
-                        if (boost.attack) {
-                            threat *= boost.attack;
+                        switch (bodypart.type) {
+                            case ATTACK:
+                                if (boost.attack) {
+                                    threatValue *= boost.attack;
+                                }
+                                break;
+                            case RANGED_ATTACK:
+                                if (boost.rangedAttack) {
+                                    threatValue *= boost.rangedAttack;
+                                }
+                                break;
+                            case HEAL:
+                                if (boost.heal) {
+                                    threatValue *= boost.heal;
+                                }
+                                break;
+                            case WORK:
+                                if (boost.dismantle) {
+                                    threatValue *= boost.dismantle;
+                                }
+                                break;
+                            case TOUGH:
+                                if (boost.damage) {
+                                    threatValue /= boost.damage;
+                                }
+                                break;
                         }
-                        break;
-                    case RANGED_ATTACK:
-                        if (boost.rangedAttack) {
-                            threat *= boost.rangedAttack;
-                        }
-                        break;
-                    case HEAL:
-                        if (boost.heal) {
-                            threat *= boost.heal;
-                        }
-                        break;
-                    case WORK:
-                        if (boost.dismantle) {
-                            threat *= boost.dismantle;
-                        }
-                        break;
-                    case TOUGH:
-                        if (boost.damage) {
-                            threat /= boost.damage;
-                        }
-                        break;
-                }
-            }
+                    }
 
-            return total + threat;
-        })}), 0), (value) => value.id);
+                    return total + threatValue;
+                })
+            }), 0), (value) => value.id);
 
         hostiles.sort((a, b) => threat[b.id].threat - threat[a.id].threat);
 
@@ -287,12 +292,12 @@ class Cache {
         return hostiles;
     }
 
-    // ##          #            ###         ###                     
-    //  #          #             #          #  #                    
-    //  #     ###  ###    ###    #    ###   #  #   ##    ##   # #   
-    //  #    #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    //  #    # ##  #  #    ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###    # #  ###   ###    ###   #  #  #  #   ##    ##   #  #  
+    // ##          #            ###         ###
+    //  #          #             #          #  #
+    //  #     ###  ###    ###    #    ###   #  #   ##    ##   # #
+    //  #    #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    //  #    # ##  #  #    ##    #    #  #  # #   #  #  #  #  #  #
+    // ###    # #  ###   ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches labs in a room.
      * @param {Room} room The room to cache for.
@@ -302,12 +307,12 @@ class Cache {
         return this.labs[room.name] ? this.labs[room.name] : this.labs[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
     }
 
-    // ##     #          #            ###         ###                     
-    //  #                #             #          #  #                    
-    //  #    ##    ###   # #    ###    #    ###   #  #   ##    ##   # #   
-    //  #     #    #  #  ##    ##      #    #  #  ###   #  #  #  #  ####  
-    //  #     #    #  #  # #     ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###   ###   #  #  #  #  ###    ###   #  #  #  #   ##    ##   #  #  
+    // ##     #          #            ###         ###
+    //  #                #             #          #  #
+    //  #    ##    ###   # #    ###    #    ###   #  #   ##    ##   # #
+    //  #     #    #  #  ##    ##      #    #  #  ###   #  #  #  #  ####
+    //  #     #    #  #  # #     ##    #    #  #  # #   #  #  #  #  #  #
+    // ###   ###   #  #  #  #  ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches links in a room.
      * @param {Room} room The room to cache for.
@@ -317,12 +322,12 @@ class Cache {
         return this.links[room.name] ? this.links[room.name] : this.links[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LINK});
     }
 
-    //             #                        ###         ###                     
-    //             #                         #          #  #                    
-    // ###   #  #  # #    ##   ###    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  #  #  ##    # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #  # #   ##    #       ##    #    #  #  # #   #  #  #  #  #  #  
-    // #  #   ###  #  #   ##   #     ###    ###   #  #  #  #   ##    ##   #  #  
+    //             #                        ###         ###
+    //             #                         #          #  #
+    // ###   #  #  # #    ##   ###    ###    #    ###   #  #   ##    ##   # #
+    // #  #  #  #  ##    # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    // #  #  #  #  # #   ##    #       ##    #    #  #  # #   #  #  #  #  #  #
+    // #  #   ###  #  #   ##   #     ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches nukers in a room.
      * @param {Room} room The room to cache for.
@@ -332,13 +337,13 @@ class Cache {
         return this.nukers[room.name] ? this.nukers[room.name] : this.nukers[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
     }
 
-    //                    #          ##           ###         ###                     
-    //                    #           #            #          #  #                    
-    // ###    ##   ###   ###    ###   #     ###    #    ###   #  #   ##    ##   # #   
-    // #  #  #  #  #  #   #    #  #   #    ##      #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #  #      #    # ##   #      ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###    ##   #       ##   # #  ###   ###    ###   #  #  #  #   ##    ##   #  #  
-    // #                                                                              
+    //                    #          ##           ###         ###
+    //                    #           #            #          #  #
+    // ###    ##   ###   ###    ###   #     ###    #    ###   #  #   ##    ##   # #
+    // #  #  #  #  #  #   #    #  #   #    ##      #    #  #  ###   #  #  #  #  ####
+    // #  #  #  #  #      #    # ##   #      ##    #    #  #  # #   #  #  #  #  #  #
+    // ###    ##   #       ##   # #  ###   ###    ###   #  #  #  #   ##    ##   #  #
+    // #
     /**
      * Caches portals in a room.
      * @param {Room} room The room to cache for.
@@ -348,13 +353,13 @@ class Cache {
         return this.portals[room.name] ? this.portals[room.name] : this.portals[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_PORTAL});
     }
 
-    //                               ###               #            ###         ###                     
-    //                               #  #              #             #          #  #                    
-    // ###    ##   #  #   ##   ###   ###    ###  ###   # #    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  #  #  #  #  # ##  #  #  #  #  #  #  #  #  ##    ##      #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #  ####  ##    #     #  #  # ##  #  #  # #     ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###    ##   ####   ##   #     ###    # #  #  #  #  #  ###    ###   #  #  #  #   ##    ##   #  #  
-    // #                                                                                                
+    //                               ###               #            ###         ###
+    //                               #  #              #             #          #  #
+    // ###    ##   #  #   ##   ###   ###    ###  ###   # #    ###    #    ###   #  #   ##    ##   # #
+    // #  #  #  #  #  #  # ##  #  #  #  #  #  #  #  #  ##    ##      #    #  #  ###   #  #  #  #  ####
+    // #  #  #  #  ####  ##    #     #  #  # ##  #  #  # #     ##    #    #  #  # #   #  #  #  #  #  #
+    // ###    ##   ####   ##   #     ###    # #  #  #  #  #  ###    ###   #  #  #  #   ##    ##   #  #
+    // #
     /**
      * Caches power banks in a room.
      * @param {Room} room The room to cache for.
@@ -363,14 +368,14 @@ class Cache {
     static powerBanksInRoom(room) {
         return this.powerBanks[room.name] ? this.powerBanks[room.name] : this.powerBanks[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_BANK});
     }
-    
-    //                                ##                                  ###         ###                     
-    //                               #  #                                  #          #  #                    
-    // ###    ##   #  #   ##   ###    #    ###    ###  #  #  ###    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  #  #  #  #  # ##  #  #    #   #  #  #  #  #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    // #  #  #  #  ####  ##    #     #  #  #  #  # ##  ####  #  #    ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###    ##   ####   ##   #      ##   ###    # #  ####  #  #  ###    ###   #  #  #  #   ##    ##   #  #  
-    // #                                   #                                                                  
+
+    //                                ##                                  ###         ###
+    //                               #  #                                  #          #  #
+    // ###    ##   #  #   ##   ###    #    ###    ###  #  #  ###    ###    #    ###   #  #   ##    ##   # #
+    // #  #  #  #  #  #  # ##  #  #    #   #  #  #  #  #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    // #  #  #  #  ####  ##    #     #  #  #  #  # ##  ####  #  #    ##    #    #  #  # #   #  #  #  #  #  #
+    // ###    ##   ####   ##   #      ##   ###    # #  ####  #  #  ###    ###   #  #  #  #   ##    ##   #  #
+    // #                                   #
     /**
      * Caches power spawns in a room.
      * @param {Room} room The room to cache for.
@@ -380,13 +385,13 @@ class Cache {
         return this.powerSpawns[room.name] ? this.powerSpawns[room.name] : this.powerSpawns[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
     }
 
-    //                          #                #     ##           ##    #                       #                             ###         ###                     
-    //                                           #      #          #  #   #                       #                              #          #  #                    
-    // ###    ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    // #     ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    // #      ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #  
-    //             #                                                                                                                                                
+    //                          #                #     ##           ##    #                       #                             ###         ###
+    //                                           #      #          #  #   #                       #                              #          #  #
+    // ###    ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #
+    // #  #  # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####
+    // #     ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #
+    // #      ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #
+    //             #
     /**
      * Caches repairable structures in a room.
      * @param {Room} room The room to cache for.
@@ -396,13 +401,13 @@ class Cache {
         return this.repairableStructures[room.name] ? this.repairableStructures[room.name] : this.repairableStructures[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => (s.my || s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_ROAD || s.structureType === STRUCTURE_CONTAINER) && s.hits});
     }
 
-    //                     #             #  ###                      #                #     ##           ##    #                       #                             ###         ###                     
-    //                     #             #  #  #                                      #      #          #  #   #                       #                              #          #  #                    
-    //  ###    ##   ###   ###    ##    ###  #  #   ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #   
-    // ##     #  #  #  #   #    # ##  #  #  ###   # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    //   ##   #  #  #      #    ##    #  #  # #   ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###     ##   #       ##   ##    ###  #  #   ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #  
-    //                                                  #                                                                                                                                                
+    //                     #             #  ###                      #                #     ##           ##    #                       #                             ###         ###
+    //                     #             #  #  #                                      #      #          #  #   #                       #                              #          #  #
+    //  ###    ##   ###   ###    ##    ###  #  #   ##   ###    ###  ##    ###    ###  ###    #     ##    #    ###   ###   #  #   ##   ###   #  #  ###    ##    ###    #    ###   #  #   ##    ##   # #
+    // ##     #  #  #  #   #    # ##  #  #  ###   # ##  #  #  #  #   #    #  #  #  #  #  #   #    # ##    #    #    #  #  #  #  #      #    #  #  #  #  # ##  ##      #    #  #  ###   #  #  #  #  ####
+    //   ##   #  #  #      #    ##    #  #  # #   ##    #  #  # ##   #    #     # ##  #  #   #    ##    #  #   #    #     #  #  #      #    #  #  #     ##      ##    #    #  #  # #   #  #  #  #  #  #
+    // ###     ##   #       ##   ##    ###  #  #   ##   ###    # #  ###   #      # #  ###   ###    ##    ##     ##  #      ###   ##     ##   ###  #      ##   ###    ###   #  #  #  #   ##    ##   #  #
+    //                                                  #
     /**
      * Caches repairable structures in a room, sorted by hits ascending.
      * @param {Room} room The room to cache for.
@@ -412,12 +417,12 @@ class Cache {
         return this.sortedRepairableStructures[room.name] ? this.sortedRepairableStructures[room.name] : this.sortedRepairableStructures[room.name] = this.repairableStructuresInRoom(room).sort((a, b) => a.hits - b.hits);
     }
 
-    //                     #             #  ###                                                     ###         ###                     
-    //                     #             #  #  #                                                     #          #  #                    
-    //  ###    ##   ###   ###    ##    ###  #  #   ##    ###    ##   #  #  ###    ##    ##    ###    #    ###   #  #   ##    ##   # #   
-    // ##     #  #  #  #   #    # ##  #  #  ###   # ##  ##     #  #  #  #  #  #  #     # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    //   ##   #  #  #      #    ##    #  #  # #   ##      ##   #  #  #  #  #     #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###     ##   #       ##   ##    ###  #  #   ##   ###     ##    ###  #      ##    ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    //                     #             #  ###                                                     ###         ###
+    //                     #             #  #  #                                                     #          #  #
+    //  ###    ##   ###   ###    ##    ###  #  #   ##    ###    ##   #  #  ###    ##    ##    ###    #    ###   #  #   ##    ##   # #
+    // ##     #  #  #  #   #    # ##  #  #  ###   # ##  ##     #  #  #  #  #  #  #     # ##  ##      #    #  #  ###   #  #  #  #  ####
+    //   ##   #  #  #      #    ##    #  #  # #   ##      ##   #  #  #  #  #     #     ##      ##    #    #  #  # #   #  #  #  #  #  #
+    // ###     ##   #       ##   ##    ###  #  #   ##   ###     ##    ###  #      ##    ##   ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches resources in a room, sorted by whether it's a mineral and then by amount.
      * @param {Room} room The room to cache for.
@@ -431,17 +436,18 @@ class Cache {
             if (a.resourceType !== RESOURCE_ENERGY && b.resourceType === RESOURCE_ENERGY) {
                 return -1;
             }
+
             return b.amount - a.amount;
         });
     }
 
-    //                                      #  #                                       ###         ###                     
-    //                                      # #                                         #          #  #                    
-    //  ###    ##   #  #  ###    ##    ##   ##     ##    ##   ###    ##   ###    ###    #    ###   #  #   ##    ##   # #   
-    // ##     #  #  #  #  #  #  #     # ##  ##    # ##  # ##  #  #  # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    //   ##   #  #  #  #  #     #     ##    # #   ##    ##    #  #  ##    #       ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###     ##    ###  #      ##    ##   #  #   ##    ##   ###    ##   #     ###    ###   #  #  #  #   ##    ##   #  #  
-    //                                                        #                                                            
+    //                                      #  #                                       ###         ###
+    //                                      # #                                         #          #  #
+    //  ###    ##   #  #  ###    ##    ##   ##     ##    ##   ###    ##   ###    ###    #    ###   #  #   ##    ##   # #
+    // ##     #  #  #  #  #  #  #     # ##  ##    # ##  # ##  #  #  # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    //   ##   #  #  #  #  #     #     ##    # #   ##    ##    #  #  ##    #       ##    #    #  #  # #   #  #  #  #  #  #
+    // ###     ##    ###  #      ##    ##   #  #   ##    ##   ###    ##   #     ###    ###   #  #  #  #   ##    ##   #  #
+    //                                                        #
     /**
      * Caches source keepers in a room.
      * @param {Room} room The room to cache for.
@@ -451,13 +457,13 @@ class Cache {
         return this.sourceKeepers[room.name] ? this.sourceKeepers[room.name] : this.sourceKeepers[room.name] = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_KEEPER_LAIR});
     }
 
-    //                                       ###         ###                     
-    //                                        #          #  #                    
-    //  ###   ###    ###  #  #  ###    ###    #    ###   #  #   ##    ##   # #   
-    // ##     #  #  #  #  #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    //   ##   #  #  # ##  ####  #  #    ##    #    #  #  # #   #  #  #  #  #  #  
-    // ###    ###    # #  ####  #  #  ###    ###   #  #  #  #   ##    ##   #  #  
-    //        #                                                                  
+    //                                       ###         ###
+    //                                        #          #  #
+    //  ###   ###    ###  #  #  ###    ###    #    ###   #  #   ##    ##   # #
+    // ##     #  #  #  #  #  #  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    //   ##   #  #  # ##  ####  #  #    ##    #    #  #  # #   #  #  #  #  #  #
+    // ###    ###    # #  ####  #  #  ###    ###   #  #  #  #   ##    ##   #  #
+    //        #
     /**
      * Caches spawns in a room.
      * @param {Room} room The room to cache for.
@@ -467,12 +473,12 @@ class Cache {
         return this.spawns[room.name] ? this.spawns[room.name] : this.spawns[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
     }
 
-    //  #                                   ###         ###                     
-    //  #                                    #          #  #                    
-    // ###    ##   #  #   ##   ###    ###    #    ###   #  #   ##    ##   # #   
-    //  #    #  #  #  #  # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####  
-    //  #    #  #  ####  ##    #       ##    #    #  #  # #   #  #  #  #  #  #  
-    //   ##   ##   ####   ##   #     ###    ###   #  #  #  #   ##    ##   #  #  
+    //  #                                   ###         ###
+    //  #                                    #          #  #
+    // ###    ##   #  #   ##   ###    ###    #    ###   #  #   ##    ##   # #
+    //  #    #  #  #  #  # ##  #  #  ##      #    #  #  ###   #  #  #  #  ####
+    //  #    #  #  ####  ##    #       ##    #    #  #  # #   #  #  #  #  #  #
+    //   ##   ##   ####   ##   #     ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches towers in a room.
      * @param {Room} room The room to cache for.
@@ -482,12 +488,12 @@ class Cache {
         return this.towers[room.name] ? this.towers[room.name] : this.towers[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
     }
 
-    //                                                         ###         ###                     
-    //                                                          #          #  #                    
-    // ###    ##    ###    ##   #  #  ###    ##    ##    ###    #    ###   #  #   ##    ##   # #   
-    // #  #  # ##  ##     #  #  #  #  #  #  #     # ##  ##      #    #  #  ###   #  #  #  #  ####  
-    // #     ##      ##   #  #  #  #  #     #     ##      ##    #    #  #  # #   #  #  #  #  #  #  
-    // #      ##   ###     ##    ###  #      ##    ##   ###    ###   #  #  #  #   ##    ##   #  #  
+    //                                                         ###         ###
+    //                                                          #          #  #
+    // ###    ##    ###    ##   #  #  ###    ##    ##    ###    #    ###   #  #   ##    ##   # #
+    // #  #  # ##  ##     #  #  #  #  #  #  #     # ##  ##      #    #  #  ###   #  #  #  #  ####
+    // #     ##      ##   #  #  #  #  #     #     ##      ##    #    #  #  # #   #  #  #  #  #  #
+    // #      ##   ###     ##    ###  #      ##    ##   ###    ###   #  #  #  #   ##    ##   #  #
     /**
      * Caches resources in a room.
      * @param {Room} room The room to cache for.

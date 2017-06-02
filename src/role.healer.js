@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           #   #                 ##                 
-//  #   #           #           #   #                  #                 
-//  #   #   ###     #     ###   #   #   ###    ###     #     ###   # ##  
-//  ####   #   #    #    #   #  #####  #   #      #    #    #   #  ##  # 
-//  # #    #   #    #    #####  #   #  #####   ####    #    #####  #     
-//  #  #   #   #    #    #      #   #  #      #   #    #    #      #     
-//  #   #   ###    ###    ###   #   #   ###    ####   ###    ###   #     
+//  ####           ##           #   #                 ##
+//  #   #           #           #   #                  #
+//  #   #   ###     #     ###   #   #   ###    ###     #     ###   # ##
+//  ####   #   #    #    #   #  #####  #   #      #    #    #   #  ##  #
+//  # #    #   #    #    #####  #   #  #####   ####    #    #####  #
+//  #  #   #   #    #    #      #   #  #      #   #    #    #      #
+//  #   #   ###    ###    ###   #   #   ###    ####   ###    ###   #
 /**
  * Represents the healer role.
  */
 class RoleHealer {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,41 +27,40 @@ class RoleHealer {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var max = 1,
-            creeps;
+        const max = 1;
 
         if (!canSpawn) {
             return {
                 name: "healer",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        var creeps = Cache.creeps[engine.room.name];
+        const {creeps: {[engine.room.name]: creeps}} = Cache;
 
         return {
             name: "healer",
             spawn: _.filter(creeps && creeps.healer || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
-            max: max
+            max
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 7500),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 7500),
             units = Math.floor(energy / 300),
             body = [];
 
@@ -69,7 +68,7 @@ class RoleHealer {
         body.push(...Array(units).fill(HEAL));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "healer",
                 home: checkSettings.home,
@@ -78,22 +77,22 @@ class RoleHealer {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var roomName = engine.room.name,
-            creeps = Cache.creeps[roomName],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.healer || []), (c) => !c.spawning),
-            tasks = engine.tasks;
+        const {room: {name: roomName}, tasks} = engine,
+            {creeps: {[roomName]: creeps}} = Cache,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.healer || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -106,7 +105,7 @@ class RoleHealer {
         if (creepsWithNoTask.length === 0) {
             return;
         }
-        
+
         // If there is a source keeper in the quadrant under 200 ticks, move towards it.
         Assign.moveToSourceKeeper(creepsWithNoTask, tasks.keepers);
 

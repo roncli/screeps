@@ -2,26 +2,26 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####                                                 #               
-//  #   #           #            #  #                                                #               
-//  #   #   ###     #     ###    #  #   ###   #   #  # ##    ## #  # ##    ###    ## #   ###   # ##  
-//  ####   #   #    #    #   #   #  #  #   #  #   #  ##  #  #  #   ##  #      #  #  ##  #   #  ##  # 
-//  # #    #   #    #    #####   #  #  #   #  # # #  #   #   ##    #       ####  #   #  #####  #     
-//  #  #   #   #    #    #       #  #  #   #  # # #  #   #  #      #      #   #  #  ##  #      #     
-//  #   #   ###    ###    ###   ####    ###    # #   #   #   ###   #       ####   ## #   ###   #     
-//                                                          #   #                                    
-//                                                           ###                                     
+//  ####           ##           ####                                                 #
+//  #   #           #            #  #                                                #
+//  #   #   ###     #     ###    #  #   ###   #   #  # ##    ## #  # ##    ###    ## #   ###   # ##
+//  ####   #   #    #    #   #   #  #  #   #  #   #  ##  #  #  #   ##  #      #  #  ##  #   #  ##  #
+//  # #    #   #    #    #####   #  #  #   #  # # #  #   #   ##    #       ####  #   #  #####  #
+//  #  #   #   #    #    #       #  #  #   #  # # #  #   #  #      #      #   #  #  ##  #      #
+//  #   #   ###    ###    ###   ####    ###    # #   #   #   ###   #       ####   ## #   ###   #
+//                                                          #   #
+//                                                           ###
 /**
  * Represents the downgrader role.
  */
 class RoleDowngrader {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -29,9 +29,9 @@ class RoleDowngrader {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var downgrader = Memory.maxCreeps.downgrader,
-            roomName = engine.room.name,
-            creeps, downgraders, roomToDowngrade;
+        const {maxCreeps: {downgrader}} = Memory,
+            {room: {name: roomName}} = engine;
+        let roomToDowngrade;
 
         if (!canSpawn) {
             return {
@@ -41,16 +41,19 @@ class RoleDowngrader {
             };
         }
 
-        creeps = Cache.creeps[roomName];
-        downgraders = creeps && creeps.downgrader || [];
-        
+        const {creeps: {[roomName]: creeps}} = Cache,
+            downgraders = creeps && creeps.downgrader || [];
+
         // Loop through the room downgraders to see if we need to spawn a creep.
         if (downgrader) {
             _.forEach(downgrader[roomName], (value, toRoom) => {
                 if (_.filter(downgraders, (c) => c.memory.downgrade === toRoom).length === 0) {
                     roomToDowngrade = toRoom;
+
                     return false;
                 }
+
+                return true;
             });
         }
 
@@ -58,24 +61,24 @@ class RoleDowngrader {
             name: "downgrader",
             spawn: !!roomToDowngrade,
             max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0,
-            roomToDowngrade: roomToDowngrade
+            roomToDowngrade
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 24400),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 24400),
             units = Math.floor(energy / 3050),
             body = [];
 
@@ -83,7 +86,7 @@ class RoleDowngrader {
         body.push(...Array(units).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "downgrader",
                 home: checkSettings.home,
@@ -92,19 +95,20 @@ class RoleDowngrader {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var creeps = Cache.creeps[engine.room.name],
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.downgrader || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {

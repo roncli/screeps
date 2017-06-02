@@ -5,25 +5,25 @@ const Cache = require("cache"),
     RoleArmyMelee = require("role.armyMelee"),
     RoleArmyRanged = require("role.armyRanged");
 
-//    #                        
-//   # #                       
-//  #   #  # ##   ## #   #   # 
-//  #   #  ##  #  # # #  #   # 
-//  #####  #      # # #  #  ## 
-//  #   #  #      # # #   ## # 
-//  #   #  #      #   #      # 
-//                       #   # 
-//                        ###  
+//    #
+//   # #
+//  #   #  # ##   ## #   #   #
+//  #   #  ##  #  # # #  #   #
+//  #####  #      # # #  #  ##
+//  #   #  #      # # #   ## #
+//  #   #  #      #   #      #
+//                       #   #
+//                        ###
 /**
  * Represents an army.
  */
 class Army {
-    //                           #                       #                
-    //                           #                       #                
-    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
-    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
-    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
-    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
     /**
      * Create a new Army object.
      * @param {string} name The name of the army.
@@ -47,30 +47,28 @@ class Army {
         this.name = name;
     }
 
-    // ###   #  #  ###   
-    // #  #  #  #  #  #  
-    // #     #  #  #  #  
-    // #      ###  #  #  
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
     /**
      * Runs the army.
+     * @return {void}
      */
     run() {
-        var name = this.name,
+        const {name, dismantler, healer, melee, ranged} = this,
             allCreepsInArmy = Cache.creeps[name] && Cache.creeps[name].all || [],
-            attackRoom = Game.rooms[this.attackRoom],
-            dismantler = this.dismantler,
-            healer = this.healer,
-            melee = this.melee,
-            ranged = this.ranged;
+            {rooms: {[this.attackRoom]: attackRoom}} = Game;
 
         // Bail if scheduled for the future.
         if (this.scheduled && this.scheduled > Game.time) {
             return;
         }
-        
+
         // Set the army to be deleted if we're successful.
         if (allCreepsInArmy.length === 0 && this.success) {
             this.delete = true;
+
             return;
         }
 
@@ -83,24 +81,21 @@ class Army {
         // If the attack room is in safe mode, activate backup plan, if any.
         if (this.safeMode && attackRoom && attackRoom.controller && attackRoom.controller.safeMode) {
             this.directive = "staging";
-            this.stageRoom = this.safeMode.stageRoom;
-            this.attackRoom = this.safeMode.attackRoom;
-            this.dismantle = this.safeMode.dismantle;
-            this.safeMode = this.safeMode.safeMode;
+            ({safeMode: {stageRoom: this.stageRoom, attackRoom: this.attackRoom, dismantle: this.dismantle, safeMode: this.safeMode}} = this);
         }
 
         // Directive is "preparing" if we have a boost room and we're missing some resources.
         if (this.directive === "preparing") {
-            let boostRoomName = this.boostRoom;
-            
-            if (boostRoomName) {
-                let boostRoomStorageStore = Game.rooms[boostRoomName].storage.store;
+            const {boostRoom: boostRoomName} = this;
 
-                if (!boostRoomStorageStore || (
+            if (boostRoomName) {
+                const {rooms: {[boostRoomName]: {storage: {store: boostRoomStorageStore}}}} = Game;
+
+                if (!boostRoomStorageStore ||
                     (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&
                     (boostRoomStorageStore[RESOURCE_CATALYZED_ZYNTHIUM_ACID] || 0) >= 30 * dismantler.units * dismantler.maxCreeps &&
                     (boostRoomStorageStore[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] || 0) >= 30 * healer.units * healer.maxCreeps
-                )) {
+                ) {
                     this.directive = "building";
                 }
             } else {
@@ -154,19 +149,21 @@ class Army {
 
         // Assign escorts.
         if (dismantler.escort || melee.escort || ranged.escort) {
-            _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (healer) => {
-                var escort = [].concat.apply([], [
+            _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (creep) => {
+                const {0: escort} = Array.prototype.concat.apply([], [
                     dismantler.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
                     melee.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
                     ranged.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
-                ])[0];
+                ]);
 
                 if (escort) {
-                    healer.memory.escorting = escort.id;
-                    escort.memory.escortedBy = healer.id;
+                    ({id: creep.memory.escorting} = escort);
+                    ({id: escort.memory.escortedBy} = creep);
                 } else {
                     return false;
                 }
+
+                return true;
             });
         }
 
@@ -193,23 +190,24 @@ class Army {
         RoleArmyRanged.assignTasks(this);
     }
 
-    //       #                 #      ##                           
-    //       #                 #     #  #                          
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #  
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #  
-    //                                     #                       
+    //       #                 #      ##
+    //       #                 #     #  #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #
+    //                                     #
     /**
      * Checks whether we should spawn for the role.
      * @param {string} role The role of the creep.
      * @param {number} max The maximum number of creeps that should be spawned.
      * @param {function} successCallback The callback to run on success.
+     * @return {void}
      */
     checkSpawn(role, max, successCallback) {
-        var armyName = this.name,
-            count = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300).length,
-            armyLog = Cache.log.army[armyName];
+        const {name: armyName} = this,
+            {length: count} = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300),
+            {log: {army: {[armyName]: armyLog}}} = Cache;
 
         if (count < max) {
             successCallback();
@@ -217,29 +215,26 @@ class Army {
 
         // Output creep count in the report.
         if (armyLog && (max > 0 || count > 0)) {
-            armyLog.creeps.push({
-                role: role,
-                count: count,
-                max: max
-            });
+            armyLog.creeps.push({role, count, max});
         }
     }
 
-    //                                ####                    ###                #                
-    //                                #                       #  #                                
-    //  ###   ###    ###  #  #  ###   ###   ###    ##   # #   #  #   ##    ###  ##     ##   ###   
-    // ##     #  #  #  #  #  #  #  #  #     #  #  #  #  ####  ###   # ##  #  #   #    #  #  #  #  
-    //   ##   #  #  # ##  ####  #  #  #     #     #  #  #  #  # #   ##     ##    #    #  #  #  #  
-    // ###    ###    # #  ####  #  #  #     #      ##   #  #  #  #   ##   #     ###    ##   #  #  
-    //        #                                                            ###                    
+    //                                ####                    ###                #
+    //                                #                       #  #
+    //  ###   ###    ###  #  #  ###   ###   ###    ##   # #   #  #   ##    ###  ##     ##   ###
+    // ##     #  #  #  #  #  #  #  #  #     #  #  #  #  ####  ###   # ##  #  #   #    #  #  #  #
+    //   ##   #  #  # ##  ####  #  #  #     #     #  #  #  #  # #   ##     ##    #    #  #  #  #
+    // ###    ###    # #  ####  #  #  #     #      ##   #  #  #  #   ##   #     ###    ##   #  #
+    //        #                                                            ###
     /**
      * Spawn a creep for this army from within the region.
      * @param {class} Role The class of the role to create the creep for.
+     * @return {bool} Whether the creep was spawned.
      */
     spawnFromRegion(Role) {
-        var settings = Role.spawnSettings(this),
-            spawns = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(settings.body) && s.room.memory.region === this.region),
-            boostRoom, labsInUse, labsToBoostWith, name;
+        const settings = Role.spawnSettings(this),
+            spawns = _.filter(Game.spawns, (s) => !s.spawning && !Cache.spawning[s.id] && s.room.energyAvailable >= Utilities.getBodypartCost(settings.body) && s.room.memory.region === this.region);
+        let boostRoom, labsInUse, labsToBoostWith;
 
         // Fail if we cannot fulfill the spawn request.
         if (spawns.length === 0) {
@@ -248,20 +243,22 @@ class Army {
 
         // Fail if we're supposed to boost, but can't.
         if (this.boostRoom) {
-            boostRoom = Game.rooms[this.boostRoom];
-            labsInUse = boostRoom.memory.labsInUse;
+            ({rooms: {[this.boostRoom]: boostRoom}} = Game);
+            ({memory: {labsInUse}} = boostRoom);
             if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length))) {
                 return false;
             }
         }
 
         // Create the creep from the first listed spawn that is available.
-        name = spawns[0].createCreep(settings.body, `${settings.name}-${this.name}-${Game.time.toFixed(0).substring(4)}`, {role: settings.name, army: this.name, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: this.portals});
+        const name = spawns[0].createCreep(settings.body, `${settings.name}-${this.name}-${Game.time.toFixed(0).substring(4)}`, {role: settings.name, army: this.name, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: this.portals});
+
         Cache.spawning[spawns[0].id] = typeof name !== "number";
 
         if (typeof name !== "number" && boostRoom) {
             // Set the labs to be in use.
             let labIndex = 0;
+
             _.forEach(settings.boosts, (amount, resource) => {
                 labsToBoostWith[labIndex].creepToBoost = name;
                 labsToBoostWith[labIndex].resource = resource;
@@ -282,15 +279,16 @@ class Army {
         return typeof name !== "number";
     }
 
-    //  #           ##   #       #   
-    //  #          #  #  #           
-    // ###    ##   #  #  ###     #   
-    //  #    #  #  #  #  #  #    #   
-    //  #    #  #  #  #  #  #    #   
-    //   ##   ##    ##   ###   # #   
-    //                          #    
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
     /**
      * Serializes the army to memory.
+     * @return {void}
      */
     toObj() {
         if (this.delete) {
@@ -317,13 +315,13 @@ class Army {
         }
     }
 
-    //   #                      ##   #       #   
-    //  # #                    #  #  #           
-    //  #    ###    ##   # #   #  #  ###     #   
-    // ###   #  #  #  #  ####  #  #  #  #    #   
-    //  #    #     #  #  #  #  #  #  #  #    #   
-    //  #    #      ##   #  #   ##   ###   # #   
-    //                                      #    
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
     /**
      * Deserializes the object from memory.
      * @param {string} armyName The name of the army.

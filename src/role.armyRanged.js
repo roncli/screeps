@@ -2,35 +2,35 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##             #                         ####                                   # 
-//  #   #           #            # #                        #   #                                  # 
-//  #   #   ###     #     ###   #   #  # ##   ## #   #   #  #   #   ###   # ##    ## #   ###    ## # 
-//  ####   #   #    #    #   #  #   #  ##  #  # # #  #   #  ####       #  ##  #  #  #   #   #  #  ## 
-//  # #    #   #    #    #####  #####  #      # # #  #  ##  # #     ####  #   #   ##    #####  #   # 
-//  #  #   #   #    #    #      #   #  #      # # #   ## #  #  #   #   #  #   #  #      #      #  ## 
-//  #   #   ###    ###    ###   #   #  #      #   #      #  #   #   ####  #   #   ###    ###    ## # 
-//                                                   #   #                       #   #               
-//                                                    ###                         ###                
+//  ####           ##             #                         ####                                   #
+//  #   #           #            # #                        #   #                                  #
+//  #   #   ###     #     ###   #   #  # ##   ## #   #   #  #   #   ###   # ##    ## #   ###    ## #
+//  ####   #   #    #    #   #  #   #  ##  #  # # #  #   #  ####       #  ##  #  #  #   #   #  #  ##
+//  # #    #   #    #    #####  #####  #      # # #  #  ##  # #     ####  #   #   ##    #####  #   #
+//  #  #   #   #    #    #      #   #  #      # # #   ## #  #  #   #   #  #   #  #      #      #  ##
+//  #   #   ###    ###    ###   #   #  #      #   #      #  #   #   ####  #   #   ###    ###    ## #
+//                                                   #   #                       #   #
+//                                                    ###                         ###
 /**
  * Represents the ranged role in the army.
  */
 class RoleArmyRanged {
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {Army} army The army to spawn the creep for.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(army) {
-        var units = army.ranged.units,
-            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
-            boosts;
+        const {ranged: {units}} = army,
+            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH];
+        let boosts;
 
         body.push(...Array(units).fill(RANGED_ATTACK));
         body.push(...Array(army.super ? 10 : units + 5).fill(MOVE));
@@ -45,22 +45,23 @@ class RoleArmyRanged {
         }
 
         return {
-            body: body,
-            boosts: boosts,
+            body,
+            boosts,
             name: "armyRanged"
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assign tasks to creeps of this role.
      * @param {Army} army The army to assign tasks to.
+     * @return {void}
      */
     static assignTasks(army) {
         switch (army.directive) {
@@ -79,19 +80,20 @@ class RoleArmyRanged {
         }
     }
 
-    //                      #                ###          #    ##       #   #                ###                #            
-    //                                       #  #               #       #                     #                 #            
-    //  ###   ###    ###   ##     ###  ###   ###   #  #  ##     #     ###  ##    ###    ###   #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #  #  #  #  #   #     #    #  #   #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #  #  #  #  #   #     #    #  #   #    #  #   ##    #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #  ###    ###  ###   ###    ###  ###   #  #  #      #     # #  ###    #  #  ###    
-    //                            ###                                                   ###                                  
+    //                      #                ###          #    ##       #   #                ###                #
+    //                                       #  #               #       #                     #                 #
+    //  ###   ###    ###   ##     ###  ###   ###   #  #  ##     #     ###  ##    ###    ###   #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #  #  #  #  #   #     #    #  #   #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #  #  #  #  #   #     #    #  #   #    #  #   ##    #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #  ###    ###  ###   ###    ###  ###   #  #  #      #     # #  ###    #  #  ###
+    //                            ###                                                   ###
     /**
      * Assignments for the building directive.
      * @param {Army} army The army to assign tasks to.
+     * @return {void}
      */
     static assignBuildingTasks(army) {
-        var creeps = Cache.creeps[army.name],
+        const {creeps: {[army.name]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
@@ -100,7 +102,7 @@ class RoleArmyRanged {
 
         // If not yet boosted, go get boosts.
         Assign.getBoost(creepsWithNoTask, "Boosting");
-        
+
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
@@ -118,19 +120,20 @@ class RoleArmyRanged {
         Assign.moveToRoom(creepsWithNoTask, army.buildRoom, "Building");
     }
 
-    //                      #                 ##    #                 #                ###                #            
-    //                                       #  #   #                                   #                 #            
-    //  ###   ###    ###   ##     ###  ###    #    ###    ###   ###  ##    ###    ###   #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #    #    #    #  #  #  #   #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #  #  #   #    # ##   ##    #    #  #   ##    #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   ##     ##   # #  #     ###   #  #  #      #     # #  ###    #  #  ###    
-    //                            ###                           ###               ###                                  
+    //                      #                 ##    #                 #                ###                #
+    //                                       #  #   #                                   #                 #
+    //  ###   ###    ###   ##     ###  ###    #    ###    ###   ###  ##    ###    ###   #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #    #    #    #  #  #  #   #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #  #  #   #    # ##   ##    #    #  #   ##    #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   ##     ##   # #  #     ###   #  #  #      #     # #  ###    #  #  ###
+    //                            ###                           ###               ###
     /**
      * Assignments for the staging directive.
      * @param {Army} army The army to assign tasks to.
+     * @return {void}
      */
     static assignStagingTasks(army) {
-        var creeps = Cache.creeps[army.name],
+        const {creeps: {[army.name]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
@@ -149,23 +152,23 @@ class RoleArmyRanged {
         Assign.moveToRoom(creepsWithNoTask, army.stageRoom, "Staging");
     }
 
-    //                      #                ###    #                              #    ##          ###                #            
-    //                                       #  #                                  #     #           #                 #            
-    //  ###   ###    ###   ##     ###  ###   #  #  ##     ###   # #    ###  ###   ###    #     ##    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #  #  #   #    ##     ####  #  #  #  #   #     #    # ##   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #  #  #   #      ##   #  #  # ##  #  #   #     #    ##     #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #  ###   ###   ###    #  #   # #  #  #    ##  ###    ##    #     # #  ###    #  #  ###    
-    //                            ###                                                                                               
+    //                      #                ###    #                              #    ##          ###                #
+    //                                       #  #                                  #     #           #                 #
+    //  ###   ###    ###   ##     ###  ###   #  #  ##     ###   # #    ###  ###   ###    #     ##    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #  #  #   #    ##     ####  #  #  #  #   #     #    # ##   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #  #  #   #      ##   #  #  # ##  #  #   #     #    ##     #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #  ###   ###   ###    #  #   # #  #  #    ##  ###    ##    #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assignments for the dismantle directive.
      * @param {Army} army The army to assign tasks to.
+     * @return {void}
      */
     static assignDismantleTasks(army) {
-        var creeps = Cache.creeps[army.name],
+        const {creeps: {[army.name]: creeps}} = Cache,
             rangedCreeps = creeps && creeps.armyRanged || [],
-            attackRoomName = army.attackRoom,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning),
-            dismantle;
+            {attackRoom: attackRoomName} = army,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -188,7 +191,9 @@ class RoleArmyRanged {
         }
 
         // Rally to near dismantle location.
-        if (Game.rooms[attackRoomName] && (dismantle = army.dismantle).length > 0) {
+        const {dismantle} = army;
+
+        if (Game.rooms[attackRoomName] && dismantle.length > 0) {
             Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
 
             _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
@@ -201,23 +206,23 @@ class RoleArmyRanged {
         Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
     }
 
-    //                      #                 ##    #     #                #     ###                #            
-    //                                       #  #   #     #                #      #                 #            
-    //  ###   ###    ###   ##     ###  ###   #  #  ###   ###    ###   ##   # #    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #  ####   #     #    #  #  #     ##     #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #  #  #   #     #    # ##  #     # #    #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #  #  #    ##    ##   # #   ##   #  #   #     # #  ###    #  #  ###    
-    //                            ###                                                                            
+    //                      #                 ##    #     #                #     ###                #
+    //                                       #  #   #     #                #      #                 #
+    //  ###   ###    ###   ##     ###  ###   #  #  ###   ###    ###   ##   # #    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #  ####   #     #    #  #  #     ##     #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #  #  #   #     #    # ##  #     # #    #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #  #  #    ##    ##   # #   ##   #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assignments for the attack directive.
      * @param {Army} army The army to assign tasks to.
+     * @return {void}
      */
     static assignAttackTasks(army) {
-        var creeps = Cache.creeps[army.name],
+        const {creeps: {[army.name]: creeps}} = Cache,
             rangedCreeps = creeps && creeps.armyRanged || [],
-            attackRoomName = army.attackRoom,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning),
-            restPosition;
+            {attackRoom: attackRoomName} = army,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -247,9 +252,11 @@ class RoleArmyRanged {
             return;
         }
 
-        if (restPosition = army.restPosition) {
+        const {restPosition} = army;
+
+        if (restPosition) {
             // Rally to army's rest position.
-            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), undefined, "Attacking");
+            Assign.moveToPos(creepsWithNoTask, new RoomPosition(restPosition.x, restPosition.y, restPosition.room), void 0, "Attacking");
         } else {
             // Rally to army's attack location.
             Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");

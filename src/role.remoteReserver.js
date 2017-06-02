@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####                         #            ####                                                   
-//  #   #           #           #   #                        #            #   #                                                  
-//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #   #   ###    ###    ###   # ##   #   #   ###   # ##  
-//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  ####   #   #  #      #   #  ##  #  #   #  #   #  ##  # 
-//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  # #    #####   ###   #####  #       # #   #####  #     
-//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #  #   #          #  #      #       # #   #      #     
-//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   ####    ###   #        #     ###   #     
+//  ####           ##           ####                         #            ####
+//  #   #           #           #   #                        #            #   #
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #   #   ###    ###    ###   # ##   #   #   ###   # ##
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  ####   #   #  #      #   #  ##  #  #   #  #   #  ##  #
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  # #    #####   ###   #####  #       # #   #####  #
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #  #   #          #  #      #       # #   #      #
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   ####    ###   #        #     ###   #
 /**
  * Represents the remote reserver role.
  */
 class RoleRemoteReserver {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,10 +27,9 @@ class RoleRemoteReserver {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
-            controller = room.controller,
-            max = 1,
-            reservation, lengthToController, controllerId, supportRoom, supportRoomName, creeps, lengthToThisController;
+        const {room} = engine,
+            {controller} = room,
+            max = 1;
 
         if (!controller) {
             return {
@@ -44,12 +43,12 @@ class RoleRemoteReserver {
             return {
                 name: "remoteReserver",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        reservation = controller.reservation;
-        
+        const {reservation} = controller;
+
         if (reservation && reservation.ticksToEnd >= 4000) {
             return {
                 name: "remoteReserver",
@@ -58,44 +57,44 @@ class RoleRemoteReserver {
             };
         }
 
-        lengthToController = Memory.lengthToController;
-        controllerId = controller.id;
-        supportRoom = engine.supportRoom;
-        supportRoomName = supportRoom.name;
-        creeps = Cache.creeps[room.name];
+        const {lengthToController} = Memory,
+            {id: controllerId} = controller,
+            {supportRoom} = engine,
+            {name: supportRoomName} = supportRoom,
+            {creeps: {[room.name]: creeps}} = Cache;
 
         if (!lengthToController[controllerId]) {
             lengthToController[controllerId] = {};
         }
 
-        lengthToThisController = lengthToController[controllerId];
+        const {[controllerId]: lengthToThisController} = lengthToController;
 
         if (!lengthToThisController[supportRoomName]) {
-            lengthToThisController[supportRoomName] = PathFinder.search(controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+            ({path: {length: lengthToThisController[supportRoomName]}} = PathFinder.search(controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}));
         }
 
         return {
             name: "remoteReserver",
             spawn: _.filter(creeps && creeps.remoteReserver || [], (c) => c.spawning || c.ticksToLive > lengthToThisController[supportRoomName]).length < max,
             max: 0,
-            spawnFromRegion: true,
+            spawnFromRegion: true
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3250),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 3250),
             units = Math.floor(energy / 650),
             body = [];
 
@@ -103,7 +102,7 @@ class RoleRemoteReserver {
         body.push(...Array(units).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "remoteReserver",
                 home: checkSettings.home,
@@ -112,20 +111,21 @@ class RoleRemoteReserver {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var room = engine.room,
-            creeps = Cache.creeps[room.name],
+        const {room} = engine,
+            {creeps: {[room.name]: creeps}} = Cache,
             creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteReserver || []);
 
         if (creepsWithNoTask.length === 0) {

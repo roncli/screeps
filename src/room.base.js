@@ -15,23 +15,23 @@ const Cache = require("cache"),
     RoleUpgrader = require("role.upgrader"),
     RoleWorker = require("role.worker");
 
-//  ####                        ####                       
-//  #   #                        #  #                      
-//  #   #   ###    ###   ## #    #  #   ###    ###    ###  
-//  ####   #   #  #   #  # # #   ###       #  #      #   # 
-//  # #    #   #  #   #  # # #   #  #   ####   ###   ##### 
-//  #  #   #   #  #   #  # # #   #  #  #   #      #  #     
-//  #   #   ###    ###   #   #  ####    ####  ####    ###  
+//  ####                        ####
+//  #   #                        #  #
+//  #   #   ###    ###   ## #    #  #   ###    ###    ###
+//  ####   #   #  #   #  # # #   ###       #  #      #   #
+//  # #    #   #  #   #  # # #   #  #   ####   ###   #####
+//  #  #   #   #  #   #  # # #   #  #  #   #      #  #
+//  #   #   ###    ###   #   #  ####    ####  ####    ###
 /**
  * A class that represents a base room.
  */
 class RoomBase extends RoomEngine {
-    //                           #                       #                
-    //                           #                       #                
-    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
-    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
-    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
-    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
     /**
      * Creates a new base room.
      * @param {Room} room The room.
@@ -42,30 +42,28 @@ class RoomBase extends RoomEngine {
         this.room = room;
     }
 
-    // ###   #  #  ###   
-    // #  #  #  #  #  #  
-    // #     #  #  #  #  
-    // #      ###  #  #  
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
     /**
      * Run the room.
+     * @return {void}
      */
     run() {
-        var room = this.room,
-            roomName, spawns, terminal, storage, memory, labQueue, labsInUse;
+        const {room} = this,
+            {name: roomName} = room;
 
         if (room.unobservable) {
             // Something is supremely wrong.  Notify and bail.
             Game.notify(`Base Room ${roomName} is unobservable, something is wrong!`);
+
             return;
         }
 
-        roomName = room.name;
-        spawns = Cache.spawnsInRoom(room);
-        terminal = room.terminal;
-        storage = room.storage;
-        memory = room.memory;
-        labQueue = memory.labQueue;
-        labsInUse = memory.labsInUse;
+        const spawns = Cache.spawnsInRoom(room),
+            {terminal, storage, memory} = room,
+            {labQueue, labsInUse} = memory;
 
         // Manage room.
         if (Game.time % 100 === 0 && spawns.length > 0) {
@@ -79,7 +77,7 @@ class RoomBase extends RoomEngine {
         if (spawns.length > 0) {
             this.transferEnergy();
         }
-        
+
         // Check to see if we can do a deal in the terminal.
         if (terminal && !terminal.cooldown) {
             this.terminal();
@@ -103,32 +101,31 @@ class RoomBase extends RoomEngine {
         if (labsInUse) {
             this.labsInUse();
         }
-        
+
         this.processPower();
     }
 
-    // # #    ###  ###    ###   ###   ##   
-    // ####  #  #  #  #  #  #  #  #  # ##  
-    // #  #  # ##  #  #  # ##   ##   ##    
-    // #  #   # #  #  #   # #  #      ##   
-    //                          ###        
+    // # #    ###  ###    ###   ###   ##
+    // ####  #  #  #  #  #  #  #  #  # ##
+    // #  #  # ##  #  #  # ##   ##   ##
+    // #  #   # #  #  #   # #  #      ##
+    //                          ###
     /**
      * Manage the room's layout.
+     * @return {void}
      */
     manage() {
-        var room = this.room,
-            controller = room.controller,
-            rcl = controller.level,
+        const {room} = this,
+            {controller, storage, name: roomName} = room,
+            {level: rcl} = controller,
             sites = room.find(FIND_MY_CONSTRUCTION_SITES),
-            spawn = Cache.spawnsInRoom(room)[0],
-            spawnPos = spawn.pos,
-            storage = room.storage,
-            minerals = room.find(FIND_MINERALS),
-            roomName = room.name,
-            extensionsToBuild;
+            extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][rcl - 1] - (Cache.extensionsInRoom(room).length + _.filter(sites, (c) => c.structureType === STRUCTURE_EXTENSION).length),
+            {0: spawn} = Cache.spawnsInRoom(room),
+            {pos: spawnPos} = spawn,
+            minerals = room.find(FIND_MINERALS);
 
         // Build extensions.
-        if ((extensionsToBuild = [0, 5, 10, 20, 30, 40, 50, 60][rcl - 1] - (Cache.extensionsInRoom(room).length + _.filter(sites, (c) => c.structureType === STRUCTURE_EXTENSION).length)) > 0) {
+        if (extensionsToBuild > 0) {
             Utilities.buildStructures(room, STRUCTURE_EXTENSION, extensionsToBuild, spawn);
         }
 
@@ -140,10 +137,9 @@ class RoomBase extends RoomEngine {
         // At RC3, build containers by source.
         if (rcl >= 3) {
             _.forEach(room.find(FIND_SOURCES), (source) => {
-                var location = PathFinder.search(source.pos, {pos: spawnPos, range: 1}, {swampCost: 1}).path[0],
+                const {path: {0: location}} = PathFinder.search(source.pos, {pos: spawnPos, range: 1}, {swampCost: 1}),
                     structures = location.lookFor(LOOK_STRUCTURES),
-                    x = location.x,
-                    y = location.y;
+                    {x, y} = location;
 
                 if (
                     _.filter(structures, (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
@@ -172,15 +168,14 @@ class RoomBase extends RoomEngine {
         // At RCL6, build extractor.
         if (rcl >= 6 && minerals.length !== Cache.extractorsInRoom(room).length) {
             _.forEach(minerals, (mineral) => {
-                var mineralPos = mineral.pos,
-                    mineralX = mineralPos.x,
-                    mineralY = mineralPos.y;
-                
+                const {pos: mineralPos} = mineral,
+                    {x, y} = mineralPos;
+
                 if (
                     _.filter(mineralPos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTRACTOR).length === 0 &&
-                    _.filter(sites, (s) => s.pos.x === mineralX && s.pos.y === mineralY && s.structureType === STRUCTURE_EXTRACTOR).length === 0
+                    _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_EXTRACTOR).length === 0
                 ) {
-                    room.createConstructionSite(mineralX, mineralY, STRUCTURE_EXTRACTOR);
+                    room.createConstructionSite(x, y, STRUCTURE_EXTRACTOR);
                 }
             });
         }
@@ -188,10 +183,9 @@ class RoomBase extends RoomEngine {
         // At RCL6, build containers by minerals.
         if (rcl >= 6) {
             _.forEach(minerals, (mineral) => {
-                var location = PathFinder.search(mineral.pos, {pos: spawnPos, range: 1}, {swampCost: 1}).path[0],
+                const {path: {0: location}} = PathFinder.search(mineral.pos, {pos: spawnPos, range: 1}, {swampCost: 1}),
                     structures = location.lookFor(LOOK_STRUCTURES),
-                    x = location.x,
-                    y = location.y;
+                    {x, y} = location;
 
                 if (
                     _.filter(structures, (s) => s.structureType === STRUCTURE_CONTAINER).length === 0 &&
@@ -210,13 +204,11 @@ class RoomBase extends RoomEngine {
         // At RCL3, build roads around our structures.
         if (rcl >= 3) {
             _.forEach(_.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_TOWER || s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_TERMINAL), (structure) => {
-                var structureX = structure.pos.x,
-                    structureY = structure.pos.y;
-                    
+                const {pos: {x: structureX, y: structureY}} = structure;
+
                 _.forEach([new RoomPosition(structureX - 1, structureY, roomName), new RoomPosition(structureX + 1, structureY, roomName), new RoomPosition(structureX, structureY - 1, roomName), new RoomPosition(structureX, structureY + 1, roomName)], (pos) => {
-                    var x = pos.x,
-                        y = pos.y;
-                    
+                    const {x, y} = pos;
+
                     if (
                         _.filter(pos.lookFor(LOOK_STRUCTURES), (s) => s.structureType === STRUCTURE_ROAD).length === 0 &&
                         _.filter(sites, (s) => s.pos.x === x && s.pos.y === y && s.structureType === STRUCTURE_ROAD).length === 0
@@ -228,12 +220,12 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    //    #          #                  #  
-    //    #         # #                 #  
-    //  ###   ##    #     ##   ###    ###  
-    // #  #  # ##  ###   # ##  #  #  #  #  
-    // #  #  ##     #    ##    #  #  #  #  
-    //  ###   ##    #     ##   #  #   ###  
+    //    #          #                  #
+    //    #         # #                 #
+    //  ###   ##    #     ##   ###    ###
+    // #  #  # ##  ###   # ##  #  #  #  #
+    // #  #  ##     #    ##    #  #  #  #
+    //  ###   ##    #     ##   #  #   ###
     /**
      * Defend the room.
      * Basic philosophy: We want to respond appropriately to incoming threats, but we also don't want to overdo it.
@@ -244,20 +236,20 @@ class RoomBase extends RoomEngine {
      * 2500+ ticks - Massive sustained threat.  Use boosts with all armies.
      * NYI - Casualties taken? - Create an army of similar size that respects the base matrixes.  If a base matrix has not yet been created, queue one for creation.
      * Enemy spending a lot of time on 0/49 tiles? - Create an army of similar size that goes after creeps in the border room they are trying to drain from.
+     * @return {void}
      */
     defend() {
-        var room = this.room,
+        const {room} = this,
             hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
-            roomName = room.name,
+            {name: roomName, memory: roomMemory} = room,
             armyName = `${roomName}-defense`,
-            roomMemory = room.memory;
+            {army: {[armyName]: army}} = Memory;
 
         if (hostiles.length > 0) {
-            let threats, edgeTicks, armySize;
+            ({time: roomMemory.lastHostile} = Game);
 
-            roomMemory.lastHostile = Game.time;
             if (!roomMemory.currentAttack) {
-                roomMemory.currentAttack = Game.time;
+                ({time: roomMemory.currentAttack} = Game);
             }
             if (!roomMemory.threats) {
                 roomMemory.threats = {};
@@ -271,13 +263,12 @@ class RoomBase extends RoomEngine {
                 };
             }
 
-            threats = roomMemory.threats;
-            edgeTicks = roomMemory.edgeTicks;
-            
+            const {threats, edgeTicks} = roomMemory;
+
             _.forEach(_.filter(_.map(hostiles, (h) => ({id: h.id, threat: _.filter(h.body, (b) => [ATTACK, RANGED_ATTACK, HEAL].indexOf(b) !== -1).length}))), (hostile) => {
-                threats[hostile.id] = hostile.threat;
+                ({threat: threats[hostile.id]} = hostile);
             });
-            armySize = Math.min(Math.ceil(_.sum(threats) / 20), 3);
+            const armySize = Math.min(Math.ceil(_.sum(threats) / 20), 3);
 
             if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
                 edgeTicks[TOP]++;
@@ -296,21 +287,18 @@ class RoomBase extends RoomEngine {
             }
 
             if (armySize > 0) {
-                if (!Memory.army[armyName]) {
-                    Game.notify(`Warning! ${roomName} is under attack!`);
-                    Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}, creepCount: 0});
-                } else {
-                    let attackTicks = Game.time - roomMemory.currentAttack,
+                if (army) {
+                    const attackTicks = Game.time - roomMemory.currentAttack,
                         exits = Game.map.describeExits(roomName);
 
                     if (attackTicks >= 500) {
-                        Memory.army[armyName].boostRoom = roomName;
+                        army.boostRoom = roomName;
 
                         if (attackTicks >= 2000) {
-                            let rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region);
+                            const rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region);
 
                             _.forEach(rooms, (remoteRoom) => {
-                                var remoteRoomName = remoteRoom.name,
+                                const {name: remoteRoomName} = remoteRoom,
                                     remoteArmyName = `${remoteRoomName}-defense-for-${roomName}`;
 
                                 if (!Memory.army[`${remoteRoomName}-defense`] && !Memory.army[remoteArmyName]) {
@@ -320,7 +308,7 @@ class RoomBase extends RoomEngine {
 
                             if (attackTicks >= 2500) {
                                 _.forEach(rooms, (remoteRoom) => {
-                                    var remoteRoomName = remoteRoom.name,
+                                    const {name: remoteRoomName} = remoteRoom,
                                         remoteArmyName = `${remoteRoomName}-defense-for-${roomName}`;
 
                                     if (Memory.army[remoteArmyName]) {
@@ -333,21 +321,22 @@ class RoomBase extends RoomEngine {
 
                     // Check edgeTicks, if any are over 50, spawn an army for that room, or update it if one already exists.
                     _.forEach(Object.keys(exits), (dir) => {
-                        var dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
+                        const dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
+
                         if (!Memory.army[dirArmyName] && edgeTicks[dir] >= 50) {
                             Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}});
                         }
                     });
 
-                    // Test army casualties taken.  If 4 or more units are lost, reduce army size and queue & respect base matrix.
-                    // TODO
+                    // TODO: Test army casualties taken.  If 4 or more units are lost, reduce army size and queue & respect base matrix.
+                } else {
+                    Game.notify(`Warning! ${roomName} is under attack!`);
+                    Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: armySize, units: 20}, ranged: {maxCreeps: 0, units: 20}, creepCount: 0});
                 }
             }
-        } else if (Memory.army[armyName]) {
+        } else if (army) {
             // This is a true success only if 50 ticks have passed since the last hostile was seen.
             if (roomMemory.lastHostile + 50 < Game.time) {
-                let army = Memory.army[armyName];
-
                 if (army) {
                     army.directive = "attack";
                     army.success = true;
@@ -365,20 +354,21 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    //  #                               #               ####                                
-    //  #                              # #              #                                   
-    // ###   ###    ###  ###    ###    #     ##   ###   ###   ###    ##   ###    ###  #  #  
-    //  #    #  #  #  #  #  #  ##     ###   # ##  #  #  #     #  #  # ##  #  #  #  #  #  #  
-    //  #    #     # ##  #  #    ##    #    ##    #     #     #  #  ##    #      ##    # #  
-    //   ##  #      # #  #  #  ###     #     ##   #     ####  #  #   ##   #     #       #   
-    //                                                                           ###   #    
+    //  #                               #               ####
+    //  #                              # #              #
+    // ###   ###    ###  ###    ###    #     ##   ###   ###   ###    ##   ###    ###  #  #
+    //  #    #  #  #  #  #  #  ##     ###   # ##  #  #  #     #  #  # ##  #  #  #  #  #  #
+    //  #    #     # ##  #  #    ##    #    ##    #     #     #  #  ##    #      ##    # #
+    //   ##  #      # #  #  #  ###     #     ##   #     ####  #  #   ##   #     #       #
+    //                                                                           ###   #
     /**
      * Transfers energy from links closest to the first spawn to remote links.
+     * @return {void}
      */
     transferEnergy() {
-        var room = this.room,
+        const {room} = this,
             links = Utilities.objectsClosestToObj(Cache.linksInRoom(room), Cache.spawnsInRoom(room)[0]),
-            firstLink = links[0];
+            {0: firstLink} = links;
 
         _.forEach(links, (link, index) => {
             if (index === 0) {
@@ -391,103 +381,104 @@ class RoomBase extends RoomEngine {
         });
     }
 
-    //  #                       #                ##    
-    //  #                                         #    
-    // ###    ##   ###   # #   ##    ###    ###   #    
-    //  #    # ##  #  #  ####   #    #  #  #  #   #    
-    //  #    ##    #     #  #   #    #  #  # ##   #    
-    //   ##   ##   #     #  #  ###   #  #   # #  ###   
+    //  #                       #                ##
+    //  #                                         #
+    // ###    ##   ###   # #   ##    ###    ###   #
+    //  #    # ##  #  #  ####   #    #  #  #  #   #
+    //  #    ##    #     #  #   #    #  #  # ##   #
+    //   ##   ##   #     #  #  ###   #  #   # #  ###
     /**
      * Make resource deals in the terminal.
+     * @return {void}
      */
     terminal() {
-        var room = this.room,
-            terminal = room.terminal,
-            terminalStore = terminal.store,
+        const {room} = this,
+            {terminal, storage, name: roomName, memory} = room,
+            {store: terminalStore} = terminal,
             terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
-            storage = room.storage,
-            roomName = room.name,
-            memory = room.memory,
-            buyQueue = memory.buyQueue,
+            {market} = Game,
+            maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => {
+                const {roomMemory, roomStorage, roomTerminal} = r;
+
+                return roomMemory && roomMemory.roomType && roomMemory.roomType.type === "base" && roomStorage && roomStorage.my && roomTerminal && roomTerminal.my;
+            }), (r) => {
+                const {roomStorage} = r;
+
+                return roomStorage && roomStorage.my ? roomStorage.store[RESOURCE_ENERGY] : 0;
+            })),
+            flips = [];
+        let {buyQueue} = memory,
             dealMade = false,
-            flips = [],
-            storageStore = {},
-            market = Game.market,
-            maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my), (r) => (r.storage && r.storage.my) ? r.storage.store[RESOURCE_ENERGY] : 0));
-            
+            storageStore = {};
+
         if (storage) {
-            storageStore = storage.store;
+            ({store: storageStore} = storage);
         }
-        
+
         if (terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
-            let reserveMinerals = Memory.reserveMinerals,
-                buyResource;
+            const {reserveMinerals} = Memory;
+            let buyResource;
 
             if (memory.buyQueue) {
-                buyResource = buyQueue.resource;
-                
+                ({resource: buyResource} = buyQueue);
+
                 if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) > (reserveMinerals[buyResource] || 0)) {
                     delete memory.buyQueue;
-                    buyQueue = undefined;
+                    buyQueue = void 0;
                 }
             }
 
             if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {
                 // Buy what we need to for the lab queue.
-                let bestOrder = (Market.getFilteredOrders().sell[buyResource] || [])[0];
+                const {0: bestOrder} = Market.getFilteredOrders().sell[buyResource] || [];
 
                 if (bestOrder) {
-                    let bestPrice = bestOrder.price;
+                    const {price: bestPrice} = bestOrder;
 
                     if (bestPrice > buyQueue.price) {
                         delete memory.buyQueue;
-                        buyQueue = undefined;
+                        buyQueue = void 0;
                     } else {
-                        let bestAmount = bestOrder.amount,
+                        const {amount: bestAmount} = bestOrder,
                             transCost = market.calcTransactionCost(Math.min(buyQueue.amount, bestAmount), roomName, bestOrder.roomName);
-                        
+
                         if (terminalEnergy > transCost && Cache.credits >= buyQueue.amount * bestPrice) {
                             Market.deal(bestOrder.id, Math.min(buyQueue.amount, bestAmount), roomName);
                             dealMade = true;
                             buyQueue.amount -= Math.min(buyQueue.amount, bestAmount);
-                        } else {
-                            if (terminalEnergy > 0) {
-                                let amount = Math.min(Math.floor(Math.min(buyQueue.amount, bestAmount) * terminalEnergy / transCost), Math.floor(Cache.credits / bestPrice));
+                        } else if (terminalEnergy > 0) {
+                            const amount = Math.min(Math.floor(Math.min(buyQueue.amount, bestAmount) * terminalEnergy / transCost), Math.floor(Cache.credits / bestPrice));
 
-                                if (amount > 0) {
-                                    Market.deal(bestOrder.id, amount, roomName);
-                                    dealMade = true;
-                                    buyQueue.amount -= amount;
-                                }
+                            if (amount > 0) {
+                                Market.deal(bestOrder.id, amount, roomName);
+                                dealMade = true;
+                                buyQueue.amount -= amount;
                             }
                         }
                     }
                 } else {
                     delete memory.buyQueue;
-                    buyQueue = undefined;
+                    buyQueue = void 0;
                 }
 
                 if (buyQueue && buyQueue.amount <= 0) {
                     delete memory.buyQueue;
-                    buyQueue = undefined;
+                    buyQueue = void 0;
                 }
             } else {
                 // Transfer what we have in excess to rooms in need if we have the minimum credits.
                 // TODO: Transfer the first excess mineral to the room that needs it the most.
                 if (Cache.credits >= Memory.minimumCredits) {
-                    _.forEach(_.filter(Game.rooms, (r) => {
-                        var memory = r.memory,
-                            roomType = memory.roomType,
-                            terminal = r.terminal;
-                        
-                        return memory && roomType && roomType.type === "base" && terminal && terminal.my;
+                    _.forEach(_.filter(Game.rooms, (gameRoom) => {
+                        const {gameRoomMemory, gameRoomTerminal} = gameRoom;
+
+                        return gameRoomMemory && gameRoomMemory.roomType && gameRoomMemory.roomType.type === "base" && gameRoomTerminal && gameRoomTerminal.my;
                     }), (otherRoom) => {
-                        var otherRoomName = otherRoom.name,
-                            otherRoomStorage = otherRoom.storage;
+                        const {name: otherRoomName, storage: otherRoomStorage} = otherRoom;
 
                         dealMade = false;
                         if (roomName === otherRoomName) {
-                            return;
+                            return true;
                         }
 
                         _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
@@ -496,35 +487,34 @@ class RoomBase extends RoomEngine {
                             otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoomStorage && otherRoomStorage.store[k] || 0),
                             needed: reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0
                         })), (r) => {
-                            var otherRoomAmount = r.otherRoomAmount,
-                                needed = r.needed,
-                                amount = r.amount;
+                            const {otherRoomAmount, needed, amount} = r;
 
                             return reserveMinerals[r.resource] && otherRoomAmount < needed && amount > 0 && needed - otherRoomAmount > 0 && Math.min(amount, needed - otherRoomAmount) >= 100;
                         }), (resource) => {
-                            var amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount),
-                                resourceResource = resource.resource;
-
-                            let transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
+                            const {resource: resourceResource} = resource;
+                            let amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount);
+                            const transCost = market.calcTransactionCost(amount, roomName, otherRoomName);
 
                             if (terminalEnergy > transCost) {
                                 if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
                                     Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
                                     dealMade = true;
+
                                     return false;
                                 }
-                            } else {
-                                if (terminalEnergy > 0) {
-                                    amount = Math.floor(amount * terminalEnergy / transCost);
-                                    if (amount > 0) {
-                                        if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
-                                            Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
-                                            dealMade = true;
-                                            return false;
-                                        }
+                            } else if (terminalEnergy > 0) {
+                                amount = Math.floor(amount * terminalEnergy / transCost);
+                                if (amount > 0) {
+                                    if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
+                                        Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
+                                        dealMade = true;
+
+                                        return false;
                                     }
                                 }
                             }
+
+                            return true;
                         });
 
                         return !dealMade;
@@ -533,49 +523,47 @@ class RoomBase extends RoomEngine {
 
                 // Sell what we have in excess.
                 if (!dealMade) {
-                    let terminalMinerals = _.filter(_.map(terminalStore, (s, k) => {
-                        return {resource: k, amount: Math.min(s, s - (reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))};
-                    }), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
+                    const terminalMinerals = _.filter(_.map(terminalStore, (s, k) => ({resource: k, amount: Math.min(s, s - (reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))})), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
                     if (terminalMinerals.length > 0) {
                         _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
-                            var resource = topResource.resource,
-                                bestOrder = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => (topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits) || (!Memory.minimumSell[resource] && !Memory.flipPrice[resource]) || (Memory.minimumSell[resource] && o.price >= Memory.minimumSell[resource]) || (Memory.flipPrice[resource] && o.price >= Memory.flipPrice[resource].price) || (Memory.flipPrice[resource] && Game.time > Memory.flipPrice[resource].expiration))[0];
-                            
+                            const {resource} = topResource,
+                                {0: bestOrder} = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits || !Memory.minimumSell[resource] && !Memory.flipPrice[resource] || Memory.minimumSell[resource] && o.price >= Memory.minimumSell[resource] || Memory.flipPrice[resource] && o.price >= Memory.flipPrice[resource].price || Memory.flipPrice[resource] && Game.time > Memory.flipPrice[resource].expiration);
+
                             if (bestOrder) {
-                                let bestAmount = bestOrder.amount,
+                                const {amount: bestAmount} = bestOrder,
                                     transCost = market.calcTransactionCost(Math.min(topResource.amount, bestAmount), roomName, bestOrder.roomName);
-                                
+
                                 if (terminalEnergy > transCost) {
                                     Market.deal(bestOrder.id, Math.min(topResource.amount, bestAmount), roomName);
                                     dealMade = true;
                                     if (topResource.amount < 5005) {
                                         delete Memory.minimumSell[bestOrder.resourceType];
                                     }
-                                    return false;
-                                } else {
-                                    if (terminalEnergy > 0) {
-                                        let amount = Math.floor(Math.min(topResource.amount, bestAmount) * terminalEnergy / transCost);
 
-                                        if (amount > 0) {
-                                            Market.deal(bestOrder.id, amount, roomName);
-                                            dealMade = true;
-                                            return false;
-                                        }
+                                    return false;
+                                } else if (terminalEnergy > 0) {
+                                    const amount = Math.floor(Math.min(topResource.amount, bestAmount) * terminalEnergy / transCost);
+
+                                    if (amount > 0) {
+                                        Market.deal(bestOrder.id, amount, roomName);
+                                        dealMade = true;
+
+                                        return false;
                                     }
                                 }
                             }
+
+                            return true;
                         });
                     }
                 }
-                
+
                 // Find an order to flip if we haven't made a deal and we have enough energy.
                 if (!dealMade && storage && maxEnergy > Memory.marketEnergy) {
-                    let filteredOrders = Market.getFilteredOrders();
+                    const filteredOrders = Market.getFilteredOrders();
 
                     _.forEach(Minerals, (children, resource) => {
-                        var sellOrder, buyOrder;
-
                         // Only flip what we are full on.
                         if (!storageStore || (storageStore[resource] || 0) < reserveMinerals[resource]) {
                             return;
@@ -587,21 +575,19 @@ class RoomBase extends RoomEngine {
                         }
 
                         // Get all the orders that can be flipped.
-                        sellOrder = (filteredOrders.sell[resource] || [])[0];
-                        buyOrder = (filteredOrders.buy[resource] || [])[0];
+                        const {0: sellOrder} = filteredOrders.sell[resource] || [],
+                            {0: buyOrder} = filteredOrders.buy[resource] || [];
 
                         if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < Cache.credits) {
-                            flips.push({resource: resource, buy: buyOrder, sell: sellOrder});
+                            flips.push({resource, buy: buyOrder, sell: sellOrder});
                         }
                     });
 
                     _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
-                        var sell = flip.sell,
-                            sellPrice = sell.price,
-                            buy = flip.buy,
-                            amount = Math.min(buy.amount, sell.amount),
-                            transCost;
-                        
+                        const {sell, buy} = flip,
+                            {price: sellPrice} = sell;
+                        let amount = Math.min(buy.amount, sell.amount);
+
                         if (amount * sellPrice > Cache.credits) {
                             amount = Math.floor(Cache.credits / sellPrice);
                         }
@@ -611,11 +597,13 @@ class RoomBase extends RoomEngine {
                         }
 
                         // Determine how much energy we need for the deal.
-                        transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
+                        const transCost = market.calcTransactionCost(amount, roomName, sell.roomName);
+
                         if (terminalEnergy > transCost) {
                             Market.deal(sell.id, amount, roomName);
                             Memory.flipPrice[flip.resource] = {price: sellPrice, expiration: Game.time + 100};
                             dealMade = true;
+
                             return false;
                         }
 
@@ -625,44 +613,44 @@ class RoomBase extends RoomEngine {
                                 Market.deal(sell.id, amount, roomName);
                                 Memory.flipPrice[flip.resource] = {price: sellPrice, expiration: Game.time + 100};
                                 dealMade = true;
+
                                 return false;
                             }
                         }
+
+                        return true;
                     });
                 }
             }
         }
     }
 
-    //  #                 #            
-    //  #                 #            
-    // ###    ###   ###   # #    ###   
-    //  #    #  #  ##     ##    ##     
-    //  #    # ##    ##   # #     ##   
-    //   ##   # #  ###    #  #  ###    
+    //  #                 #
+    //  #                 #
+    // ###    ###   ###   # #    ###
+    //  #    #  #  ##     ##    ##
+    //  #    # ##    ##   # #     ##
+    //   ##   # #  ###    #  #  ###
     /**
      * Compile the tasks available for this room.
+     * @return {void}
      */
     tasks() {
-        var room = this.room,
-            controller = room.controller,
-            rcl = controller ? controller.level : undefined,
+        const {room} = this,
+            {controller, storage, terminal, memory: roomMemory} = room,
+            rcl = controller ? controller.level : void 0,
             extensionEnergyCapacity = rcl ? EXTENSION_ENERGY_CAPACITY[rcl] : 0,
-            nuker = Cache.nukersInRoom(room)[0],
-            powerSpawn = Cache.powerSpawnsInRoom(room)[0],
-            storage = room.storage,
-            terminal = room.terminal,
+            {0: nuker} = Cache.nukersInRoom(room),
+            {0: powerSpawn} = Cache.powerSpawnsInRoom(room),
             terminalEnergy = terminal ? terminal.store[RESOURCE_ENERGY] : 0,
-            store = storage ? storage.store : undefined,
-            roomMemory = room.memory,
-            labsInUse = roomMemory.labsInUse,
-            labQueue = roomMemory.labQueue,
+            store = storage ? storage.store : void 0,
+            {labsInUse, labQueue} = roomMemory,
             labs = Cache.labsInRoom(room),
-            labAmount = labQueue ? labQueue.amount : undefined,
-            reserveMinerals = Memory.reserveMinerals,
+            labAmount = labQueue ? labQueue.amount : void 0,
+            {reserveMinerals} = Memory,
             links = Cache.linksInRoom(room),
-            spawns = Cache.spawnsInRoom(room),
-            tasks, status, sourceLabs, lab0, lab1, labsCollectMinerals;
+            spawns = Cache.spawnsInRoom(room);
+        let status, sourceLabs, lab0, lab1;
 
         this.tasks = {
             constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES),
@@ -671,19 +659,19 @@ class RoomBase extends RoomEngine {
             hostiles: Cache.hostilesInRoom(room),
             hurtCreeps: _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),
             labsCollectMinerals: [],
-            nuker: nuker,
+            nuker,
             nukerResourcesNeeded: {},
-            powerSpawn: powerSpawn,
+            powerSpawn,
             powerSpawnResourcesNeeded: {},
             repairableStructures: _.filter(Cache.sortedRepairableStructuresInRoom(room), (s) => s.hits / s.hitsMax < 0.9 || s.hitsMax - s.hits > 100000),
             spawns: _.filter(Cache.spawnsInRoom(room), (s) => s.energy < SPAWN_ENERGY_CAPACITY),
-            structuresWithEnergy: [...(storage && storage.my ? [storage] : []), ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
-            terminalsCollectEnergy: terminal && (!terminal.my || (terminalEnergy >= 5000 && (!roomMemory.buyQueue || !storage || store[RESOURCE_ENERGY] < Memory.marketEnergy || Cache.credits < Memory.minimumCredits))),
+            structuresWithEnergy: [...storage && storage.my ? [storage] : [], ..._.filter(Cache.containersInRoom(room), (c) => c.store[RESOURCE_ENERGY] >= 500).sort((a, b) => b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY])],
+            terminalsCollectEnergy: terminal && (!terminal.my || terminalEnergy >= 5000 && (!roomMemory.buyQueue || !storage || store[RESOURCE_ENERGY] < Memory.marketEnergy || Cache.credits < Memory.minimumCredits)),
             terminalsFillWithEnergy: terminal && terminal.my && terminalEnergy < 1000 ? [terminal] : [],
             towers: _.filter(Cache.towersInRoom(room), (t) => t.energy < TOWER_CAPACITY * 0.8)
         };
 
-        tasks = this.tasks;
+        const {tasks} = this;
 
         tasks.quickConstructionSites = _.filter(tasks.constructionSites, (s) => s.progressTotal === 1);
 
@@ -692,12 +680,13 @@ class RoomBase extends RoomEngine {
             // If the room only has storage and no terminal, minerals go to storage.
             // Otherwise, if the room has storage and is not at capacity, minerals should be put into storage, but only up to a certain amount.
             if (!terminal || !terminal.my) {
-                tasks.storageResourcesNeeded = undefined;
+                tasks.storageResourcesNeeded = void 0;
             } else if (_.sum(store) < storage.storeCapacity && reserveMinerals) {
                 tasks.storageResourcesNeeded = {};
                 _.forEach(Object.keys(reserveMinerals), (resource) => {
-                    var reserveMineralsResource = reserveMinerals[resource],
+                    const {[resource]: reserveMineralsResource} = reserveMinerals,
                         amount = (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) - (store[resource] || 0);
+
                     if (amount > 0) {
                         tasks.storageResourcesNeeded[resource] = amount;
                     }
@@ -705,59 +694,58 @@ class RoomBase extends RoomEngine {
             }
         }
 
-        //nukerResourcesNeeded
+        // nukerResourcesNeeded
         if (nuker) {
             tasks.nukerResourcesNeeded[RESOURCE_GHODIUM] = nuker.ghodiumCapacity - nuker.ghodium;
         }
 
-        //powerSpawnResourcesNeeded
+        // powerSpawnResourcesNeeded
         if (powerSpawn / powerSpawn.power < 0.5) {
             tasks.powerSpawnResourcesNeeded[RESOURCE_POWER] = powerSpawn.powerCapacity - powerSpawn.power;
         }
 
         // labsCollectMinerals
         if (labQueue) {
-            status = labQueue.status;
-            sourceLabs = labQueue.sourceLabs;
+            ({status, sourceLabs} = labQueue);
             if (sourceLabs) {
                 lab0 = Game.getObjectById(sourceLabs[0]);
                 lab1 = Game.getObjectById(sourceLabs[1]);
             }
         }
 
-        labsCollectMinerals = tasks.labsCollectMinerals;
-    
+        const {labsCollectMinerals} = tasks;
+
         if (labsInUse) {
             _.forEach(labsInUse, (lab) => {
                 if (!Game.creeps[lab.creepToBoost]) {
                     labsCollectMinerals.push(Game.getObjectById(lab.id));
                 }
             });
-    
+
             _.forEach(labsCollectMinerals, (task) => {
                 _.remove(labsInUse, (l) => l.id === task.id);
             });
         }
-    
+
         if (storage && labQueue && status === "clearing") {
             _.forEach(_.filter(labs, (l) => _.map(labsInUse, (liu) => liu.id).indexOf(l.id) === -1 && l.mineralAmount > 0), (lab) => {
                 labsCollectMinerals.push(lab);
             });
         }
-    
+
         if (storage && labsInUse) {
             _.forEach(_.filter(labsInUse, (l) => {
-                var lab = Game.getObjectById(l.id);
+                const lab = Game.getObjectById(l.id);
 
                 return (!l.status || l.status === "emptying") && lab && lab.mineralType && lab.mineralType !== l.resource;
             }), (lab) => {
                 labsCollectMinerals.push(Game.getObjectById(lab.id));
             });
         }
-    
+
         if (storage && labQueue && sourceLabs && status === "creating" && !Utilities.roomLabsArePaused(room)) {
-            let lab0Amount = lab0.mineralAmount,
-                lab1Amount = lab1.mineralAmount;
+            const {mineralAmount: lab0Amount} = lab0,
+                {mineralAmount: lab1Amount} = lab1;
 
             if (lab0Amount === 0 && lab1Amount !== 0) {
                 labsCollectMinerals.push(lab1);
@@ -766,7 +754,7 @@ class RoomBase extends RoomEngine {
                 labsCollectMinerals.push(lab0);
             }
         }
-    
+
         if (storage && labQueue && status === "returning") {
             _.forEach(_.filter(labs, (l) => l.mineralType === labQueue.resource), (lab) => {
                 labsCollectMinerals.push(lab);
@@ -776,17 +764,17 @@ class RoomBase extends RoomEngine {
         // labsFillMinerals
         if (labsInUse) {
             _.forEach(_.filter(labsInUse, (l) => {
-                var lab = Game.getObjectById(l.id),
-                    status = l.status;
+                const lab = Game.getObjectById(l.id),
+                    {status: labStatus} = l;
 
-                return (!status || ["filling", "refilling"].indexOf(status) !== -1) && (!lab.mineralType || lab.mineralType === (status === "refilling" ? l.oldResource : l.resource)) && (lab.mineralAmount < (status === "refilling" ? l.oldAmount : l.amount));
+                return (!labStatus || ["filling", "refilling"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource)) && lab.mineralAmount < (labStatus === "refilling" ? l.oldAmount : l.amount);
             }), (labInUse) => {
-                var status = labInUse.status,
+                const {status: labStatus} = labInUse,
                     lab = Game.getObjectById(labInUse.id);
 
                 tasks.labsFillMinerals = lab;
                 tasks.labsFillMineralsResourcesNeeded = {};
-                tasks.labsFillMineralsResourcesNeeded[status === "refilling" ? labInUse.oldResource : labInUse.resource] = (status === "refilling" ? labInUse.oldAmount : labInUse.amount) - lab.mineralAmount;
+                tasks.labsFillMineralsResourcesNeeded[labStatus === "refilling" ? labInUse.oldResource : labInUse.resource] = (labStatus === "refilling" ? labInUse.oldAmount : labInUse.amount) - lab.mineralAmount;
 
                 return false;
             });
@@ -808,13 +796,11 @@ class RoomBase extends RoomEngine {
         // terminalCollectMinerals
         if (storage && terminal && reserveMinerals) {
             _.forEach(terminal.store, (amount, resource) => {
-                var reserveMineralsResource;
-
                 if (resource === RESOURCE_ENERGY) {
                     return;
                 }
 
-                reserveMineralsResource = reserveMinerals[resource];
+                const {[resource]: reserveMineralsResource} = reserveMinerals;
 
                 if (!reserveMineralsResource) {
                     return;
@@ -822,7 +808,7 @@ class RoomBase extends RoomEngine {
                 if (!store[resource]) {
                     tasks.terminalCollectMinerals = [terminal];
                     tasks.terminalCollectMineralsResource = resource;
-                    tasks.terminalCollectMineralsAmount = Math.min(amount, (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource));
+                    tasks.terminalCollectMineralsAmount = Math.min(amount, resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource);
                 } else if (store[resource] < (resource.startsWith("X") && resource.length === 5 ? Memory.reserveMinerals[resource] - 5000 : Memory.reserveMinerals[resource])) {
                     tasks.terminalCollectMinerals = [terminal];
                     tasks.terminalCollectMineralsResource = resource;
@@ -835,49 +821,51 @@ class RoomBase extends RoomEngine {
         if (controller && rcl >= 6) {
             if (storage && labsInUse) {
                 _.forEach(_.filter(labsInUse, (l) => {
-                    var status = l.status,
+                    const {status: labStatus} = l,
                         lab = Game.getObjectById(l.id);
 
-                    return (!status || ["filling", "refilling"].indexOf(status) !== -1) && (!lab.mineralType || lab.mineralType === (status === "refilling" ? l.oldResource : l.resource));
+                    return (!labStatus || ["filling", "refilling"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource));
                 }), (l) => {
-                    var status = l.status,
+                    const {status: labStatus} = l,
                         lab = Game.getObjectById(l.id);
 
-                    if ((status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount)) > 0) {
+                    if ((labStatus === "refilling" ? l.oldAmount - lab.mineralAmount : l.amount - lab.mineralAmount) > 0) {
                         links.storageCollectMinerals = [storage];
-                        links.storageCollectMineralsResource = status === "refilling" ? l.oldResource : l.resource;
-                        links.storageCollectMineralsAmount = status === "refilling" ? (l.oldAmount - lab.mineralAmount) : (l.amount - lab.mineralAmount);
+                        links.storageCollectMineralsResource = labStatus === "refilling" ? l.oldResource : l.resource;
+                        links.storageCollectMineralsAmount = labStatus === "refilling" ? l.oldAmount - lab.mineralAmount : l.amount - lab.mineralAmount;
 
                         return false;
                     }
+
+                    return true;
                 });
             }
-    
+
             // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
             if (!links.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
                 _.forEach(labQueue.children, (resource) => {
-                    var amount;
+                    const amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount);
 
-                    if ((amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount)) < labAmount) {
+                    if (amount < labAmount) {
                         links.storageCollectMinerals = [storage];
                         links.storageCollectMineralsResource = resource;
                         links.storageCollectMineralsAmount = labAmount - amount;
 
                         return false;
                     }
+
+                    return true;
                 });
             }
-    
+
             // We only need to transfer from storage to terminal when we have both storage and terminal.
             if (!links.storageCollectMinerals && storage && terminal && reserveMinerals) {
                 _.forEach(store, (amount, resource) => {
-                    var reserveMineralsResource;
-
                     if (resource === RESOURCE_ENERGY) {
-                        return;
+                        return true;
                     }
 
-                    reserveMineralsResource = reserveMinerals[resource];
+                    const {[resource]: reserveMineralsResource} = reserveMinerals;
 
                     if (!reserveMineralsResource) {
                         links.storageCollectMinerals = [storage];
@@ -892,9 +880,11 @@ class RoomBase extends RoomEngine {
 
                         return false;
                     }
+
+                    return true;
                 });
             }
-    
+
             if (!links.storageCollectMinerals) {
                 // If we have a nuker, transfer ghodium.  If we have a power spawn, transfer power.
                 if (nuker && rcl > 8 && nuker.ghodium < nuker.ghodiumCapacity && store[RESOURCE_GHODIUM]) {
@@ -915,11 +905,11 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    //  ###   ###    ###  #  #  ###   
-    // ##     #  #  #  #  #  #  #  #  
-    //   ##   #  #  # ##  ####  #  #  
-    // ###    ###    # #  ####  #  #  
-    //        #                       
+    //  ###   ###    ###  #  #  ###
+    // ##     #  #  #  #  #  #  #  #
+    //   ##   #  #  # ##  ####  #  #
+    // ###    ###    # #  ####  #  #
+    //        #
     /**
      * Spawns needed creeps.
      * @param {canSpawn} bool Whether to spawn creeps this turn.
@@ -948,13 +938,13 @@ class RoomBase extends RoomEngine {
         }).length > 0));
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps.
      */
@@ -972,13 +962,13 @@ class RoomBase extends RoomEngine {
         Tower.assignTasks(this);
     }
 
-    // ##          #      ##                           
-    //  #          #     #  #                          
-    //  #     ###  ###   #  #  #  #   ##   #  #   ##   
-    //  #    #  #  #  #  #  #  #  #  # ##  #  #  # ##  
-    //  #    # ##  #  #  ## #  #  #  ##    #  #  ##    
-    // ###    # #  ###    ##    ###   ##    ###   ##   
-    //                      #                          
+    // ##          #      ##
+    //  #          #     #  #
+    //  #     ###  ###   #  #  #  #   ##   #  #   ##
+    //  #    #  #  #  #  #  #  #  #  # ##  #  #  # ##
+    //  #    # ##  #  #  ## #  #  #  ##    #  #  ##
+    // ###    # #  ###    ##    ###   ##    ###   ##
+    //                      #
     /**
      * Processes the lab queue.
      */
@@ -987,11 +977,11 @@ class RoomBase extends RoomEngine {
             memory = room.memory,
             labQueue = memory.labQueue,
             status = labQueue.status;
-        
+
         if (status === "clearing") {
             let labsInUse = memory.labsInUse,
                 labs = Cache.labsInRoom(room);
-            
+
             if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => _.filter(labsInUse, (u) => u.id === l.id).length === 0 && l.mineralAmount > 0).length === 0) {
                 labQueue.status = "moving";
             }
@@ -1007,7 +997,7 @@ class RoomBase extends RoomEngine {
                     sourceLab0 = Game.getObjectById(sourceLabs[0]),
                     sourceLab1 = Game.getObjectById(sourceLabs[1]),
                     labsInUse = memory.labsInUse;
-                
+
                 _.forEach(children, (resource) => {
                     if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
                         moved = false;
@@ -1033,7 +1023,7 @@ class RoomBase extends RoomEngine {
                 labsInUse = memory.labsInUse,
                 sourceLab0 = Game.getObjectById(sourceLabs[0]),
                 sourceLab1 = Game.getObjectById(sourceLabs[1]);
-            
+
             _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
                 if (lab.mineralAmount === LAB_MINERAL_CAPACITY) {
                     labQueue.status = "returning";
@@ -1062,12 +1052,12 @@ class RoomBase extends RoomEngine {
         }
     }
 
-    // ##          #            ###         #  #               
-    //  #          #             #          #  #               
-    //  #     ###  ###    ###    #    ###   #  #   ###    ##   
-    //  #    #  #  #  #  ##      #    #  #  #  #  ##     # ##  
-    //  #    # ##  #  #    ##    #    #  #  #  #    ##   ##    
-    // ###    # #  ###   ###    ###   #  #   ##   ###     ##   
+    // ##          #            ###         #  #
+    //  #          #             #          #  #
+    //  #     ###  ###    ###    #    ###   #  #   ###    ##
+    //  #    #  #  #  #  ##      #    #  #  #  #  ##     # ##
+    //  #    # ##  #  #    ##    #    #  #  #  #    ##   ##
+    // ###    # #  ###   ###    ###   #  #   ##   ###     ##
     /**
      * Checks for labs in use and updates the queue with what needs to be done with them.
      */
@@ -1078,7 +1068,7 @@ class RoomBase extends RoomEngine {
         _.forEach(labsInUse, (queue) => {
             var status = queue.status,
                 lab = Game.getObjectById(queue.id);
-            
+
             if (status === "emptying") {
                 if (lab.mineralAmount === 0) {
                     queue.status = "filling";
@@ -1093,7 +1083,7 @@ class RoomBase extends RoomEngine {
                 }
             } else {
                 let creep = Game.creeps[queue.creepToBoost];
-                
+
                 if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
                     if (lab.boostCreep(creep) === OK) {
                         _.remove(creep.memory.labs, (l) => l === queue.id);
@@ -1112,13 +1102,13 @@ class RoomBase extends RoomEngine {
         });
     }
 
-    //                                             ###                           
-    //                                             #  #                          
-    // ###   ###    ##    ##    ##    ###    ###   #  #   ##   #  #   ##   ###   
-    // #  #  #  #  #  #  #     # ##  ##     ##     ###   #  #  #  #  # ##  #  #  
-    // #  #  #     #  #  #     ##      ##     ##   #     #  #  ####  ##    #     
-    // ###   #      ##    ##    ##   ###    ###    #      ##   ####   ##   #     
-    // #                                                                         
+    //                                             ###
+    //                                             #  #
+    // ###   ###    ##    ##    ##    ###    ###   #  #   ##   #  #   ##   ###
+    // #  #  #  #  #  #  #     # ##  ##     ##     ###   #  #  #  #  # ##  #  #
+    // #  #  #     #  #  #     ##      ##     ##   #     #  #  ####  ##    #
+    // ###   #      ##    ##    ##   ###    ###    #      ##   ####   ##   #
+    // #
     /**
      * Processes power in the room.
      */
@@ -1130,13 +1120,13 @@ class RoomBase extends RoomEngine {
         });
     }
 
-    //  #           ##   #       #   
-    //  #          #  #  #           
-    // ###    ##   #  #  ###     #   
-    //  #    #  #  #  #  #  #    #   
-    //  #    #  #  #  #  #  #    #   
-    //   ##   ##    ##   ###   # #   
-    //                          #    
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
     /**
      * Serialize the room to an object.
      */
@@ -1146,13 +1136,13 @@ class RoomBase extends RoomEngine {
         };
     }
 
-    //   #                      ##   #       #   
-    //  # #                    #  #  #           
-    //  #    ###    ##   # #   #  #  ###     #   
-    // ###   #  #  #  #  ####  #  #  #  #    #   
-    //  #    #     #  #  #  #  #  #  #  #    #   
-    //  #    #      ##   #  #   ##   ###   # #   
-    //                                      #    
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
     /**
      * Deserializes room from an object.
      * @param {Room} room The room to deserialize from.

@@ -1,25 +1,25 @@
-var Assign = require("assign"),
+const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####     #                                 #      ##                 
-//  #   #           #            #  #                                      #       #                 
-//  #   #   ###     #     ###    #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##  
-//  ####   #   #    #    #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  # 
-//  # #    #   #    #    #####   #  #    #     ###   # # #   ####  #   #   #       #    #####  #     
-//  #  #   #   #    #    #       #  #    #        #  # # #  #   #  #   #   #  #    #    #      #     
-//  #   #   ###    ###    ###   ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #     
+//  ####           ##           ####     #                                 #      ##
+//  #   #           #            #  #                                      #       #
+//  #   #   ###     #     ###    #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##
+//  ####   #   #    #    #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  #
+//  # #    #   #    #    #####   #  #    #     ###   # # #   ####  #   #   #       #    #####  #
+//  #  #   #   #    #    #       #  #    #        #  # # #  #   #  #   #   #  #    #    #      #
+//  #   #   ###    ###    ###   ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #
 /**
  * Represents the dismantler role.
  */
 class RoleDismantler {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,41 +27,40 @@ class RoleDismantler {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var max = 1,
-            creeps;
+        const max = 1;
 
         if (!canSpawn) {
             return {
                 name: "dismantler",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        creeps = Cache.creeps[engine.room.name];
+        const {creeps: {[engine.room.name]: creeps}} = Cache;
 
         return {
             name: "dismantler",
             spawn: _.filter(creeps && creeps.dismantler || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
             spawnFromRegion: true,
-            max: max
+            max
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             body = [];
@@ -71,7 +70,7 @@ class RoleDismantler {
         body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "dismantler",
                 home: checkSettings.home,
@@ -80,24 +79,24 @@ class RoleDismantler {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var room = engine.room,
-            roomName = room.name,
-            creeps = Cache.creeps[roomName],
+        const {room, tasks} = engine,
+            {name: roomName} = room,
+            {creeps: {[roomName]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.dismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            allCreeps = creeps && creeps.all || [],
-            tasks = engine.tasks;
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -128,7 +127,7 @@ class RoleDismantler {
         }
 
         // Check for unfilled terminals for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, undefined, "Terminal");
+        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, void 0, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

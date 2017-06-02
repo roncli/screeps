@@ -1,4 +1,4 @@
-var Minerals = {};
+const Minerals = {};
 
 Minerals[RESOURCE_HYDROGEN] = [];
 Minerals[RESOURCE_OXYGEN] = [];

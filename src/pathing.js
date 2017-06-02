@@ -1,56 +1,54 @@
-const direction = {
-    1: {dx: 0, dy: -1},
-    2: {dx: 1, dy: -1},
-    3: {dx: 1, dy: 0},
-    4: {dx: 1, dy: 1},
-    5: {dx: 0, dy: 1},
-    6: {dx: -1, dy: 1},
-    7: {dx: -1, dy: 0},
-    8: {dx: -1, dy: -1}
-},
-    Cache = require("cache"); //,
-//    Segment = require("segment");
+const Cache = require("cache"),
+//    Segment = require("segment"),
+    direction = {
+        1: {dx: 0, dy: -1},
+        2: {dx: 1, dy: -1},
+        3: {dx: 1, dy: 0},
+        4: {dx: 1, dy: 1},
+        5: {dx: 0, dy: 1},
+        6: {dx: -1, dy: 1},
+        7: {dx: -1, dy: 0},
+        8: {dx: -1, dy: -1}
+    };
 
-//  ####           #     #        #                 
-//  #   #          #     #                          
-//  #   #   ###   ####   # ##    ##    # ##    ## # 
-//  ####       #   #     ##  #    #    ##  #  #  #  
-//  #       ####   #     #   #    #    #   #   ##   
-//  #      #   #   #  #  #   #    #    #   #  #     
-//  #       ####    ##   #   #   ###   #   #   ###  
-//                                            #   # 
-//                                             ###  
+//  ####           #     #        #
+//  #   #          #     #
+//  #   #   ###   ####   # ##    ##    # ##    ## #
+//  ####       #   #     ##  #    #    ##  #  #  #
+//  #       ####   #     #   #    #    #   #   ##
+//  #      #   #   #  #  #   #    #    #   #  #
+//  #       ####    ##   #   #   ###   #   #   ###
+//                                            #   #
+//                                             ###
 /**
  * A class for efficient creep pathing.
  */
 class Pathing {
-    //                         ###         
-    //                          #          
-    // # #    ##   # #    ##    #     ##   
-    // ####  #  #  # #   # ##   #    #  #  
-    // #  #  #  #  # #   ##     #    #  #  
-    // #  #   ##    #     ##    #     ##   
+    //                         ###
+    //                          #
+    // # #    ##   # #    ##    #     ##
+    // ####  #  #  # #   # ##   #    #  #
+    // #  #  #  #  # #   ##     #    #  #
+    // #  #   ##    #     ##    #     ##
     /**
      * Moves a creep to a position.
      * @param {Creep} creep The creep to move.
      * @param {object} pos The position or object to path to.
      * @param {number} [range=0] The range to path within.
+     * @return {void}
      */
     static moveTo(creep, pos, range) {
-        var creepMemory = creep.memory,
-            pathing = creepMemory._pathing,
-            restartOn = [],
-            creepPos = creep.pos,
-            creepX = creepPos.x,
-            creepY = creepPos.y,
-            creepRoom = creepPos.roomName,
-            tick = Game.time,
-            posX, posY, posRoom, wasStationary, firstPos, multiplier;
+        const {memory: creepMemory, pos: creepPos} = creep,
+            {x: creepX, y: creepY, roomName: creepRoom} = creepPos,
+            {time: tick} = Game,
+            restartOn = [];
+        let {_pathing: pathing} = creepMemory,
+            wasStationary, firstPos, multiplier;
 
         if (pos instanceof RoomObject) {
-            pos = pos.pos;
+            ({pos} = pos);
         }
-        
+
         // Default range to 0.
         if (!range) {
             range = 0;
@@ -61,15 +59,13 @@ class Pathing {
             return;
         }
 
-        posX = pos.x;
-        posY = pos.y;
-        posRoom = pos.roomName;
+        const {x: posX, y: posY, roomName: posRoom} = pos;
 
         if (pathing) {
             // If the position doesn't match where we're going, nuke pathing.
             if (pathing.dest.x !== posX || pathing.dest.y !== posY || pathing.dest.room !== posRoom) {
                 delete creepMemory._pathing;
-                pathing = undefined;
+                pathing = void 0;
             }
         }
 
@@ -82,13 +78,13 @@ class Pathing {
         // If we haven't moved in 2 turns, set the position to avoid, and then nuke pathing.path.
         if (pathing) {
             wasStationary = creepX === pathing.start.x && creepY === pathing.start.y && creepRoom === pathing.start.room || (Math.abs(creepX - pathing.start.x) === 49 || Math.abs(creepY - pathing.start.y) === 49) && creepRoom !== pathing.start.room;
-            
+
             pathing.stationary = wasStationary ? pathing.stationary + 1 : 0;
 
             if (pathing.stationary >= 2) {
                 if (pathing.path && pathing.path.length > 0) {
-                    let dir = direction[+pathing.path[0]];
-                    
+                    const {[+pathing.path[0]]: dir} = direction;
+
                     firstPos = {
                         x: creepX + dir.dx,
                         y: creepY + dir.dy,
@@ -105,7 +101,7 @@ class Pathing {
                 }
 
                 pathing.stationary = 0;
-                
+
                 delete pathing.path;
                 delete pathing.restartOn;
             } else if (pathing.path && !wasStationary) {
@@ -113,7 +109,7 @@ class Pathing {
                 if (pathing.path.length === 1) {
                     // We've reached the end of the path.
                     delete creepMemory._pathing;
-                    pathing = undefined;
+                    pathing = void 0;
                 } else {
                     // Update start position and remaining path.
                     pathing.start = {
@@ -125,14 +121,14 @@ class Pathing {
                 }
             }
         }
-        
+
         // If we don't have a pathing, generate it.
         if (!pathing || !pathing.path) {
-            let moveParts = creep.getActiveBodyparts(MOVE),
+            const moveParts = creep.getActiveBodyparts(MOVE),
 //                paths = new Segment(4).memory;
-                paths = Memory.paths,
-                key, path, newPath;
-            
+                {paths} = Memory;
+            let newPath;
+
             // Determine multiplier to use for terrain cost.
             multiplier = 1 + (_.filter(creep.body, (b) => b.hits > 0 && [MOVE, CARRY].indexOf(b.type) === -1).length + Math.ceil(_.sum(creep.carry) / 50) - moveParts) / moveParts;
 
@@ -141,15 +137,14 @@ class Pathing {
                 _.remove(pathing.blocked, (b) => b.blockedUntil <= tick);
             }
 
-            key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`;
-
-            path = paths[key];
+            const key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`,
+                {[key]: path} = paths;
 
             if ((!pathing || pathing.blocked.length === 0) && path) {
                 // Use the cache.
                 if (pathing) {
                     pathing.path = this.decodePath(path[0]);
-                    pathing.restartOn = path[1];
+                    ({1: pathing.restartOn} = path);
                 } else {
                     pathing = {
                         start: {
@@ -170,13 +165,12 @@ class Pathing {
                 }
                 path[3] = tick;
             } else {
-                newPath = PathFinder.search(creepPos, {pos: pos, range: range}, {
+                newPath = PathFinder.search(creepPos, {pos, range}, {
                     plainCost: Math.ceil(1 * multiplier),
                     swampCost: Math.ceil(5 * multiplier),
                     maxOps: creepRoom === posRoom ? 2000 : 100000,
                     roomCallback: (roomName) => {
-                        var room = Game.rooms[roomName],
-                            matrix;
+                        const {rooms: {[roomName]: room}} = Game;
 
                         // Avoid rooms that we are instructed to, or avoid other rooms if the target is in the same room and this creep is not a remote worker or army creep.
                         if (creepRoom !== roomName && (Memory.avoidRooms.indexOf(roomName) !== -1 || creepRoom === posRoom && roomName !== posRoom && !creepMemory.role.startsWith("remote") && !creepMemory.role.startsWith("army"))) {
@@ -185,10 +179,11 @@ class Pathing {
 
                         if (!room) {
                             restartOn.push(roomName);
-                            return;
+
+                            return true;
                         }
 
-                        matrix = Cache.costMatrixForRoom(room);
+                        const matrix = Cache.costMatrixForRoom(room);
 
                         if (pathing && roomName === creepRoom) {
                             _.forEach(pathing.blocked, (blocked) => {
@@ -226,7 +221,7 @@ class Pathing {
                         path: this.serializePath(creepPos, newPath.path),
                         stationary: 0,
                         blocked: [],
-                        restartOn: restartOn
+                        restartOn
                     };
                 }
 
@@ -249,25 +244,26 @@ class Pathing {
         creepMemory._pathing = pathing;
     }
 
-    //                     #          ##     #                ###          #    #     
-    //                                 #                      #  #         #    #     
-    //  ###    ##   ###   ##     ###   #    ##    ####   ##   #  #   ###  ###   ###   
-    // ##     # ##  #  #   #    #  #   #     #      #   # ##  ###   #  #   #    #  #  
-    //   ##   ##    #      #    # ##   #     #     #    ##    #     # ##   #    #  #  
-    // ###     ##   #     ###    # #  ###   ###   ####   ##   #      # #    ##  #  #  
+    //                     #          ##     #                ###          #    #
+    //                                 #                      #  #         #    #
+    //  ###    ##   ###   ##     ###   #    ##    ####   ##   #  #   ###  ###   ###
+    // ##     # ##  #  #   #    #  #   #     #      #   # ##  ###   #  #   #    #  #
+    //   ##   ##    #      #    # ##   #     #     #    ##    #     # ##   #    #  #
+    // ###     ##   #     ###    # #  ###   ###   ####   ##   #      # #    ##  #  #
     /**
      * Serializes the path to a string.
      * @param {RoomPosition} start The starting location of the path.
      * @param {RoomPosition[]} path Every location along the path.
+     * @return {string} A serialized path.
      */
     static serializePath(start, path) {
         return _.map(path, (pos, index) => {
-            var startPos;
+            let startPos;
 
             if (index === 0) {
                 startPos = start;
             } else {
-                startPos = path[index - 1];
+                ({[index - 1]: startPos} = path);
             }
 
             switch (pos.x - startPos.x) {
@@ -330,24 +326,26 @@ class Pathing {
                     }
                     break;
             }
+
+            return "";
         }).join("");
     }
 
-    //                            #        ###          #    #     
-    //                            #        #  #         #    #     
-    //  ##   ###    ##    ##    ###   ##   #  #   ###  ###   ###   
-    // # ##  #  #  #     #  #  #  #  # ##  ###   #  #   #    #  #  
-    // ##    #  #  #     #  #  #  #  ##    #     # ##   #    #  #  
-    //  ##   #  #   ##    ##    ###   ##   #      # #    ##  #  #  
+    //                            #        ###          #    #
+    //                            #        #  #         #    #
+    //  ##   ###    ##    ##    ###   ##   #  #   ###  ###   ###
+    // # ##  #  #  #     #  #  #  #  # ##  ###   #  #   #    #  #
+    // ##    #  #  #     #  #  #  #  ##    #     # ##   #    #  #
+    //  ##   #  #   ##    ##    ###   ##   #      # #    ##  #  #
     /**
      * Encodes a path to reduce size by ~50%.
      * @param {string} path The path to encode.
      * @return {string} The encoded path.
      */
     static encodePath(path) {
-        var codes = [],
-            index;
-        
+        const codes = [];
+        let index;
+
         for (index = 0; index < path.length; index += 2) {
             if (index === path.length - 1) {
                 codes.push(path.charCodeAt(index) - 17);
@@ -359,22 +357,24 @@ class Pathing {
         return String.fromCharCode(...codes);
     }
 
-    //    #                       #        ###          #    #     
-    //    #                       #        #  #         #    #     
-    //  ###   ##    ##    ##    ###   ##   #  #   ###  ###   ###   
-    // #  #  # ##  #     #  #  #  #  # ##  ###   #  #   #    #  #  
-    // #  #  ##    #     #  #  #  #  ##    #     # ##   #    #  #  
-    //  ###   ##    ##    ##    ###   ##   #      # #    ##  #  #  
+    //    #                       #        ###          #    #
+    //    #                       #        #  #         #    #
+    //  ###   ##    ##    ##    ###   ##   #  #   ###  ###   ###
+    // #  #  # ##  #     #  #  #  #  # ##  ###   #  #   #    #  #
+    // #  #  ##    #     #  #  #  #  ##    #     # ##   #    #  #
+    //  ###   ##    ##    ##    ###   ##   #      # #    ##  #  #
     /**
      * Decodes an encoded path.
-     * @param {string} path The decoded path.
+     * @param {string} path The path to decode.
+     * @return {string} The decoded path.
      */
     static decodePath(path) {
-        var codes = [],
-            index;
-        
+        const codes = [];
+        let index;
+
         for (index = 0; index < path.length; index++) {
-            let char = path.charCodeAt(index);
+            const char = path.charCodeAt(index);
+
             if (char < 40) {
                 codes.push(char + 17);
             } else {

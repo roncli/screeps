@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####                         #            ####            #     ##        #               
-//  #   #           #           #   #                        #             #  #                  #        #               
-//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###    #  #  #   #   ##      #     ## #   ###   # ##  
-//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   ###   #   #    #      #    #  ##  #   #  ##  # 
-//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####   #  #  #   #    #      #    #   #  #####  #     
-//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #       #  #  #  ##    #      #    #  ##  #      #     
-//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   ####    ## #   ###    ###    ## #   ###   #     
+//  ####           ##           ####                         #            ####            #     ##        #
+//  #   #           #           #   #                        #             #  #                  #        #
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###    #  #  #   #   ##      #     ## #   ###   # ##
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   ###   #   #    #      #    #  ##  #   #  ##  #
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####   #  #  #   #    #      #    #   #  #####  #
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #       #  #  #  ##    #      #    #  ##  #      #
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   ####    ## #   ###    ###    ## #   ###   #
 /**
  * Represents the remote builder role.
  */
 class RoleRemoteBuilder {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,41 +27,40 @@ class RoleRemoteBuilder {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var max = 2,
-            creeps;
+        const max = 2;
 
         if (!canSpawn) {
             return {
                 name: "remoteBuilder",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        creeps = Cache.creeps[engine.room.name];
+        const {creeps: {[engine.room.name]: creeps}} = Cache;
 
         return {
             name: "remoteBuilder",
             spawn: (creeps && creeps.remoteBuilder || []).length < max,
             spawnFromRegion: true,
-            max: max
+            max
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             body = [];
@@ -71,7 +70,7 @@ class RoleRemoteBuilder {
         body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "remoteBuilder",
                 home: checkSettings.home,
@@ -80,19 +79,20 @@ class RoleRemoteBuilder {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var creeps = Cache.creeps[engine.room.name],
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [];
 

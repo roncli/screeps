@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##            ###            #                   #       #            #    
-//  #   #           #           #   #                               #                    #    
-//  #   #   ###     #     ###   #       ###    ##     ###   # ##   ####    ##     ###   ####  
-//  ####   #   #    #    #   #   ###   #   #    #    #   #  ##  #   #       #    #       #    
-//  # #    #   #    #    #####      #  #        #    #####  #   #   #       #     ###    #    
-//  #  #   #   #    #    #      #   #  #   #    #    #      #   #   #  #    #        #   #  # 
-//  #   #   ###    ###    ###    ###    ###    ###    ###   #   #    ##    ###   ####     ##  
+//  ####           ##            ###            #                   #       #            #
+//  #   #           #           #   #                               #                    #
+//  #   #   ###     #     ###   #       ###    ##     ###   # ##   ####    ##     ###   ####
+//  ####   #   #    #    #   #   ###   #   #    #    #   #  ##  #   #       #    #       #
+//  # #    #   #    #    #####      #  #        #    #####  #   #   #       #     ###    #
+//  #  #   #   #    #    #      #   #  #   #    #    #      #   #   #  #    #        #   #  #
+//  #   #   ###    ###    ###    ###    ###    ###    ###   #   #    ##    ###   ####     ##
 /**
  * Represents the scientist role.
  */
 class RoleScientist {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,41 +27,40 @@ class RoleScientist {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
-            max = 1,
-            creeps;
+        const {room} = engine,
+            max = 1;
 
         if (!canSpawn) {
             return {
                 name: "scientist",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        creeps = Cache.creeps[room.name];
+        const {creeps: {[room.name]: creeps}} = Cache;
 
         return {
             name: "scientist",
             spawn: _.filter(creeps && creeps.scientist || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
-            max: max
+            max
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 2500),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 2500),
             units = Math.floor(energy / 150),
             remainder = energy % 150,
             body = [];
@@ -70,7 +69,7 @@ class RoleScientist {
         body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "scientist",
                 home: checkSettings.home
@@ -78,23 +77,23 @@ class RoleScientist {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var room = engine.room,
-            creeps = Cache.creeps[room.name],
+        const {room, tasks} = engine,
+            {creeps: {[room.name]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.scientist || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
-            allCreeps = creeps && creeps.all || [],
-            tasks = engine.tasks;
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -102,14 +101,14 @@ class RoleScientist {
 
         // Check for unfilled towers.
         Assign.fillTowersWithEnergy(creepsWithNoTask, allCreeps, tasks.towers, "Tower");
-        
+
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
         // Attempt to get minerals from labs.
-        Assign.collectMinerals(creepsWithNoTask, allCreeps, tasks.labsCollectMinerals, undefined, undefined, "Collecting");
+        Assign.collectMinerals(creepsWithNoTask, allCreeps, tasks.labsCollectMinerals, void 0, void 0, "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -149,7 +148,7 @@ class RoleScientist {
         }
 
         // Check for unfilled terminals for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, undefined, "Terminal");
+        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, void 0, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

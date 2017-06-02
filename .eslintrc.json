@@ -293,16 +293,69 @@
         "sourceType": "module",
         "ecmaVersion": 6
     },
+    "extends": "eslint:all",
     "rules": {
-        "constructor-super": "warn",
-        "no-const-assign": "warn",
-        "no-this-before-super": "warn",
-        "no-undef": "warn",
-        "no-unreachable": "warn",
-        "no-unused-vars": "warn",
-        "require-jsdoc": "warn",
-        "semi": "warn",
-        "valid-jsdoc": "warn",
-        "valid-typeof": "warn"
+        "capitalized-comments": "off",
+        "complexity": "off",
+        "consistent-this": "off",
+        "default-case": "off",
+        "dot-location": "off",
+        "func-names": "off",
+        "global-require": "off",
+        "id-length": "off",
+        "indent": [
+            "error", 4, {
+                "SwitchCase": 1
+            }
+        ],
+        "init-declarations": "off",
+        "line-comment-position": "off",
+        "linebreak-style": "off",
+        "max-depth": "off",
+        "max-len": "off",
+        "max-lines": "off",
+        "max-params": "off",
+        "max-statements": "off",
+        "multiline-ternary": "off",
+        "no-confusing-arrow": "off",
+        "no-continue": "off",
+        "no-implicit-coercion": "off",
+        "no-inline-comments": "off",
+        "no-invalid-this": "off",
+        "no-magic-numbers": "off",
+        "no-mixed-operators": "off",
+        "no-mixed-requires": "off",
+        "no-nested-ternary": "off",
+        "no-param-reassign": "off",
+        "no-plusplus": "off",
+        "no-return-assign": "off",
+        "no-ternary": "off",
+        "no-underscore-dangle": "off",
+        "no-void": "off",
+        "object-property-newline": "off",
+        "one-var": [
+            "off", {
+                "const": "always"
+            }
+        ],
+        "padded-blocks": "off",
+        "prefer-destructuring": [
+            "error", {
+                "array": false
+            }, {
+                "enforceForRenamedProperties": true
+            }
+        ],
+        "sort-keys": "off",
+        "sort-vars": "off",
+        "space-before-function-paren": "off",
+        "quote-props": "off",
+        "valid-jsdoc": [
+            "error", {
+                "prefer": {
+                    "return": "return"
+                }
+            }
+        ]
     }
 }

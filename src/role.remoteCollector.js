@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####                         #             ###           ##     ##                   #                  
-//  #   #           #           #   #                        #            #   #           #      #                   #                  
-//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #       ###     #      #     ###    ###   ####    ###   # ##  
-//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  #      #   #    #      #    #   #  #   #   #     #   #  ##  # 
-//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  #      #   #    #      #    #####  #       #     #   #  #     
-//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #   #  #   #    #      #    #      #   #   #  #  #   #  #     
-//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###    ###    ###    ###    ###    ###    ###     ##    ###   #     
+//  ####           ##           ####                         #             ###           ##     ##                   #
+//  #   #           #           #   #                        #            #   #           #      #                   #
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #       ###     #      #     ###    ###   ####    ###   # ##
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  #      #   #    #      #    #   #  #   #   #     #   #  ##  #
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  #      #   #    #      #    #####  #       #     #   #  #
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #   #  #   #    #      #    #      #   #   #  #  #   #  #
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###    ###    ###    ###    ###    ###    ###     ##    ###   #
 /**
  * Represents the remote collector role.
  */
 class RoleRemoteCollector {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,41 +27,40 @@ class RoleRemoteCollector {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var max = engine.type === "cleanup" ? 3 : 1,
-            creeps;
+        const max = engine.type === "cleanup" ? 3 : 1;
 
         if (!canSpawn) {
             return {
                 name: "remoteCollector",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        creeps = Cache.creeps[engine.room.name];
+        const {creeps: {[engine.room.name]: creeps}} = Cache;
 
         return {
             name: "remoteCollector",
             spawn: _.filter(creeps && creeps.remoteCollector || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
-            max: max
+            max
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 2400),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 2400),
             units = Math.floor(energy / 150),
             body = [];
 
@@ -69,7 +68,7 @@ class RoleRemoteCollector {
         body.push(...Array(units).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "remoteCollector",
                 home: checkSettings.home,
@@ -78,23 +77,23 @@ class RoleRemoteCollector {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var roomName = engine.room.name,
-            creeps = Cache.creeps[roomName],
+        const {room: {name: roomName}, supportRoom} = engine,
+            {creeps: {[roomName]: creeps}} = Cache,
             creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteCollector || []),
-            allCreeps = creeps && creeps.all || [],
-            supportRoom = engine.supportRoom;
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -109,7 +108,7 @@ class RoleRemoteCollector {
         }
 
         // Attempt to get minerals from containers.
-        Assign.collectMinerals(creepsWithNoTask, allCreeps, engine.tasks.mineralStructures, undefined, undefined, "Collecting");
+        Assign.collectMinerals(creepsWithNoTask, allCreeps, engine.tasks.mineralStructures, void 0, void 0, "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -141,7 +140,7 @@ class RoleRemoteCollector {
         }
 
         // Check for unfilled terminals for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.terminal, undefined, "Terminal");
+        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.terminal, void 0, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

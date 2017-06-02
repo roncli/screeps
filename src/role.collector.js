@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##            ###           ##     ##                   #                  
-//  #   #           #           #   #           #      #                   #                  
-//  #   #   ###     #     ###   #       ###     #      #     ###    ###   ####    ###   # ##  
-//  ####   #   #    #    #   #  #      #   #    #      #    #   #  #   #   #     #   #  ##  # 
-//  # #    #   #    #    #####  #      #   #    #      #    #####  #       #     #   #  #     
-//  #  #   #   #    #    #      #   #  #   #    #      #    #      #   #   #  #  #   #  #     
-//  #   #   ###    ###    ###    ###    ###    ###    ###    ###    ###     ##    ###   #     
+//  ####           ##            ###           ##     ##                   #
+//  #   #           #           #   #           #      #                   #
+//  #   #   ###     #     ###   #       ###     #      #     ###    ###   ####    ###   # ##
+//  ####   #   #    #    #   #  #      #   #    #      #    #   #  #   #   #     #   #  ##  #
+//  # #    #   #    #    #####  #      #   #    #      #    #####  #       #     #   #  #
+//  #  #   #   #    #    #      #   #  #   #    #      #    #      #   #   #  #  #   #  #
+//  #   #   ###    ###    ###    ###    ###    ###    ###    ###    ###     ##    ###   #
 /**
  * Represents the collector role.
  */
 class RoleCollector {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,11 +27,11 @@ class RoleCollector {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
-            storage = room.storage,
-            maxPerSource = 3,
-            sources, creeps, collectors, max, sourceIdToCollectFrom;
-        
+        const {room} = engine,
+            {storage} = room,
+            maxPerSource = 3;
+        let sourceIdToCollectFrom;
+
         // If there is storage and containers in the room, ignore the room.
         if (Cache.containersInRoom(room).length !== 0 && storage && storage.my) {
             return {
@@ -42,7 +42,8 @@ class RoleCollector {
         }
 
         // If there is only one energy source, ignore the room.
-        sources = room.find(FIND_SOURCES);
+        const sources = room.find(FIND_SOURCES);
+
         if (sources.length <= 1) {
             return {
                 name: "collector",
@@ -51,58 +52,60 @@ class RoleCollector {
             };
         }
 
-        max = maxPerSource * (sources.length - 1);
+        const max = maxPerSource * (sources.length - 1);
 
         if (!canSpawn) {
             return {
                 name: "collector",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        creeps = Cache.creeps[room.name];
-        collectors = creeps && creeps.collector || [];
+        const {creeps: {[room.name]: creeps}} = Cache,
+            collectors = creeps && creeps.collector || [];
 
         // Loop through sources to see if we have anything we need to spawn.
         _.forEach(Utilities.objectsClosestToObj(sources, Cache.spawnsInRoom(room)[0]), (source, index) => {
-            var sourceId;
-            
             // Skip the first source, it is for workers instead of collectors.
             if (index === 0) {
-                return;
+                return true;
             }
 
-            sourceId = source.id;
+            const {id: sourceId} = source;
+
             if (_.filter(collectors, (c) => c.memory.homeSource === sourceId).length < maxPerSource) {
                 sourceIdToCollectFrom = sourceId;
+
                 return false;
             }
+
+            return true;
         });
 
         return {
             name: "collector",
             spawn: !!sourceIdToCollectFrom,
-            max: max,
+            max,
             spawnFromRegion: true,
-            sourceIdToCollectFrom: sourceIdToCollectFrom
+            sourceIdToCollectFrom
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             body = [];
@@ -112,7 +115,7 @@ class RoleCollector {
         body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "collector",
                 home: checkSettings.home,
@@ -121,25 +124,24 @@ class RoleCollector {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var room = engine.room,
-            roomName = room.name,
-            creeps = Cache.creeps[roomName],
+        const {room, tasks} = engine,
+            {name: roomName, controller} = room,
+            {creeps: {[roomName]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.collector || []), (c) => !c.spawning),
-            controller = room.controller,
-            allCreeps = creeps && creeps.all || [],
-            tasks = engine.tasks;
+            allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -171,7 +173,7 @@ class RoleCollector {
 
         // Check for unfilled towers.
         Assign.fillTowersWithEnergy(creepsWithNoTask, allCreeps, tasks.towers, "Tower");
-        
+
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;

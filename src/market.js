@@ -1,24 +1,24 @@
 const Cache = require("cache"),
     Utilities = require("utilities");
 
-//  #   #                #              #    
-//  #   #                #              #    
-//  ## ##   ###   # ##   #   #   ###   ####  
-//  # # #      #  ##  #  #  #   #   #   #    
-//  #   #   ####  #      ###    #####   #    
-//  #   #  #   #  #      #  #   #       #  # 
-//  #   #   ####  #      #   #   ###     ##  
+//  #   #                #              #
+//  #   #                #              #
+//  ## ##   ###   # ##   #   #   ###   ####
+//  # # #      #  ##  #  #  #   #   #   #
+//  #   #   ####  #      ###    #####   #
+//  #   #  #   #  #      #  #   #       #  #
+//  #   #   ####  #      #   #   ###     ##
 /**
  * A class for dealing with and caching market data.
  */
 class Market {
-    //              #     ##   ##    ##     ##            #                     
-    //              #    #  #   #     #    #  #           #                     
-    //  ###   ##   ###   #  #   #     #    #  #  ###    ###   ##   ###    ###   
-    // #  #  # ##   #    ####   #     #    #  #  #  #  #  #  # ##  #  #  ##     
-    //  ##   ##     #    #  #   #     #    #  #  #     #  #  ##    #       ##   
-    // #      ##     ##  #  #  ###   ###    ##   #      ###   ##   #     ###    
-    //  ###                                                                     
+    //              #     ##   ##    ##     ##            #
+    //              #    #  #   #     #    #  #           #
+    //  ###   ##   ###   #  #   #     #    #  #  ###    ###   ##   ###    ###
+    // #  #  # ##   #    ####   #     #    #  #  #  #  #  #  # ##  #  #  ##
+    //  ##   ##     #    #  #   #     #    #  #  #     #  #  ##    #       ##
+    // #      ##     ##  #  #  ###   ###    ##   #      ###   ##   #     ###
+    //  ###
     /**
      * Gets and caches all of the orders on the market.
      * @return {object[]} All of the orders on the market.
@@ -28,17 +28,17 @@ class Market {
             Market.orders = Game.market.getAllOrders();
             delete Market.filteredOrders;
         }
-        
+
         return Market.orders;
     }
 
-    //              #    ####   #    ##     #                         #   ##            #                     
-    //              #    #            #     #                         #  #  #           #                     
-    //  ###   ##   ###   ###   ##     #    ###    ##   ###    ##    ###  #  #  ###    ###   ##   ###    ###   
-    // #  #  # ##   #    #      #     #     #    # ##  #  #  # ##  #  #  #  #  #  #  #  #  # ##  #  #  ##     
-    //  ##   ##     #    #      #     #     #    ##    #     ##    #  #  #  #  #     #  #  ##    #       ##   
-    // #      ##     ##  #     ###   ###     ##   ##   #      ##    ###   ##   #      ###   ##   #     ###    
-    //  ###                                                                                                   
+    //              #    ####   #    ##     #                         #   ##            #
+    //              #    #            #     #                         #  #  #           #
+    //  ###   ##   ###   ###   ##     #    ###    ##   ###    ##    ###  #  #  ###    ###   ##   ###    ###
+    // #  #  # ##   #    #      #     #     #    # ##  #  #  # ##  #  #  #  #  #  #  #  #  # ##  #  #  ##
+    //  ##   ##     #    #      #     #     #    ##    #     ##    #  #  #  #  #     #  #  ##    #       ##
+    // #      ##     ##  #     ###   ###     ##   ##   #      ##    ###   ##   #      ###   ##   #     ###
+    //  ###
     /**
      * Gets all orders on the market filtered by type (buy/sell) and resource type.
      * @return {object} All of the orders on the market, filtered by type and resource type.
@@ -53,16 +53,16 @@ class Market {
                 Market.filteredOrders.buy[resource].sort((a, b) => b.price - a.price);
             });
         }
-        
+
         return Market.filteredOrders;
     }
 
-    //    #              ##    
-    //    #               #    
-    //  ###   ##    ###   #    
-    // #  #  # ##  #  #   #    
-    // #  #  ##    # ##   #    
-    //  ###   ##    # #  ###   
+    //    #              ##
+    //    #               #
+    //  ###   ##    ###   #
+    // #  #  # ##  #  #   #
+    // #  #  ##    # ##   #
+    //  ###   ##    # #  ###
     /**
      * Attempt to deal on the market.
      * @param {string} orderId The order ID to fill.
@@ -71,9 +71,9 @@ class Market {
      * @return {number} The return value from Game.market.deal.
      */
     static deal(orderId, amount, yourRoomName) {
-        var ret = Game.market.deal(orderId, amount, yourRoomName),
+        const ret = Game.market.deal(orderId, amount, yourRoomName),
             order = _.find(Market.orders, (m) => m.id === orderId);
-        
+
         if (ret === OK) {
             if (order) {
                 if (order.type === "sell") {
@@ -88,14 +88,12 @@ class Market {
                     Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} ${order.amount} remaining on ${order.id}`);
                 }
             }
-        } else {
-            if (order) {
-                Cache.log.events.push(`${yourRoomName} failed to process order ID ${orderId}: ${ret}`);
-                _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
-                _.remove(Market.orders, (m) => m.id === orderId);
-            }
+        } else if (order) {
+            Cache.log.events.push(`${yourRoomName} failed to process order ID ${orderId}: ${ret}`);
+            _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
+            _.remove(Market.orders, (m) => m.id === orderId);
         }
-        
+
         return ret;
     }
 }

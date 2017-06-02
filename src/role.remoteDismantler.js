@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####                         #            ####     #                                 #      ##                 
-//  #   #           #           #   #                        #             #  #                                      #       #                 
-//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###    #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##  
-//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  # 
-//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####   #  #    #     ###   # # #   ####  #   #   #       #    #####  #     
-//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #       #  #    #        #  # # #  #   #  #   #   #  #    #    #      #     
-//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #     
+//  ####           ##           ####                         #            ####     #                                 #      ##
+//  #   #           #           #   #                        #             #  #                                      #       #
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###    #  #   ##     ###   ## #    ###   # ##   ####     #     ###   # ##
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #   #  #    #    #      # # #      #  ##  #   #       #    #   #  ##  #
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####   #  #    #     ###   # # #   ####  #   #   #       #    #####  #
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #       #  #    #        #  # # #  #   #  #   #   #  #    #    #      #
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   ####    ###   ####   #   #   ####  #   #    ##    ###    ###   #
 /**
  * Represents the remote dismantler role.
  */
 class RoleRemoteDismantler {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,42 +27,41 @@ class RoleRemoteDismantler {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
-            max = max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1,
-            creeps;
+        const {room} = engine,
+            max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1;
 
         if (!canSpawn) {
             return {
                 name: "remoteDismantler",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        creeps = Cache.creeps[room.name];
+        const {creeps: {[room.name]: creeps}} = Cache;
 
         return {
             name: "remoteDismantler",
             spawn: _.filter(creeps && creeps.remoteDismantler || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
-            max: max
+            max
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3750),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 3750),
             units = Math.floor(energy / 150),
             body = [];
 
@@ -70,7 +69,7 @@ class RoleRemoteDismantler {
         body.push(...Array(units).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "remoteDismantler",
                 home: checkSettings.home,
@@ -79,22 +78,22 @@ class RoleRemoteDismantler {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var roomName = engine.room.name,
-            creeps = Cache.creeps[roomName],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteDismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning),
-            tasks = engine.tasks;
+        const {room: {name: roomName}, tasks} = engine,
+            {creeps: {[roomName]: creeps}} = Cache,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteDismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;

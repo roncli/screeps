@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           #   #                #                   
-//  #   #           #           #   #                #                   
-//  #   #   ###     #     ###   #   #   ###   # ##   #   #   ###   # ##  
-//  ####   #   #    #    #   #  # # #  #   #  ##  #  #  #   #   #  ##  # 
-//  # #    #   #    #    #####  # # #  #   #  #      ###    #####  #     
-//  #  #   #   #    #    #      ## ##  #   #  #      #  #   #      #     
-//  #   #   ###    ###    ###   #   #   ###   #      #   #   ###   #     
+//  ####           ##           #   #                #
+//  #   #           #           #   #                #
+//  #   #   ###     #     ###   #   #   ###   # ##   #   #   ###   # ##
+//  ####   #   #    #    #   #  # # #  #   #  ##  #  #  #   #   #  ##  #
+//  # #    #   #    #    #####  # # #  #   #  #      ###    #####  #
+//  #  #   #   #    #    #      ## ##  #   #  #      #  #   #      #
+//  #   #   ###    ###    ###   #   #   ###   #      #   #   ###   #
 /**
  * Represents the worker role.
  */
 class RoleWorker {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,40 +27,39 @@ class RoleWorker {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
-            storage = room.storage,
-            max = storage && storage.my ? 1 : 2,
-            roomName, creeps, roomToSpawnFor;
+        const {room} = engine,
+            {storage} = room,
+            max = storage && storage.my ? 1 : 2;
+        let roomToSpawnFor;
 
         if (!canSpawn) {
             return {
                 name: "worker",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        roomName = room.name;
-        creeps = Cache.creeps[roomName];
+        const {name: roomName} = room,
+            {creeps: {[roomName]: creeps}} = Cache;
 
         if (max > 0 && _.filter(creeps && creeps.worker || [], (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length < max) {
-            roomToSpawnFor = room.name;
+            ({name: roomToSpawnFor} = room);
         }
 
         // Support smaller rooms in the region.
         if (!roomToSpawnFor) {
-            _.forEach(_.filter(Game.rooms, (r) => {
-                var memory = r.memory,
-                    roomType = memory.roomType,
-                    controller = r.controller;
+            _.forEach(_.filter(Game.rooms, (gameRoom) => {
+                const {memory, controller} = gameRoom,
+                    {roomType} = memory;
 
-                return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && r.name !== roomName && controller && controller.level < 6;
+                return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && gameRoom.name !== roomName && controller && controller.level < 6;
             }), (otherRoom) => {
-                var otherRoomName = otherRoom.name,
-                    otherCreeps = Cache.creeps[otherRoom.name];
-                
+                const {name: otherRoomName} = otherRoom,
+                    {creeps: {[otherRoom.name]: otherCreeps}} = Cache;
+
                 if (_.filter(otherCreeps && otherCreeps.worker || [], (c) => {
-                    var memory = c.memory;
+                    const {memory} = c;
 
                     return memory.supportRoom !== memory.home;
                 }).length === 0) {
@@ -72,32 +71,31 @@ class RoleWorker {
         return {
             name: "worker",
             spawn: !!roomToSpawnFor,
-            max: max,
+            max,
             spawnFromRegion: room.controller.level < 6,
-            roomToSpawnFor: roomToSpawnFor
+            roomToSpawnFor
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var room = Game.rooms[checkSettings.home],
+        const {rooms: {[checkSettings.home]: room}} = Game,
             energy = Math.min(room.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
-            storage = room.storage,
-            storage = room.storage,
-            store = storage.store,
+            {storage} = room,
+            {store} = storage,
             spawns = Cache.spawnsInRoom(room),
             body = [],
             boosts = {};
@@ -117,8 +115,8 @@ class RoleWorker {
         }
 
         return {
-            body: body,
-            boosts: boosts,
+            body,
+            boosts,
             memory: {
                 role: "worker",
                 home: checkSettings.home,
@@ -128,27 +126,26 @@ class RoleWorker {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var room = engine.room,
-            roomName = room.name,
-            creeps = Cache.creeps[roomName],
+        const {room, tasks} = engine,
+            {name: roomName, controller} = room,
+            {creeps: {[roomName]: creeps}} = Cache,
             workers = creeps && creeps.worker || [],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(workers), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [],
-            storers = creeps && creeps.storer || [],
-            controller = room.controller,
-            tasks = engine.tasks;
+            storers = creeps && creeps.storer || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -156,7 +153,7 @@ class RoleWorker {
 
         // If not yet boosted, go get boosts.
         Assign.getBoost(creepsWithNoTask, "Boosting");
-        
+
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
@@ -171,7 +168,7 @@ class RoleWorker {
         }
 
         // Check for unfilled terminals for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, undefined, "Terminal");
+        Assign.fillWithMinerals(creepsWithNoTask, room.terminal, void 0, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -208,7 +205,7 @@ class RoleWorker {
 
         // Check for unfilled towers.
         Assign.fillTowersWithEnergy(creepsWithNoTask, allCreeps, tasks.towers, "Tower");
-        
+
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;

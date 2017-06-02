@@ -2,24 +2,24 @@ const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
 
-//  ####           ##           ####                         #            #   #    #                        
-//  #   #           #           #   #                        #            #   #                             
-//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   ## ##   ##    # ##    ###   # ##  
-//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  # # #    #    ##  #  #   #  ##  # 
-//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  #   #    #    #   #  #####  #     
-//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #   #    #    #   #  #      #     
-//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   #   #   ###   #     
+//  ####           ##           ####                         #            #   #    #
+//  #   #           #           #   #                        #            #   #
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   ## ##   ##    # ##    ###   # ##
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  # # #    #    ##  #  #   #  ##  #
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  #   #    #    #   #  #####  #
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      #   #    #    #   #  #      #
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   #   #   ###   #
 /**
  * Represents the remote miner role.
  */
 class RoleRemoteMiner {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,11 +27,11 @@ class RoleRemoteMiner {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
+        const {room} = engine,
             containers = Cache.containersInRoom(room),
             minerals = room.find(FIND_MINERALS),
-            sources = [].concat.apply([], [room.find(FIND_SOURCES), minerals]),
-            lengthToContainer, containerSource, supportRoom, supportRoomName, spawnsInRoom, creeps, miners, containerIdToMineOn, isMineralHarvester;
+            sources = Array.prototype.concat.apply([], [room.find(FIND_SOURCES), minerals]);
+        let containerIdToMineOn, isMineralHarvester;
 
         // If there are no containers or sources in the room, ignore the room.
         if (containers.length === 0 || sources.length === 0) {
@@ -50,48 +50,49 @@ class RoleRemoteMiner {
             };
         }
 
-        lengthToContainer = Memory.lengthToContainer,
-        supportRoom = engine.supportRoom,
-        supportRoomName = supportRoom.name,
-        spawnsInRoom = Cache.spawnsInRoom(supportRoom),
-        containerSource = Memory.containerSource,
-        creeps = Cache.creeps[room.name],
-        miners = creeps && creeps.remoteMiner || [];
+        const {lengthToContainer, containerSource} = Memory,
+            {supportRoom} = engine,
+            {name: supportRoomName} = supportRoom,
+            spawnsInRoom = Cache.spawnsInRoom(supportRoom),
+            {creeps: {[room.name]: creeps}} = Cache,
+            miners = creeps && creeps.remoteMiner || [];
 
         // Loop through containers to see if we have anything we need to spawn.
         _.forEach(containers, (container) => {
-            var containerId = container.id,
-                lengthToThisContainer, source, isMineral;
+            const {id: containerId} = container;
 
             // Calculate path length from container to support room's storage.
             if (!lengthToContainer[containerId]) {
                 lengthToContainer[containerId] = {};
             }
 
-            lengthToThisContainer = lengthToContainer[containerId];
+            const {[containerId]: lengthToThisContainer} = lengthToContainer;
 
             if (!lengthToThisContainer[supportRoomName]) {
-                lengthToThisContainer[supportRoomName] = PathFinder.search(container.pos, {pos: spawnsInRoom[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}).path.length;
+                ({path: {length: lengthToThisContainer[supportRoomName]}} = PathFinder.search(container.pos, {pos: spawnsInRoom[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}));
             }
 
             if (!containerSource[containerId]) {
-                containerSource[containerId] = Utilities.objectsClosestToObj(sources, container)[0].id;
+                ({0: {id: containerSource[containerId]}} = Utilities.objectsClosestToObj(sources, container));
             }
 
-            source = Game.getObjectById(containerSource[containerId]);
-            isMineral = source instanceof Mineral;
+            const source = Game.getObjectById(containerSource[containerId]),
+                isMineral = source instanceof Mineral;
 
             // If this container is for a mineral, check to make sure it has resources.
             if (isMineral && source.mineralAmount === 0) {
-                return;
+                return true;
             }
 
             // If we don't have a remote miner for this container, spawn one.
             if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150 + lengthToThisContainer[supportRoomName] * 3) && c.memory.container === containerId).length === 0) {
                 containerIdToMineOn = containerId;
                 isMineralHarvester = isMineral;
+
                 return false;
             }
+
+            return true;
         });
 
         return {
@@ -99,31 +100,31 @@ class RoleRemoteMiner {
             spawn: !!containerIdToMineOn,
             max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
             spawnFromRegion: true,
-            containerIdToMineOn: containerIdToMineOn,
-            isMineralHarvester: isMineralHarvester
+            containerIdToMineOn,
+            isMineralHarvester
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var body = [];
+        let body = [];
 
         if (checkSettings.isMineralHarvester) {
-            let energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
+            const energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
                 units = Math.floor(energy / 450),
                 remainder = energy % 450;
-            
+
             body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
             body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
         } else {
@@ -131,7 +132,7 @@ class RoleRemoteMiner {
         }
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "remoteMiner",
                 home: checkSettings.home,
@@ -141,19 +142,20 @@ class RoleRemoteMiner {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var creeps = Cache.creeps[engine.room.name],
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
             creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteMiner || []);
 
         if (creepsWithNoTask.length === 0) {

@@ -1,25 +1,25 @@
 const Assign = require("assign"),
     Cache = require("cache"),
     Utilities = require("utilities");
-                                                                                                                
-//  ####           ##           ####                         #            #   #                #                   
-//  #   #           #           #   #                        #            #   #                #                   
-//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #   #   ###   # ##   #   #   ###   # ##  
-//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  # # #  #   #  ##  #  #  #   #   #  ##  # 
-//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  # # #  #   #  #      ###    #####  #     
-//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      ## ##  #   #  #      #  #   #      #     
-//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   #      #   #   ###   #     
+
+//  ####           ##           ####                         #            #   #                #
+//  #   #           #           #   #                        #            #   #                #
+//  #   #   ###     #     ###   #   #   ###   ## #    ###   ####    ###   #   #   ###   # ##   #   #   ###   # ##
+//  ####   #   #    #    #   #  ####   #   #  # # #  #   #   #     #   #  # # #  #   #  ##  #  #  #   #   #  ##  #
+//  # #    #   #    #    #####  # #    #####  # # #  #   #   #     #####  # # #  #   #  #      ###    #####  #
+//  #  #   #   #    #    #      #  #   #      # # #  #   #   #  #  #      ## ##  #   #  #      #  #   #      #
+//  #   #   ###    ###    ###   #   #   ###   #   #   ###     ##    ###   #   #   ###   #      #   #   ###   #
 /**
  * Represents the remote worker role.
  */
 class RoleRemoteWorker {
-    //       #                 #      ##                            ##          #     #     #                       
-    //       #                 #     #  #                          #  #         #     #                             
-    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //                                     #                                                            ###         
+    //       #                 #      ##                            ##          #     #     #
+    //       #                 #     #  #                          #  #         #     #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //                                     #                                                            ###
     /**
      * Gets the settings for checking whether a creep should spawn.
      * @param {RoomEngine} engine The room engine to check for.
@@ -27,11 +27,11 @@ class RoleRemoteWorker {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
-        var room = engine.room,
+        const {room} = engine,
             containers = Cache.containersInRoom(room),
-            max = 1,
-            spawn = false,
-            sources, lengthToContainer, creeps, workers, supportRoomName, containerIdToCollectFrom;
+            max = 1;
+        let spawn = false,
+            containerIdToCollectFrom;
 
         // If there are no containers in the room, ignore the room.
         if (containers.length === 0) {
@@ -46,25 +46,25 @@ class RoleRemoteWorker {
             return {
                 name: "remoteWorker",
                 spawn: false,
-                max: max
+                max
             };
         }
 
-        sources = [].concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
-        lengthToContainer = Memory.lengthToContainer;
-        creeps = Cache.creeps[room.name];
-        workers = creeps && creeps.remoteWorker || [];
-        supportRoomName = engine.supportRoom.name;
+        const sources = Array.prototype.concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
+            {lengthToContainer} = Memory,
+            {creeps: {[room.name]: creeps}} = Cache,
+            workers = creeps && creeps.remoteWorker || [],
+            {supportRoom: {name: supportRoomName}} = engine;
 
         // Loop through containers to see if we have anything we need to spawn.
         _.forEach(containers, (container) => {
-            var source = Utilities.objectsClosestToObj(sources, container)[0],
-                containerId = container.id,
-                lengthToThisAContainer = lengthToContainer[containerId];
+            const {0: source} = Utilities.objectsClosestToObj(sources, container),
+                {id: containerId} = container,
+                {[containerId]: lengthToThisAContainer} = lengthToContainer;
 
             // If this container is for a mineral, skip it.
             if (source instanceof Mineral) {
-                return;
+                return true;
             }
 
             if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
@@ -78,31 +78,31 @@ class RoleRemoteWorker {
 
         return {
             name: "remoteWorker",
-            spawn: spawn,
-            max: max,
+            spawn,
+            max,
             spawnFromRegion: true,
-            containerIdToCollectFrom: containerIdToCollectFrom
+            containerIdToCollectFrom
         };
     }
 
-    //                                 ##          #     #     #                       
-    //                                #  #         #     #                             
-    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   
-    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     
-    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   
-    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###    
-    //        #                                                            ###         
+    //                                 ##          #     #     #
+    //                                #  #         #     #
+    //  ###   ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###
+    // ##     #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##
+    //   ##   #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##
+    // ###    ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###
+    //        #                                                            ###
     /**
      * Gets the settings for spawning a creep.
      * @param {object} checkSettings The settings from checking if a creep needs to be spawned.
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        var energy = Math.min(checkSettings.energyCapacityAvailable, 3000),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 3000),
             units = Math.floor(Math.min(energy, 2000) / 200),
-            secondUnits = Math.floor(Math.max((energy - 2000), 0) / 150),
+            secondUnits = Math.floor(Math.max(energy - 2000, 0) / 150),
             remainder = Math.min(energy, 2000) % 200,
-            secondRemainder = Math.max((energy - 2000), 0) % 150,
+            secondRemainder = Math.max(energy - 2000, 0) % 150,
             body = [];
 
         body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
@@ -110,7 +110,7 @@ class RoleRemoteWorker {
         body.push(...Array(units + secondUnits + (remainder >= 50 ? 1 : 0) + (secondRemainder >= 50 ? 1 : 0)).fill(MOVE));
 
         return {
-            body: body,
+            body,
             memory: {
                 role: "remoteWorker",
                 home: checkSettings.home,
@@ -120,22 +120,23 @@ class RoleRemoteWorker {
         };
     }
 
-    //                      #                ###                #            
-    //                                        #                 #            
-    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                            ###                                        
+    //                      #                ###                #
+    //                                        #                 #
+    //  ###   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // #  #  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    // # ##    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    //  # #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                            ###
     /**
      * Assigns tasks to creeps of this role.
      * @param {RoomEngine} engine The room engine to assign tasks for.
+     * @return {void}
      */
     static assignTasks(engine) {
-        var creeps = Cache.creeps[engine.room.name],
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteWorker || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [],
-            supportRoom = engine.supportRoom;
+            {supportRoom} = engine;
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -182,7 +183,7 @@ class RoleRemoteWorker {
         }
 
         // Check for unfilled terminals for minerals.
-        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.terminal, undefined, "Terminal");
+        Assign.fillWithMinerals(creepsWithNoTask, supportRoom.terminal, void 0, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

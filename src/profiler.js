@@ -1,25 +1,25 @@
-//  ####                   ##     #     ##                 
-//  #   #                 #  #           #                 
-//  #   #  # ##    ###    #      ##      #     ###   # ##  
-//  ####   ##  #  #   #  ####     #      #    #   #  ##  # 
-//  #      #      #   #   #       #      #    #####  #     
-//  #      #      #   #   #       #      #    #      #     
-//  #      #       ###    #      ###    ###    ###   #     
+//  ####                   ##     #     ##
+//  #   #                 #  #           #
+//  #   #  # ##    ###    #      ##      #     ###   # ##
+//  ####   ##  #  #   #  ####     #      #    #   #  ##  #
+//  #      #      #   #   #       #      #    #####  #
+//  #      #      #   #   #       #      #    #      #
+//  #      #       ###    #      ###    ###    ###   #
 /**
  * A class that profiles JavaScript objects in Screeps.
  */
 class Profiler {
-    //                           #                       #                
-    //                           #                       #                
-    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
-    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
-    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
-    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
     /**
      * Initializes the profiler.
      */
     constructor() {
-        const data = Memory.profiler;
+        const {profiler: data} = Memory;
 
         this.callStack = [];
         this.stackStats = data && data.stackStats || {};
@@ -29,16 +29,16 @@ class Profiler {
         Game.profiler = this;
     }
 
-    //         #                 #    
-    //         #                 #    
-    //  ###   ###    ###  ###   ###   
-    // ##      #    #  #  #  #   #    
-    //   ##    #    # ##  #      #    
-    // ###      ##   # #  #       ##  
+    //         #                 #
+    //         #                 #
+    //  ###   ###    ###  ###   ###
+    // ##      #    #  #  #  #   #
+    //   ##    #    # ##  #      #
+    // ###      ##   # #  #       ##
     /**
      * Starts profiling.
-     * @param {number} length The number of ticks to profile for.
-     * @returns {void}
+     * @param {number} [length=10] The number of ticks to profile for.
+     * @return {void}
      */
     start(length) {
         if (!length || typeof length !== "number") {
@@ -52,18 +52,18 @@ class Profiler {
         };
     }
 
-    //                     #    #    ##          
-    //                    # #         #          
-    // ###   ###    ##    #    ##     #     ##   
-    // #  #  #  #  #  #  ###    #     #    # ##  
-    // #  #  #     #  #   #     #     #    ##    
-    // ###   #      ##    #    ###   ###    ##   
-    // #                                         
+    //                     #    #    ##
+    //                    # #         #
+    // ###   ###    ##    #    ##     #     ##
+    // #  #  #  #  #  #  ###    #     #    # ##
+    // #  #  #     #  #   #     #     #    ##
+    // ###   #      ##    #    ###   ###    ##
+    // #
     /**
      * A function to replace the original object with a new object that's profiled.
      * @param {object} obj The object to profile.
      * @param {string} name The name to call the function.
-     * @returns {object} The profiled object.
+     * @return {object} The profiled object.
      */
     profile(obj, name) {
         // If the object has already been profiled, just return itself.
@@ -75,7 +75,7 @@ class Profiler {
 
         // For each property that's not the constructor or the prototype, wrap it.
         _.forEach(Object.getOwnPropertyNames(obj), (property) => {
-            const objProperty = obj[property];
+            const {[property]: objProperty} = obj;
 
             if (typeof objProperty === "function" && ["constructor", "prototype"].indexOf(property) === -1) {
                 obj[property] = profiler.wrapFunction(objProperty, `${name}.${property}`, false);
@@ -87,16 +87,18 @@ class Profiler {
             // Backup the new object.
             const oldObj = obj;
 
-            // Wrap the constructor by creating a new function.
+            /**
+             * Wraps the constructor into a new function.
+             * @return {object} An instanciated object.
+             */
             obj = function() {
-                // TODO: Research whether we need to return the result of the following line or `this`.
                 profiler.wrapFunction(oldObj.prototype.constructor, `${name}.constructor`, true)();
-                
+
                 return this;
             };
 
             // Transfer the prototype from the backup object to the new object.
-            obj.prototype = oldObj.prototype;
+            ({prototype: obj.prototype} = oldObj);
 
             // Name the object.
             Object.defineProperty(obj, "name", {value: name});
@@ -107,7 +109,7 @@ class Profiler {
             // Put all of the static methods from the backup object onto the new object.
             _.forEach(Object.getOwnPropertyNames(oldObj), (property) => {
                 if (typeof oldObj[property] === "function" && ["constructor", "prototype"].indexOf(property) === -1) {
-                    obj[property] = oldObj[property];
+                    ({[property]: obj[property]} = oldObj);
                 }
             });
 
@@ -119,15 +121,15 @@ class Profiler {
         return obj;
     }
 
-    //                         ####                     #     #                
-    //                         #                        #                      
-    // #  #  ###    ###  ###   ###   #  #  ###    ##   ###   ##     ##   ###   
-    // #  #  #  #  #  #  #  #  #     #  #  #  #  #      #     #    #  #  #  #  
-    // ####  #     # ##  #  #  #     #  #  #  #  #      #     #    #  #  #  #  
-    // ####  #      # #  ###   #      ###  #  #   ##     ##  ###    ##   #  #  
-    //                   #                                                     
+    //                         ####                     #     #
+    //                         #                        #
+    // #  #  ###    ###  ###   ###   #  #  ###    ##   ###   ##     ##   ###
+    // #  #  #  #  #  #  #  #  #     #  #  #  #  #      #     #    #  #  #  #
+    // ####  #     # ##  #  #  #     #  #  #  #  #      #     #    #  #  #  #
+    // ####  #      # #  ###   #      ###  #  #   ##     ##  ###    ##   #  #
+    //                   #
     /**
-     * 
+     *
      * @param {function} fx The function to profile.
      * @param {string} name The name of the function.
      * @param {bool} isConstructor Whether this function is a constructor, which will need to be called differently.
@@ -135,12 +137,15 @@ class Profiler {
      */
     wrapFunction(fx, name, isConstructor) {
         const profiler = this,
+
             /**
              * Profiles a function.
-             * @returns {*} The result from the original function.
+             * @return {*} The result from the original function.
              */
-            newFx = () => {
-                var result;
+            newFx = (...args) => {
+                let result;
+
+                // If we are profiling, profile the function and return the result from the original function, otherwise just return the result from the original function.
 
                 if (profiler.profiling) {
                     // Set the start time.
@@ -151,9 +156,9 @@ class Profiler {
 
                     // Get the result from the original function.
                     if (isConstructor) {
-                        result = new (Function.prototype.bind.apply(fx, arguments));
+                        result = new (Function.prototype.bind.apply(fx, args))();
                     } else {
-                        result = fx.apply(this, arguments);
+                        result = fx.apply(this, args);
                     }
 
                     // Record the time elapsed.
@@ -161,13 +166,10 @@ class Profiler {
 
                     // Pop the function from the stack.
                     profiler.callStack.pop();
+                } else if (isConstructor) {
+                    result = new (Function.prototype.bind.apply(fx, args))();
                 } else {
-                    // Get the result from the original function.
-                    if (isConstructor) {
-                        result = new (Function.prototype.bind.apply(fx, arguments));
-                    } else {
-                        result = fx.apply(this, arguments);
-                    }
+                    result = fx.apply(this, args);
                 }
 
                 // Return the result from the original function.
@@ -178,23 +180,21 @@ class Profiler {
         return newFx;
     }
 
-    //                                  #  
-    //                                  #  
-    // ###    ##    ##    ##   ###    ###  
-    // #  #  # ##  #     #  #  #  #  #  #  
-    // #     ##    #     #  #  #     #  #  
-    // #      ##    ##    ##   #      ###  
+    //                                  #
+    //                                  #
+    // ###    ##    ##    ##   ###    ###
+    // #  #  # ##  #     #  #  #  #  #  #
+    // #     ##    #     #  #  #     #  #
+    // #      ##    ##    ##   #      ###
     /**
      * Records performance statistics about the current function.
      * @param {number} time The amount of time to record.
-     * @returns {void}
+     * @return {void}
      */
     record(time) {
-        const callStack = this.callStack,
+        const {callStack, stackStats, functionStats} = this,
             stackKey = callStack.join(":"),
-            stackStats = this.stackStats,
-            functionKey = callStack[callStack.length - 1],
-            functionStats = this.functionStats;
+            {[callStack.length - 1]: functionKey} = callStack;
 
         // Setup the stack trace stats.
         if (!stackStats[stackKey]) {
@@ -212,9 +212,9 @@ class Profiler {
             };
         }
 
-        const stackStatsValue = stackStats[stackKey],
-            functionStatsValue = functionStats[functionKey];
-        
+        const {[stackKey]: stackStatsValue} = stackStats,
+            {[functionKey]: functionStatsValue} = functionStats;
+
         // Increment the number of calls.
         stackStatsValue.calls++;
         functionStatsValue.calls++;

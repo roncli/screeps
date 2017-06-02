@@ -19,9 +19,37 @@ class Profiler {
      * Initializes the profiler.
      */
     constructor() {
+        const data = Memory.profiler;
+
         this.callStack = [];
-        this.stackStats = {};
-        this.functionStats = {};
+        this.stackStats = data && data.stackStats || {};
+        this.functionStats = data && data.functionStats || {};
+        this.profiling = data && data.profileUntil && data.profileUntil <= Game.time || false;
+
+        Game.profiler = this;
+    }
+
+    //         #                 #    
+    //         #                 #    
+    //  ###   ###    ###  ###   ###   
+    // ##      #    #  #  #  #   #    
+    //   ##    #    # ##  #      #    
+    // ###      ##   # #  #       ##  
+    /**
+     * Starts profiling.
+     * @param {number} length The number of ticks to profile for.
+     * @returns {void}
+     */
+    start(length) {
+        if (!length || typeof length !== "number") {
+            length = 10;
+        }
+
+        this.profiling = {
+            stackStats: {},
+            functionStats: {},
+            profileUntil: Game.time + length
+        };
     }
 
     //                     #    #    ##          
@@ -39,7 +67,7 @@ class Profiler {
      */
     profile(obj, name) {
         // If the object has already been profiled, just return itself.
-        if (obj.isProfiled) {
+        if (!this.profiling || obj.isProfiled) {
             return obj;
         }
 
@@ -47,8 +75,10 @@ class Profiler {
 
         // For each property that's not the constructor or the prototype, wrap it.
         _.forEach(Object.getOwnPropertyNames(obj), (property) => {
-            if (typeof obj[property] === "function" && ["constructor", "prototype"].indexOf(property) === -1) {
-                obj[property] = profiler.wrapFunction(obj[property], `${name}.${property}`, false);
+            const objProperty = obj[property];
+
+            if (typeof objProperty === "function" && ["constructor", "prototype"].indexOf(property) === -1) {
+                obj[property] = profiler.wrapFunction(objProperty, `${name}.${property}`, false);
             }
         });
 
@@ -59,6 +89,7 @@ class Profiler {
 
             // Wrap the constructor by creating a new function.
             obj = function() {
+                // TODO: Research whether we need to return the result of the following line or `this`.
                 profiler.wrapFunction(oldObj.prototype.constructor, `${name}.constructor`, true)();
                 
                 return this;
@@ -111,24 +142,33 @@ class Profiler {
             newFx = () => {
                 var result;
 
-                // Set the start time.
-                const start = Game.cpu.getUsed();
+                if (profiler.profiling) {
+                    // Set the start time.
+                    const start = Game.cpu.getUsed();
 
-                // Push the name of the function on to the stack.
-                profiler.callStack.push(name);
+                    // Push the name of the function on to the stack.
+                    profiler.callStack.push(name);
 
-                // Get the result from the original function.
-                if (isConstructor) {
-                    result = new (Function.prototype.bind.apply(fx, arguments));
+                    // Get the result from the original function.
+                    if (isConstructor) {
+                        result = new (Function.prototype.bind.apply(fx, arguments));
+                    } else {
+                        result = fx.apply(this, arguments);
+                    }
+
+                    // Record the time elapsed.
+                    profiler.record(Game.cpu.getUsed() - start);
+
+                    // Pop the function from the stack.
+                    profiler.callStack.pop();
                 } else {
-                    result = fx.apply(this, arguments);
+                    // Get the result from the original function.
+                    if (isConstructor) {
+                        result = new (Function.prototype.bind.apply(fx, arguments));
+                    } else {
+                        result = fx.apply(this, arguments);
+                    }
                 }
-
-                // Record the time elapsed.
-                profiler.record(Game.cpu.getUsed() - start);
-
-                // Pop the function from the stack.
-                profiler.callStack.pop();
 
                 // Return the result from the original function.
                 return result;
@@ -147,38 +187,41 @@ class Profiler {
     /**
      * Records performance statistics about the current function.
      * @param {number} time The amount of time to record.
+     * @returns {void}
      */
     record(time) {
         const callStack = this.callStack,
             stackKey = callStack.join(":"),
-            functionKey = callStack[callStack.length - 1];
+            stackStats = this.stackStats,
+            functionKey = callStack[callStack.length - 1],
+            functionStats = this.functionStats;
 
         // Setup the stack trace stats.
-        if (!this.stackStats[stackKey]) {
-            this.stackStats[stackKey] = {
+        if (!stackStats[stackKey]) {
+            stackStats[stackKey] = {
                 calls: 0,
                 time: 0
             };
         }
 
         // Setup the function stats.
-        if (!this.functionStats[functionKey]) {
-            this.functionStats[functionKey] = {
+        if (!functionStats[functionKey]) {
+            functionStats[functionKey] = {
                 calls: 0,
                 time: 0
             };
         }
 
-        const stackStats = this.stackStats[stackKey],
-            functionStats = this.functionStats[functionKey];
+        const stackStatsValue = stackStats[stackKey],
+            functionStatsValue = functionStats[functionKey];
         
         // Increment the number of calls.
-        stackStats.calls++;
-        functionStats.calls++;
+        stackStatsValue.calls++;
+        functionStatsValue.calls++;
 
         // Increase the total elapsed time of the call.
-        stackStats.time += time;
-        functionStats.time += time;
+        stackStatsValue.time += time;
+        functionStatsValue.time += time;
     }
 }
 

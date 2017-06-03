@@ -1,7 +1,27 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Pathing = require("pathing");
 
-class Build {
+//  #####                #      ####            #     ##        #
+//    #                  #       #  #                  #        #
+//    #     ###    ###   #   #   #  #  #   #   ##      #     ## #
+//    #        #  #      #  #    ###   #   #    #      #    #  ##
+//    #     ####   ###   ###     #  #  #   #    #      #    #   #
+//    #    #   #      #  #  #    #  #  #  ##    #      #    #  ##
+//    #     ####  ####   #   #  ####    ## #   ###    ###    ## #
+/**
+ * A class that performs building.
+ */
+class TaskBuild {
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
+    /**
+     * Creates a new task.
+     * @param {string} id The ID of the construction site.
+     */
     constructor(id) {
         this.type = "build";
         this.id = id;
@@ -9,22 +29,45 @@ class Build {
         this.force = true;
     }
 
+    //                    ##                  #
+    //                   #  #
+    //  ##    ###  ###   #  #   ###    ###   ##     ###  ###
+    // #     #  #  #  #  ####  ##     ##      #    #  #  #  #
+    // #     # ##  #  #  #  #    ##     ##    #     ##   #  #
+    //  ##    # #  #  #  #  #  ###    ###    ###   #     #  #
+    //                                              ###
+    /**
+     * Checks to see if the task can be assigned to a creep.
+     * @param {Creep} creep The creep to try to assign the task to.
+     * @return {bool} Whether the task was assigned to the creep.
+     */
     canAssign(creep) {
         if (creep.spawning || !creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
             return false;
         }
-        
+
         Cache.creepTasks[creep.name] = this;
         this.toObj(creep);
+
         return true;
     }
 
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
+    /**
+     * Run the task for the creep.
+     * @param {Creep} creep The creep to run the task for.
+     * @return {void}
+     */
     run(creep) {
-        var site = this.constructionSite;
+        const {constructionSite: site} = this;
 
         // Complete task if we're out of energy, the site is gone, or we can't do the work.
         if (!creep.carry[RESOURCE_ENERGY] || !site || creep.getActiveBodyparts(WORK) === 0) {
             delete creep.memory.currentTask;
+
             return;
         }
 
@@ -34,11 +77,22 @@ class Build {
             // If we have the means to complete the construction site or we run out of energy, complete the task.
             if (Math.min(creep.getActiveBodyparts(WORK) * 5, creep.carry[RESOURCE_ENERGY]) >= site.progressTotal - site.progress || creep.carry[RESOURCE_ENERGY] <= Math.min(creep.getActiveBodyparts(WORK) * 5)) {
                 delete creep.memory.currentTask;
-                return;
             }
         }
     }
 
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
+    /**
+     * Serializes the task to the creep's memory.
+     * @param {Creep} creep The creep to serialize the task for.
+     * @return {void}
+     */
     toObj(creep) {
         if (this.constructionSite) {
             creep.memory.currentTask = {
@@ -50,16 +104,30 @@ class Build {
         }
     }
 
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
+    /**
+     * Deserializes the task from the creep's memory.
+     * @param {Creep} creep The creep to deserialize the task for.
+     * @return {TaskBuild|undefined} The deserialized object.
+     */
     static fromObj(creep) {
-        if (Game.getObjectById(creep.memory.currentTask.id)) {
-            return new Build(creep.memory.currentTask.id);
-        } else {
-            return;
+        const {memory: {currentTask: {id}}} = creep;
+
+        if (Game.getObjectById(id)) {
+            return new TaskBuild(id);
         }
+
+        return void 0;
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Build, "TaskBuild");
+    require("screeps-profiler").registerObject(TaskBuild, "TaskBuild");
 }
-module.exports = Build;
+module.exports = TaskBuild;

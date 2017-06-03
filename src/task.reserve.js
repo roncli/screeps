@@ -1,56 +1,127 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Pathing = require("pathing");
 
-class Reserve {
+//  #####                #      ####
+//    #                  #      #   #
+//    #     ###    ###   #   #  #   #   ###    ###    ###   # ##   #   #   ###
+//    #        #  #      #  #   ####   #   #  #      #   #  ##  #  #   #  #   #
+//    #     ####   ###   ###    # #    #####   ###   #####  #       # #   #####
+//    #    #   #      #  #  #   #  #   #          #  #      #       # #   #
+//    #     ####  ####   #   #  #   #   ###   ####    ###   #        #     ###
+/**
+ * A class that performs reservation of a controller.
+ */
+class TaskReserve {
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
+    /**
+     * Creates a new task.
+     */
     constructor() {
         this.type = "reserve";
         this.force = true;
     }
-    
+
+    //                    ##                  #
+    //                   #  #
+    //  ##    ###  ###   #  #   ###    ###   ##     ###  ###
+    // #     #  #  #  #  ####  ##     ##      #    #  #  #  #
+    // #     # ##  #  #  #  #    ##     ##    #     ##   #  #
+    //  ##    # #  #  #  #  #  ###    ###    ###   #     #  #
+    //                                              ###
+    /**
+     * Checks to see if the task can be assigned to a creep.
+     * @param {Creep} creep The creep to try to assign the task to.
+     * @return {bool} Whether the task was assigned to the creep.
+     */
     canAssign(creep) {
         if (creep.spawning || creep.getActiveBodyparts(CLAIM) === 0) {
             return false;
         }
-    
-        if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my) {
+
+        const {rooms: {[creep.memory.home]: room}} = Game;
+
+        if (!room || !room.controller || room.controller.my) {
             return false;
         }
-    
+
         Cache.creepTasks[creep.name] = this;
         this.toObj(creep);
+
         return true;
     }
-    
+
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
+    /**
+     * Run the task for the creep.
+     * @param {Creep} creep The creep to run the task for.
+     * @return {void}
+     */
     run(creep) {
+        const {memory: {home: roomName}} = creep,
+            {rooms: {[creep.memory.home]: room}} = Game;
+
         // R.I.P. Pete Burns
         creep.say(["You", "spin", "me", "right", "round", "baby", "right", "round", "like a", "record", "baby", "right", "round", "round", "round", ""][Game.time % 16], true);
-    
+
         // If no controller, or controller is mine, or no CLAIM parts, bail.
-        if (!Game.rooms[creep.memory.home] || !Game.rooms[creep.memory.home].controller || Game.rooms[creep.memory.home].controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
+        if (!room || !room.controller || room.controller.my || creep.getActiveBodyparts(CLAIM) === 0) {
             delete creep.memory.currentTask;
+
             return;
         }
-        
-        Pathing.moveTo(creep, Game.rooms[creep.memory.home].controller, 1);
-        creep.reserveController(Game.rooms[creep.memory.home].controller);
-    
-        if (Memory.signs && Memory.signs[creep.room.name] && (!creep.room.controller.sign || creep.room.controller.sign.username !== "roncli")) {
-            creep.signController(creep.room.controller, Memory.signs[creep.room.name]);
+
+        const {signs, signs: {[roomName]: signInRoom}} = Memory,
+            {controller, controller: {sign}} = room;
+
+        Pathing.moveTo(creep, controller, 1);
+        creep.reserveController(controller);
+
+        if (signs && signInRoom && (!sign || sign.username !== "roncli")) {
+            creep.signController(controller, signInRoom);
         }
     }
-    
+
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
+    /**
+     * Serializes the task to the creep's memory.
+     * @param {Creep} creep The creep to serialize the task for.
+     * @return {void}
+     */
     toObj(creep) {
-        creep.memory.currentTask = {
-            type: this.type
-        };
+        creep.memory.currentTask = {type: this.type};
     }
-    
+
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
+    /**
+     * Deserializes the task from the creep's memory.
+     * @return {TaskReserve} The deserialized object.
+     */
     static fromObj() {
-        return new Reserve();
+        return new TaskReserve();
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Reserve, "TaskReserve");
+    require("screeps-profiler").registerObject(TaskReserve, "TaskReserve");
 }
-module.exports = Reserve;
+module.exports = TaskReserve;

@@ -1,7 +1,29 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Pathing = require("pathing");
 
-class CollectMinerals {
+//  #####                #       ###           ##     ##                   #     #   #    #                                 ##
+//    #                  #      #   #           #      #                   #     #   #                                       #
+//    #     ###    ###   #   #  #       ###     #      #     ###    ###   ####   ## ##   ##    # ##    ###   # ##    ###     #     ###
+//    #        #  #      #  #   #      #   #    #      #    #   #  #   #   #     # # #    #    ##  #  #   #  ##  #      #    #    #
+//    #     ####   ###   ###    #      #   #    #      #    #####  #       #     #   #    #    #   #  #####  #       ####    #     ###
+//    #    #   #      #  #  #   #   #  #   #    #      #    #      #   #   #  #  #   #    #    #   #  #      #      #   #    #        #
+//    #     ####  ####   #   #   ###    ###    ###    ###    ###    ###     ##   #   #   ###   #   #   ###   #       ####   ###   ####
+/**
+ * A class that performs collecting minerals from a structure.
+ */
+class TaskCollectMinerals {
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
+    /**
+     * Creates a new task.
+     * @param {string} id The ID of the structure.
+     * @param {string} [resource] The resource to collect.
+     * @param {number} [amount] The amount of resource to collect.
+     */
     constructor(id, resource, amount) {
         this.type = "collectMinerals";
         this.id = id;
@@ -9,60 +31,88 @@ class CollectMinerals {
         this.amount = amount;
         this.object = Game.getObjectById(id);
     }
-    
+
+    //                    ##                  #
+    //                   #  #
+    //  ##    ###  ###   #  #   ###    ###   ##     ###  ###
+    // #     #  #  #  #  ####  ##     ##      #    #  #  #  #
+    // #     # ##  #  #  #  #    ##     ##    #     ##   #  #
+    //  ##    # #  #  #  #  #  ###    ###    ###   #     #  #
+    //                                              ###
+    /**
+     * Checks to see if the task can be assigned to a creep.
+     * @param {Creep} creep The creep to try to assign the task to.
+     * @return {bool} Whether the task was assigned to the creep.
+     */
     canAssign(creep) {
-        var obj = this.object;
-    
+        const {object: obj} = this;
+
         if (this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
             return false;
         }
 
-        if (obj.structureType === STRUCTURE_LAB && obj.mineralAmount === 0 || obj.store && _.sum(obj.store) === obj.store[RESOURCE_ENERGY]) {
+        const isLab = obj.structureType === STRUCTURE_LAB,
+            {mineralAmount, store} = obj;
+
+        if (isLab && mineralAmount === 0 || obj.store && _.sum(store) === store[RESOURCE_ENERGY]) {
             return false;
         }
-        
-        if (this.resource && this.amount) {
-            if (obj.structureType === STRUCTURE_LAB && obj.mineralType !== this.resource && obj.mineralAmount < this.amount) {
+
+        const {resource, amount} = this;
+
+        if (resource && this.amount) {
+            if (isLab && obj.mineralType !== resource && mineralAmount < amount) {
                 return false;
             }
-    
-            if (obj.structureType !== STRUCTURE_LAB && (obj.store[this.resource] || 0) < this.amount) {
+
+            if (!isLab && (store[resource] || 0) < amount) {
                 return false;
             }
         }
-        
+
         Cache.creepTasks[creep.name] = this;
         this.toObj(creep);
+
         return true;
     }
-    
+
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
+    /**
+     * Run the task for the creep.
+     * @param {Creep} creep The creep to run the task for.
+     * @return {void}
+     */
     run(creep) {
-        var obj = this.object,
-            resource = this.resource,
-            creepCarry = creep.carry,
-            creepCarryCapacity = creep.carryCapacity,
-            amount = this.amount,
-            objStore, minerals;
-    
+        const {object: obj, resource, amount} = this,
+            {carryCapacity} = creep,
+            carry = _.sum(creep.carry);
+        let minerals;
+
         // If the amount is less than 0, or the creep is about to die, or if the object doesn't exist, complete.
         if (amount < 0 || creep.ticksToLive < 150 || !obj) {
             delete creep.memory.currentTask;
+
             return;
         }
-    
-        objStore = obj.store;
-    
+
+        const {store: objStore} = obj;
+
         // If we're full, complete task.
-        if (_.sum(creep.carry) === creep.carryCapacity) {
+        if (carry === carryCapacity) {
             delete creep.memory.currentTask;
+
             return;
         }
-    
+
         // Get the resource we're going to use.
         if (obj.structureType === STRUCTURE_LAB) {
             // Lab is empty, complete task.
             if (obj.mineralType === null) {
                 delete creep.memory.currentTask;
+
                 return;
             }
             minerals = [obj.mineralType];
@@ -71,31 +121,44 @@ class CollectMinerals {
         } else {
             minerals = _.filter(Object.keys(objStore), (m) => m !== RESOURCE_ENERGY && objStore[m] > 0);
         }
-    
+
         // We're out of minerals, complete task.
         if (minerals.length === 0) {
             delete creep.memory.currentTask;
+
             return;
         }
-    
+
         // Move to the object.
         Pathing.moveTo(creep, obj, 1);
-    
+
         // Collect from the object.
         if (amount) {
-            if (creep.withdraw(obj, minerals[0], Math.min(amount, creepCarryCapacity - _.sum(creepCarry))) === OK) {
+            if (creep.withdraw(obj, minerals[0], Math.min(amount, carryCapacity - carry)) === OK) {
                 delete creep.memory.currentTask;
             }
+
             return;
         }
-    
+
         if (creep.withdraw(obj, minerals[0]) === OK) {
             // Complete task.
             delete creep.memory.currentTask;
-            return;
         }
     }
-    
+
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
+    /**
+     * Serializes the task to the creep's memory.
+     * @param {Creep} creep The creep to serialize the task for.
+     * @return {void}
+     */
     toObj(creep) {
         if (this.object) {
             creep.memory.currentTask = {
@@ -108,17 +171,31 @@ class CollectMinerals {
             delete creep.memory.currentTask;
         }
     }
-    
+
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
+    /**
+     * Deserializes the task from the creep's memory.
+     * @param {Creep} creep The creep to deserialize the task for.
+     * @return {TaskCollectMinerals|undefined} The deserialized object.
+     */
     static fromObj(creep) {
-        if (Game.getObjectById(creep.memory.currentTask.id)) {
-            return new CollectMinerals(creep.memory.currentTask.id, creep.memory.currentTask.resource, creep.memory.currentTask.amount);
-        } else {
-            return;
+        const {memory: {currentTask, currentTask: {id}}} = creep;
+
+        if (Game.getObjectById(id)) {
+            return new TaskCollectMinerals(id, currentTask.resource, currentTask.amount);
         }
+
+        return void 0;
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(CollectMinerals, "TaskCollectMinerals");
+    require("screeps-profiler").registerObject(TaskCollectMinerals, "TaskCollectMinerals");
 }
-module.exports = CollectMinerals;
+module.exports = TaskCollectMinerals;

@@ -1,69 +1,146 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     TaskCollectEnergy = require("task.collectEnergy"),
     Utilities = require("utilities"),
     Pathing = require("pathing");
 
-class Pickup {
+//  #####                #      ####     #           #                    ####
+//    #                  #      #   #                #                    #   #
+//    #     ###    ###   #   #  #   #   ##     ###   #   #  #   #  # ##   #   #   ###    ###    ###   #   #  # ##    ###    ###
+//    #        #  #      #  #   ####     #    #   #  #  #   #   #  ##  #  ####   #   #  #      #   #  #   #  ##  #  #   #  #   #
+//    #     ####   ###   ###    #        #    #      ###    #   #  ##  #  # #    #####   ###   #   #  #   #  #      #      #####
+//    #    #   #      #  #  #   #        #    #   #  #  #   #  ##  # ##   #  #   #          #  #   #  #  ##  #      #   #  #
+//    #     ####  ####   #   #  #       ###    ###   #   #   ## #  #      #   #   ###   ####    ###    ## #  #       ###    ###
+//                                                                 #
+//                                                                 #
+/**
+ * A class that performs picking up resources.
+ */
+class TaskPickupResource {
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
+    /**
+     * Creates a new task.
+     * @param {string} [id] The ID of the resource to pickup.
+     */
     constructor(id) {
         this.type = "pickupResource";
         this.id = id;
         this.resource = Game.getObjectById(id);
         this.force = true;
     }
-    
+
+    //                    ##                  #
+    //                   #  #
+    //  ##    ###  ###   #  #   ###    ###   ##     ###  ###
+    // #     #  #  #  #  ####  ##     ##      #    #  #  #  #
+    // #     # ##  #  #  #  #    ##     ##    #     ##   #  #
+    //  ##    # #  #  #  #  #  ###    ###    ###   #     #  #
+    //                                              ###
+    /**
+     * Checks to see if the task can be assigned to a creep.
+     * @param {Creep} creep The creep to try to assign the task to.
+     * @return {bool} Whether the task was assigned to the creep.
+     */
     canAssign(creep) {
-        if (creep.spawning || creep.ticksToLive < 150 || !this.resource || _.sum(creep.carry) === creep.carryCapacity || this.resource.amount < creep.pos.getRangeTo(this.resource) || this.resource.resourceType === RESOURCE_ENERGY && this.resource.amount < 50 || this.resource.room.controller && Memory.allies.indexOf(Utilities.getControllerOwner(this.resource.room.controller)) !== -1) {
+        const {resource, resource: {amount, room: {controller}}} = this;
+
+        if (creep.spawning || creep.ticksToLive < 150 || !resource || _.sum(creep.carry) === creep.carryCapacity || amount < creep.pos.getRangeTo(resource) || resource.resourceType === RESOURCE_ENERGY && amount < 50 || controller && Memory.allies.indexOf(Utilities.getControllerOwner(controller)) !== -1) {
             return false;
         }
-        
+
         Cache.creepTasks[creep.name] = this;
         this.toObj(creep);
+
         return true;
     }
-    
+
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
+    /**
+     * Run the task for the creep.
+     * @param {Creep} creep The creep to run the task for.
+     * @return {void}
+     */
     run(creep) {
+        const {resource} = this;
+
         // Resource is gone or we are full.
-        if (!this.resource || _.sum(creep.carry) === creep.carryCapacity) {
+        if (!resource || _.sum(creep.carry) === creep.carryCapacity) {
             delete creep.memory.currentTask;
+
             return;
         }
-    
-        // Move and pickup if possible.    
-        Pathing.moveTo(creep, this.resource, 1);
-        if (creep.pickup(this.resource) === OK) {
+
+        // Move and pickup if possible.
+        Pathing.moveTo(creep, resource, 1);
+        if (creep.pickup(resource) === OK) {
             // Task always is completed one way or another upon successful transfer.
             delete creep.memory.currentTask;
-    
+
             // If there is a container here, change the task.
-            let structures = _.filter(creep.room.lookForAt(LOOK_STRUCTURES, this.resource), (s) => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY]);
+            const structures = _.filter(creep.room.lookForAt(LOOK_STRUCTURES, resource), (s) => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY]);
+
             if (structures.length > 0) {
-                let task = new TaskCollectEnergy(structures[0].id);
-                task.canAssign(creep);
+                new TaskCollectEnergy(structures[0].id).canAssign(creep);
             }
         }
     }
-    
+
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
+    /**
+     * Serializes the task to the creep's memory.
+     * @param {Creep} creep The creep to serialize the task for.
+     * @return {void}
+     */
     toObj(creep) {
-        if (this.resource) {
+        const {resource} = this;
+
+        if (resource) {
             creep.memory.currentTask = {
                 type: this.type,
-                id: this.resource.id
+                id: resource.id
             };
         } else {
             delete creep.memory.currentTask;
         }
     }
-    
+
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
+    /**
+     * Deserializes the task from the creep's memory.
+     * @param {Creep} creep The creep to deserialize the task for.
+     * @return {TaskPickupResource|undefined} The deserialized object.
+     */
     static fromObj(creep) {
-        if (Game.getObjectById(creep.memory.currentTask.id)) {
-            return new Pickup(creep.memory.currentTask.id);
-        } else {
-            return;
+        const {memory: {currentTask: {id}}} = creep;
+
+        if (Game.getObjectById(id)) {
+            return new TaskPickupResource(id);
         }
+
+        return void 0;
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Pickup, "TaskPickupResource");
+    require("screeps-profiler").registerObject(TaskPickupResource, "TaskPickupResource");
 }
-module.exports = Pickup;
+module.exports = TaskPickupResource;

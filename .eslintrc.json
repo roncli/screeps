@@ -296,6 +296,7 @@
     "extends": "eslint:all",
     "rules": {
         "capitalized-comments": "off",
+        "class-methods-use-this": "off",
         "complexity": "off",
         "consistent-this": "off",
         "default-case": "off",

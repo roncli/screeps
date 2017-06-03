@@ -1,49 +1,109 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Pathing = require("pathing");
 
-class Downgrade {
-    constructor(controllerId, x, y, roomName) {
-        this.controller = Game.getObjectById(controllerId);
-        if (this.controller) {
-            let pos = this.controller.pos;
+//  #####                #      ####                                                 #
+//    #                  #       #  #                                                #
+//    #     ###    ###   #   #   #  #   ###   #   #  # ##    ## #  # ##    ###    ## #   ###
+//    #        #  #      #  #    #  #  #   #  #   #  ##  #  #  #   ##  #      #  #  ##  #   #
+//    #     ####   ###   ###     #  #  #   #  # # #  #   #   ##    #       ####  #   #  #####
+//    #    #   #      #  #  #    #  #  #   #  # # #  #   #  #      #      #   #  #  ##  #
+//    #     ####  ####   #   #  ####    ###    # #   #   #   ###   #       ####   ## #   ###
+//                                                          #   #
+//                                                           ###
+/**
+ * A class that performs downgrading on a constructor.
+ */
+class TaskDowngrade {
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
+    /**
+     * Creates a new task.
+     * @param {string} id The ID of the controller.
+     * @param {RoomPosition} [pos] The position of the controller.
+     */
+    constructor(id, pos) {
+        const controller = Game.getObjectById(id);
 
-            this.x = pos.x;
-            this.y = pos.y;
-            this.roomName = pos.roomName;
+        this.id = id;
+        this.controller = controller;
+
+        if (controller) {
+            ({pos: this.pos} = controller);
         } else {
-            this.x = x;
-            this.y = y;
-            this.roomName = roomName;
+            this.pos = pos;
         }
         this.type = "downgrade";
     }
 
+    //                    ##                  #
+    //                   #  #
+    //  ##    ###  ###   #  #   ###    ###   ##     ###  ###
+    // #     #  #  #  #  ####  ##     ##      #    #  #  #  #
+    // #     # ##  #  #  #  #    ##     ##    #     ##   #  #
+    //  ##    # #  #  #  #  #  ###    ###    ###   #     #  #
+    //                                              ###
+    /**
+     * Checks to see if the task can be assigned to a creep.
+     * @param {Creep} creep The creep to try to assign the task to.
+     * @return {bool} Whether the task was assigned to the creep.
+     */
     canAssign(creep) {
-        var controller = this.controller;
+        const {controller} = this;
 
         if (creep.spawning || creep.memory.role !== "downgrader" || !controller || !controller.level || creep.getActiveBodyparts(CLAIM) === 0) {
             return false;
         }
-        
+
         Cache.creepTasks[creep.name] = this;
         this.toObj(creep);
+
         return true;
     }
 
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
+    /**
+     * Run the task for the creep.
+     * @param {Creep} creep The creep to run the task for.
+     * @return {void}
+     */
     run(creep) {
-        if (!creep.room.controller || !creep.room.controller.level || !creep.getActiveBodyparts(CLAIM) === 0) {
+        if (!creep.getActiveBodyparts(CLAIM) === 0) {
             delete creep.memory.currentTask;
+
             return;
         }
 
-        // Move towards the controller and downgrade it.    
+        const {controller} = this;
+
+        // Move towards the controller and downgrade it.
         Pathing.moveTo(creep, new RoomPosition(this.x, this.y, this.roomName), 1);
-        creep.attackController(creep.room.controller);
+        if (controller) {
+            creep.attackController(controller);
+        }
     }
 
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
+    /**
+     * Serializes the task to the creep's memory.
+     * @param {Creep} creep The creep to serialize the task for.
+     * @return {void}
+     */
     toObj(creep) {
         creep.memory.currentTask = {
-            controllerId: this.controller.id,
+            id: this.controller.id,
             x: this.x,
             y: this.y,
             roomName: this.roomName,
@@ -51,14 +111,26 @@ class Downgrade {
         };
     }
 
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
+    /**
+     * Deserializes the task from the creep's memory.
+     * @param {Creep} creep The creep to deserialize the task for.
+     * @return {TaskDowngrade} The deserialized object.
+     */
     static fromObj(creep) {
-        var task = creep.memory.currentTask;
+        const {memory: {currentTask: task}} = creep;
 
-        return new Downgrade(task.controllerId, task.x, task.y, task.roomName);
+        return new TaskDowngrade(task.id, new RoomPosition(task.x, task.y, task.roomName));
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Downgrade, "TaskDowngrade");
+    require("screeps-profiler").registerObject(TaskDowngrade, "TaskDowngrade");
 }
-module.exports = Downgrade;
+module.exports = TaskDowngrade;

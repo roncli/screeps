@@ -917,11 +917,11 @@ class RoomBase extends RoomEngine {
      */
     spawn(canSpawn) {
         const {room, tasks} = this,
-            {storage, controller, name: roomName} = room,
+            {storage, storage: {store: {[RESOURCE_ENERGY]: energy}}, controller, name: roomName} = room,
             {level: rcl} = controller,
             {dismantle} = Memory;
 
-        this.checkSpawn(RoleWorker, canSpawn && (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.criticalRepairableStructures && tasks.criticalRepairableStructures.length > 0 || tasks.repairableStructures && _.filter(tasks.repairableStructures, (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== 1 && s.hits < 1000000).length > 0));
+        this.checkSpawn(RoleWorker, canSpawn && (!storage || energy >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.criticalRepairableStructures && tasks.criticalRepairableStructures.length > 0 || tasks.repairableStructures && _.filter(tasks.repairableStructures, (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== 1 && s.hits < 1000000).length > 0));
         this.checkSpawn(RoleMiner, canSpawn);
         this.checkSpawn(RoleStorer, canSpawn);
         this.checkSpawn(RoleScientist, canSpawn && rcl >= 6);
@@ -929,7 +929,7 @@ class RoomBase extends RoomEngine {
         this.checkSpawn(RoleCollector, canSpawn);
         this.checkSpawn(RoleClaimer, canSpawn);
         this.checkSpawn(RoleDowngrader, canSpawn);
-        this.checkSpawn(RoleUpgrader, canSpawn && (rcl < 8 || _.filter(Game.rooms, (r) => {
+        this.checkSpawn(RoleUpgrader, canSpawn && (energy >= Memory.upgradeEnergy || rcl < 8 || _.filter(Game.rooms, (r) => {
             const {controller: roomController} = r;
 
             return roomController && roomController.my && roomController.level < 8;

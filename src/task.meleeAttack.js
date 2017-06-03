@@ -1,35 +1,79 @@
-var Cache = require("cache"),
+const Cache = require("cache"),
     Pathing = require("pathing");
 
-class Melee {
+//  #####                #      #   #          ##
+//    #                  #      #   #           #
+//    #     ###    ###   #   #  ## ##   ###     #     ###    ###
+//    #        #  #      #  #   # # #  #   #    #    #   #  #   #
+//    #     ####   ###   ###    #   #  #####    #    #####  #####
+//    #    #   #      #  #  #   #   #  #        #    #      #
+//    #     ####  ####   #   #  #   #   ###    ###    ###    ###
+/**
+ * A class that performs a melee attack on a creep.
+ */
+class TaskMelee {
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
+    /**
+     * Creates a new task.
+     * @param {string} [id] The ID of the creep to attack.
+     */
     constructor(id) {
         this.type = "meleeAttack";
         this.id = id;
         this.enemy = Game.getObjectById(id);
     }
-    
+
+    //                    ##                  #
+    //                   #  #
+    //  ##    ###  ###   #  #   ###    ###   ##     ###  ###
+    // #     #  #  #  #  ####  ##     ##      #    #  #  #  #
+    // #     # ##  #  #  #  #    ##     ##    #     ##   #  #
+    //  ##    # #  #  #  #  #  ###    ###    ###   #     #  #
+    //                                              ###
+    /**
+     * Checks to see if the task can be assigned to a creep.
+     * @param {Creep} creep The creep to try to assign the task to.
+     * @return {bool} Whether the task was assigned to the creep.
+     */
     canAssign(creep) {
         if (creep.spawning || creep.getActiveBodyparts(ATTACK) === 0) {
             return false;
         }
-        
+
         Cache.creepTasks[creep.name] = this;
         this.toObj(creep);
+
         return true;
     }
-    
+
+    // ###   #  #  ###
+    // #  #  #  #  #  #
+    // #     #  #  #  #
+    // #      ###  #  #
+    /**
+     * Run the task for the creep.
+     * @param {Creep} creep The creep to run the task for.
+     * @return {void}
+     */
     run(creep) {
         // If enemy is gone, we're done.
         if (!this.enemy) {
             creep.say("Get Rekt!", true);
             delete creep.memory.currentTask;
+
             return;
         }
-    
-        // If we're out of attack parts, we're done.    
+
+        // If we're out of attack parts, we're done.
         if (creep.getActiveBodyparts(ATTACK) === 0) {
             creep.say("Help!");
             delete creep.memory.currentTask;
+
             return;
         }
 
@@ -41,13 +85,25 @@ class Melee {
                 creep.heal(creep);
             }
         }
-    
+
         // Try ranged attack if possible.
         if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
             creep.rangedAttack(this.enemy);
         }
     }
-    
+
+    //  #           ##   #       #
+    //  #          #  #  #
+    // ###    ##   #  #  ###     #
+    //  #    #  #  #  #  #  #    #
+    //  #    #  #  #  #  #  #    #
+    //   ##   ##    ##   ###   # #
+    //                          #
+    /**
+     * Serializes the task to the creep's memory.
+     * @param {Creep} creep The creep to serialize the task for.
+     * @return {void}
+     */
     toObj(creep) {
         if (this.enemy) {
             creep.memory.currentTask = {
@@ -58,17 +114,31 @@ class Melee {
             delete creep.memory.currentTask;
         }
     }
-    
+
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
+    /**
+     * Deserializes the task from the creep's memory.
+     * @param {Creep} creep The creep to deserialize the task for.
+     * @return {TaskMelee|undefined} The deserialized object.
+     */
     static fromObj(creep) {
-        if (Game.getObjectById(creep.memory.currentTask.id)) {
-            return new Melee(creep.memory.currentTask.id);
-        } else {
-            return;
+        const {memory: {currentTask: {id}}} = creep;
+
+        if (Game.getObjectById(id)) {
+            return new TaskMelee(id);
         }
+
+        return void 0;
     }
 }
 
 if (Memory.profiling) {
-    require("screeps-profiler").registerObject(Melee, "TaskMeleeAttack");
+    require("screeps-profiler").registerObject(TaskMelee, "TaskMeleeAttack");
 }
-module.exports = Melee;
+module.exports = TaskMelee;

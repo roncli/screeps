@@ -1,58 +1,59 @@
-var memory = [];
+const memory = [];
 
-//   ###                                       #    
-//  #   #                                      #    
-//  #       ###    ## #  ## #    ###   # ##   ####  
-//   ###   #   #  #  #   # # #  #   #  ##  #   #    
-//      #  #####   ##    # # #  #####  #   #   #    
-//  #   #  #      #      # # #  #      #   #   #  # 
-//   ###    ###    ###   #   #   ###   #   #    ##  
-//                #   #                             
-//                 ###                              
+//   ###                                       #
+//  #   #                                      #
+//  #       ###    ## #  ## #    ###   # ##   ####
+//   ###   #   #  #  #   # # #  #   #  ##  #   #
+//      #  #####   ##    # # #  #####  #   #   #
+//  #   #  #      #      # # #  #      #   #   #  #
+//   ###    ###    ###   #   #   ###   #   #    ##
+//                #   #
+//                 ###
 /**
  * Represents a segment of memory.
  */
 class Segment {
-    //                           #                       #                
-    //                           #                       #                
-    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
-    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
-    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
-    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
     /**
      * Gets a segment of memory.
      * @param {number} id The ID number of the segment to retrieve from 1 to 10.
      */
     constructor(id) {
         this.id = id;
-        
+
         if (!memory[id]) {
             try {
                 memory[id] = JSON.parse(RawMemory.segments[id]);
             } catch (e) {
-                memory[id] = undefined;
+                memory[id] = void 0;
             }
         }
     }
 
-    //  #           #     #    
-    //                    #    
-    // ##    ###   ##    ###   
-    //  #    #  #   #     #    
-    //  #    #  #   #     #    
-    // ###   #  #  ###     ##  
+    //  #           #     #
+    //                    #
+    // ##    ###   ##    ###
+    //  #    #  #   #     #
+    //  #    #  #   #     #
+    // ###   #  #  ###     ##
     /**
      * Initializes the active segments for the next tick.
+     * @return {void}
      */
     static init() {
         RawMemory.setActiveSegments([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     }
 
-    // # #    ##   # #    ##   ###   #  #  
-    // ####  # ##  ####  #  #  #  #  #  #  
-    // #  #  ##    #  #  #  #  #      # #  
-    // #  #   ##   #  #   ##   #       #   
-    //                                #    
+    // # #    ##   # #    ##   ###   #  #
+    // ####  # ##  ####  #  #  #  #  #  #
+    // #  #  ##    #  #  #  #  #      # #
+    // #  #   ##   #  #   ##   #       #
+    //                                #
     /**
      * Gets the memory for this segment.
      * @return {object} The memory for this segment.
@@ -69,14 +70,15 @@ class Segment {
         memory[this.id] = value;
     }
 
-    //         #                      
-    //         #                      
-    //  ###   ###    ##   ###    ##   
-    // ##      #    #  #  #  #  # ##  
-    //   ##    #    #  #  #     ##    
-    // ###      ##   ##   #      ##   
+    //         #
+    //         #
+    //  ###   ###    ##   ###    ##
+    // ##      #    #  #  #  #  # ##
+    //   ##    #    #  #  #     ##
+    // ###      ##   ##   #      ##
     /**
      * Stores the segment to memory.
+     * @return {void}
      */
     store() {
         RawMemory.segments[this.id] = JSON.stringify(memory[this.id]);

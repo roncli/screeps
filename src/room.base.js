@@ -912,29 +912,27 @@ class RoomBase extends RoomEngine {
     //        #
     /**
      * Spawns needed creeps.
-     * @param {canSpawn} bool Whether to spawn creeps this turn.
+     * @param {bool} canSpawn Whether to spawn creeps this turn.
+     * @return {void}
      */
     spawn(canSpawn) {
-        var room = this.room,
-            storage = room.storage,
-            controller = room.controller,
-            tasks = this.tasks,
-            rcl = controller.level,
-            dismantle = Memory.dismantle,
-            roomName = room.name;
+        const {room, tasks} = this,
+            {storage, controller, name: roomName} = room,
+            {level: rcl} = controller,
+            {dismantle} = Memory;
 
         this.checkSpawn(RoleWorker, canSpawn && (!storage || storage.store[RESOURCE_ENERGY] >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.criticalRepairableStructures && tasks.criticalRepairableStructures.length > 0 || tasks.repairableStructures && _.filter(tasks.repairableStructures, (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== 1 && s.hits < 1000000).length > 0));
         this.checkSpawn(RoleMiner, canSpawn);
         this.checkSpawn(RoleStorer, canSpawn);
         this.checkSpawn(RoleScientist, canSpawn && rcl >= 6);
-        this.checkSpawn(RoleDismantler, canSpawn && (!!(dismantle && dismantle[roomName] && dismantle[roomName].length > 0)));
+        this.checkSpawn(RoleDismantler, canSpawn && !!(dismantle && dismantle[roomName] && dismantle[roomName].length > 0));
         this.checkSpawn(RoleCollector, canSpawn);
         this.checkSpawn(RoleClaimer, canSpawn);
         this.checkSpawn(RoleDowngrader, canSpawn);
         this.checkSpawn(RoleUpgrader, canSpawn && (rcl < 8 || _.filter(Game.rooms, (r) => {
-            var controller = r.controller;
+            const {controller: roomController} = r;
 
-            return controller && controller.my && controller.level < 8;
+            return roomController && roomController.my && roomController.level < 8;
         }).length > 0));
     }
 
@@ -947,6 +945,7 @@ class RoomBase extends RoomEngine {
     //                            ###
     /**
      * Assigns tasks to creeps.
+     * @return {void}
      */
     assignTasks() {
         RoleWorker.assignTasks(this);
@@ -971,15 +970,15 @@ class RoomBase extends RoomEngine {
     //                      #
     /**
      * Processes the lab queue.
+     * @return {void}
      */
     labQueue() {
-        var room = this.room,
-            memory = room.memory,
-            labQueue = memory.labQueue,
-            status = labQueue.status;
+        const {room, room: {memory}} = this;
+        let {labQueue} = memory;
+        const {status} = labQueue;
 
         if (status === "clearing") {
-            let labsInUse = memory.labsInUse,
+            const {labsInUse} = memory,
                 labs = Cache.labsInRoom(room);
 
             if (!labsInUse || labs.length - labsInUse.length > 2 && _.filter(labs, (l) => _.filter(labsInUse, (u) => u.id === l.id).length === 0 && l.mineralAmount > 0).length === 0) {
@@ -988,25 +987,26 @@ class RoomBase extends RoomEngine {
         } else if (status === "moving") {
             if (!labQueue.start || labQueue.start + 500 < Game.time) {
                 delete memory.labQueue;
-                labQueue = undefined;
+                labQueue = void 0;
             } else {
-                let moved = true,
-                    children = labQueue.children || [],
+                const children = labQueue.children || [],
                     labs = Cache.labsInRoom(room),
                     sourceLabs = labQueue.sourceLabs || [],
                     sourceLab0 = Game.getObjectById(sourceLabs[0]),
                     sourceLab1 = Game.getObjectById(sourceLabs[1]),
-                    labsInUse = memory.labsInUse;
+                    {labsInUse} = memory;
+                let moved = true;
 
                 _.forEach(children, (resource) => {
                     if (_.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount) < labQueue.amount) {
                         moved = false;
-                        return false;
                     }
+
+                    return moved;
                 });
 
                 if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
-                    _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+                    _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (liu) => liu.resource !== labQueue.resource), (liu) => liu.id).indexOf(l.id) === -1)), (lab) => {
                         if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
                             labQueue.amount -= 5;
                         }
@@ -1018,13 +1018,13 @@ class RoomBase extends RoomEngine {
                 }
             }
         } else if (status === "creating") {
-            let labs = Cache.labsInRoom(room),
+            const labs = Cache.labsInRoom(room),
                 sourceLabs = labQueue.sourceLabs || [],
-                labsInUse = memory.labsInUse,
+                {labsInUse} = memory,
                 sourceLab0 = Game.getObjectById(sourceLabs[0]),
                 sourceLab1 = Game.getObjectById(sourceLabs[1]);
 
-            _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (l) => l.resource !== labQueue.resource), (l) => l.id).indexOf(l.id) === -1)), (lab) => {
+            _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (liu) => liu.resource !== labQueue.resource), (liu) => liu.id).indexOf(l.id) === -1)), (lab) => {
                 if (lab.mineralAmount === LAB_MINERAL_CAPACITY) {
                     labQueue.status = "returning";
                 }
@@ -1039,12 +1039,12 @@ class RoomBase extends RoomEngine {
 
             if (labQueue.amount <= 0 && (sourceLab0.mineralAmount < 5 || sourceLab1.mineralAmount < 5)) {
                 delete memory.labQueue;
-                labQueue = undefined;
+                labQueue = void 0;
             }
         } else if (status === "returning") {
             if (_.sum(_.filter(Cache.labsInRoom(room), (l) => l.mineralType === labQueue.resource), (l) => l.mineralAmount) === 0) {
                 delete memory.labQueue;
-                labQueue = undefined;
+                labQueue = void 0;
             }
         } else {
             labQueue.status = "clearing";
@@ -1060,13 +1060,14 @@ class RoomBase extends RoomEngine {
     // ###    # #  ###   ###    ###   #  #   ##   ###     ##
     /**
      * Checks for labs in use and updates the queue with what needs to be done with them.
+     * @return {void}
      */
     labsInUse() {
-        var labsInUse = this.room.memory.labsInUse,
+        const {room: {memory: {labsInUse}}} = this,
             boosted = [];
 
         _.forEach(labsInUse, (queue) => {
-            var status = queue.status,
+            const {status} = queue,
                 lab = Game.getObjectById(queue.id);
 
             if (status === "emptying") {
@@ -1082,7 +1083,7 @@ class RoomBase extends RoomEngine {
                     boosted.push(queue);
                 }
             } else {
-                let creep = Game.creeps[queue.creepToBoost];
+                const {creeps: {[queue.creepToBoost]: creep}} = Game;
 
                 if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
                     if (lab.boostCreep(creep) === OK) {
@@ -1111,6 +1112,7 @@ class RoomBase extends RoomEngine {
     // #
     /**
      * Processes power in the room.
+     * @return {void}
      */
     processPower() {
         _.forEach(Cache.powerSpawnsInRoom(this.room), (spawn) => {
@@ -1129,11 +1131,10 @@ class RoomBase extends RoomEngine {
     //                          #
     /**
      * Serialize the room to an object.
+     * @return {void}
      */
     toObj() {
-        Memory.rooms[this.room.name].roomType = {
-            type: this.type
-        };
+        Memory.rooms[this.room.name].roomType = {type: this.type};
     }
 
     //   #                      ##   #       #

@@ -319,6 +319,7 @@
         "multiline-ternary": "off",
         "no-confusing-arrow": "off",
         "no-continue": "off",
+        "no-empty-function": "off",
         "no-implicit-coercion": "off",
         "no-inline-comments": "off",
         "no-invalid-this": "off",
@@ -331,6 +332,7 @@
         "no-return-assign": "off",
         "no-ternary": "off",
         "no-underscore-dangle": "off",
+        "no-useless-constructor": "off",
         "no-void": "off",
         "object-property-newline": "off",
         "one-var": [

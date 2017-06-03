@@ -5,23 +5,23 @@ const Cache = require("cache"),
     RoleHealer = require("role.healer"),
     RoleRemoteCollector = require("role.remoteCollector");
 
-//  ####                         ###                                     
-//  #   #                       #   #                                    
-//  #   #   ###    ###   ## #   #       ###   #   #  # ##    ###    ###  
-//  ####   #   #  #   #  # # #   ###   #   #  #   #  ##  #  #   #  #   # 
-//  # #    #   #  #   #  # # #      #  #   #  #   #  #      #      ##### 
-//  #  #   #   #  #   #  # # #  #   #  #   #  #  ##  #      #   #  #     
-//  #   #   ###    ###   #   #   ###    ###    ## #  #       ###    ###  
+//  ####                         ###
+//  #   #                       #   #
+//  #   #   ###    ###   ## #   #       ###   #   #  # ##    ###    ###
+//  ####   #   #  #   #  # # #   ###   #   #  #   #  ##  #  #   #  #   #
+//  # #    #   #  #   #  # # #      #  #   #  #   #  #      #      #####
+//  #  #   #   #  #   #  # # #  #   #  #   #  #  ##  #      #   #  #
+//  #   #   ###    ###   #   #   ###    ###    ## #  #       ###    ###
 /**
  * A class that represents a source room.
  */
 class RoomSource extends RoomMine {
-    //                           #                       #                
-    //                           #                       #                
-    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###   
-    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #  
-    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #     
-    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #     
+    //                           #                       #
+    //                           #                       #
+    //  ##    ##   ###    ###   ###   ###   #  #   ##   ###    ##   ###
+    // #     #  #  #  #  ##      #    #  #  #  #  #      #    #  #  #  #
+    // #     #  #  #  #    ##    #    #     #  #  #      #    #  #  #
+    //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
     /**
      * Creates a new source room.
      * @param {Room} room The room.
@@ -35,19 +35,20 @@ class RoomSource extends RoomMine {
         delete this.convert;
     }
 
-    //         #                       #    ###                #            
-    //         #                      ##     #                 #            
-    //  ###   ###    ###   ###   ##    #     #     ###   ###   # #    ###   
-    // ##      #    #  #  #  #  # ##   #     #    #  #  ##     ##    ##     
-    //   ##    #    # ##   ##   ##     #     #    # ##    ##   # #     ##   
-    // ###      ##   # #  #      ##   ###    #     # #  ###    #  #  ###    
-    //                     ###                                              
+    //         #                       #    ###                #
+    //         #                      ##     #                 #
+    //  ###   ###    ###   ###   ##    #     #     ###   ###   # #    ###
+    // ##      #    #  #  #  #  # ##   #     #    #  #  ##     ##    ##
+    //   ##    #    # ##   ##   ##     #     #    # ##    ##   # #     ##
+    // ###      ##   # #  #      ##   ###    #     # #  ###    #  #  ###
+    //                     ###
     /**
      * Tasks to perform while the room is in stage 1.
+     * @return {void}
      */
     stage1Tasks() {
-        var room = this.room;
-        
+        const {room} = this;
+
         super.stage1Tasks();
 
         this.tasks.hostiles = Cache.hostilesInRoom(room);
@@ -55,20 +56,20 @@ class RoomSource extends RoomMine {
         this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
     }
 
-    //         #                       #     ##                           
-    //         #                      ##    #  #                          
-    //  ###   ###    ###   ###   ##    #     #    ###    ###  #  #  ###   
-    // ##      #    #  #  #  #  # ##   #      #   #  #  #  #  #  #  #  #  
-    //   ##    #    # ##   ##   ##     #    #  #  #  #  # ##  ####  #  #  
-    // ###      ##   # #  #      ##   ###    ##   ###    # #  ####  #  #  
-    //                     ###                    #                       
+    //         #                       #     ##
+    //         #                      ##    #  #
+    //  ###   ###    ###   ###   ##    #     #    ###    ###  #  #  ###
+    // ##      #    #  #  #  #  # ##   #      #   #  #  #  #  #  #  #  #
+    //   ##    #    # ##   ##   ##     #    #  #  #  #  # ##  ####  #  #
+    // ###      ##   # #  #      ##   ###    ##   ###    # #  ####  #  #
+    //                     ###                    #
     /**
      * Spawns creeps while the room is in stage 1.
+     * @return {void}
      */
     stage1Spawn() {
-        var creeps = Cache.creeps[this.room.name],
-            defenders = creeps.defender;
-        
+        const {creeps: {[this.room.name]: creeps, [this.room.name]: {defender: defenders}}} = Cache;
+
         this.checkSpawn(RoleDefender, true);
         this.checkSpawn(RoleHealer, true);
 
@@ -80,15 +81,16 @@ class RoomSource extends RoomMine {
         super.stage1Spawn();
     }
 
-    //         #                       #     ##                  #                ###                #            
-    //         #                      ##    #  #                                   #                 #            
-    //  ###   ###    ###   ###   ##    #    #  #   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // ##      #    #  #  #  #  # ##   #    ####  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    //   ##    #    # ##   ##   ##     #    #  #    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    // ###      ##   # #  #      ##   ###   #  #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                     ###                                         ###                                        
+    //         #                       #     ##                  #                ###                #
+    //         #                      ##    #  #                                   #                 #
+    //  ###   ###    ###   ###   ##    #    #  #   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // ##      #    #  #  #  #  # ##   #    ####  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    //   ##    #    # ##   ##   ##     #    #  #    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    // ###      ##   # #  #      ##   ###   #  #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                     ###                                         ###
     /**
      * Assigns tasks to creeps while the room is in stage 1.
+     * @return {void}
      */
     stage1AssignTasks() {
         RoleDefender.assignTasks(this);
@@ -98,26 +100,25 @@ class RoomSource extends RoomMine {
         super.stage1AssignTasks(this);
     }
 
-    //    #          #                  #  
-    //    #         # #                 #  
-    //  ###   ##    #     ##   ###    ###  
-    // #  #  # ##  ###   # ##  #  #  #  #  
-    // #  #  ##     #    ##    #  #  #  #  
-    //  ###   ##    #     ##   #  #   ###  
+    //    #          #                  #
+    //    #         # #                 #
+    //  ###   ##    #     ##   ###    ###
+    // #  #  # ##  ###   # ##  #  #  #  #
+    // #  #  ##     #    ##    #  #  #  #
+    //  ###   ##    #     ##   #  #   ###
     /**
      * Defends the room from invaders.
+     * @return {void}
      */
     defend() {
-        var room = this.room,
-            roomName = room.name,
+        const {room, room: {name: roomName}, supportRoom: {name: supportRoomName}} = this,
             armyName = `${roomName}-defense`,
-            army = Memory.army[armyName],
-            supportRoomName = this.supportRoom.name;
-        
+            {army: {[armyName]: army}} = Memory;
+
         if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
             if (!army) {
-                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: undefined, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
             }
         } else if (army) {
             // Cancel army if invaders are gone.
@@ -126,19 +127,20 @@ class RoomSource extends RoomMine {
         }
     }
 
-    //         #                       ##   ###                #            
-    //         #                      #  #   #                 #            
-    //  ###   ###    ###   ###   ##      #   #     ###   ###   # #    ###   
-    // ##      #    #  #  #  #  # ##    #    #    #  #  ##     ##    ##     
-    //   ##    #    # ##   ##   ##     #     #    # ##    ##   # #     ##   
-    // ###      ##   # #  #      ##   ####   #     # #  ###    #  #  ###    
-    //                     ###                                              
+    //         #                       ##   ###                #
+    //         #                      #  #   #                 #
+    //  ###   ###    ###   ###   ##      #   #     ###   ###   # #    ###
+    // ##      #    #  #  #  #  # ##    #    #    #  #  ##     ##    ##
+    //   ##    #    # ##   ##   ##     #     #    # ##    ##   # #     ##
+    // ###      ##   # #  #      ##   ####   #     # #  ###    #  #  ###
+    //                     ###
     /**
      * Tasks to perform while the room is in stage 2.
+     * @return {void}
      */
     stage2Tasks() {
-        var room = this.room;
-        
+        const {room} = this;
+
         super.stage2Tasks();
 
         this.tasks.hostiles = Cache.hostilesInRoom(room);
@@ -146,19 +148,19 @@ class RoomSource extends RoomMine {
         this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
     }
 
-    //         #                       ##    ##                           
-    //         #                      #  #  #  #                          
-    //  ###   ###    ###   ###   ##      #   #    ###    ###  #  #  ###   
-    // ##      #    #  #  #  #  # ##    #     #   #  #  #  #  #  #  #  #  
-    //   ##    #    # ##   ##   ##     #    #  #  #  #  # ##  ####  #  #  
-    // ###      ##   # #  #      ##   ####   ##   ###    # #  ####  #  #  
-    //                     ###                    #                       
+    //         #                       ##    ##
+    //         #                      #  #  #  #
+    //  ###   ###    ###   ###   ##      #   #    ###    ###  #  #  ###
+    // ##      #    #  #  #  #  # ##    #     #   #  #  #  #  #  #  #  #
+    //   ##    #    # ##   ##   ##     #    #  #  #  #  # ##  ####  #  #
+    // ###      ##   # #  #      ##   ####   ##   ###    # #  ####  #  #
+    //                     ###                    #
     /**
      * Spawns creeps while the room is in stage 2.
+     * @return {void}
      */
     stage2Spawn() {
-        var creeps = Cache.creeps[this.room.name],
-            defenders = creeps.defender;
+        const {creeps: {[this.room.name]: creeps, [this.room.name]: {defender: defenders}}} = Cache;
 
         this.checkSpawn(RoleDefender, true);
         this.checkSpawn(RoleHealer, true);
@@ -173,15 +175,16 @@ class RoomSource extends RoomMine {
         this.checkSpawn(RoleRemoteCollector, true);
     }
 
-    //         #                       ##    ##                  #                ###                #            
-    //         #                      #  #  #  #                                   #                 #            
-    //  ###   ###    ###   ###   ##      #  #  #   ###    ###   ##     ###  ###    #     ###   ###   # #    ###   
-    // ##      #    #  #  #  #  # ##    #   ####  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##     
-    //   ##    #    # ##   ##   ##     #    #  #    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##   
-    // ###      ##   # #  #      ##   ####  #  #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###    
-    //                     ###                                         ###                                        
+    //         #                       ##    ##                  #                ###                #
+    //         #                      #  #  #  #                                   #                 #
+    //  ###   ###    ###   ###   ##      #  #  #   ###    ###   ##     ###  ###    #     ###   ###   # #    ###
+    // ##      #    #  #  #  #  # ##    #   ####  ##     ##      #    #  #  #  #   #    #  #  ##     ##    ##
+    //   ##    #    # ##   ##   ##     #    #  #    ##     ##    #     ##   #  #   #    # ##    ##   # #     ##
+    // ###      ##   # #  #      ##   ####  #  #  ###    ###    ###   #     #  #   #     # #  ###    #  #  ###
+    //                     ###                                         ###
     /**
      * Assigns tasks to creeps while the room is in stage 2.
+     * @return {void}
      */
     stage2AssignTasks() {
         RoleDefender.assignTasks(this);
@@ -193,13 +196,13 @@ class RoomSource extends RoomMine {
         RoleRemoteCollector.assignTasks(this);
     }
 
-    //   #                      ##   #       #   
-    //  # #                    #  #  #           
-    //  #    ###    ##   # #   #  #  ###     #   
-    // ###   #  #  #  #  ####  #  #  #  #    #   
-    //  #    #     #  #  #  #  #  #  #  #    #   
-    //  #    #      ##   #  #   ##   ###   # #   
-    //                                      #    
+    //   #                      ##   #       #
+    //  # #                    #  #  #
+    //  #    ###    ##   # #   #  #  ###     #
+    // ###   #  #  #  #  ####  #  #  #  #    #
+    //  #    #     #  #  #  #  #  #  #  #    #
+    //  #    #      ##   #  #   ##   ###   # #
+    //                                      #
     /**
      * Deserializes room from an object.
      * @param {Room} room The room to deserialize from.

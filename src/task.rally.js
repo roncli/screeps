@@ -22,19 +22,23 @@ class TaskRally {
     //  ##    ##   #  #  ###      ##  #      ###   ##     ##   ##   #
     /**
      * Creates a new task.
-     * @param {string|RoomPosition} [id] Either the name of the room, or the room position to rally to.
+     * @param {string|RoomPosition} id Either the name of the room, or the room position to rally to.
+     * @param {string} rallyTo The type of position we are rallying to.
      */
-    constructor(id) {
+    constructor(id, rallyTo) {
         this.type = "rally";
         this.id = id;
-        if (id instanceof RoomPosition) {
-            this.rallyPoint = new RoomPosition(id.x, id.y, id.roomName);
-        } else {
-            this.rallyPoint = Game.getObjectById(id);
-            if (!this.rallyPoint) {
+        this.rallyTo = rallyTo;
+        switch (rallyTo) {
+            case "position":
+                this.rallyPoint = new RoomPosition(id.x, id.y, id.roomName);
+                break;
+            case "id":
+                this.rallyPoint = Game.getObjectById(id);
+                break;
+            case "room":
                 this.rallyPoint = new RoomPosition(25, 25, id);
                 this.range = 5;
-            }
         }
         this.unimportant = true;
     }
@@ -159,6 +163,7 @@ class TaskRally {
             creep.memory.currentTask = {
                 type: this.type,
                 id: this.id,
+                rallyTo: this.rallyTo,
                 unimportant: this.unimportant,
                 range: this.range
             };
@@ -180,13 +185,19 @@ class TaskRally {
      * @return {TaskRally} The deserialized object.
      */
     static fromObj(creep) {
-        const {memory: {currentTask: {id, range}}} = creep;
+        const {memory: {currentTask: {id, rallyTo, range}}} = creep;
         let task;
 
-        if (id.roomName) {
-            task = new TaskRally(new RoomPosition(id.x, id.y, id.roomName));
-        } else {
-            task = new TaskRally(id);
+        switch (rallyTo) {
+            case "position":
+                task = new TaskRally(new RoomPosition(id.x, id.y, id.roomName), rallyTo);
+                break;
+            case "id":
+            case "room":
+                task = new TaskRally(id, rallyTo);
+                break;
+            default:
+                return void 0;
         }
 
         if (task && range) {

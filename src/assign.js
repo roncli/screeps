@@ -69,7 +69,7 @@ class Assign {
                 const closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
 
                 // Rally towards the first creep.
-                task = new TaskRally(firstCreep.pos);
+                task = new TaskRally(firstCreep.pos, "position");
 
                 // If there are any creeps within 1 range, attack them.
                 if (closeCreeps.length > 0) {
@@ -122,7 +122,7 @@ class Assign {
                 const closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
 
                 // Rally towards the first creep.
-                task = new TaskRally(firstCreep.pos);
+                task = new TaskRally(firstCreep.pos, "position");
 
                 // If there are any creeps within 1 range, attack them.
                 if (closeCreeps.length > 0) {
@@ -623,7 +623,7 @@ class Assign {
 
             // Determine who to heal.  If self, rally.  If escortee, heal.
             if (escorting.hitsMax - escorting.hits === 0 || escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
-                new TaskRally(escorting.pos).canAssign(creep);
+                new TaskRally(escorting.pos, "position").canAssign(creep);
             } else if (say) {
                 creep.say(say);
             }
@@ -873,7 +873,7 @@ class Assign {
      */
     static getBoost(creeps, say) {
         _.forEach(_.filter(creeps, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-            const task = new TaskRally(creep.memory.labs[0]);
+            const task = new TaskRally(creep.memory.labs[0], "id");
 
             if (task.canAssign(creep)) {
                 ({time: creep.memory.currentTask.priority} = Game);
@@ -934,7 +934,7 @@ class Assign {
 
             if (creep.id === mostHurtCreep.id && creepsToHeal.length >= 2) {
                 // If we are the most hurt creep, Rally towards the second most hurt creep.  Healers with rally tasks heal themselves by default.
-                task = new TaskRally(creepsToHeal[1].pos);
+                task = new TaskRally(creepsToHeal[1].pos, "position");
             } else if (creep.pos.getRangeTo(mostHurtCreep) <= 3) {
                 // Heal the most hurt creep when in range.
                 task = new TaskHeal(mostHurtCreep.id);
@@ -942,7 +942,7 @@ class Assign {
                 let closeCreeps;
 
                 // Rally towards the most hurt creep.
-                task = new TaskRally(mostHurtCreep.pos);
+                task = new TaskRally(mostHurtCreep.pos, "position");
 
                 // If we are not hurt, see if we can heal someone else.
                 if (creep.hits === creep.hitsMax) {
@@ -1008,9 +1008,9 @@ class Assign {
             let task;
 
             if (_.sum(creep.carry) > 0) {
-                task = new TaskRally(creep.memory.supportRoom);
+                task = new TaskRally(creep.memory.supportRoom, "room");
             } else {
-                task = new TaskRally(creep.memory.home);
+                task = new TaskRally(creep.memory.home, "room");
             }
             task.canAssign(creep);
         });
@@ -1029,7 +1029,7 @@ class Assign {
      */
     static moveToHomeRoom(creeps) {
         _.forEach(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (creep) => {
-            new TaskRally(creep.memory.home).canAssign(creep);
+            new TaskRally(creep.memory.home, "room").canAssign(creep);
         });
     }
 
@@ -1046,7 +1046,7 @@ class Assign {
      */
     static moveToHomeSource(creeps) {
         _.forEach(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (creep) => {
-            new TaskRally(creep.memory.homeSource).canAssign(creep);
+            new TaskRally(creep.memory.homeSource, "id").canAssign(creep);
         });
     }
 
@@ -1065,7 +1065,7 @@ class Assign {
      * @param {string} say Text to say on successful assignment.
      */
     static moveToPos(creeps, pos, range, say) {
-        const task = new TaskRally(pos);
+        const task = new TaskRally(pos, "position");
 
         if (range) {
             task.range = range;
@@ -1112,12 +1112,12 @@ class Assign {
                 // If we're in the portal's origin room, rally to the portal.  Otherwise, rally to the origin room.
                 if (portals[0] === creep.room.name) {
                     creep.memory.portaling = true;
-                    task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos);
+                    task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos, "position");
                 } else {
-                    task = new TaskRally(portals[0]);
+                    task = new TaskRally(portals[0], "room");
                 }
             } else {
-                task = new TaskRally(roomName);
+                task = new TaskRally(roomName, "room");
             }
 
             // Assign the task.
@@ -1149,7 +1149,7 @@ class Assign {
 
         _.forEach(creeps, (creep) => {
             _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && Utilities.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
-                const task = new TaskRally(keeper.pos);
+                const task = new TaskRally(keeper.pos, "position");
 
                 task.range = 1;
                 if (task.canAssign(creep)) {
@@ -1178,11 +1178,11 @@ class Assign {
     static moveToTerminalOrRoom(creeps, room) {
         if (room.terminal) {
             _.forEach(creeps, (creep) => {
-                new TaskRally(room.terminal.pos).canAssign(creep);
+                new TaskRally(room.terminal.pos, "position").canAssign(creep);
             });
         } else {
             _.forEach(creeps, (creep) => {
-                new TaskRally(room.name).canAssign(creep);
+                new TaskRally(room.name, "room").canAssign(creep);
             });
         }
     }
@@ -1301,7 +1301,7 @@ class Assign {
                 const closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 3);
 
                 // Rally towards the most hurt creep.
-                task = new TaskRally(firstCreep.pos);
+                task = new TaskRally(firstCreep.pos, "position");
 
                 // If there are any creeps within 3 range, attack them.
                 if (closeCreeps.length > 0) {
@@ -1451,7 +1451,7 @@ class Assign {
 
         // Only retreat if there is somewhere to retreat to.
         if (stageRoomName !== attackRoomName) {
-            const task = new TaskRally(stageRoomName);
+            const task = new TaskRally(stageRoomName, "room");
 
             // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
@@ -1490,7 +1490,7 @@ class Assign {
 
         // Only retreat if there is somewhere to retreat to.
         if (stageRoomName !== attackRoomName) {
-            const task = new TaskRally(stageRoomName);
+            const task = new TaskRally(stageRoomName, "room");
 
             // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
@@ -1513,7 +1513,7 @@ class Assign {
 
                 // Check to see if the closest healer is further than 2 squares away, rally to it if so.
                 if (closest[0].pos.getRangeTo(creep) > 2) {
-                    task = new TaskRally(closest[0].pos);
+                    task = new TaskRally(closest[0].pos, "position");
                     if (task.canAssign(creep)) {
                         ({time: creep.memory.currentTask.priority} = Game);
                     }
@@ -1542,7 +1542,7 @@ class Assign {
         }
 
         _.forEach(creeps, (creep) => {
-            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0].pos).canAssign(creep)) {
+            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0].pos, "position").canAssign(creep)) {
                 ({time: creep.memory.currentTask.priority} = Game);
                 if (say) {
                     creep.say(say);

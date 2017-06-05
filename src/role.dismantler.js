@@ -56,7 +56,7 @@ class RoleDismantler {
         if (dismantlers.length > 0) {
             engine.room.memory.maxCreeps.dismantler = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Math.min(..._.map(dismantlers, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))) : 25
+                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(dismantlers, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))) : 25
             };
         }
 

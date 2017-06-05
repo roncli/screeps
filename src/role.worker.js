@@ -86,7 +86,7 @@ class RoleWorker {
         if (workers.length > 0) {
             engine.room.memory.maxCreeps.worker = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Math.min(..._.map(workers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(workers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
             };
         }
 

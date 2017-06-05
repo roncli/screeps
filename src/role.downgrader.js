@@ -73,7 +73,7 @@ class RoleDowngrader {
         if (downgraders.length > 0) {
             engine.room.memory.maxCreeps.downgrader = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Math.min(..._.map(downgraders, (c) => c.spawning ? 100 : Math.min(c.timeToLive, 100))) : 100
+                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(downgraders, (c) => c.spawning ? 100 : Math.min(c.timeToLive, 100))) : 100
             };
         }
 

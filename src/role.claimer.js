@@ -71,7 +71,7 @@ class RoleClaimer {
         if (claimers.length > 0) {
             engine.room.memory.maxCreeps.claimer = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Math.min(..._.map(claimers, (c) => c.spawning ? 100 : Math.min(c.timeToLive, 100))) : 100
+                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(claimers, (c) => c.spawning ? 100 : Math.min(c.timeToLive, 100))) : 100
             };
         }
 

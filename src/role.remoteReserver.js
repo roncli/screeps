@@ -90,7 +90,7 @@ class RoleRemoteReserver {
         if (remoteReservers.length > 0) {
             engine.room.memory.maxCreeps.remoteReserver = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Math.min(..._.map(remoteReservers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(remoteReservers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
             };
         }
 

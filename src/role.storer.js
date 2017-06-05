@@ -97,7 +97,7 @@ class RoleStorer {
         if (storers.length > 0) {
             engine.room.memory.maxCreeps.storer = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Math.min(..._.map(storers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(storers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
             };
         }
 

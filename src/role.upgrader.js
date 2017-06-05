@@ -100,7 +100,7 @@ class RoleUpgrader {
         if (upgraders.length > 0) {
             engine.room.memory.maxCreeps.upgrader = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(upgraders, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(upgraders, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))))
             };
         }
 

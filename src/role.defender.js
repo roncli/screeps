@@ -56,7 +56,7 @@ class RoleDefender {
         if (defenders.length > 0) {
             engine.room.memory.maxCreeps.defender = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(defenders, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))) : 25
+                cacheUntil: Game.time + (settings.spawn ? 25 : Math.min(..._.map(defenders, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))))
             };
         }
 

@@ -93,7 +93,7 @@ class RoleRemoteWorker {
         if (remoteWorkers.length > 0) {
             engine.room.memory.maxCreeps.remoteWorker = {
                 cache: settings,
-                cacheUntil: settings.spawn ? Game.time + Math.min(..._.map(remoteWorkers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteWorkers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))))
             };
         }
 

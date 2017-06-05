@@ -21,26 +21,30 @@ class Cache {
      */
     static reset() {
         // Caches for objects.
-        this.containers = {};
-        this.costMatrixes = {};
-        this.criticalRepairableStructures = {};
         this.extensions = {};
-        this.extractors = {};
         this.hostileConstructionSites = {};
         this.hostiles = {};
-        this.labs = {};
-        this.links = {};
-        this.nukers = {};
-        this.portals = {};
-        this.powerBanks = {};
-        this.powerSpawns = {};
-        this.repairableStructures = {};
+        this.spawns = {};
         this.resources = {};
         this.sortedRepairableStructures = {};
-        this.sortedResources = {};
-        this.sourceKeepers = {};
-        this.spawns = {};
-        this.towers = {};
+
+        // Long term objects.
+        if (Game.time % 10 === 0) {
+            this.containers = {};
+            this.costMatrixes = {};
+            this.criticalRepairableStructures = {};
+            this.extractors = {};
+            this.labs = {};
+            this.links = {};
+            this.nukers = {};
+            this.portals = {};
+            this.powerBanks = {};
+            this.powerSpawns = {};
+            this.repairableStructures = {};
+            this.sortedResources = {};
+            this.sourceKeepers = {};
+            this.towers = {};
+        }
 
         // Caches for data.
         this.armies = {};

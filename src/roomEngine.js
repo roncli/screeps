@@ -124,6 +124,28 @@ class RoomEngine {
             }
         }
     }
+
+    //       #                 #      ##                            ##          #     #     #                        ##               #
+    //       #                 #     #  #                          #  #         #     #                             #  #              #
+    //  ##   ###    ##    ##   # #    #    ###    ###  #  #  ###    #     ##   ###   ###   ##    ###    ###   ###   #      ###   ##   ###    ##
+    // #     #  #  # ##  #     ##      #   #  #  #  #  #  #  #  #    #   # ##   #     #     #    #  #  #  #  ##     #     #  #  #     #  #  # ##
+    // #     #  #  ##    #     # #   #  #  #  #  # ##  ####  #  #  #  #  ##     #     #     #    #  #   ##     ##   #  #  # ##  #     #  #  ##
+    //  ##   #  #   ##    ##   #  #   ##   ###    # #  ####  #  #   ##    ##     ##    ##  ###   #  #  #     ###     ##    # #   ##   #  #   ##
+    //                                     #                                                            ###
+    /**
+     * Checks the spawn settings cache to see if we can use the cache instead of calculating it manually.
+     * @param {string} role The role to check.
+     * @return {object} The spawn settings to use.
+     */
+    checkSpawnSettingsCache(role) {
+        const {room: {memory: {maxCreeps}}} = this;
+
+        if (maxCreeps && maxCreeps[role] && maxCreeps[role].cacheUntil >= Game.time) {
+            return maxCreeps[role].cache;
+        }
+
+        return void 0;
+    }
 }
 
 if (Memory.profiling) {

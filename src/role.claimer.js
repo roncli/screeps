@@ -27,9 +27,15 @@ class RoleClaimer {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("claimer"),
+            roomToClaim;
+
+        if (settings) {
+            return settings;
+        }
+
         const {maxCreeps: {claimer}} = Memory,
             {room: {name: roomName}} = engine;
-        let roomToClaim;
 
         if (!canSpawn) {
             return {
@@ -55,12 +61,19 @@ class RoleClaimer {
             });
         }
 
-        return {
+        settings = {
             name: "claimer",
             spawn: !!roomToClaim,
             max: claimer && claimer[roomName] ? Object.keys(claimer[roomName]).length : 0,
             roomToClaim
         };
+
+        engine.room.memory.maxCreeps.claimer = {
+            cache: settings,
+            cacheUntil: Math.min(..._.map(claimers, (c) => c.spawning ? 100 : Math.min(c.timeToLive, 100)))
+        };
+
+        return settings;
     }
 
     //                                 ##          #     #     #

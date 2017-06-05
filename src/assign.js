@@ -1567,7 +1567,7 @@ class Assign {
      */
     static upgradeController(creeps, controller, say) {
         if (controller.my) {
-            const task = new TaskUpgradeController(controller.room);
+            const task = new TaskUpgradeController(controller.room.name);
 
             _.forEach(creeps, (creep) => {
                 if (task.canAssign(creep)) {
@@ -1595,7 +1595,7 @@ class Assign {
      */
     static upgradeCriticalController(creeps, controller, say) {
         if (controller.my && controller.ticksToDowngrade < [0, 10000, 3500, 5000, 10000, 20000, 30000, 50000, 100000][controller.level]) {
-            if (new TaskUpgradeController(controller.room).canAssign(creeps[0])) {
+            if (new TaskUpgradeController(controller.room.name).canAssign(creeps[0])) {
                 if (say) {
                     creeps[0].say(say);
                 }

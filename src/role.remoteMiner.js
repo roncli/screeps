@@ -27,11 +27,17 @@ class RoleRemoteMiner {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteMiner"),
+            containerIdToMineOn, isMineralHarvester;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             containers = Cache.containersInRoom(room),
             minerals = room.find(FIND_MINERALS),
             sources = Array.prototype.concat.apply([], [room.find(FIND_SOURCES), minerals]);
-        let containerIdToMineOn, isMineralHarvester;
 
         // If there are no containers or sources in the room, ignore the room.
         if (containers.length === 0 || sources.length === 0) {
@@ -55,7 +61,7 @@ class RoleRemoteMiner {
             {name: supportRoomName} = supportRoom,
             spawnsInRoom = Cache.spawnsInRoom(supportRoom),
             {creeps: {[room.name]: creeps}} = Cache,
-            miners = creeps && creeps.remoteMiner || [];
+            remoteMiners = creeps && creeps.remoteMiner || [];
 
         // Loop through containers to see if we have anything we need to spawn.
         _.forEach(containers, (container) => {
@@ -85,7 +91,7 @@ class RoleRemoteMiner {
             }
 
             // If we don't have a remote miner for this container, spawn one.
-            if (_.filter(miners, (c) => (c.spawning || c.ticksToLive >= 150 + lengthToThisContainer[supportRoomName] * 3) && c.memory.container === containerId).length === 0) {
+            if (_.filter(remoteMiners, (c) => (c.spawning || c.ticksToLive >= 300) && c.memory.container === containerId).length === 0) {
                 containerIdToMineOn = containerId;
                 isMineralHarvester = isMineral;
 
@@ -95,7 +101,7 @@ class RoleRemoteMiner {
             return true;
         });
 
-        return {
+        settings = {
             name: "remoteMiner",
             spawn: !!containerIdToMineOn,
             max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
@@ -103,6 +109,15 @@ class RoleRemoteMiner {
             containerIdToMineOn,
             isMineralHarvester
         };
+
+        if (remoteMiners.length > 0) {
+            engine.room.memory.maxCreeps.remoteMiner = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteMiners, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

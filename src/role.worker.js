@@ -27,10 +27,16 @@ class RoleWorker {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("worker"),
+            roomToSpawnFor;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             {storage} = room,
             max = storage && storage.my ? 1 : 2;
-        let roomToSpawnFor;
 
         if (!canSpawn) {
             return {
@@ -41,9 +47,10 @@ class RoleWorker {
         }
 
         const {name: roomName} = room,
-            {creeps: {[roomName]: creeps}} = Cache;
+            {creeps: {[roomName]: creeps}} = Cache,
+            workers = creeps && creeps.worker || [];
 
-        if (max > 0 && _.filter(creeps && creeps.worker || [], (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length < max) {
+        if (max > 0 && _.filter(workers, (c) => c.spawning || c.ticksToLive >= (storage && storage.my ? 150 : 300)).length < max) {
             ({name: roomToSpawnFor} = room);
         }
 
@@ -68,13 +75,22 @@ class RoleWorker {
             });
         }
 
-        return {
+        settings = {
             name: "worker",
             spawn: !!roomToSpawnFor,
             max,
             spawnFromRegion: room.controller.level < 6,
             roomToSpawnFor
         };
+
+        if (workers.length > 0) {
+            engine.room.memory.maxCreeps.worker = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(workers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

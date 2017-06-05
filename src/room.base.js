@@ -40,6 +40,11 @@ class RoomBase extends RoomEngine {
         super();
         this.type = "base";
         this.room = room;
+
+        // Initialize memory.
+        if (!room.memory.maxCreeps) {
+            room.memory.maxCreeps = {};
+        }
     }
 
     // ###   #  #  ###

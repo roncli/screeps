@@ -33,6 +33,11 @@ class RoomCleanup extends RoomEngine {
         this.type = "cleanup";
         this.room = room;
         ({rooms: {[Memory.rooms[room.name].roomType.supportRoom]: this.supportRoom}} = Game);
+
+        // Initialize memory.
+        if (!room.memory.maxCreeps) {
+            room.memory.maxCreeps = {};
+        }
     }
 
     // ###   #  #  ###

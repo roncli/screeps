@@ -27,11 +27,17 @@ class RoleRemoteWorker {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteWorker"),
+            spawn = false,
+            containerIdToCollectFrom;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             containers = Cache.containersInRoom(room),
             max = 1;
-        let spawn = false,
-            containerIdToCollectFrom;
 
         // If there are no containers in the room, ignore the room.
         if (containers.length === 0) {
@@ -53,7 +59,7 @@ class RoleRemoteWorker {
         const sources = Array.prototype.concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
             {lengthToContainer} = Memory,
             {creeps: {[room.name]: creeps}} = Cache,
-            workers = creeps && creeps.remoteWorker || [],
+            remoteWorkers = creeps && creeps.remoteWorker || [],
             {supportRoom: {name: supportRoomName}} = engine;
 
         // Loop through containers to see if we have anything we need to spawn.
@@ -67,7 +73,7 @@ class RoleRemoteWorker {
                 return true;
             }
 
-            if (_.filter(workers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
+            if (_.filter(remoteWorkers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
                 containerIdToCollectFrom = containerId;
                 spawn = true;
             }
@@ -76,13 +82,22 @@ class RoleRemoteWorker {
             return false;
         });
 
-        return {
+        settings = {
             name: "remoteWorker",
             spawn,
             max,
             spawnFromRegion: true,
             containerIdToCollectFrom
         };
+
+        if (remoteWorkers.length > 0) {
+            engine.room.memory.maxCreeps.remoteWorker = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteWorkers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

@@ -27,6 +27,12 @@ class RoleRemoteReserver {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteReserver");
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             {controller} = room,
             max = 1;
@@ -61,7 +67,8 @@ class RoleRemoteReserver {
             {id: controllerId} = controller,
             {supportRoom} = engine,
             {name: supportRoomName} = supportRoom,
-            {creeps: {[room.name]: creeps}} = Cache;
+            {creeps: {[room.name]: creeps}} = Cache,
+            remoteReservers = creeps && creeps.remoteReserver || [];
 
         if (!lengthToController[controllerId]) {
             lengthToController[controllerId] = {};
@@ -73,12 +80,21 @@ class RoleRemoteReserver {
             ({path: {length: lengthToThisController[supportRoomName]}} = PathFinder.search(controller.pos, {pos: Cache.spawnsInRoom(supportRoom)[0].pos, range: 1}, {swampCost: 1, maxOps: 100000}));
         }
 
-        return {
+        settings = {
             name: "remoteReserver",
-            spawn: _.filter(creeps && creeps.remoteReserver || [], (c) => c.spawning || c.ticksToLive > lengthToThisController[supportRoomName]).length < max,
-            max: 0,
+            spawn: _.filter(remoteReservers, (c) => c.spawning || c.ticksToLive > lengthToThisController[supportRoomName]).length < max,
+            max,
             spawnFromRegion: true
         };
+
+        if (remoteReservers.length > 0) {
+            engine.room.memory.maxCreeps.remoteReserver = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteReservers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

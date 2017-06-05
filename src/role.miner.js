@@ -27,11 +27,17 @@ class RoleMiner {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("miner"),
+            containerIdToMineOn, isMineralHarvester;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             containers = Cache.containersInRoom(room),
             minerals = room.find(FIND_MINERALS),
             sources = Array.prototype.concat.apply([], [room.find(FIND_SOURCES), minerals]);
-        let containerIdToMineOn, isMineralHarvester;
 
         // If there are no containers in the room, ignore the room.
         if (containers.length === 0) {
@@ -81,13 +87,22 @@ class RoleMiner {
             return true;
         });
 
-        return {
+        settings = {
             name: "miner",
             spawn: !!containerIdToMineOn,
             max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
             containerIdToMineOn,
             isMineralHarvester
         };
+
+        if (miners.length > 0) {
+            engine.room.memory.maxCreeps.miner = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(miners, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

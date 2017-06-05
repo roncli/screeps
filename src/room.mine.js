@@ -38,6 +38,11 @@ class RoomMine extends RoomEngine {
         this.room = room;
         ({rooms: {[roomType.supportRoom]: this.supportRoom}} = Game);
         this.stage = roomType.stage || 1;
+
+        // Initialize memory.
+        if (!room.memory.maxCreeps) {
+            room.memory.maxCreeps = {};
+        }
     }
 
     // ###   #  #  ###

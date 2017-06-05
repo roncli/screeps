@@ -27,6 +27,12 @@ class RoleScientist {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("scientist");
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             max = 1;
 
@@ -38,13 +44,23 @@ class RoleScientist {
             };
         }
 
-        const {creeps: {[room.name]: creeps}} = Cache;
+        const {creeps: {[room.name]: creeps}} = Cache,
+            scientists = creeps && creeps.scientist || [];
 
-        return {
+        settings = {
             name: "scientist",
-            spawn: _.filter(creeps && creeps.scientist || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            spawn: _.filter(scientists, (c) => c.spawning || c.ticksToLive >= 150).length < max,
             max
         };
+
+        if (scientists.length > 0) {
+            engine.room.memory.maxCreeps.scientist = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(scientists, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

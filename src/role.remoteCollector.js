@@ -27,6 +27,12 @@ class RoleRemoteCollector {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteCollector");
+
+        if (settings) {
+            return settings;
+        }
+
         const max = engine.type === "cleanup" ? 3 : 1;
 
         if (!canSpawn) {
@@ -37,14 +43,24 @@ class RoleRemoteCollector {
             };
         }
 
-        const {creeps: {[engine.room.name]: creeps}} = Cache;
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
+            remoteCollectors = creeps && creeps.remoteCollector || [];
 
-        return {
+        settings = {
             name: "remoteCollector",
-            spawn: _.filter(creeps && creeps.remoteCollector || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawn: _.filter(remoteCollectors, (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
             max
         };
+
+        if (remoteCollectors.length > 0) {
+            engine.room.memory.maxCreeps.remoteCollector = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteCollectors, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

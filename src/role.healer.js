@@ -27,6 +27,12 @@ class RoleHealer {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("healer");
+
+        if (settings) {
+            return settings;
+        }
+
         const max = 1;
 
         if (!canSpawn) {
@@ -37,14 +43,24 @@ class RoleHealer {
             };
         }
 
-        const {creeps: {[engine.room.name]: creeps}} = Cache;
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
+            healers = creeps && creeps.healer || [];
 
-        return {
+        settings = {
             name: "healer",
-            spawn: _.filter(creeps && creeps.healer || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawn: _.filter(healers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
             max
         };
+
+        if (healers.length > 0) {
+            engine.room.memory.maxCreeps.healer = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(healers, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))) : 25
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

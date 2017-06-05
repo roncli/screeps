@@ -27,6 +27,12 @@ class RoleDismantler {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("dismantler");
+
+        if (settings) {
+            return settings;
+        }
+
         const max = 1;
 
         if (!canSpawn) {
@@ -37,14 +43,24 @@ class RoleDismantler {
             };
         }
 
-        const {creeps: {[engine.room.name]: creeps}} = Cache;
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
+            dismantlers = creeps && creeps.dismantler || [];
 
-        return {
+        settings = {
             name: "dismantler",
-            spawn: _.filter(creeps && creeps.dismantler || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
+            spawn: _.filter(dismantlers || [], (c) => c.spawning || c.ticksToLive >= 150).length < max,
             spawnFromRegion: true,
             max
         };
+
+        if (dismantlers.length > 0) {
+            engine.room.memory.maxCreeps.dismantler = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(dismantlers, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))) : 25
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

@@ -27,10 +27,16 @@ class RoleRemoteStorer {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteStorer"),
+            max = 0,
+            foundFirstSource, containerIdToCollectFrom;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             containers = Cache.containersInRoom(room);
-        let max = 0,
-            foundFirstSource, containerIdToCollectFrom;
 
         // If there are no containers in the room, ignore the room.
         if (containers.length === 0) {
@@ -81,7 +87,7 @@ class RoleRemoteStorer {
             max += count;
 
             // If we don't have enough remote storers for this container, spawn one.
-            if (canSpawn && !containerIdToCollectFrom && _.filter(remoteStorers || [], (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
+            if (canSpawn && !containerIdToCollectFrom && _.filter(remoteStorers, (c) => (c.spawning || c.ticksToLive >= 150 + length * 2) && c.memory.container === containerId).length < count) {
                 containerIdToCollectFrom = containerId;
             }
         });
@@ -94,7 +100,7 @@ class RoleRemoteStorer {
             };
         }
 
-        return {
+        settings = {
             name: "remoteStorer",
             spawn: !!containerIdToCollectFrom,
             max,
@@ -102,6 +108,15 @@ class RoleRemoteStorer {
             containerIdToCollectFrom,
             supportRoomRcl
         };
+
+        if (remoteStorers.length > 0) {
+            engine.room.memory.maxCreeps.remoteStorer = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteStorers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

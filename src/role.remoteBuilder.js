@@ -27,6 +27,12 @@ class RoleRemoteBuilder {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteBuilder");
+
+        if (settings) {
+            return settings;
+        }
+
         const max = 2;
 
         if (!canSpawn) {
@@ -37,14 +43,24 @@ class RoleRemoteBuilder {
             };
         }
 
-        const {creeps: {[engine.room.name]: creeps}} = Cache;
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
+            remoteBuilders = creeps && creeps.remoteBuilder || [];
 
-        return {
+        settings = {
             name: "remoteBuilder",
-            spawn: (creeps && creeps.remoteBuilder || []).length < max,
+            spawn: _.filter(remoteBuilders, (c) => c.spawning || c.ticksToLive >= 150).length < max,
             spawnFromRegion: true,
             max
         };
+
+        if (remoteBuilders.length > 0) {
+            engine.room.memory.maxCreeps.remoteBuilder = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteBuilders, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

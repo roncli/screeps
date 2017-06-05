@@ -65,7 +65,8 @@ class RoomEngine {
             return;
         }
 
-        const supportRoomName = checkSettings.supportRoom || (room.memory.roomType && room.memory.roomType.supportRoom ? room.memory.roomType.supportRoom : roomName),
+        const {memory, memory: {roomType}} = room,
+            supportRoomName = checkSettings.supportRoom || (roomType && roomType.supportRoom ? roomType.supportRoom : roomName),
             {rooms: {[supportRoomName]: supportRoom}} = Game;
 
         // Set additional settings.
@@ -98,11 +99,16 @@ class RoomEngine {
         spawnSettings.memory.labs = canBoost ? _.map(labsToBoostWith, (l) => l.id) : [];
 
         // Spawn the creep.
-        const name = spawnToUse.createCreep(spawnSettings.body, `${checkSettings.name}-${checkSettings.roomToSpawnFor || roomName}-${Game.time.toFixed(0).substring(4)}`, spawnSettings.memory);
+        const name = spawnToUse.createCreep(spawnSettings.body, `${checkSettings.name}-${checkSettings.roomToSpawnFor || roomName}-${Game.time.toFixed(0).substring(4)}`, spawnSettings.memory),
+            spawning = typeof name !== "number";
 
-        Cache.spawning[spawnToUse.id] = typeof name !== "number";
+        if (spawning) {
+            delete memory.maxCreeps[checkSettings.name];
+        }
 
-        if (canBoost && typeof name !== "number") {
+        Cache.spawning[spawnToUse.id] = spawning;
+
+        if (canBoost && typeof spawning) {
             // Set the labs to be in use.
             const {memory: {labsInUse}} = supportRoom;
             let labIndex = 0;
@@ -138,11 +144,13 @@ class RoomEngine {
      * @return {object} The spawn settings to use.
      */
     checkSpawnSettingsCache(role) {
-        const {room: {memory: {maxCreeps}}} = this;
+        const {room: {memory: {maxCreeps, maxCreeps: {[role]: cache}}}} = this;
 
-        if (maxCreeps && maxCreeps[role] && maxCreeps[role].cacheUntil >= Game.time) {
-            return maxCreeps[role].cache;
+        if (cache && (!cache.cacheUntil || cache.cacheUntil >= Game.time)) {
+            return cache.cache;
         }
+
+        delete maxCreeps[role];
 
         return void 0;
     }

@@ -27,6 +27,12 @@ class RoleRemoteDismantler {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("remoteDismantler");
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length, 8) : 1;
 
@@ -38,14 +44,24 @@ class RoleRemoteDismantler {
             };
         }
 
-        const {creeps: {[room.name]: creeps}} = Cache;
+        const {creeps: {[room.name]: creeps}} = Cache,
+            remoteDismantlers = creeps && creeps.remoteDismantler || [];
 
-        return {
+        settings = {
             name: "remoteDismantler",
-            spawn: _.filter(creeps && creeps.remoteDismantler || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawn: _.filter(remoteDismantlers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
             max
         };
+
+        if (remoteDismantlers.length > 0) {
+            engine.room.memory.maxCreeps.remoteDismantler = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(remoteDismantlers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

@@ -27,6 +27,12 @@ class RoleDefender {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("defender");
+
+        if (settings) {
+            return settings;
+        }
+
         const max = 1;
 
         if (!canSpawn) {
@@ -37,14 +43,24 @@ class RoleDefender {
             };
         }
 
-        const {creeps: {[engine.room.name]: creeps}} = Cache;
+        const {creeps: {[engine.room.name]: creeps}} = Cache,
+            defenders = creeps && creeps.defender || [];
 
-        return {
+        settings = {
             name: "defender",
-            spawn: _.filter(creeps && creeps.defender || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawn: _.filter(defenders || [], (c) => c.spawning || c.ticksToLive >= 300).length < max,
             spawnFromRegion: true,
             max
         };
+
+        if (defenders.length > 0) {
+            engine.room.memory.maxCreeps.defender = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(defenders, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))) : 25
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

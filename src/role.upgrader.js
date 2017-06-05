@@ -29,10 +29,16 @@ class RoleUpgrader {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("upgrader"),
+            max, spawnForRoom;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             {name: roomName, storage} = room,
             storageEnergy = storage ? storage.store[RESOURCE_ENERGY] : 0;
-        let max, spawnForRoom;
 
         if (roomName === Memory.rushRoom) {
             max = 1;
@@ -51,9 +57,10 @@ class RoleUpgrader {
         }
 
         const {controller} = room,
-            {creeps: {[roomName]: creeps}} = Cache;
+            {creeps: {[roomName]: creeps}} = Cache,
+            upgraders = creeps && creeps.upgrader || [];
 
-        if (max > 0 && (controller && controller.level < 8 && storage && storageEnergy > 900000 || _.filter(creeps && creeps.upgrader || [], (c) => c.spawning || c.ticksToLive >= 150).length < max)) {
+        if (max > 0 && (controller && controller.level < 8 && storage && storageEnergy > 900000 || _.filter(upgraders, (c) => c.spawning || c.ticksToLive >= 150).length < max)) {
             spawnForRoom = roomName;
         }
 
@@ -82,13 +89,22 @@ class RoleUpgrader {
             });
         }
 
-        return {
+        settings = {
             name: "upgrader",
             spawn: !!spawnForRoom,
             max,
             spawnFromRegion: controller.level < 6,
             spawnForRoom
         };
+
+        if (upgraders.length > 0) {
+            engine.room.memory.maxCreeps.upgrader = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(upgraders, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

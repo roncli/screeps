@@ -27,10 +27,16 @@ class RoleStorer {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("storer"),
+            max = 0,
+            length = 0;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             containers = Cache.containersInRoom(room);
-        let max = 0,
-            length = 0;
 
         // If there are no containers or storages in the room, ignore the room.
         if (containers.length === 0 || !room.storage || !room.storage.my) {
@@ -81,12 +87,21 @@ class RoleStorer {
             };
         }
 
-        return {
+        settings = {
             name: "storer",
             spawn: _.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
             max,
             rcl
         };
+
+        if (storers.length > 0) {
+            engine.room.memory.maxCreeps.storer = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(storers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

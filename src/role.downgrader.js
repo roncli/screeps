@@ -29,9 +29,15 @@ class RoleDowngrader {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("downgrader"),
+            roomToDowngrade;
+
+        if (settings) {
+            return settings;
+        }
+
         const {maxCreeps: {downgrader}} = Memory,
             {room: {name: roomName}} = engine;
-        let roomToDowngrade;
 
         if (!canSpawn) {
             return {
@@ -57,12 +63,21 @@ class RoleDowngrader {
             });
         }
 
-        return {
+        settings = {
             name: "downgrader",
             spawn: !!roomToDowngrade,
             max: downgrader && downgrader[roomName] ? Object.keys(downgrader[roomName]).length : 0,
             roomToDowngrade
         };
+
+        if (downgraders.length > 0) {
+            engine.room.memory.maxCreeps.downgrader = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(downgraders, (c) => c.spawning ? 100 : Math.min(c.timeToLive, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #

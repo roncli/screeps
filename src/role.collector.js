@@ -27,10 +27,16 @@ class RoleCollector {
      * @return {object} The settings to use for checking spawns.
      */
     static checkSpawnSettings(engine, canSpawn) {
+        let settings = engine.checkSpawnSettingsCache("collector"),
+            sourceIdToCollectFrom;
+
+        if (settings) {
+            return settings;
+        }
+
         const {room} = engine,
             {storage} = room,
             maxPerSource = 3;
-        let sourceIdToCollectFrom;
 
         // If there is storage and containers in the room, ignore the room.
         if (Cache.containersInRoom(room).length !== 0 && storage && storage.my) {
@@ -74,7 +80,7 @@ class RoleCollector {
 
             const {id: sourceId} = source;
 
-            if (_.filter(collectors, (c) => c.memory.homeSource === sourceId).length < maxPerSource) {
+            if (_.filter(collectors, (c) => c.memory.homeSource === sourceId && (c.spawning || c.ticksToLive >= 150)).length < maxPerSource) {
                 sourceIdToCollectFrom = sourceId;
 
                 return false;
@@ -83,13 +89,22 @@ class RoleCollector {
             return true;
         });
 
-        return {
+        settings = {
             name: "collector",
             spawn: !!sourceIdToCollectFrom,
             max,
             spawnFromRegion: true,
             sourceIdToCollectFrom
         };
+
+        if (collectors.length > 0) {
+            engine.room.memory.maxCreeps.collector = {
+                cache: settings,
+                cacheUntil: settings.spawn ? Math.min(..._.map(collectors, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))) : 100
+            };
+        }
+
+        return settings;
     }
 
     //                                 ##          #     #     #
@@ -140,7 +155,7 @@ class RoleCollector {
         const {room, tasks} = engine,
             {name: roomName, controller} = room,
             {creeps: {[roomName]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.collector || []), (c) => !c.spawning),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.collector || []), (c) => !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {

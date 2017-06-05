@@ -654,7 +654,7 @@ class RoomBase extends RoomEngine {
 
         this.tasks = {
             constructionSites: room.find(FIND_MY_CONSTRUCTION_SITES),
-            criticalRepairableStructures: _.filter(Cache.criticalRepairableStructuresInRoom(room), (s) => s.hits < 125000 && s.hits / s.hitsMax < 0.5), // TODO: Cache critical structures to repair in current room.
+            criticalRepairableStructures: Cache.criticalRepairableStructuresInRoom(room),
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
             hostiles: Cache.hostilesInRoom(room),
             hurtCreeps: _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),

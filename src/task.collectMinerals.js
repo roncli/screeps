@@ -47,7 +47,7 @@ class TaskCollectMinerals {
     canAssign(creep) {
         const {object: obj} = this;
 
-        if (this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
+        if (!obj || this.amount < 0 || creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity) {
             return false;
         }
 

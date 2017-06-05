@@ -46,9 +46,15 @@ class TaskPickupResource {
      * @return {bool} Whether the task was assigned to the creep.
      */
     canAssign(creep) {
-        const {resource, resource: {amount, room: {controller}}} = this;
+        const {resource} = this;
 
-        if (creep.spawning || creep.ticksToLive < 150 || !resource || _.sum(creep.carry) === creep.carryCapacity || amount < creep.pos.getRangeTo(resource) || resource.resourceType === RESOURCE_ENERGY && amount < 50 || controller && Memory.allies.indexOf(Utilities.getControllerOwner(controller)) !== -1) {
+        if (!resource) {
+            return false;
+        }
+
+        const {amount, room: {controller}} = resource;
+
+        if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || amount < creep.pos.getRangeTo(resource) || resource.resourceType === RESOURCE_ENERGY && amount < 50 || controller && Memory.allies.indexOf(Utilities.getControllerOwner(controller)) !== -1) {
             return false;
         }
 

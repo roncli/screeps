@@ -29,7 +29,7 @@ class Cache {
         this.sortedRepairableStructures = {};
 
         // Long term objects.
-        if (Game.time % 10 === 0) {
+        if (Game.time % 10 === 0 || !this.containers) {
             this.containers = {};
             this.costMatrixes = {};
             this.criticalRepairableStructures = {};

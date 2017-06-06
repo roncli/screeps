@@ -1096,10 +1096,6 @@ class Assign {
         _.forEach(creeps, (creep) => {
             let task;
 
-            if (creep.room.name === roomName) {
-                return;
-            }
-
             const {memory: {portals}} = creep;
 
             // If the creep was trying to go through a portal and is no longer in origin room, assume the portal was successful and remove the origin room from the portals array.

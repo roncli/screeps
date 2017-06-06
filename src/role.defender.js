@@ -129,7 +129,7 @@ class RoleDefender {
 
         // Move to the next quadrant.
         _.forEach(_.filter(creepsWithNoTask, (c) => !c.memory.currentTask), (creep) => {
-            creep.memory.quadrant = (creep.memory.quadrant + 1) % 4;
+            creep.memory.quadrant = (creep.memory.quadrant + 1) % 4 || 0;
         });
     }
 }

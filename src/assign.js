@@ -1028,7 +1028,7 @@ class Assign {
      * @return {void}
      */
     static moveToHomeRoom(creeps) {
-        _.forEach(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.homeSource), (creep) => {
+        _.forEach(_.filter(creeps, (c) => !c.spawning && c.ticksToLive >= 150 && c.memory.home), (creep) => {
             new TaskRally(creep.memory.home, "room").canAssign(creep);
         });
     }

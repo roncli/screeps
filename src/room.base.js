@@ -835,9 +835,9 @@ class RoomBase extends RoomEngine {
                         lab = Game.getObjectById(l.id);
 
                     if ((labStatus === "refilling" ? l.oldAmount - lab.mineralAmount : l.amount - lab.mineralAmount) > 0) {
-                        links.storageCollectMinerals = [storage];
-                        links.storageCollectMineralsResource = labStatus === "refilling" ? l.oldResource : l.resource;
-                        links.storageCollectMineralsAmount = labStatus === "refilling" ? l.oldAmount - lab.mineralAmount : l.amount - lab.mineralAmount;
+                        tasks.storageCollectMinerals = [storage];
+                        tasks.storageCollectMineralsResource = labStatus === "refilling" ? l.oldResource : l.resource;
+                        tasks.storageCollectMineralsAmount = labStatus === "refilling" ? l.oldAmount - lab.mineralAmount : l.amount - lab.mineralAmount;
 
                         return false;
                     }
@@ -847,14 +847,14 @@ class RoomBase extends RoomEngine {
             }
 
             // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-            if (!links.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
+            if (!tasks.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
                 _.forEach(labQueue.children, (resource) => {
                     const amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount);
 
                     if (amount < labAmount) {
-                        links.storageCollectMinerals = [storage];
-                        links.storageCollectMineralsResource = resource;
-                        links.storageCollectMineralsAmount = labAmount - amount;
+                        tasks.storageCollectMinerals = [storage];
+                        tasks.storageCollectMineralsResource = resource;
+                        tasks.storageCollectMineralsAmount = labAmount - amount;
 
                         return false;
                     }
@@ -864,7 +864,7 @@ class RoomBase extends RoomEngine {
             }
 
             // We only need to transfer from storage to terminal when we have both storage and terminal.
-            if (!links.storageCollectMinerals && storage && terminal && reserveMinerals) {
+            if (!tasks.storageCollectMinerals && storage && terminal && reserveMinerals) {
                 _.forEach(store, (amount, resource) => {
                     if (resource === RESOURCE_ENERGY) {
                         return true;
@@ -873,15 +873,15 @@ class RoomBase extends RoomEngine {
                     const {[resource]: reserveMineralsResource} = reserveMinerals;
 
                     if (!reserveMineralsResource) {
-                        links.storageCollectMinerals = [storage];
-                        links.storageCollectMineralsResource = resource;
-                        links.storageCollectMineralsAmount = amount;
+                        tasks.storageCollectMinerals = [storage];
+                        tasks.storageCollectMineralsResource = resource;
+                        tasks.storageCollectMineralsAmount = amount;
 
                         return false;
                     } else if ((resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource) < amount) {
-                        links.storageCollectMinerals = [storage];
-                        links.storageCollectMineralsResource = resource;
-                        links.storageCollectMineralsAmount = amount - (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource);
+                        tasks.storageCollectMinerals = [storage];
+                        tasks.storageCollectMineralsResource = resource;
+                        tasks.storageCollectMineralsAmount = amount - (resource.startsWith("X") && resource.length === 5 ? reserveMineralsResource - 5000 : reserveMineralsResource);
 
                         return false;
                     }
@@ -890,16 +890,16 @@ class RoomBase extends RoomEngine {
                 });
             }
 
-            if (!links.storageCollectMinerals) {
+            if (!tasks.storageCollectMinerals) {
                 // If we have a nuker, transfer ghodium.  If we have a power spawn, transfer power.
                 if (nuker && rcl > 8 && nuker.ghodium < nuker.ghodiumCapacity && store[RESOURCE_GHODIUM]) {
-                    links.storageCollectMinerals = [storage];
-                    links.storageCollectMineralsResource = RESOURCE_GHODIUM;
-                    links.storageCollectMineralsAmount = Math.min(nuker.ghodiumCapacity - nuker.ghodium, store[RESOURCE_GHODIUM]);
+                    tasks.storageCollectMinerals = [storage];
+                    tasks.storageCollectMineralsResource = RESOURCE_GHODIUM;
+                    tasks.storageCollectMineralsAmount = Math.min(nuker.ghodiumCapacity - nuker.ghodium, store[RESOURCE_GHODIUM]);
                 } else if (powerSpawn && rcl > 8 && powerSpawn.power / powerSpawn.powerCapacity < 0.5 && store[RESOURCE_POWER]) {
-                    links.storageCollectMinerals = [storage];
-                    links.storageCollectMineralsResource = RESOURCE_POWER;
-                    links.storageCollectMineralsAmount = Math.min(powerSpawn.powerCapacity - powerSpawn.power, store[RESOURCE_POWER]);
+                    tasks.storageCollectMinerals = [storage];
+                    tasks.storageCollectMineralsResource = RESOURCE_POWER;
+                    tasks.storageCollectMineralsAmount = Math.min(powerSpawn.powerCapacity - powerSpawn.power, store[RESOURCE_POWER]);
                 }
             }
         }

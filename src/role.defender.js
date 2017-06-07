@@ -124,13 +124,13 @@ class RoleDefender {
             return;
         }
 
-        // Rally to the room.
-        Assign.moveToRoom(creepsWithNoTask, roomName);
-
         // Move to the next quadrant.
         _.forEach(_.filter(creepsWithNoTask, (c) => !c.memory.currentTask), (creep) => {
             creep.memory.quadrant = (creep.memory.quadrant + 1) % 4 || 0;
         });
+
+        // Rally to the room.
+        Assign.moveToRoom(creepsWithNoTask, roomName);
     }
 }
 

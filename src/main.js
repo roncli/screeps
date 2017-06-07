@@ -569,18 +569,12 @@ class Main {
                 } else {
                     const {0: mineral} = mostNeededMineralsToBuy;
 
-                    // memory.buyQueue = {
-                    //     resource: mineral.resource,
-                    //     amount: mineral.amount - mineral.amountInRoom,
-                    //     price: mineral.marketPrice,
-                    //     start: Game.time
-                    // };
-                    console.log(`Buy queue for ${roomName}`, JSON.stringify({
+                    memory.buyQueue = {
                         resource: mineral.resource,
                         amount: mineral.amount - mineral.amountInRoom,
                         price: mineral.marketPrice,
                         start: Game.time
-                    }), JSON.stringify(mineral));
+                    };
                 }
 
                 // Create the most needed resource.
@@ -603,18 +597,12 @@ class Main {
                         const {0: mineralToCreate, 0: {resource}} = mineralsToCreate,
                             {[resource]: mineralResource} = Minerals;
 
-                        // memory.labQueue = {
-                        //     resource,
-                        //     amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(mineralToCreate.amount - mineralToCreate.amountInRoom, _.find(roomMinerals, (rm) => rm.resource === mineralResource[0]).amountInRoom), _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]).amountInRoom), LAB_MINERAL_CAPACITY) / 5), LAB_MINERAL_CAPACITY),
-                        //     children: mineralResource,
-                        //     start: Game.time
-                        // };
-                        console.log(`Lab queue for ${roomName}`, JSON.stringify({
+                        memory.labQueue = {
                             resource,
                             amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(mineralToCreate.amount - mineralToCreate.amountInRoom, _.find(roomMinerals, (rm) => rm.resource === mineralResource[0]).amountInRoom), _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]).amountInRoom), LAB_MINERAL_CAPACITY) / 5), LAB_MINERAL_CAPACITY),
                             children: mineralResource,
                             start: Game.time
-                        }), JSON.stringify(mineralToCreate));
+                        };
                     }
                 }
             });

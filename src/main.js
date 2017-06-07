@@ -530,8 +530,8 @@ class Main {
                 const {memory: {roomType}} = r;
 
                 return roomType && roomType.type === "base";
-            }), (room, roomName) => {
-                const {memory, storage, terminal} = room,
+            }), (room) => {
+                const {name: roomName, memory, storage, terminal} = room,
                     {creeps: {[roomName]: creeps}} = Cache,
                     allCreepsInRoom = creeps && creeps.all,
                     labs = Cache.labsInRoom(room);
@@ -578,7 +578,7 @@ class Main {
                         amount: mineral.amount - mineral.amountInRoom,
                         price: mineral.marketPrice,
                         start: Game.time
-                    }));
+                    }), JSON.stringify(mineral));
                 }
 
                 // Create the most needed resource.
@@ -596,7 +596,7 @@ class Main {
                         return m.amountInRoom < m.amount && mineralResource[0] && mineral0 && mineral1 && mineral0.amountInRoom >= 5 && mineral1.amountInRoom >= 5;
                     }).sort((a, b) => b.amount - b.amountInRoom - (a.amount - a.amountInRoom));
 
-                    if (mineralsToCreate > 0) {
+                    if (mineralsToCreate.length > 0) {
                         const {0: mineralToCreate, 0: {resource}} = mineralsToCreate,
                             {[resource]: mineralResource} = Minerals;
 
@@ -611,7 +611,7 @@ class Main {
                             amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(mineralToCreate.amount - mineralToCreate.amountInRoom, _.find(roomMinerals, (rm) => rm.resource === mineralResource[0]).amountInRoom), _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]).amountInRoom), LAB_MINERAL_CAPACITY) / 5), LAB_MINERAL_CAPACITY),
                             children: mineralResource,
                             start: Game.time
-                        }));
+                        }), JSON.stringify(mineralToCreate));
                     }
                 }
             });

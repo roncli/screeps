@@ -128,7 +128,7 @@ class RoleDefender {
         Assign.moveToRoom(creepsWithNoTask, roomName);
 
         // Move to the next quadrant.
-        _.forEach(_.filter(creepsWithNoTask, (c) => !c.memory.currentTask || !c.memory.currentTask.unimportant), (creep) => {
+        _.forEach(_.filter(creepsWithNoTask, (c) => !c.memory.currentTask || c.memory.currentTask.unimportant), (creep) => {
             creep.memory.quadrant = (creep.memory.quadrant + 1) % 4 || 0;
         });
     }

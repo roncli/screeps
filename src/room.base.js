@@ -421,7 +421,7 @@ class RoomBase extends RoomEngine {
         }
 
         if (terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
-            const {reserveMinerals} = Memory;
+            const {reserveMinerals, mineralPrices} = Memory;
             let buyResource;
 
             if (memory.buyQueue) {
@@ -533,7 +533,8 @@ class RoomBase extends RoomEngine {
                     if (terminalMinerals.length > 0) {
                         _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                             const {resource} = topResource,
-                                {0: bestOrder} = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits || !Memory.minimumSell[resource] && !Memory.flipPrice[resource] || Memory.minimumSell[resource] && o.price >= Memory.minimumSell[resource] || Memory.flipPrice[resource] && o.price >= Memory.flipPrice[resource].price || Memory.flipPrice[resource] && Game.time > Memory.flipPrice[resource].expiration);
+                                mineralPrice = _.find(mineralPrices, (m) => m.resource === resource),
+                                {0: bestOrder} = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits && (!mineralPrice || o.price > mineralPrice.value));
 
                             if (bestOrder) {
                                 const {amount: bestAmount} = bestOrder,
@@ -542,9 +543,6 @@ class RoomBase extends RoomEngine {
                                 if (terminalEnergy > transCost) {
                                     Market.deal(bestOrder.id, Math.min(topResource.amount, bestAmount), roomName);
                                     dealMade = true;
-                                    if (topResource.amount < 5005) {
-                                        delete Memory.minimumSell[bestOrder.resourceType];
-                                    }
 
                                     return false;
                                 } else if (terminalEnergy > 0) {
@@ -581,9 +579,10 @@ class RoomBase extends RoomEngine {
 
                         // Get all the orders that can be flipped.
                         const {0: sellOrder} = filteredOrders.sell[resource] || [],
-                            {0: buyOrder} = filteredOrders.buy[resource] || [];
+                            {0: buyOrder} = filteredOrders.buy[resource] || [],
+                            mineralPrice = _.find(mineralPrices, (m) => m.resource === resource);
 
-                        if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < Cache.credits) {
+                        if (sellOrder && buyOrder && sellOrder.price < buyOrder.price && sellOrder.price < Cache.credits && (!mineralPrice || sellOrder.price <= mineralPrice.value && buyOrder.price >= mineralPrice.value)) {
                             flips.push({resource, buy: buyOrder, sell: sellOrder});
                         }
                     });
@@ -606,7 +605,6 @@ class RoomBase extends RoomEngine {
 
                         if (terminalEnergy > transCost) {
                             Market.deal(sell.id, amount, roomName);
-                            Memory.flipPrice[flip.resource] = {price: sellPrice, expiration: Game.time + 100};
                             dealMade = true;
 
                             return false;
@@ -616,7 +614,6 @@ class RoomBase extends RoomEngine {
                             amount = Math.floor(amount * terminalEnergy / transCost);
                             if (amount > 0) {
                                 Market.deal(sell.id, amount, roomName);
-                                Memory.flipPrice[flip.resource] = {price: sellPrice, expiration: Game.time + 100};
                                 dealMade = true;
 
                                 return false;

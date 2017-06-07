@@ -342,14 +342,6 @@ class Main {
             Memory.stats.gclProgress = [];
         }
 
-        if (!Memory.minimumSell) {
-            Memory.minimumSell = {};
-        }
-
-        if (!Memory.flipPrice) {
-            Memory.flipPrice = {};
-        }
-
         if (!Memory.allies) {
             Memory.allies = [];
         }

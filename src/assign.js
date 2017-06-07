@@ -1144,7 +1144,7 @@ class Assign {
         }
 
         _.forEach(creeps, (creep) => {
-            _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && Utilities.checkQuadrant(k.pos, creep.memory.quadrant)), (keeper) => {
+            _.forEach(_.filter(keepers, (k) => k.ticksToSpawn < 200 && (creep.memory.role !== "defender" || Utilities.checkQuadrant(k.pos, creep.memory.quadrant))), (keeper) => {
                 const task = new TaskRally(keeper.pos, "position");
 
                 task.range = 1;

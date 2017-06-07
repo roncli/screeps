@@ -53,7 +53,7 @@ class RoleRemoteStorer {
             {name: supportRoomName} = supportRoom,
             {controller: {level: supportRoomRcl}} = supportRoom,
             {creeps: {[room.name]: creeps}} = Cache,
-            remoteStorers = creeps && creeps.remoteStorer;
+            remoteStorers = creeps && creeps.remoteStorer || [];
 
         foundFirstSource = false;
 

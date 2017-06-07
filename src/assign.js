@@ -520,7 +520,7 @@ class Assign {
                     const {memory} = creep;
 
                     memory.role = "worker";
-                    ({0: {id: memory.container}} = Cache.containersInRoom(memory.supportRoom));
+                    ({0: {id: memory.container}} = Cache.containersInRoom(Game.rooms[memory.supportRoom]));
                     delete Cache.creepTasks[creep.name];
                 });
             };

@@ -1371,8 +1371,8 @@ class Assign {
             return;
         }
 
-        _.forEach(structures, (structure) => {
-            _.forEach(creeps, (creep) => {
+        _.forEach(creeps, (creep) => {
+            _.forEach(structures, (structure) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "repair" && c.memory.currentTask.id === structure.id).length === 0) {
                     if (new TaskRepair(structure.id).canAssign(creep)) {
                         if (say) {

@@ -893,11 +893,11 @@ class RoomBase extends RoomEngine {
 
             if (!tasks.storageCollectMinerals) {
                 // If we have a nuker, transfer ghodium.  If we have a power spawn, transfer power.
-                if (nuker && rcl > 8 && nuker.ghodium < nuker.ghodiumCapacity && store[RESOURCE_GHODIUM]) {
+                if (nuker && rcl >= 8 && nuker.ghodium < nuker.ghodiumCapacity && store[RESOURCE_GHODIUM]) {
                     tasks.storageCollectMinerals = [storage];
                     tasks.storageCollectMineralsResource = RESOURCE_GHODIUM;
                     tasks.storageCollectMineralsAmount = Math.min(nuker.ghodiumCapacity - nuker.ghodium, store[RESOURCE_GHODIUM]);
-                } else if (powerSpawn && rcl > 8 && powerSpawn.power / powerSpawn.powerCapacity < 0.5 && store[RESOURCE_POWER]) {
+                } else if (powerSpawn && rcl >= 8 && powerSpawn.power / powerSpawn.powerCapacity < 0.5 && store[RESOURCE_POWER]) {
                     tasks.storageCollectMinerals = [storage];
                     tasks.storageCollectMineralsResource = RESOURCE_POWER;
                     tasks.storageCollectMineralsAmount = Math.min(powerSpawn.powerCapacity - powerSpawn.power, store[RESOURCE_POWER]);

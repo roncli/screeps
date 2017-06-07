@@ -403,11 +403,11 @@ class RoomBase extends RoomEngine {
             terminalEnergy = terminalStore[RESOURCE_ENERGY] || 0,
             {market} = Game,
             maxEnergy = Math.max(..._.map(_.filter(Game.rooms, (r) => {
-                const {roomMemory, roomStorage, roomTerminal} = r;
+                const {memory: roomMemory, storage: roomStorage, terminal: roomTerminal} = r;
 
                 return roomMemory && roomMemory.roomType && roomMemory.roomType.type === "base" && roomStorage && roomStorage.my && roomTerminal && roomTerminal.my;
             }), (r) => {
-                const {roomStorage} = r;
+                const {storage: roomStorage} = r;
 
                 return roomStorage && roomStorage.my ? roomStorage.store[RESOURCE_ENERGY] : 0;
             })),

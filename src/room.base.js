@@ -706,7 +706,7 @@ class RoomBase extends RoomEngine {
         }
 
         // powerSpawnResourcesNeeded
-        if (powerSpawn / powerSpawn.power < 0.5) {
+        if (powerSpawn.power / powerSpawn.powerCapacity < 0.5) {
             tasks.powerSpawnResourcesNeeded[RESOURCE_POWER] = powerSpawn.powerCapacity - powerSpawn.power;
         }
 

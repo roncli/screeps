@@ -32,9 +32,11 @@ class TaskRally {
         switch (rallyTo) {
             case "position":
                 this.rallyPoint = new RoomPosition(id.x, id.y, id.roomName);
+                this.range = 1;
                 break;
             case "id":
                 this.rallyPoint = Game.getObjectById(id);
+                this.range = 1;
                 break;
             case "room":
                 this.rallyPoint = new RoomPosition(25, 25, id);
@@ -86,9 +88,8 @@ class TaskRally {
         }
 
         // Rally to the rally point.
-        const {room: {name: creepRoomName}, pos: creepPos, pos: {x: creepX, y: creepY}} = creep,
-            {pos: rallyPointPos} = rallyPoint,
-            range = creepRoomName === rallyPoint.roomName || !(rallyPoint instanceof RoomPosition) || rallyPointPos && creepRoomName === rallyPointPos.roomName ? this.range || 0 : 20;
+        const {pos: creepPos, pos: {x: creepX, y: creepY}} = creep,
+            {range} = this;
 
         if (creepPos.getRangeTo(rallyPoint) <= range) {
             if (creepX === 0) {

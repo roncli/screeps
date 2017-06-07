@@ -111,7 +111,7 @@ class RoleDismantler {
         const {room, tasks} = engine,
             {name: roomName} = room,
             {creeps: {[roomName]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.dismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.dismantler || []), (c) => !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {

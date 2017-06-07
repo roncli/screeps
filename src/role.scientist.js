@@ -260,7 +260,7 @@ class RoleScientist {
         }
 
         // Attempt to get minerals from containers.
-        Assign.collectMinerals(creepsWithNoTask, allCreeps, tasks.structuresWithMinerals, "Collecting");
+        Assign.collectMinerals(creepsWithNoTask, allCreeps, tasks.structuresWithMinerals, void 0, void 0, "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

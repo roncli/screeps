@@ -427,7 +427,7 @@ class RoomBase extends RoomEngine {
             if (memory.buyQueue) {
                 ({resource: buyResource} = buyQueue);
 
-                if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) > (reserveMinerals[buyResource] || 0)) {
+                if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) >= (reserveMinerals[buyResource] || 0)) {
                     delete memory.buyQueue;
                     buyQueue = void 0;
                 }
@@ -563,7 +563,7 @@ class RoomBase extends RoomEngine {
                 }
 
                 // Find an order to flip if we haven't made a deal and we have enough energy.
-                if (!dealMade && storage && maxEnergy > Memory.marketEnergy) {
+                if (!dealMade && storage && maxEnergy > Memory.marketEnergy && _.filter(Game.rooms, (r) => r.memory.buyQueue).length === 0) {
                     const filteredOrders = Market.getFilteredOrders();
 
                     _.forEach(Minerals, (children, resource) => {

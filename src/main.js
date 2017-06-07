@@ -449,11 +449,10 @@ class Main {
      */
     static minerals() {
         const mineralOrders = {};
-        let minerals;
 
         if (Game.time % 10 === 0 || Game.cpu.bucket >= Memory.marketBucket) {
             // Determine the minerals we need.
-            minerals = [
+            Memory.mineralPrices = [
                 {resource: RESOURCE_HYDROGEN, amount: 15000, priority: 1},
                 {resource: RESOURCE_OXYGEN, amount: 15000, priority: 1},
                 {resource: RESOURCE_ZYNTHIUM, amount: 15000, priority: 1},
@@ -492,11 +491,11 @@ class Main {
                 {resource: RESOURCE_POWER, amount: 15000, priority: 2}
             ];
 
-            // Determine how many of each mineral needs to be saved in each room.
             Memory.reserveMinerals = {};
 
-            const {reserveMinerals} = Memory;
+            const {reserveMinerals, mineralPrices: minerals} = Memory;
 
+            // Determine how many of each mineral needs to be saved in each room.
             _.forEach(minerals, (mineral) => {
                 ({amount: reserveMinerals[mineral.resource]} = mineral);
             });

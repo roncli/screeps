@@ -177,7 +177,7 @@ class RoleRemoteWorker {
         }
 
         // Check for construction sites.
-        Assign.buildInCurrentRoom(creepsWithNoTask, allCreeps, "Build");
+        Assign.buildInCurrentRoom(creepsWithNoTask, allCreeps, false, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

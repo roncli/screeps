@@ -49,7 +49,6 @@ class Cache {
         // Caches for data.
         this.armies = {};
         this.creepTasks = {};
-        this.minerals = {};
         this.spawning = {};
         this.rooms = {};
 

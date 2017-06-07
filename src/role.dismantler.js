@@ -39,7 +39,7 @@ class RoleDismantler {
             return {
                 name: "dismantler",
                 spawn: false,
-                max
+                0
             };
         }
 

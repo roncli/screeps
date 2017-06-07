@@ -29,7 +29,7 @@ class RoleRemoteWorker {
     static checkSpawnSettings(engine, canSpawn) {
         let settings = engine.checkSpawnSettingsCache("remoteWorker"),
             spawn = false,
-            containerIdToCollectFrom;
+            containerIdToCollectFrom, homeSource;
 
         if (settings) {
             return settings;
@@ -75,6 +75,7 @@ class RoleRemoteWorker {
 
             if (_.filter(remoteWorkers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
                 containerIdToCollectFrom = containerId;
+                homeSource = source;
                 spawn = true;
             }
 
@@ -87,7 +88,8 @@ class RoleRemoteWorker {
             spawn,
             max,
             spawnFromRegion: true,
-            containerIdToCollectFrom
+            containerIdToCollectFrom,
+            homeSource
         };
 
         if (remoteWorkers.length > 0) {
@@ -130,7 +132,8 @@ class RoleRemoteWorker {
                 role: "remoteWorker",
                 home: checkSettings.home,
                 supportRoom: checkSettings.supportRoom,
-                container: checkSettings.containerIdToCollectFrom
+                container: checkSettings.containerIdToCollectFrom,
+                homeSource: checkSettings.homeSource
             }
         };
     }
@@ -238,14 +241,6 @@ class RoleRemoteWorker {
         }
 
         // Rally remaining creeps.
-        Assign.moveToHomeSource(creepsWithNoTask);
-
-        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // Rally to room.
         Assign.moveToHomeRoom(creepsWithNoTask);
     }
 }

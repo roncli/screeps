@@ -280,7 +280,7 @@ class RoleWorker {
         }
 
         // Attempt to get energy from terminals.
-        Assign.fillWithEnergy(creepsWithNoTask, tasks.terminalsCollectEnergy, "Terminal");
+        Assign.collectEnergy(creepsWithNoTask, allCreeps, tasks.terminalsCollectEnergy, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

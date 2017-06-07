@@ -189,7 +189,7 @@ class Assign {
      * Assigns creeps to build structures in their current room.
      * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {Creep[]} allCreeps All creeps.
-     * @param {Creep[]} quickOnly Only build quick construction sites.
+     * @param {bool} quickOnly Only build quick construction sites.
      * @param {string} say Text to say on successful assignment.
      * @return {void}
      */

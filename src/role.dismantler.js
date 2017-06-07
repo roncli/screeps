@@ -118,8 +118,16 @@ class RoleDismantler {
             return;
         }
 
+        // Check for structures needing dismantling.
+        Assign.dismantleTargets(creepsWithNoTask, room, "Dismantle");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // Check for construction sites.
-        Assign.build(creepsWithNoTask, allCreeps, tasks.constructionSites, "Build");
+        Assign.buildInCurrentRoom(creepsWithNoTask, allCreeps, false, "Build");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
@@ -152,14 +160,6 @@ class RoleDismantler {
 
         // Check for unfilled containers.
         Assign.fillWithEnergy(creepsWithNoTask, allCreeps, Cache.containersInRoom(room), "Container");
-
-        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
-        // Check for structures needing dismantling.
-        Assign.dismantleTargets(creepsWithNoTask, room, "Dismantle");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

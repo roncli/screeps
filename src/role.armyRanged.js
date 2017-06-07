@@ -194,11 +194,16 @@ class RoleArmyRanged {
         const {dismantle} = army;
 
         if (Game.rooms[attackRoomName] && dismantle.length > 0) {
-            Assign.moveToPos(creepsWithNoTask, dismantle[0].pos, 3, "Attacking");
+            const {0: id} = dismantle,
+                obj = Game.getObjectById(id);
 
-            _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-            if (creepsWithNoTask.length === 0) {
-                return;
+            if (obj) {
+                Assign.moveToPos(creepsWithNoTask, obj.pos, 3, "Attacking");
+
+                _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+                if (creepsWithNoTask.length === 0) {
+                    return;
+                }
             }
         }
 

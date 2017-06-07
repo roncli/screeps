@@ -520,8 +520,10 @@ class Main {
 
                 if (!mineralResource || mineralResource.length === 0) {
                     ({[resource]: mineral.value} = mineralOrders);
+
                 } else {
                     mineral.value = _.sum(_.map(mineralResource, (r) => mineralOrders[r] || Infinity)) * 1.2;
+                    ({value: mineralOrders[resource]} = mineral);
                 }
             });
 
@@ -584,9 +586,10 @@ class Main {
                 // Create the most needed resource.
                 if (!memory.labQueue) {
                     const mineralsToCreate = _.filter(roomMinerals, (m) => {
-                        const {[m.resource]: mineralResource} = Minerals;
+                        const {resource} = m,
+                            {[resource]: mineralResource} = Minerals;
 
-                        if (!mineralResource || mineralResource.length === 0) {
+                        if (memory.buyQueue && memory.buyQueue.resource === resource || mineralResource || mineralResource.length === 0) {
                             return false;
                         }
 

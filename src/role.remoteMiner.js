@@ -113,7 +113,7 @@ class RoleRemoteMiner {
         if (remoteMiners.length > 0) {
             engine.room.memory.maxCreeps.remoteMiner = {
                 cache: settings,
-                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteMiners, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))))
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteMiners, (c) => c.spawning ? 100 : Math.min(c.ticksToLive - 300, 100))))
             };
         }
 

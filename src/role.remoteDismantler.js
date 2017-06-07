@@ -57,7 +57,7 @@ class RoleRemoteDismantler {
         if (remoteDismantlers.length > 0) {
             engine.room.memory.maxCreeps.remoteDismantler = {
                 cache: settings,
-                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteDismantlers, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 300, 100))))
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteDismantlers, (c) => c.spawning ? 100 : Math.min(c.ticksToLive - 300, 100))))
             };
         }
 

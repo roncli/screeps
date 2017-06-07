@@ -98,7 +98,7 @@ class RoleMiner {
         if (miners.length > 0) {
             engine.room.memory.maxCreeps.miner = {
                 cache: settings,
-                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(miners, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))))
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(miners, (c) => c.spawning ? 100 : Math.min(c.ticksToLive - 150, 100))))
             };
         }
 

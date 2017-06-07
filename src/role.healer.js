@@ -56,7 +56,7 @@ class RoleHealer {
         if (healers.length > 0) {
             engine.room.memory.maxCreeps.healer = {
                 cache: settings,
-                cacheUntil: Game.time + (settings.spawn ? 25 : Math.min(..._.map(healers, (c) => c.spawning ? 25 : Math.min(c.timeToLive - 300, 25))))
+                cacheUntil: Game.time + (settings.spawn ? 25 : Math.min(..._.map(healers, (c) => c.spawning ? 25 : Math.min(c.ticksToLive - 300, 25))))
             };
         }
 

@@ -56,7 +56,7 @@ class RoleScientist {
         if (scientists.length > 0) {
             engine.room.memory.maxCreeps.scientist = {
                 cache: settings,
-                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(scientists, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))))
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(scientists, (c) => c.spawning ? 100 : Math.min(c.ticksToLive - 150, 100))))
             };
         }
 

@@ -146,6 +146,10 @@ class RoomEngine {
     checkSpawnSettingsCache(role) {
         const {room: {memory: {maxCreeps, maxCreeps: {[role]: cache}}}} = this;
 
+        if (cache && cache.cacheUntil === null && cache.cache.spawn === false) {
+            delete maxCreeps[role];
+        }
+
         if (cache && (!cache.cacheUntil || cache.cacheUntil >= Game.time)) {
             return cache.cache;
         }

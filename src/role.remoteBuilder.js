@@ -56,7 +56,7 @@ class RoleRemoteBuilder {
         if (remoteBuilders.length > 0) {
             engine.room.memory.maxCreeps.remoteBuilder = {
                 cache: settings,
-                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteBuilders, (c) => c.spawning ? 100 : Math.min(c.timeToLive - 150, 100))))
+                cacheUntil: Game.time + (settings.spawn ? 100 : Math.min(..._.map(remoteBuilders, (c) => c.spawning ? 100 : Math.min(c.ticksToLive - 150, 100))))
             };
         }
 

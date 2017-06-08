@@ -127,7 +127,7 @@ class TaskHarvest {
     static fromObj(creep) {
         const {memory: {currentTask}} = creep;
 
-        if (Game.getObjectById(currentTask.source)) {
+        if (Game.getObjectById(currentTask.id)) {
             return new TaskHarvest(currentTask.source, currentTask.failIn);
         }
 

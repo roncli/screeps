@@ -590,7 +590,7 @@ class Main {
 
                         memory.labQueue = {
                             resource,
-                            amount: Math.min(5 * Math.ceil(Math.min(Math.min(Math.min(mineralToCreate.amount - mineralToCreate.amountInRoom, _.find(roomMinerals, (rm) => rm.resource === mineralResource[0]).amountInRoom), _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]).amountInRoom), LAB_MINERAL_CAPACITY) / 5), LAB_MINERAL_CAPACITY),
+                            amount: Math.min(5 * Math.floor(Math.min(Math.min(Math.min(mineralToCreate.amount - mineralToCreate.amountInRoom, _.find(roomMinerals, (rm) => rm.resource === mineralResource[0]).amountInRoom), _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]).amountInRoom), LAB_MINERAL_CAPACITY) / 5), LAB_MINERAL_CAPACITY),
                             children: mineralResource,
                             start: Game.time
                         };

@@ -51,9 +51,11 @@ class RoomSource extends RoomMine {
 
         super.stage1Tasks();
 
-        this.tasks.hostiles = Cache.hostilesInRoom(room);
-        this.tasks.keepers = Cache.sourceKeepersInRoom(room);
-        this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
+        if (!room.unobservable) {
+            this.tasks.hostiles = Cache.hostilesInRoom(room);
+            this.tasks.keepers = Cache.sourceKeepersInRoom(room);
+            this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
+        }
     }
 
     //         #                       #     ##

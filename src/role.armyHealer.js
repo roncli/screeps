@@ -201,6 +201,7 @@ class RoleArmyHealer {
             const {dismantle: {0: id}} = army,
                 obj = Game.getObjectById(id);
 
+            // TODO: This is broke.  Fix.
             if (obj) {
                 Assign.moveToPos(creepsWithNoTask, obj.pos, 3, "Attacking");
 

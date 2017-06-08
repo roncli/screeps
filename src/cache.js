@@ -87,7 +87,7 @@ class Cache {
      * @return {StructureContainer[]} The containers in the room.
      */
     static containersInRoom(room) {
-        return this.containers[room.name] ? this.containers[room.name] : this.containers[room.name] = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_CONTAINER);
+        return this.containers[room.name] ? this.containers[room.name] : this.containers[room.name] = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_CONTAINER});
     }
 
     //                     #    #  #         #           #          ####              ###
@@ -177,7 +177,7 @@ class Cache {
      * @return {StructureExtension[]} The extensions in the room.
      */
     static extensionsInRoom(room) {
-        return this.extensions[room.name] ? this.extensions[room.name] : this.extensions[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_EXTENSION);
+        return this.extensions[room.name] ? this.extensions[room.name] : this.extensions[room.name] = room.find(FIND_MY_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_EXTENSION});
     }
 
     //              #                       #                       ###         ###
@@ -207,7 +207,7 @@ class Cache {
      * @return {ConstructionSite[]} The hostile construction sites in the room.
      */
     static hostileConstructionSitesInRoom(room) {
-        return this.hostileConstructionSites[room.name] ? this.hostileConstructionSites[room.name] : this.hostileConstructionSites[room.name] = _.filter(room.find(FIND_HOSTILE_CONSTRUCTION_SITES), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1);
+        return this.hostileConstructionSites[room.name] ? this.hostileConstructionSites[room.name] : this.hostileConstructionSites[room.name] = room.find(FIND_HOSTILE_CONSTRUCTION_SITES, {filter: (s) => !s.owner || Memory.allies.indexOf(s.owner.username) === -1});
     }
 
     // #                   #     #    ##                 ###         ###
@@ -226,7 +226,7 @@ class Cache {
             return [];
         }
 
-        const hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = _.filter(room.find(FIND_HOSTILE_CREEPS), (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1),
+        const hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = room.find(FIND_HOSTILE_CREEPS, {filter: (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1}),
             {memory} = room,
             threat = _.groupBy(_.map(hostiles, (h) => ({
                 id: h.id, threat: _.reduce(h.body, (total, bodypart) => {
@@ -307,7 +307,7 @@ class Cache {
      * @return {StructureLab[]} The labs in the room.
      */
     static labsInRoom(room) {
-        return this.labs[room.name] ? this.labs[room.name] : this.labs[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_LAB);
+        return this.labs[room.name] ? this.labs[room.name] : this.labs[room.name] = room.find(FIND_MY_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_LAB});
     }
 
     // ##     #          #            ###         ###
@@ -337,7 +337,7 @@ class Cache {
      * @return {StructureNuker[]} The nukers in the room.
      */
     static nukersInRoom(room) {
-        return this.nukers[room.name] ? this.nukers[room.name] : this.nukers[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_NUKER);
+        return this.nukers[room.name] ? this.nukers[room.name] : this.nukers[room.name] = room.find(FIND_MY_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_NUKER});
     }
 
     //                    #          ##           ###         ###
@@ -385,7 +385,7 @@ class Cache {
      * @return {StructurePowerSpawn[]} The power spawns in the room.
      */
     static powerSpawnsInRoom(room) {
-        return this.powerSpawns[room.name] ? this.powerSpawns[room.name] : this.powerSpawns[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_POWER_SPAWN);
+        return this.powerSpawns[room.name] ? this.powerSpawns[room.name] : this.powerSpawns[room.name] = room.find(FIND_MY_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_POWER_SPAWN});
     }
 
     //                          #                #     ##           ##    #                       #                             ###         ###
@@ -473,7 +473,7 @@ class Cache {
      * @return {StructureSpawn[]} The spawns in the room.
      */
     static spawnsInRoom(room) {
-        return this.spawns[room.name] ? this.spawns[room.name] : this.spawns[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_SPAWN);
+        return this.spawns[room.name] ? this.spawns[room.name] : this.spawns[room.name] = room.find(FIND_MY_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_SPAWN});
     }
 
     //  #                                   ###         ###
@@ -488,7 +488,7 @@ class Cache {
      * @return {StructureTower[]} The towers in the room.
      */
     static towersInRoom(room) {
-        return this.towers[room.name] ? this.towers[room.name] : this.towers[room.name] = _.filter(room.find(FIND_MY_STRUCTURES), (s) => s.structureType === STRUCTURE_TOWER);
+        return this.towers[room.name] ? this.towers[room.name] : this.towers[room.name] = room.find(FIND_MY_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_TOWER});
     }
 
     //                                                         ###         ###

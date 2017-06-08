@@ -448,7 +448,7 @@ class Assign {
             return;
         }
 
-        const structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
+        const structures = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1});
 
         if (structures.length > 0) {
             const task = new TaskDismantle(structures[0].id);

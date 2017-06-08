@@ -29,7 +29,7 @@ class RoleRemoteWorker {
     static checkSpawnSettings(engine, canSpawn) {
         let settings = engine.checkSpawnSettingsCache("remoteWorker"),
             spawn = false,
-            containerIdToCollectFrom, homeSource;
+            containerIdToCollectFrom;
 
         if (settings) {
             return settings;
@@ -75,7 +75,6 @@ class RoleRemoteWorker {
 
             if (_.filter(remoteWorkers, (c) => (c.spawning || c.ticksToLive >= 150 + (lengthToThisAContainer && lengthToThisAContainer[supportRoomName] ? lengthToThisAContainer[supportRoomName] : 0) * 2) && c.memory.container === containerId).length === 0) {
                 containerIdToCollectFrom = containerId;
-                homeSource = source;
                 spawn = true;
             }
 
@@ -88,8 +87,7 @@ class RoleRemoteWorker {
             spawn,
             max,
             spawnFromRegion: true,
-            containerIdToCollectFrom,
-            homeSource
+            containerIdToCollectFrom
         };
 
         if (remoteWorkers.length > 0) {
@@ -132,8 +130,7 @@ class RoleRemoteWorker {
                 role: "remoteWorker",
                 home: checkSettings.home,
                 supportRoom: checkSettings.supportRoom,
-                container: checkSettings.containerIdToCollectFrom,
-                homeSource: checkSettings.homeSource
+                container: checkSettings.containerIdToCollectFrom
             }
         };
     }

@@ -44,11 +44,11 @@ class TaskHarvest {
     canAssign(creep) {
         let source = Game.getObjectById(creep.memory.homeSource);
 
-        if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || !source || creep.getActiveBodyparts(WORK) === 0) {
+        if (creep.spawning || creep.ticksToLive < 150 || _.sum(creep.carry) === creep.carryCapacity || creep.getActiveBodyparts(WORK) === 0) {
             return false;
         }
 
-        if (["miner", "remoteMiner"].indexOf(creep.role) === -1 && source.energy === 0) {
+        if (["miner", "remoteMiner"].indexOf(creep.role) === -1 && (!source || source.energy === 0)) {
             ({0: source} = creep.room.find(FIND_SOURCES_ACTIVE));
             if (!source) {
                 return false;

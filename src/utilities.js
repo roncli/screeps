@@ -38,7 +38,7 @@ class Utilities {
                     }
 
                     // If there is already a construction site here, skip.
-                    if (_.filter(room.find(FIND_MY_CONSTRUCTION_SITES), (s) => s.pos.x === x && s.pos.y === y).length > 0) {
+                    if (room.find(FIND_MY_CONSTRUCTION_SITES, {filter: (s) => s.pos.x === x && s.pos.y === y}).length > 0) {
                         continue;
                     }
 

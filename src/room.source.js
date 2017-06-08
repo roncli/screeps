@@ -51,9 +51,11 @@ class RoomSource extends RoomMine {
 
         super.stage1Tasks();
 
-        this.tasks.hostiles = Cache.hostilesInRoom(room);
-        this.tasks.keepers = Cache.sourceKeepersInRoom(room);
-        this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
+        if (!room.unobservable) {
+            this.tasks.hostiles = Cache.hostilesInRoom(room);
+            this.tasks.keepers = Cache.sourceKeepersInRoom(room);
+            this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
+        }
     }
 
     //         #                       #     ##
@@ -68,13 +70,17 @@ class RoomSource extends RoomMine {
      * @return {void}
      */
     stage1Spawn() {
-        const {creeps: {[this.room.name]: creeps, [this.room.name]: {defender: defenders}}} = Cache;
+        const {room, room: {name: roomName}} = this,
+            {creeps: {[roomName]: creeps}} = Cache,
+            defenders = creeps && creeps.defenders || [];
 
-        this.checkSpawn(RoleDefender, true);
-        this.checkSpawn(RoleHealer, true);
+        if (!room.unobservable) {
+            this.checkSpawn(RoleDefender, true);
+            this.checkSpawn(RoleHealer, true);
 
-        if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
-            return;
+            if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
+                return;
+            }
         }
 
         // Call original method.
@@ -143,19 +149,21 @@ class RoomSource extends RoomMine {
 
         super.stage2Tasks();
 
-        this.tasks.hostiles = Cache.hostilesInRoom(room);
-        this.tasks.keepers = Cache.sourceKeepersInRoom(room).sort((a, b) => {
-            if (a.ticksToSpawn && !b.ticksToSpawn) {
-                return -1;
-            }
+        if (!room.unobservable) {
+            this.tasks.hostiles = Cache.hostilesInRoom(room);
+            this.tasks.keepers = Cache.sourceKeepersInRoom(room).sort((a, b) => {
+                if (a.ticksToSpawn && !b.ticksToSpawn) {
+                    return -1;
+                }
 
-            if (!a.ticksToSpawn && b.ticksToSpawn) {
-                return 1;
-            }
+                if (!a.ticksToSpawn && b.ticksToSpawn) {
+                    return 1;
+                }
 
-            return a.ticksToSpawn - b.ticksToSpawn;
-        });
-        this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
+                return a.ticksToSpawn - b.ticksToSpawn;
+            });
+            this.tasks.hurtCreeps = _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax);
+        }
     }
 
     //         #                       ##    ##
@@ -170,19 +178,23 @@ class RoomSource extends RoomMine {
      * @return {void}
      */
     stage2Spawn() {
-        const {creeps: {[this.room.name]: creeps, [this.room.name]: {defender: defenders}}} = Cache;
+        const {room, room: {name: roomName}} = this,
+            {creeps: {[roomName]: creeps}} = Cache,
+            defenders = creeps && creeps.defenders || [];
 
-        this.checkSpawn(RoleDefender, true);
-        this.checkSpawn(RoleHealer, true);
+        if (!room.unobservable) {
+            this.checkSpawn(RoleDefender, true);
+            this.checkSpawn(RoleHealer, true);
 
-        if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
-            return;
+            if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
+                return;
+            }
+
+            // Call original method.
+            super.stage2Spawn();
+
+            this.checkSpawn(RoleRemoteCollector, true);
         }
-
-        // Call original method.
-        super.stage2Spawn();
-
-        this.checkSpawn(RoleRemoteCollector, true);
     }
 
     //         #                       ##    ##                  #                ###                #

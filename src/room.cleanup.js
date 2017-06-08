@@ -79,15 +79,15 @@ class RoomCleanup extends RoomEngine {
         const {tasks} = this;
 
         // Find all ramparts.
-        tasks.ramparts = _.filter(room.find(FIND_STRUCTURES), (s) => s.structureType === STRUCTURE_RAMPART);
+        tasks.ramparts = room.find(FIND_STRUCTURES, {filter: (s) => s.structureType === STRUCTURE_RAMPART});
 
         // Find all structures that aren't under ramparts, divided by whether they have resources or not.
-        tasks.structures = _.filter(room.find(FIND_STRUCTURES), (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (tasks.ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(tasks.ramparts, s)[0]) > 0));
+        tasks.structures = room.find(FIND_STRUCTURES, {filter: (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (tasks.ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(tasks.ramparts, s)[0]) > 0)});
         tasks.noResourceStructures = _.filter(tasks.structures, (s) => s.structureType === STRUCTURE_NUKER || (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
         tasks.resourceStructures = _.filter(tasks.structures, (s) => s.structureType !== STRUCTURE_NUKER && (s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
 
         // Find all walls and roads.
-        tasks.junk = _.filter(room.find(FIND_STRUCTURES), (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1);
+        tasks.junk = room.find(FIND_STRUCTURES, {filter: (s) => [STRUCTURE_WALL, STRUCTURE_ROAD].indexOf(s.structureType) !== -1});
 
         // Collect energy and minerals from structures that aren't under ramparts.
         tasks.energyStructures = _.filter(tasks.resourceStructures, (s) => s.energy || s.store && s.store[RESOURCE_ENERGY]).sort((a, b) => (a.energy || a.store[RESOURCE_ENERGY]) - (b.energy || b.store[RESOURCE_ENERGY]));

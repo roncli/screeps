@@ -448,7 +448,7 @@ class Assign {
             return;
         }
 
-        const structures = _.filter(room.find(FIND_HOSTILE_STRUCTURES), (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1);
+        const structures = room.find(FIND_HOSTILE_STRUCTURES, {filter: (s) => [STRUCTURE_CONTROLLER, STRUCTURE_RAMPART, STRUCTURE_KEEPER_LAIR].indexOf(s.structureType) === -1});
 
         if (structures.length > 0) {
             const task = new TaskDismantle(structures[0].id);
@@ -1111,9 +1111,11 @@ class Assign {
                     task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos, "position");
                 } else {
                     task = new TaskRally(portals[0], "room");
+                    task.range = 20;
                 }
             } else {
                 task = new TaskRally(roomName, "room");
+                task.range = 20;
             }
 
             // Assign the task.

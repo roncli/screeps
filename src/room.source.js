@@ -70,13 +70,17 @@ class RoomSource extends RoomMine {
      * @return {void}
      */
     stage1Spawn() {
-        const {creeps: {[this.room.name]: creeps, [this.room.name]: {defender: defenders}}} = Cache;
+        const {room, room: {name: roomName}} = this,
+            {creeps: {[roomName]: creeps}} = Cache,
+            defenders = creeps && creeps.defenders || [];
 
-        this.checkSpawn(RoleDefender, true);
-        this.checkSpawn(RoleHealer, true);
+        if (!room.unobservable) {
+            this.checkSpawn(RoleDefender, true);
+            this.checkSpawn(RoleHealer, true);
 
-        if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
-            return;
+            if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
+                return;
+            }
         }
 
         // Call original method.
@@ -174,19 +178,23 @@ class RoomSource extends RoomMine {
      * @return {void}
      */
     stage2Spawn() {
-        const {creeps: {[this.room.name]: creeps, [this.room.name]: {defender: defenders}}} = Cache;
+        const {room, room: {name: roomName}} = this,
+            {creeps: {[roomName]: creeps}} = Cache,
+            defenders = creeps && creeps.defenders || [];
 
-        this.checkSpawn(RoleDefender, true);
-        this.checkSpawn(RoleHealer, true);
+        if (!room.unobservable) {
+            this.checkSpawn(RoleDefender, true);
+            this.checkSpawn(RoleHealer, true);
 
-        if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
-            return;
+            if (!creeps || !defenders || _.filter(defenders, (c) => !c.spawning).length === 0) {
+                return;
+            }
+
+            // Call original method.
+            super.stage2Spawn();
+
+            this.checkSpawn(RoleRemoteCollector, true);
         }
-
-        // Call original method.
-        super.stage2Spawn();
-
-        this.checkSpawn(RoleRemoteCollector, true);
     }
 
     //         #                       ##    ##                  #                ###                #

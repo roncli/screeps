@@ -907,6 +907,10 @@ class Assign {
         _.forEach(creeps, (creep) => {
             const task = new TaskHarvest();
 
+            if (creep.room.name !== creep.memory.home) {
+                return;
+            }
+
             if (task.canAssign(creep)) {
                 if (say) {
                     creep.say(say);

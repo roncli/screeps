@@ -72,7 +72,7 @@ class RoomSource extends RoomMine {
     stage1Spawn() {
         const {room, room: {name: roomName}} = this,
             {creeps: {[roomName]: creeps}} = Cache,
-            defenders = creeps && creeps.defenders || [];
+            defenders = creeps && creeps.defender || [];
 
         if (!room.unobservable) {
             this.checkSpawn(RoleDefender, true);
@@ -180,7 +180,7 @@ class RoomSource extends RoomMine {
     stage2Spawn() {
         const {room, room: {name: roomName}} = this,
             {creeps: {[roomName]: creeps}} = Cache,
-            defenders = creeps && creeps.defenders || [];
+            defenders = creeps && creeps.defender || [];
 
         if (!room.unobservable) {
             this.checkSpawn(RoleDefender, true);

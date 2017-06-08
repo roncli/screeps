@@ -108,7 +108,7 @@ class TaskHarvest {
         creep.memory.currentTask = {
             type: this.type,
             failIn: this.failIn,
-            source: this.source
+            id: this.id
         };
     }
 
@@ -128,7 +128,7 @@ class TaskHarvest {
         const {memory: {currentTask}} = creep;
 
         if (Game.getObjectById(currentTask.id)) {
-            return new TaskHarvest(currentTask.source, currentTask.failIn);
+            return new TaskHarvest(currentTask.id, currentTask.failIn);
         }
 
         return void 0;

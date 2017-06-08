@@ -1111,9 +1111,11 @@ class Assign {
                     task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos, "position");
                 } else {
                     task = new TaskRally(portals[0], "room");
+                    task.range = 20;
                 }
             } else {
                 task = new TaskRally(roomName, "room");
+                task.range = 20;
             }
 
             // Assign the task.

@@ -109,7 +109,8 @@ class RoleRemoteDismantler {
     static assignTasks(engine) {
         const {room: {name: roomName}, tasks} = engine,
             {creeps: {[roomName]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteDismantler || []), (c) => _.sum(c.carry) > 0 || !c.spawning);
+            remoteDismantlers = creeps && creeps.remoteDismantler,
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(remoteDismantlers || []), (c) => _.sum(c.carry) > 0 || !c.spawning);
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -124,7 +125,7 @@ class RoleRemoteDismantler {
         }
 
         // Check for structures needing dismantling.
-        Assign.dismantleStructures(creepsWithNoTask, tasks.dismantle, "Dismantle");
+        Assign.dismantleStructures(creepsWithNoTask, remoteDismantlers, tasks.dismantle, "Dismantle");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

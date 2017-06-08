@@ -472,27 +472,36 @@ class Assign {
     /**
      * Assigns creeps to dismantle a structure from a list of structures.
      * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} allCreeps All creeps.
      * @param {Structure[]} structures An array of structures to dismantle.
      * @param {string} say Text to say on successful assignment.
      * @return {void}
      */
-    static dismantleStructures(creeps, structures, say) {
+    static dismantleStructures(creeps, allCreeps, structures, say) {
         if (!structures || structures.length === 0) {
             return;
         }
 
-        _.forEach(creeps, (creep, index) => {
-            let task;
+        _.forEach(creeps, (creep) => {
+            _.forEach(structures, (structure) => {
+                if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "dismantle" && c.memory.currentTask.id === structure.id).length === 0) {
+                    if (new TaskDismantle(structure.id).canAssign(creep)) {
+                        if (say) {
+                            creep.say(say);
+                        }
 
-            if (structures[index]) {
-                task = new TaskDismantle(structures[index].id);
-            } else {
-                task = new TaskDismantle(structures[0].id);
-            }
+                        return false;
+                    }
+                }
 
-            if (task.canAssign(creep)) {
-                if (say) {
-                    creep.say(say);
+                return true;
+            });
+
+            if (!creep.memory.currentTask) {
+                if (new TaskDismantle(structures[0].id).canAssign(creep)) {
+                    if (say) {
+                        creep.say(say);
+                    }
                 }
             }
         });

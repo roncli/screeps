@@ -582,7 +582,7 @@ class Main {
                             mineral1 = _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]);
 
                         return m.amountInRoom < m.amount && mineralResource[0] && mineral0 && mineral1 && mineral0.amountInRoom >= 5 && mineral1.amountInRoom >= 5;
-                    }).sort((a, b) => a.amount - a.amountInRoom - (b.amount - b.amountInRoom));
+                    }).sort((a, b) => b.amount - b.amountInRoom - (a.amount - a.amountInRoom));
 
                     if (mineralsToCreate.length > 0) {
                         const {0: mineralToCreate, 0: {resource}} = mineralsToCreate,

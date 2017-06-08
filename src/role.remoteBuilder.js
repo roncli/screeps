@@ -142,11 +142,13 @@ class RoleRemoteBuilder {
         }
 
         // Check for dropped resources in current room.
-        Assign.pickupResources(creepsWithNoTask, allCreeps, Cache.sortedResourcesInRoom(room), Cache.hostilesInRoom(room), "Pickup");
+        if (!room.unobservable) {
+            Assign.pickupResources(creepsWithNoTask, allCreeps, Cache.sortedResourcesInRoom(room), Cache.hostilesInRoom(room), "Pickup");
 
-        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-        if (creepsWithNoTask.length === 0) {
-            return;
+            _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+            if (creepsWithNoTask.length === 0) {
+                return;
+            }
         }
 
         // Attempt to assign harvest task to remaining creeps.

@@ -109,6 +109,7 @@ class RoleRemoteBuilder {
      */
     static assignTasks(engine) {
         const {creeps: {[engine.room.name]: creeps}} = Cache,
+            {room} = engine,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [];
 
@@ -141,7 +142,7 @@ class RoleRemoteBuilder {
         }
 
         // Check for dropped resources in current room.
-        Assign.pickupResourcesInCurrentRoom(creepsWithNoTask, allCreeps, "Pickup");
+        Assign.pickupResources(creepsWithNoTask, allCreeps, Cache.sortedResourcesInRoom(room), Cache.hostilesInRoom(room), "Pickup");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

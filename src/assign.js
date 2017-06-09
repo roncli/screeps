@@ -114,9 +114,12 @@ class Assign {
 
             ({0: firstCreep} = _.filter(creepsToAttack, (c) => Utilities.checkQuadrant(c.pos, creep.memory.quadrant)));
 
-            if (firstCreep) {
+            if (!firstCreep) {
                 return;
             }
+
+            // Set target.
+            ({id: creep.memory.target} = firstCreep);
 
             if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.

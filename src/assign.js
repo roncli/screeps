@@ -868,6 +868,19 @@ class Assign {
         });
     }
 
+    //   #   ##
+    //  # #   #
+    //  #     #     ##    ##
+    // ###    #    # ##  # ##
+    //  #     #    ##    ##
+    //  #    ###    ##    ##
+    /**
+     * Assigns creeps to flee from nearby hostiles.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} hostiles The hostiles to run from.
+     * @param {string} say Text to say on successful assignment.
+     * @return {void}
+     */
     static flee(creeps, hostiles, say) {
         if (!hostiles || hostiles.length === 0) {
             return;

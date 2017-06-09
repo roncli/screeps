@@ -50,13 +50,15 @@ class Pathing {
             ({pos} = pos);
         }
 
+        const creepRange = creepPos.getRangeTo(pos);
+
         // Default range to 0.
         if (!range) {
             range = 0;
         }
 
         // If creep is at the position, we're done.
-        if (creepPos.getRangeTo(pos) <= range) {
+        if (!flee && creepRange <= range || flee && creepRange >= range) {
             return;
         }
 

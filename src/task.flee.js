@@ -62,7 +62,7 @@ class TaskFlee {
      */
     run(creep) {
         // Run away from the position.
-        Pathing.moveTo(creep, this.pos, 10, true);
+        Pathing.moveTo(creep, this.pos, 10, true, Cache.hostilesInRoom(creep.room));
     }
 
     //  #           ##   #       #

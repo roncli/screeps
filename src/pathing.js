@@ -36,9 +36,10 @@ class Pathing {
      * @param {object} pos The position or object to path to.
      * @param {number} [range=0] The range to path within.
      * @param {bool} [flee=false] Whether to flee from the position.
+     * @param {Creep[]} [fleeFrom] All creeps to flee from.
      * @return {void}
      */
-    static moveTo(creep, pos, range, flee) {
+    static moveTo(creep, pos, range, flee, fleeFrom) {
         const {memory: creepMemory, pos: creepPos} = creep,
             {x: creepX, y: creepY, roomName: creepRoom} = creepPos,
             {time: tick} = Game,
@@ -168,7 +169,7 @@ class Pathing {
                 }
                 path[3] = tick;
             } else {
-                newPath = PathFinder.search(creepPos, {pos, range}, {
+                newPath = PathFinder.search(creepPos, flee ? _.map(fleeFrom, (c) => ({pos: c.pos, range})) : {pos, range}, {
                     plainCost: Math.ceil(1 * multiplier),
                     swampCost: Math.ceil(5 * multiplier),
                     flee,

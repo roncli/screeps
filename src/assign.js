@@ -889,7 +889,7 @@ class Assign {
         _.forEach(creeps, (creep) => {
             const {0: closest} = Utilities.objectsClosestToObj(hostiles, creep);
 
-            if (closest.pos.getRangeTo(creep) < 5) {
+            if (closest.pos.getRangeTo(creep) < 7) {
                 const task = new TaskFlee(closest.pos);
 
                 if (task.canAssign(creep)) {

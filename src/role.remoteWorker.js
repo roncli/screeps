@@ -149,10 +149,19 @@ class RoleRemoteWorker {
      */
     static assignTasks(engine) {
         const {creeps: {[engine.room.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteWorker || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            remoteWorkers = _.filter(creeps && creeps.remoteWorker || [], (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            creepsWithNoTask = Utilities.creepsWithNoTask(remoteWorkers),
             allCreeps = creeps && creeps.all || [],
             {supportRoom} = engine;
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Flee from enemies.
+        Assign.flee(remoteWorkers, engine.tasks.hostiles, "Run away!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }

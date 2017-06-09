@@ -109,16 +109,25 @@ class RoleRemoteBuilder {
      */
     static assignTasks(engine) {
         const {creeps: {[engine.room.name]: creeps}} = Cache,
-            {room} = engine,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.remoteBuilder || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            {room, tasks} = engine,
+            remoteBuilders = _.filter(creeps && creeps.remoteBuilder || [], (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            creepsWithNoTask = Utilities.creepsWithNoTask(remoteBuilders),
             allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
             return;
         }
 
+        // Flee from enemies.
+        Assign.flee(remoteBuilders, tasks.hostiles, "Run away!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // Check for enemy construction sites and rally to them.
-        Assign.stomp(creepsWithNoTask, engine.tasks.hostileConstructionSites, "Stomping");
+        Assign.stomp(creepsWithNoTask, tasks.hostileConstructionSites, "Stomping");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

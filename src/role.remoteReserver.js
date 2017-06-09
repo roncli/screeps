@@ -142,8 +142,17 @@ class RoleRemoteReserver {
     static assignTasks(engine) {
         const {room} = engine,
             {creeps: {[room.name]: creeps}} = Cache,
-            creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteReserver || []);
+            remoteReservers = _.filter(creeps && creeps.remoteReserver || [], (c) => !c.spawning),
+            creepsWithNoTask = Utilities.creepsWithNoTask(remoteReservers);
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Flee from enemies.
+        Assign.flee(remoteReservers, engine.tasks.hostiles, "Run away!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }

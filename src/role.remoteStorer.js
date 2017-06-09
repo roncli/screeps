@@ -178,10 +178,19 @@ class RoleRemoteStorer {
      */
     static assignTasks(engine) {
         const {creeps: {[engine.room.name]: creeps}} = Cache,
-            creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteStorer || []),
+            remoteStorers = _.filter(creeps && creeps.remoteStorer || [], (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            creepsWithNoTask = Utilities.creepsWithNoTask(remoteStorers),
             allCreeps = creeps && creeps.all || [],
             {supportRoom} = engine;
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Flee from enemies.
+        Assign.flee(remoteStorers, engine.tasks.hostiles, "Run away!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }

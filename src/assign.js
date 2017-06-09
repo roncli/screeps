@@ -9,6 +9,7 @@ const Cache = require("cache"),
     TaskDowngrade = require("task.downgrade"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
+    TaskFlee = require("task.flee"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
     TaskMine = require("task.mine"),
@@ -861,6 +862,25 @@ class Assign {
         _.forEach(creeps, (creep) => {
             if (new TaskFillMinerals(structure.id, resourcesNeeded).canAssign(creep)) {
                 if (say) {
+                    creep.say(say);
+                }
+            }
+        });
+    }
+
+    static flee(creeps, hostiles, say) {
+        if (!hostiles || hostiles.length === 0) {
+            return;
+        }
+
+        _.forEach(creeps, (creep) => {
+            const {0: closest} = Utilities.objectsClosestToObj(hostiles, creep);
+
+            if (closest.pos.getRangeTo(creep) < 5) {
+                const task = new TaskFlee(closest.pos);
+
+                if (task.canAssign(creep)) {
+                    ({time: creep.memory.currentTask.priority} = Game);
                     creep.say(say);
                 }
             }

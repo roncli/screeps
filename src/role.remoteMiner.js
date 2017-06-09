@@ -171,8 +171,17 @@ class RoleRemoteMiner {
      */
     static assignTasks(engine) {
         const {creeps: {[engine.room.name]: creeps}} = Cache,
-            creepsWithNoTask = Utilities.creepsWithNoTask(creeps && creeps.remoteMiner || []);
+            remoteMiners = _.filter(creeps && creeps.remoteMiner || [], (c) => !c.spawning),
+            creepsWithNoTask = Utilities.creepsWithNoTask(remoteMiners);
 
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Flee from enemies.
+        Assign.flee(remoteMiners, engine.tasks.hostiles, "Run away!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {
             return;
         }

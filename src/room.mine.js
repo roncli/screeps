@@ -169,6 +169,7 @@ class RoomMine extends RoomEngine {
         this.tasks = {};
 
         if (!room.unobservable) {
+            this.tasks.hostiles = Cache.hostilesInRoom(room);
             this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
     }
@@ -387,6 +388,7 @@ class RoomMine extends RoomEngine {
         this.tasks = {};
 
         if (!room.unobservable) {
+            this.tasks.hostiles = Cache.hostilesInRoom(room);
             this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
         }
     }

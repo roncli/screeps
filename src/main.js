@@ -42,6 +42,7 @@ const profiler = require("screeps-profiler"),
     TaskDowngrade = require("task.downgrade"),
     TaskFillEnergy = require("task.fillEnergy"),
     TaskFillMinerals = require("task.fillMinerals"),
+    TaskFlee = require("task.flee"),
     TaskHarvest = require("task.harvest"),
     TaskHeal = require("task.heal"),
     TaskMeleeAttack = require("task.meleeAttack"),
@@ -51,6 +52,7 @@ const profiler = require("screeps-profiler"),
     TaskRangedAttack = require("task.rangedAttack"),
     TaskRepair = require("task.repair"),
     TaskReserve = require("task.reserve"),
+    TaskSuicide = require("task.suicide"),
     TaskUpgradeController = require("task.upgradeController");
 
 //  #   #           #
@@ -722,6 +724,9 @@ class Main {
                     case "fillMinerals":
                         creepTasks[creep.name] = TaskFillMinerals.fromObj(creep);
                         break;
+                    case "flee":
+                        creepTasks[creep.name] = TaskFlee.fromObj(creep);
+                        break;
                     case "harvest":
                         creepTasks[creep.name] = TaskHarvest.fromObj(creep);
                         break;
@@ -748,6 +753,9 @@ class Main {
                         break;
                     case "reserve":
                         creepTasks[creep.name] = TaskReserve.fromObj(creep);
+                        break;
+                    case "suicide":
+                        creepTasks[creep.name] = TaskSuicide.fromObj(creep);
                         break;
                     case "upgradeController":
                         creepTasks[creep.name] = TaskUpgradeController.fromObj(creep);

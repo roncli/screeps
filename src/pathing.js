@@ -35,9 +35,10 @@ class Pathing {
      * @param {Creep} creep The creep to move.
      * @param {object} pos The position or object to path to.
      * @param {number} [range=0] The range to path within.
+     * @param {bool} [flee=false] Whether to flee from the position.
      * @return {void}
      */
-    static moveTo(creep, pos, range) {
+    static moveTo(creep, pos, range, flee) {
         const {memory: creepMemory, pos: creepPos} = creep,
             {x: creepX, y: creepY, roomName: creepRoom} = creepPos,
             {time: tick} = Game,
@@ -140,7 +141,7 @@ class Pathing {
             const key = `${creepRoom}.${creepX}.${creepY}.${posRoom}.${posX}.${posY}.${range}.${multiplier <= 1 ? 0 : 1}`,
                 {[key]: path} = paths;
 
-            if ((!pathing || pathing.blocked.length === 0) && path) {
+            if ((!pathing || pathing.blocked.length === 0) && path && !flee) {
                 // Use the cache.
                 if (pathing) {
                     pathing.path = this.decodePath(path[0]);
@@ -168,6 +169,7 @@ class Pathing {
                 newPath = PathFinder.search(creepPos, {pos, range}, {
                     plainCost: Math.ceil(1 * multiplier),
                     swampCost: Math.ceil(5 * multiplier),
+                    flee,
                     maxOps: creepRoom === posRoom ? 2000 : 100000,
                     roomCallback: (roomName) => {
                         const {rooms: {[roomName]: room}} = Game;
@@ -226,7 +228,7 @@ class Pathing {
                 }
 
                 // Cache serialized path
-                if (pathing.blocked.length === 0 && pathing.path.length > 10) {
+                if (pathing.blocked.length === 0 && pathing.path.length > 10 && !flee) {
                     paths[key] = [this.encodePath(pathing.path), [], tick, tick];
                     if (restartOn && restartOn.length > 0) {
                         paths[key][1] = restartOn;

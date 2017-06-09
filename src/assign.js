@@ -118,9 +118,6 @@ class Assign {
                 return;
             }
 
-            // Set target.
-            ({id: creep.memory.target} = firstCreep);
-
             if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.
                 task = new TaskMeleeAttack(firstCreep.id);

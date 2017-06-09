@@ -82,7 +82,8 @@ class TaskFlee {
             type: this.type,
             x: this.pos.x,
             y: this.pos.y,
-            roomName: this.pos.roomName
+            roomName: this.pos.roomName,
+            unimportant: this.unimportant
         };
     }
 

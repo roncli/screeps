@@ -108,6 +108,14 @@ class RoleDefender {
             return;
         }
 
+        // If we have a target, attack it.
+        Assign.attackTarget(creepsWithNoTask, tasks.hostiles, "Die!");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // If there is a hostile in the quadrant, attack it.
         Assign.attackInQuadrant(creepsWithNoTask, tasks.hostiles, "Die!");
 

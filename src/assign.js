@@ -114,9 +114,14 @@ class Assign {
 
             ({0: firstCreep} = _.filter(creepsToAttack, (c) => Utilities.checkQuadrant(c.pos, creep.memory.quadrant)));
 
-            if (!firstCreep) {
+            // Set target.
+            ({id: creep.memory.target} = firstCreep);
+
+            if (firstCreep) {
                 return;
-            } else if (creep.pos.getRangeTo(firstCreep) <= 1) {
+            }
+
+            if (creep.pos.getRangeTo(firstCreep) <= 1) {
                 // Attack the first creep when in range.
                 task = new TaskMeleeAttack(firstCreep.id);
             } else {
@@ -124,6 +129,60 @@ class Assign {
 
                 // Rally towards the first creep.
                 task = new TaskRally(firstCreep.pos, "position");
+
+                // If there are any creeps within 1 range, attack them.
+                if (closeCreeps.length > 0) {
+                    ({0: {id: task.attack}} = closeCreeps);
+                }
+            }
+
+            if (task.canAssign(creep)) {
+                ({time: creep.memory.currentTask.priority} = Game);
+                if (say) {
+                    creep.say(say);
+                }
+            }
+        });
+    }
+
+    //        #     #                #     ###                            #
+    //        #     #                #      #                             #
+    //  ###  ###   ###    ###   ##   # #    #     ###  ###    ###   ##   ###
+    // #  #   #     #    #  #  #     ##     #    #  #  #  #  #  #  # ##   #
+    // # ##   #     #    # ##  #     # #    #    # ##  #      ##   ##     #
+    //  # #    ##    ##   # #   ##   #  #   #     # #  #     #      ##     ##
+    //                                                        ###
+    /**
+     * Assigns creeps to attack a set target.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {Creep[]} creepsToAttack The list of creeps to attack.
+     * @param {string} say Text to say on successful assignment.
+     * @return {void}
+     */
+    static attackTarget(creeps, creepsToAttack, say) {
+        _.forEach(creeps, (creep) => {
+            let task;
+
+            if (!creep.memory.target) {
+                return;
+            }
+
+            const target = Game.getObjectById(creep.memory.target);
+
+            if (!target) {
+                delete creep.memory.target;
+
+                return;
+            }
+
+            if (creep.pos.getRangeTo(target) <= 1) {
+                // Attack the first creep when in range.
+                task = new TaskMeleeAttack(target.id);
+            } else {
+                const closeCreeps = _.filter(creepsToAttack, (c) => creep.pos.getRangeTo(c) <= 1);
+
+                // Rally towards the first creep.
+                task = new TaskRally(target.pos, "position");
 
                 // If there are any creeps within 1 range, attack them.
                 if (closeCreeps.length > 0) {

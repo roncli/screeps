@@ -33,7 +33,7 @@ class RoleRemoteCollector {
             return settings;
         }
 
-        const max = engine.type === "cleanup" ? 3 : 1;
+        const max = engine.type === "cleanup" ? 5 : 1;
 
         if (!canSpawn) {
             return {

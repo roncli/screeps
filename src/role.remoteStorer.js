@@ -183,7 +183,7 @@ class RoleRemoteStorer {
             allCreeps = creeps && creeps.all || [],
             {supportRoom} = engine;
 
-        if (creepsWithNoTask.length === 0) {
+        if (remoteStorers.length === 0) {
             return;
         }
 

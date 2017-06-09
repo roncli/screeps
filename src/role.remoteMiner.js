@@ -174,7 +174,7 @@ class RoleRemoteMiner {
             remoteMiners = _.filter(creeps && creeps.remoteMiner || [], (c) => !c.spawning),
             creepsWithNoTask = Utilities.creepsWithNoTask(remoteMiners);
 
-        if (creepsWithNoTask.length === 0) {
+        if (remoteMiners.length === 0) {
             return;
         }
 

@@ -154,7 +154,7 @@ class RoleRemoteWorker {
             allCreeps = creeps && creeps.all || [],
             {supportRoom} = engine;
 
-        if (creepsWithNoTask.length === 0) {
+        if (remoteWorkers.length === 0) {
             return;
         }
 

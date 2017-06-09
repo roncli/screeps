@@ -145,7 +145,7 @@ class RoleRemoteReserver {
             remoteReservers = _.filter(creeps && creeps.remoteReserver || [], (c) => !c.spawning),
             creepsWithNoTask = Utilities.creepsWithNoTask(remoteReservers);
 
-        if (creepsWithNoTask.length === 0) {
+        if (remoteReservers.length === 0) {
             return;
         }
 

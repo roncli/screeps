@@ -114,7 +114,7 @@ class RoleRemoteBuilder {
             creepsWithNoTask = Utilities.creepsWithNoTask(remoteBuilders),
             allCreeps = creeps && creeps.all || [];
 
-        if (creepsWithNoTask.length === 0) {
+        if (remoteBuilders.length === 0) {
             return;
         }
 

@@ -128,7 +128,7 @@ class RoleMiner {
             body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
             body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
         } else {
-            body = [MOVE, WORK, WORK, WORK, WORK, WORK];
+            body = [MOVE, MOVE, WORK, WORK, WORK, WORK, WORK];
         }
 
         return {

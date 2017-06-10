@@ -404,6 +404,8 @@ class RoomMine extends RoomEngine {
         if (!room.unobservable) {
             this.tasks.hostiles = Cache.hostilesInRoom(room);
             this.tasks.hostileConstructionSites = Cache.hostileConstructionSitesInRoom(room);
+            this.tasks.energyStructures = Cache.containersInRoom(room);
+            this.tasks.mineralStructures = Cache.containersInRoom(room);
         }
     }
 

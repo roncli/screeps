@@ -248,7 +248,7 @@ class RoomBase extends RoomEngine {
             hostiles = _.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username !== "Invader"),
             {name: roomName, memory: roomMemory} = room,
             armyName = `${roomName}-defense`,
-            {army: {[armyName]: army}} = Memory;
+            {armies: {[armyName]: army}} = Cache;
 
         if (hostiles.length > 0) {
             ({time: roomMemory.lastHostile} = Game);

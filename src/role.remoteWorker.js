@@ -159,7 +159,7 @@ class RoleRemoteWorker {
         }
 
         // Flee from enemies.
-        Assign.flee(remoteWorkers, engine.tasks.hostiles, "Run away!");
+        Assign.flee(remoteWorkers, "Run away!");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

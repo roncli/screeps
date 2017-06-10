@@ -222,13 +222,20 @@ class Cache {
      * @return {Creep[]} The hostiles in the room.
      */
     static hostilesInRoom(room) {
+        const {name: roomName} = room;
+
+        if (this.hostiles[roomName]) {
+            return this.hostiles[roomName];
+        }
+
         if (!room || room.unobservable) {
             return [];
         }
 
-        const hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = room.find(FIND_HOSTILE_CREEPS, {filter: (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1}),
-            {memory} = room,
-            threat = _.groupBy(_.map(hostiles, (h) => ({
+        this.hostiles[roomName] = room.find(FIND_HOSTILE_CREEPS, {filter: (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1});
+
+        const {memory} = room,
+            threat = _.groupBy(_.map(this.hostiles[roomName], (h) => ({
                 id: h.id, threat: _.sum(h.body, (bodypart) => {
                     let threatValue;
 
@@ -284,17 +291,17 @@ class Cache {
 
         memory.threat = _.sum(_.map(_.values(threat), (t) => t.threat));
 
-        hostiles.sort((a, b) => threat[b.id].threat - threat[a.id].threat);
+        this.hostiles[roomName].sort((a, b) => threat[b.id].threat - threat[a.id].threat);
 
         if (memory) {
             if (!memory.hostiles) {
                 memory.hostiles = [];
             }
 
-            memory.hostiles = _.map(hostiles, (h) => h.id);
+            memory.hostiles = _.map(this.hostiles[roomName], (h) => h.id);
         }
 
-        return hostiles;
+        return this.hostiles[roomName];
     }
 
     // ##          #            ###         ###

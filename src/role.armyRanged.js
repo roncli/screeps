@@ -38,7 +38,7 @@ class RoleArmyRanged {
         if (army.boostRoom) {
             boosts = {};
             boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
-            boosts[RESOURCE_CATALYZED_UTRIUM_ACID] = units;
+            boosts[RESOURCE_CATALYZED_KEANIUM_ALKALIDE] = units;
             if (army.super) {
                 boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;
             }

@@ -229,7 +229,7 @@ class Cache {
         const hostiles = this.hostiles[room.name] ? this.hostiles[room.name] : this.hostiles[room.name] = room.find(FIND_HOSTILE_CREEPS, {filter: (c) => !c.owner || Memory.allies.indexOf(c.owner.username) === -1}),
             {memory} = room,
             threat = _.groupBy(_.map(hostiles, (h) => ({
-                id: h.id, threat: _.reduce(h.body, (total, bodypart) => {
+                id: h.id, threat: _.sum(h.body, (bodypart) => {
                     let threatValue;
 
                     switch (bodypart.type) {
@@ -241,7 +241,7 @@ class Cache {
                             ({[bodypart.type]: threatValue} = BODYPART_COST);
                             break;
                         default:
-                            return total;
+                            return 0;
                     }
 
                     const {[bodypart.type]: boosts} = BOOSTS;
@@ -278,9 +278,9 @@ class Cache {
                         }
                     }
 
-                    return total + threatValue;
+                    return threatValue;
                 })
-            }), 0), (value) => value.id);
+            })), (value) => value.id);
 
         memory.threat = threat;
 

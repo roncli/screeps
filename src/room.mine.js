@@ -302,6 +302,8 @@ class RoomMine extends RoomEngine {
                 army.healer.maxCreeps = maxCreeps;
                 army.melee.maxCreeps = maxCreeps;
                 army.melee.escort = true;
+                army.success = false;
+                army.reinforce = true;
             } else {
                 Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps, units: 20}, melee: {maxCreeps, units: 20, escort: true}, ranged: {maxCreeps: 0, units: 20}});
             }
@@ -316,6 +318,7 @@ class RoomMine extends RoomEngine {
             // Cancel army if invaders are gone.
             army.directive = "attack";
             army.success = true;
+            army.reinforce = false;
         }
     }
 

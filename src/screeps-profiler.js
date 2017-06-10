@@ -175,7 +175,7 @@ const Profiler = {
     }
 
     const elapsedTicks = Game.time - Memory.profiler.enabledTick + 1;
-    const header = 'calls\t\ttime\t\tavg\t\tfunction';
+    const header = 'calls\t\ttime\t\tavg\t\tmax\t\tfunction';
     const footer = [
       `Avg: ${(Memory.profiler.totalTime / elapsedTicks).toFixed(2)}`,
       `Total: ${Memory.profiler.totalTime.toFixed(2)}`,
@@ -191,7 +191,8 @@ const Profiler = {
         name: functionName,
         calls: functionCalls.calls,
         totalTime: functionCalls.time,
-        averageTime: functionCalls.time / functionCalls.calls
+        averageTime: functionCalls.time / functionCalls.calls,
+        maxTime: functionCalls.maxTime
       };
     }).sort((val1, val2) => {
       return val2.totalTime - val1.totalTime;
@@ -202,7 +203,8 @@ const Profiler = {
         data.calls,
         data.totalTime.toFixed(1),
         data.averageTime.toFixed(3),
-        data.name
+        data.name,
+        data.maxTime
       ].join('\t\t');
     });
 
@@ -224,11 +226,13 @@ const Profiler = {
     if (!Memory.profiler.map[functionName]) {
       Memory.profiler.map[functionName] = {
         time: 0,
-        calls: 0
+        calls: 0,
+        maxTime: 0
       };
     }
     Memory.profiler.map[functionName].calls++;
     Memory.profiler.map[functionName].time += time;
+    Memory.profiler.map[functionName].maxTime = Math.max(Memory.profiler.map[functionName].maxTime, time);
   },
 
   endTick() {

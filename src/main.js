@@ -1082,7 +1082,7 @@ class Main {
 
             if (rooms && roomMemory && roomMemory.roomType) {
                 // Run rooms.
-                if (Game.cpu.bucket >= 9700 || roomMemory.roomType === "base" && Game.time % 2) {
+                if (Game.cpu.bucket >= 9700 || Game.time % 2 || roomMemory.roomType !== "base") {
                     rooms.run();
                 }
 

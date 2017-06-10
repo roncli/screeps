@@ -203,8 +203,8 @@ const Profiler = {
         data.calls,
         data.totalTime.toFixed(1),
         data.averageTime.toFixed(3),
-        data.name,
-        data.maxTime
+        data.maxTime,
+        data.name
       ].join('\t\t');
     });
 

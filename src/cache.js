@@ -282,7 +282,7 @@ class Cache {
                 })
             })), (value) => value.id);
 
-        memory.threat = threat;
+        memory.threat = _.sum(_.map(_.values(threat), (t) => t.threat));
 
         hostiles.sort((a, b) => threat[b.id].threat - threat[a.id].threat);
 

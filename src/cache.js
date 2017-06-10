@@ -26,10 +26,9 @@ class Cache {
         this.hostiles = {};
         this.spawns = {};
         this.resources = {};
-        this.sortedRepairableStructures = {};
 
         // Long term objects.
-        if (Game.time % 2 === 0 || !this.containers) {
+        if (Game.time % 4 === 0 || !this.containers) {
             this.containers = {};
             this.costMatrixes = {};
             this.criticalRepairableStructures = {};
@@ -41,6 +40,7 @@ class Cache {
             this.powerBanks = {};
             this.powerSpawns = {};
             this.repairableStructures = {};
+            this.sortedRepairableStructures = {};
             this.sortedResources = {};
             this.sourceKeepers = {};
             this.towers = {};

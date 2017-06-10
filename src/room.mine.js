@@ -296,14 +296,14 @@ class RoomMine extends RoomEngine {
             {army: {[armyName]: army}} = Memory;
 
         if (_.filter(hostiles, (h) => h.owner && h.owner.username !== "Invader").length > 0) {
-            const units = Math.ceil(threat / (BODYPART_COST[ATTACK] * 20));
+            const maxCreeps = Math.ceil(threat / (BODYPART_COST[ATTACK] * 20));
 
             if (army) {
-                army.healer.units = units;
-                army.melee.units = units;
+                army.healer.maxCreeps = maxCreeps;
+                army.melee.maxCreeps = maxCreeps;
                 army.melee.escort = true;
             } else {
-                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units}, melee: {maxCreeps: 1, units, escort: true}, ranged: {maxCreeps: 0, units: 20}});
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps, units: 20}, melee: {maxCreeps, units: 20, escort: true}, ranged: {maxCreeps: 0, units: 20}});
             }
         } else if (_.filter(hostiles, (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.

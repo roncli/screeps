@@ -1605,7 +1605,7 @@ class Assign {
             const task = new TaskRally(stageRoomName, "room");
 
             // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
-            _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
+            _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 2 || c.pos.x >= 47 || c.pos.y <= 2 || c.pos.y >= 47) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
                 if (task.canAssign(creep)) {
                     ({time: creep.memory.currentTask.priority} = Game);
                     if (say) {

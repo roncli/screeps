@@ -1349,7 +1349,14 @@ class Assign {
         const creepsByRoom = _.groupBy(creeps, (c) => c.room.name);
 
         _.forEach(Object.keys(creepsByRoom), (roomName) => {
-            const resources = Cache.sortedResourcesInRoom(Game.rooms[roomName]);
+            const {rooms: {[roomName]: room}} = Game,
+                hostiles = Cache.hostilesInRoom(room);
+
+            if (hostiles.length === 0) {
+                return;
+            }
+
+            const resources = Cache.sortedResourcesInRoom(room);
 
             _.forEach(creepsByRoom[roomName], (creep) => {
                 _.forEach(_.filter(resources, (r) => r.amount > creep.pos.getRangeTo(r)), (resource) => {

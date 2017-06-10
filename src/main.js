@@ -1081,12 +1081,14 @@ class Main {
                 {[roomName]: roomMemory} = memoryRooms;
 
             if (rooms && roomMemory && roomMemory.roomType) {
+                const {roomType: {type}} = roomMemory;
+
                 // Run rooms.
-                if (Game.cpu.bucket >= 9700 || Game.time % 2 || roomMemory.roomType !== "base") {
+                if (Game.cpu.bucket >= 9700 || Game.time % 2 || type !== "base") {
                     rooms.run();
                 }
 
-                if (roomMemory.roomType.type === rooms.type) {
+                if (type === rooms.type) {
                     rooms.toObj();
                 }
             }

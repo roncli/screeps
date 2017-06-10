@@ -290,11 +290,22 @@ class RoomMine extends RoomEngine {
      * @return {void}
      */
     defend() {
-        const {room, room: {name: roomName}, supportRoom, supportRoom: {name: supportRoomName}} = this,
+        const {room, room: {name: roomName}, supportRoom, supportRoom: {name: supportRoomName}, memory: {threat}} = this,
             armyName = `${roomName}-defense`,
+            hostiles = Cache.hostilesInRoom(room),
             {army: {[armyName]: army}} = Memory;
 
-        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
+        if (_.filter(hostiles, (h) => h.owner && h.owner.username !== "Invader").length > 0) {
+            const units = threat / (BODYPART_COST[ATTACK] * 20);
+
+            if (army) {
+                army.healer.units = units;
+                army.melee.units = units;
+                army.melee.escort = true;
+            } else {
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units}, melee: {maxCreeps: 1, units, escort: true}, ranged: {maxCreeps: 0, units: 20}});
+            }
+        } else if (_.filter(hostiles, (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
             if (!army) {
                 const {energyCapacityAvailable} = supportRoom;

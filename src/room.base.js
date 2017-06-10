@@ -424,15 +424,6 @@ class RoomBase extends RoomEngine {
             const {reserveMinerals, mineralPrices} = Memory;
             let buyResource;
 
-            if (memory.buyQueue) {
-                ({resource: buyResource} = buyQueue);
-
-                if (Cache.credits < Memory.minimumCredits || (storageStore[buyResource] || 0) + (terminalStore[buyResource] || 0) >= (reserveMinerals[buyResource] || 0)) {
-                    delete memory.buyQueue;
-                    buyQueue = void 0;
-                }
-            }
-
             if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {
                 // Buy what we need to for the lab queue.
                 const {0: bestOrder} = Market.getFilteredOrders().sell[buyResource] || [];
@@ -475,7 +466,7 @@ class RoomBase extends RoomEngine {
                 // TODO: Transfer the first excess mineral to the room that needs it the most.
                 if (Cache.credits >= Memory.minimumCredits) {
                     _.forEach(_.filter(Game.rooms, (gameRoom) => {
-                        const {gameRoomMemory, gameRoomTerminal} = gameRoom;
+                        const {memory: gameRoomMemory, terminal: gameRoomTerminal} = gameRoom;
 
                         return gameRoomMemory && gameRoomMemory.roomType && gameRoomMemory.roomType.type === "base" && gameRoomTerminal && gameRoomTerminal.my;
                     }), (otherRoom) => {

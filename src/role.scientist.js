@@ -179,14 +179,6 @@ class RoleScientist {
             return;
         }
 
-        // Check for terminals.
-        Assign.fillWithEnergy(creepsWithNoTask, tasks.terminalsFillWithEnergy, "Terminal");
-
-        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
         // Check for unfilled nukers.
         Assign.fillWithEnergy(creepsWithNoTask, Cache.nukersInRoom(room), "NukeEnergy");
 
@@ -197,6 +189,14 @@ class RoleScientist {
 
         // Check for unfilled power spawns.
         Assign.fillWithEnergy(creepsWithNoTask, Cache.powerSpawnsInRoom(room), "PwrEnergy");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Check for terminals.
+        Assign.fillWithEnergy(creepsWithNoTask, tasks.terminalsFillWithEnergy, "Terminal");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

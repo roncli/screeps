@@ -576,14 +576,14 @@ class Main {
                         const {resource} = m,
                             {[resource]: mineralResource} = Minerals;
 
-                        if (memory.buyQueue && memory.buyQueue.resource === resource || !mineralResource || mineralResource.length === 0) {
+                        if ((memory.buyQueue || !Memory.buy) && memory.buyQueue.resource === resource || !mineralResource || mineralResource.length === 0) {
                             return false;
                         }
 
                         const mineral0 = _.find(roomMinerals, (rm) => rm.resource === mineralResource[0]),
                             mineral1 = _.find(roomMinerals, (rm) => rm.resource === mineralResource[1]);
 
-                        return m.amountInRoom < m.amount && mineralResource[0] && mineral0 && mineral1 && mineral0.amountInRoom >= 5 && mineral1.amountInRoom >= 5;
+                        return m.amountInRoom < m.amount && mineral0 && mineral1 && mineral0.amountInRoom >= 5 && mineral1.amountInRoom >= 5;
                     }).sort((a, b) => b.amount - b.amountInRoom - (a.amount - a.amountInRoom));
 
                     if (mineralsToCreate.length > 0) {

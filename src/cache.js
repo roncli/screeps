@@ -289,7 +289,7 @@ class Cache {
                 })
             })), (value) => value.id);
 
-        memory.threat = _.sum(_.map(_.values(threat), (t) => t.threat));
+        memory.threat = _.sum(_.map(_.values(threat), (t) => t[0].threat));
 
         this.hostiles[roomName].sort((a, b) => threat[b.id].threat - threat[a.id].threat);
 

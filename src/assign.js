@@ -1352,7 +1352,7 @@ class Assign {
             const {rooms: {[roomName]: room}} = Game,
                 hostiles = Cache.hostilesInRoom(room);
 
-            if (hostiles.length === 0) {
+            if (hostiles.length > 0) {
                 return;
             }
 

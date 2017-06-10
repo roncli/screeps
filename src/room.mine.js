@@ -300,7 +300,7 @@ class RoomMine extends RoomEngine {
 
             if (army) {
                 army.boostRoom = supportRoomName;
-                army.healer.maxCreeps = maxCreeps;
+                army.healer.maxCreeps = 2 * maxCreeps;
                 army.melee.maxCreeps = maxCreeps;
                 army.melee.escort = true;
                 army.ranged.maxCreeps = maxCreeps;

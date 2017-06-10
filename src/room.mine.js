@@ -290,13 +290,13 @@ class RoomMine extends RoomEngine {
      * @return {void}
      */
     defend() {
-        const {room, room: {name: roomName}, supportRoom, supportRoom: {name: supportRoomName}, memory: {threat}} = this,
+        const {room, room: {name: roomName, memory: {threat}}, supportRoom, supportRoom: {name: supportRoomName}} = this,
             armyName = `${roomName}-defense`,
             hostiles = Cache.hostilesInRoom(room),
             {army: {[armyName]: army}} = Memory;
 
         if (_.filter(hostiles, (h) => h.owner && h.owner.username !== "Invader").length > 0) {
-            const units = threat / (BODYPART_COST[ATTACK] * 20);
+            const units = Math.ceil(threat / (BODYPART_COST[ATTACK] * 20));
 
             if (army) {
                 army.healer.units = units;

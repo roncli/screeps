@@ -151,9 +151,9 @@ class Army {
         if (dismantler.escort || melee.escort || ranged.escort) {
             _.forEach(_.filter(Cache.creeps[name] && Cache.creeps[name].armyHealer || [], (c) => !c.memory.escorting && !c.spawning), (creep) => {
                 const {0: escort} = Array.prototype.concat.apply([], [
-                    dismantler.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                    melee.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => !c.memory.escortedBy && !c.spawning) : [],
-                    ranged.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => !c.memory.escortedBy && !c.spawning) : []
+                    dismantler.escort && Cache.creeps[name].armyDismantler ? _.filter(Cache.creeps[name].armyDismantler, (c) => (!c.memory.escortedBy || !Game.getObjectById(c.memory.escortedBy)) && !c.spawning) : [],
+                    melee.escort && Cache.creeps[name].armyMelee ? _.filter(Cache.creeps[name].armyMelee, (c) => (!c.memory.escortedBy || !Game.getObjectById(c.memory.escortedBy)) && !c.spawning) : [],
+                    ranged.escort && Cache.creeps[name].armyRanged ? _.filter(Cache.creeps[name].armyRanged, (c) => (!c.memory.escortedBy || !Game.getObjectById(c.memory.escortedBy)) && !c.spawning) : []
                 ]);
 
                 if (escort) {

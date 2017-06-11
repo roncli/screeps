@@ -27,6 +27,11 @@ class Tower {
         const {tasks, room} = engine,
             towers = Cache.towersInRoom(room);
 
+        // Don't do anything unless all towers have energy.
+        if (_.filter(towers, (t) => t.energy === 0)) {
+            return;
+        }
+
         // Find hostiles to attack.
         if (tasks.hostiles.length > 0) {
             _.forEach(towers, (tower) => {

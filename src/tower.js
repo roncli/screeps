@@ -33,7 +33,7 @@ class Tower {
         }
 
         // Find hostiles to attack.
-        if (tasks.hostiles.length > 0) {
+        if (tasks.hostiles.length > 0 && _.filter(towers, (t) => t.energy < 500).length > 0) {
             _.forEach(towers, (tower) => {
                 tower.attack(tasks.hostiles[0]);
             });

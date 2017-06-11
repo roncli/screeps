@@ -266,7 +266,7 @@ class RoomBase extends RoomEngine {
             }
 
             const {threat, edgeTicks} = roomMemory,
-                armySize = Math.ceil(threat / (BODYPART_COST[ATTACK] * 100));
+                armySize = Math.ceil(threat / (BODYPART_COST[ATTACK] * 200));
 
             if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
                 edgeTicks[TOP]++;

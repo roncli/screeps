@@ -1084,7 +1084,7 @@ class Main {
                 const {roomType: {type}} = roomMemory;
 
                 // Run rooms.
-                if (Game.cpu.bucket >= 9700 || Game.time % 2 || type !== "base" || Cache.hostilesInRoom(room) > 0) {
+                if (Game.cpu.bucket >= 9700 || Game.time % 2 || type !== "base" || Cache.hostilesInRoom(room).length > 0) {
                     rooms.run();
                 }
 

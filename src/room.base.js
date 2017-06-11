@@ -256,9 +256,6 @@ class RoomBase extends RoomEngine {
             if (!roomMemory.currentAttack) {
                 ({time: roomMemory.currentAttack} = Game);
             }
-            if (!roomMemory.threats) {
-                roomMemory.threats = {};
-            }
             if (!roomMemory.edgeTicks) {
                 roomMemory.edgeTicks = {
                     1: 0,
@@ -268,12 +265,8 @@ class RoomBase extends RoomEngine {
                 };
             }
 
-            const {threats, edgeTicks} = roomMemory;
-
-            _.forEach(_.filter(_.map(hostiles, (h) => ({id: h.id, threat: _.filter(h.body, (b) => [ATTACK, RANGED_ATTACK, HEAL].indexOf(b) !== -1).length}))), (hostile) => {
-                ({threat: threats[hostile.id]} = hostile);
-            });
-            const armySize = Math.min(Math.ceil(_.sum(threats) / 20), 3);
+            const {threat, edgeTicks} = roomMemory,
+                armySize = Math.ceil(threat / (BODYPART_COST[ATTACK] * 100));
 
             if (_.filter(hostiles, (h) => h.pos.x === 0).length > 0) {
                 edgeTicks[TOP]++;
@@ -348,13 +341,11 @@ class RoomBase extends RoomEngine {
                 }
                 delete roomMemory.lastHostile;
                 delete roomMemory.currentAttack;
-                delete roomMemory.threats;
                 delete roomMemory.edgeTicks;
             }
         } else {
             delete roomMemory.lastHostile;
             delete roomMemory.currentAttack;
-            delete roomMemory.threats;
             delete roomMemory.edgeTicks;
         }
     }

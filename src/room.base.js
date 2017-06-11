@@ -293,7 +293,11 @@ class RoomBase extends RoomEngine {
                         army.boostRoom = roomName;
 
                         if (attackTicks >= 2000) {
-                            const rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.region === roomMemory.region);
+                            const rooms = _.filter(Game.rooms, (r) => {
+                                const {memory} = r;
+
+                                return memory && memory.roomType && memory.roomType.type === "base" && memory.region === roomMemory.region;
+                            });
 
                             _.forEach(rooms, (remoteRoom) => {
                                 const {name: remoteRoomName} = remoteRoom,

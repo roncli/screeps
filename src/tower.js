@@ -28,7 +28,7 @@ class Tower {
             towers = Cache.towersInRoom(room);
 
         // Don't do anything unless all towers have energy.
-        if (_.filter(towers, (t) => t.energy === 0)) {
+        if (_.filter(towers, (t) => t.energy === 0).length > 0) {
             return;
         }
 

@@ -187,6 +187,14 @@ class RoleStorer {
             return;
         }
 
+        // Check for unfilled labs.
+        Assign.fillWithEnergy(creepsWithNoTask, Cache.labsInRoom(room), "LabEnergy");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
         // Check for terminals.
         Assign.fillWithEnergy(creepsWithNoTask, tasks.terminalsFillWithEnergy, "Terminal");
 

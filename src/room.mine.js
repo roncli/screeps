@@ -296,7 +296,7 @@ class RoomMine extends RoomEngine {
             {armies: {[armyName]: army}} = Cache;
 
         if (_.filter(hostiles, (h) => h.owner && h.owner.username !== "Invader").length > 0 && threat && threat > 0) {
-            const maxCreeps = Math.ceil(threat / (BODYPART_COST[ATTACK] * 200));
+            const maxCreeps = Math.ceil(threat / (BODYPART_COST[ATTACK] * 300));
 
             if (army) {
                 army.boostRoom = supportRoomName;

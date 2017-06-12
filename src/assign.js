@@ -354,6 +354,7 @@ class Assign {
                     if (new TaskCollectEnergy(structure.id).canAssign(creep)) {
                         if (say) {
                             creep.say(say);
+                            _.remove(creeps, (c) => c.id === creep.id);
                         }
 
                         if (creep.memory.role === "storer") {

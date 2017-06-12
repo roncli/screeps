@@ -955,7 +955,7 @@ class Assign {
 
             const {0: closest} = Utilities.objectsClosestToObj(hostiles, creep);
 
-            if (closest.pos.getRangeTo(creep) < 7) {
+            if (closest.pos.getRangeTo(creep) < 10) {
                 const task = new TaskFlee(closest.pos);
 
                 if (task.canAssign(creep)) {

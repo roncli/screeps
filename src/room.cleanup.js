@@ -83,7 +83,7 @@ class RoomCleanup extends RoomEngine {
 
         // Find all structures that aren't under ramparts, divided by whether they have resources or not.
         tasks.structures = room.find(FIND_STRUCTURES, {filter: (s) => !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_ROAD) && !(s.structureType === STRUCTURE_WALL) && (tasks.ramparts.length === 0 || s.pos.getRangeTo(Utilities.objectsClosestToObj(tasks.ramparts, s)[0]) > 0)});
-        tasks.noResourceStructures = _.filter(tasks.structures, (s) => s.structureType === STRUCTURE_NUKER || (!s.energy || s.energy === 0) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
+        tasks.noResourceStructures = _.filter(tasks.structures, (s) => s.structureType === STRUCTURE_NUKER || (!s.energy || s.energy < 50) && (!s.store || _.sum(s.store) === 0) && (!s.mineralAmount || s.mineralAmount === 0));
         tasks.resourceStructures = _.filter(tasks.structures, (s) => s.structureType !== STRUCTURE_NUKER && (s.energy && s.energy > 0 || s.store && _.sum(s.store) > 0 || s.mineralAmount && s.mineralAmount > 0));
 
         // Find all walls and roads.

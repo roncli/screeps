@@ -97,7 +97,11 @@ class TaskRangedAttack {
                 creep.rangedAttack(enemy);
             }
         } else {
-            Pathing.moveTo(creep, enemy, 3);
+            if (creep.pos.getRangeTo(enemy) > 3) {
+                Pathing.moveTo(creep, enemy, 3);
+            } else {
+                Pathing.moveTo(creep, enemy, 3, true, [enemy]);
+            }
 
             creep.rangedAttack(enemy);
 

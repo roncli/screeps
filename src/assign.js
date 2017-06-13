@@ -351,10 +351,6 @@ class Assign {
 
             if (energy > 0) {
                 _.forEach(creeps, (creep) => {
-                    if (!creep) {
-                        return true;
-                    }
-
                     if (new TaskCollectEnergy(structure.id).canAssign(creep)) {
                         if (say) {
                             creep.say(say);

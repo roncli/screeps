@@ -190,7 +190,7 @@ class RoleUpgrader {
         const {room, tasks} = engine,
             {name: roomName} = room,
             {creeps: {[roomName]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.upgrader || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(upgraders || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [];
 
         if (creepsWithNoTask.length === 0) {
@@ -213,7 +213,7 @@ class RoleUpgrader {
             return;
         }
 
-        Assign.collectEnergy(creeps, [], Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller), "Collecting");
+        Assign.collectEnergy(creepsWithNoTask, [], Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller), "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

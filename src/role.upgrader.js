@@ -190,6 +190,7 @@ class RoleUpgrader {
         const {room, tasks} = engine,
             {name: roomName} = room,
             {creeps: {[roomName]: creeps}} = Cache,
+            upgraders = creeps && creeps.upgrader,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(upgraders || []), (c) => _.sum(c.carry) > 0 || !c.spawning && c.ticksToLive > 150),
             allCreeps = creeps && creeps.all || [];
 

@@ -118,10 +118,7 @@ class RoomCleanup extends RoomEngine {
 
             // No longer need dismantlers.
             _.forEach(creeps && creeps.remoteDismantler || [], (creep) => {
-                const {memory} = creep;
-
-                memory.role = "upgrader";
-                ({name: memory.home} = supportRoom);
+                creep.suicide();
             });
 
             // Eliminate the room from memory.

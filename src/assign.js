@@ -981,7 +981,26 @@ class Assign {
      */
     static getBoost(creeps, say) {
         _.forEach(_.filter(creeps, (c) => c.memory.labs && c.memory.labs.length > 0), (creep) => {
-            const task = new TaskRally(creep.memory.labs[0], "id");
+            const {memory: {labs: {0: id}}} = creep,
+                lab = Game.getObjectById(id);
+
+            // Lab doesn't exist, don't boost.
+            if (!lab) {
+                creep.memory.labs.shift();
+
+                return;
+            }
+
+            const {room: {memory: {labsInUse}}} = lab;
+
+            // Lab is not in use, don't boost.
+            if (!labsInUse || _.filter(labsInUse, (l) => l.id === id).length === 0) {
+                creep.memory.labs.shift();
+
+                return;
+            }
+
+            const task = new TaskRally(id, "id");
 
             if (task.canAssign(creep)) {
                 ({time: creep.memory.currentTask.priority} = Game);

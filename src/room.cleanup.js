@@ -123,6 +123,8 @@ class RoomCleanup extends RoomEngine {
 
             // Eliminate the room from memory.
             Commands.setRoomType(roomName);
+
+            delete Cache.rooms[roomName];
         }
     }
 

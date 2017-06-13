@@ -44,7 +44,7 @@ class TaskRepair {
      * @return {bool} Whether the task was assigned to the creep.
      */
     canAssign(creep) {
-        if (creep.spawning || !creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
+        if (!this.structure || creep.spawning || !creep.carry[RESOURCE_ENERGY] || creep.getActiveBodyparts(WORK) === 0) {
             return false;
         }
 

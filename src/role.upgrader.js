@@ -214,7 +214,8 @@ class RoleUpgrader {
             return;
         }
 
-        Assign.collectEnergy(creepsWithNoTask, [], Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller), "Collecting");
+        // Grab energy from link.
+        Assign.collectEnergy(upgraders, [], Utilities.objectsClosestToObj(Cache.linksInRoom(room), room.controller), "Collecting");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

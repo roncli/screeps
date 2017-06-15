@@ -34,7 +34,7 @@ class RoleScientist {
         }
 
         const {room} = engine,
-            max = _.filter(Cache.hostilesInRoom(room), (c) => c.owner && c.owner.username !== "Invader") > 0 ? 2 : 1;
+            max = 1;
 
         if (!canSpawn) {
             return {

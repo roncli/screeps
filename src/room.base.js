@@ -417,11 +417,11 @@ class RoomBase extends RoomEngine {
 
         if (terminalEnergy >= 1000 && maxEnergy >= Memory.dealEnergy) {
             const {reserveMinerals, mineralPrices} = Memory;
-            let buyResource;
 
             if (buyQueue && maxEnergy > Memory.marketEnergy && Memory.buy) {
                 // Buy what we need to for the lab queue.
-                const {0: bestOrder} = Market.getFilteredOrders().sell[buyResource] || [];
+                const {resource: buyResource} = buyQueue,
+                    {0: bestOrder} = Market.getFilteredOrders().sell[buyResource] || [];
 
                 if (bestOrder) {
                     const {price: bestPrice} = bestOrder;

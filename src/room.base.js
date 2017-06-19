@@ -769,7 +769,7 @@ class RoomBase extends RoomEngine {
             });
         }
 
-        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && ["moving, creating"].indexOf(labQueue.status) !== -1 && sourceLabs && !Utilities.roomLabsArePaused(room)) {
+        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && ["moving", "creating"].indexOf(labQueue.status) !== -1 && sourceLabs && !Utilities.roomLabsArePaused(room)) {
             if (lab0.mineralAmount < labAmount) {
                 tasks.labsFillMinerals = lab0;
                 tasks.labsFillMineralsResourcesNeeded = {};
@@ -832,7 +832,7 @@ class RoomBase extends RoomEngine {
             }
 
             // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-            if (!tasks.storageCollectMinerals && storage && labQueue && ["moving, creating"].indexOf(labQueue.status) !== -1 && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
+            if (!tasks.storageCollectMinerals && storage && labQueue && ["moving", "creating"].indexOf(labQueue.status) !== -1 && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
                 _.forEach(labQueue.children, (resource) => {
                     const amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount);
 

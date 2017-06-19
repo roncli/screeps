@@ -756,7 +756,7 @@ class RoomBase extends RoomEngine {
                 const lab = Game.getObjectById(l.id),
                     {status: labStatus} = l;
 
-                return (!labStatus || ["filling", "refilling"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource)) && lab.mineralAmount < (labStatus === "refilling" ? l.oldAmount : l.amount);
+                return (!labStatus || ["filling", "refilling", "creating"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource)) && lab.mineralAmount < (labStatus === "refilling" ? l.oldAmount : l.amount);
             }), (labInUse) => {
                 const {status: labStatus} = labInUse,
                     lab = Game.getObjectById(labInUse.id);
@@ -814,7 +814,7 @@ class RoomBase extends RoomEngine {
                     const {status: labStatus} = l,
                         lab = Game.getObjectById(l.id);
 
-                    return (!labStatus || ["filling", "refilling"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource));
+                    return (!labStatus || ["filling", "refilling", "creating"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource));
                 }), (l) => {
                     const {status: labStatus} = l,
                         lab = Game.getObjectById(l.id);

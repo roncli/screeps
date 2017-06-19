@@ -549,7 +549,7 @@ class RoomBase extends RoomEngine {
                 }
 
                 // Find an order to flip if we haven't made a deal and we have enough energy.
-                if (!dealMade && storage && maxEnergy > Memory.marketEnergy && _.filter(Game.rooms, (r) => r.memory.buyQueue).length === 0) {
+                if (!dealMade && storage && maxEnergy > Memory.marketEnergy && (!Memory.buy || _.filter(Game.rooms, (r) => r.memory.buyQueue).length === 0)) {
                     const filteredOrders = Market.getFilteredOrders();
 
                     _.forEach(Minerals, (children, resource) => {

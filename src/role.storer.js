@@ -47,7 +47,7 @@ class RoleStorer {
             };
         }
 
-        const {containerSource, lengthToStorage, army} = Memory,
+        const {containerSource, lengthToStorage} = Memory,
             sources = Array.prototype.concat.apply([], [room.find(FIND_SOURCES), room.find(FIND_MINERALS)]),
             {controller} = room,
             {level: rcl} = controller,

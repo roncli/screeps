@@ -76,7 +76,7 @@ class RoleHealer {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        const energy = Math.min(checkSettings.energyCapacityAvailable, 7500),
+        const energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
             units = Math.floor(energy / 300),
             body = [];
 

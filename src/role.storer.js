@@ -77,7 +77,7 @@ class RoleStorer {
             }
         });
 
-        max += Math.ceil(2 * length / (controller && rcl === 8 ? 35 : 30)) + (rcl >= 7 && army && _.filter(army, (a) => a.region === room.memory.region && a.directive === "building").length > 0 ? 1 : 0);
+        max += Math.ceil(length / (rcl === 8 ? 20 : 15)) + (rcl >= 7 && army && _.filter(army, (a) => a.region === room.memory.region && a.directive === "building").length > 0 ? 1 : 0);
 
         if (!canSpawn) {
             return {

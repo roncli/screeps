@@ -756,7 +756,7 @@ class RoomBase extends RoomEngine {
                 const lab = Game.getObjectById(l.id),
                     {status: labStatus} = l;
 
-                return (!labStatus || ["filling", "refilling", "creating"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource)) && lab.mineralAmount < (labStatus === "refilling" ? l.oldAmount : l.amount);
+                return (!labStatus || ["filling", "refilling"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource)) && lab.mineralAmount < (labStatus === "refilling" ? l.oldAmount : l.amount);
             }), (labInUse) => {
                 const {status: labStatus} = labInUse,
                     lab = Game.getObjectById(labInUse.id);
@@ -769,7 +769,7 @@ class RoomBase extends RoomEngine {
             });
         }
 
-        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && labQueue.status === "moving" && sourceLabs && !Utilities.roomLabsArePaused(room)) {
+        if (!tasks.labsFillMinerals && storage && labs.length >= 3 && labQueue && ["moving, creating"].indexOf(labQueue.status) !== -1 && sourceLabs && !Utilities.roomLabsArePaused(room)) {
             if (lab0.mineralAmount < labAmount) {
                 tasks.labsFillMinerals = lab0;
                 tasks.labsFillMineralsResourcesNeeded = {};
@@ -814,7 +814,7 @@ class RoomBase extends RoomEngine {
                     const {status: labStatus} = l,
                         lab = Game.getObjectById(l.id);
 
-                    return (!labStatus || ["filling", "refilling", "creating"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource));
+                    return (!labStatus || ["filling", "refilling"].indexOf(labStatus) !== -1) && (!lab.mineralType || lab.mineralType === (labStatus === "refilling" ? l.oldResource : l.resource));
                 }), (l) => {
                     const {status: labStatus} = l,
                         lab = Game.getObjectById(l.id);
@@ -832,7 +832,7 @@ class RoomBase extends RoomEngine {
             }
 
             // We only need to transfer from storage to lab when we have both storage and at least 3 labs.
-            if (!tasks.storageCollectMinerals && storage && labQueue && labQueue.status === "moving" && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
+            if (!tasks.storageCollectMinerals && storage && labQueue && ["moving, creating"].indexOf(labQueue.status) !== -1 && labs.length >= 3 && !Utilities.roomLabsArePaused(room)) {
                 _.forEach(labQueue.children, (resource) => {
                     const amount = _.sum(_.filter(labs, (l) => l.mineralType === resource), (l) => l.mineralAmount);
 
@@ -1027,7 +1027,7 @@ class RoomBase extends RoomEngine {
                 labQueue.status = "returning";
             }
 
-            if (labQueue.amount <= 0 && (sourceLab0.mineralAmount < 5 || sourceLab1.mineralAmount < 5)) {
+            if (labQueue.amount <= 0) {
                 delete memory.labQueue;
                 labQueue = void 0;
             }

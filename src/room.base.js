@@ -520,7 +520,7 @@ class RoomBase extends RoomEngine {
                         _.forEach(terminalMinerals.sort((a, b) => b.amount - a.amount), (topResource) => {
                             const {resource} = topResource,
                                 mineralPrice = _.find(mineralPrices, (m) => m.resource === resource),
-                                {0: bestOrder} = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits && (!mineralPrice || o.price > mineralPrice.value));
+                                {0: bestOrder} = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits || mineralPrice && o.price > mineralPrice.value);
 
                             if (bestOrder) {
                                 const {amount: bestAmount} = bestOrder,

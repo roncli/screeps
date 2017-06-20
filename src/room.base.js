@@ -625,7 +625,7 @@ class RoomBase extends RoomEngine {
      */
     tasks() {
         const {room} = this,
-            {controller, storage, terminal, memory: roomMemory} = room,
+            {controller, storage, terminal, memory: roomMemory, name: roomName} = room,
             rcl = controller ? controller.level : void 0,
             extensionEnergyCapacity = rcl ? EXTENSION_ENERGY_CAPACITY[rcl] : 0,
             {0: nuker} = Cache.nukersInRoom(room),
@@ -645,7 +645,7 @@ class RoomBase extends RoomEngine {
             criticalRepairableStructures: Cache.criticalRepairableStructuresInRoom(room),
             extensions: _.filter(Cache.extensionsInRoom(room), (e) => e.energy < extensionEnergyCapacity),
             hostiles: Cache.hostilesInRoom(room),
-            hurtCreeps: _.filter(Game.creeps, (c) => c.room.name === room.name && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),
+            hurtCreeps: _.filter(Game.creeps, (c) => c.room.name === roomName && c.hits < c.hitsMax).sort((a, b) => a.hits / a.hitsMax - b.hits / b.hitsMax),
             labsCollectMinerals: [],
             nuker,
             nukerResourcesNeeded: {},
@@ -661,6 +661,12 @@ class RoomBase extends RoomEngine {
         };
 
         const {tasks} = this;
+
+        if (tasks.structuresWithEnergy.length > 0) {
+            _.forEach(Cache.creeps[roomName].storer, (storer) => {
+                storer.memory.lastCollectEnergyWasStorage = false;
+            });
+        }
 
         tasks.quickConstructionSites = _.filter(tasks.constructionSites, (s) => s.progressTotal === 1);
 

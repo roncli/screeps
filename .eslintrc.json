@@ -295,6 +295,7 @@
     },
     "extends": "eslint:all",
     "rules": {
+        "array-element-newline": "off",
         "capitalized-comments": "off",
         "class-methods-use-this": "off",
         "complexity": "off",

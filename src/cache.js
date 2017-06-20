@@ -24,6 +24,7 @@ class Cache {
         this.extensions = {};
         this.hostileConstructionSites = {};
         this.hostiles = {};
+        this.labs = {};
         this.spawns = {};
         this.resources = {};
 
@@ -33,7 +34,6 @@ class Cache {
             this.costMatrixes = {};
             this.criticalRepairableStructures = {};
             this.extractors = {};
-            this.labs = {};
             this.links = {};
             this.nukers = {};
             this.portals = {};

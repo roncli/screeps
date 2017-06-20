@@ -744,8 +744,8 @@ class RoomBase extends RoomEngine {
             }
         }
 
-        if (storage && labQueue && status === "returning") {
-            _.forEach(_.filter(labs, (l) => l.mineralType === labQueue.resource), (lab) => {
+        if (storage && (!labQueue || status === "returning")) {
+            _.forEach(_.filter(labs, (l) => l.mineralType === labQueue.resource && (!labsInUse || _.filter(labsInUse, (liu) => liu.id === l.id).length === 0)), (lab) => {
                 labsCollectMinerals.push(lab);
             });
         }

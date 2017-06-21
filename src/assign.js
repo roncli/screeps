@@ -606,7 +606,8 @@ class Assign {
         }
 
         while (dismantle[roomName].length > 0) {
-            const {[roomName]: {0: pos}} = dismantle,
+            const {[roomName]: dismantleRoom} = dismantle,
+                {0: pos} = dismantleRoom,
                 structures = _.filter(room.lookForAt(LOOK_STRUCTURES, pos.x, pos.y), (s) => s.hits);
 
             if (structures.length === 0) {

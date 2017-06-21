@@ -31,7 +31,8 @@ class RoomMine extends RoomEngine {
      * @param {Room} room The room.
      */
     constructor(room) {
-        const {rooms: {[room.name]: {roomType}}} = Memory;
+        const {rooms: {[room.name]: roomMemory}} = Memory,
+            {roomType} = roomMemory;
 
         super();
         this.type = "mine";

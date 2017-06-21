@@ -26,9 +26,11 @@ class TaskUpgrade {
      * @param {string} roomName The name of the room with the controller to upgrade.
      */
     constructor(roomName) {
+        const {rooms: {[roomName]: room}} = Game;
+
         this.type = "upgradeController";
         this.room = roomName;
-        ({rooms: {[roomName]: {controller: this.controller}}} = Game);
+        ({controller: this.controller} = room);
         this.force = true;
     }
 

@@ -330,7 +330,7 @@ class RoomBase extends RoomEngine {
                         }
                     });
 
-                    // TODO: Test army casualties taken.  If 4 or more units are lost, reduce army size and queue & respect base matrix.
+                    // TODO: Test army casualties taken.  If 4 or more units are lost, reduce army size, defend with ranged only, and queue & respect base matrix.
                 } else {
                     Game.notify(`Warning! ${roomName} is under attack!`);
                     Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}, creepCount: 0});
@@ -488,7 +488,6 @@ class RoomBase extends RoomEngine {
 
                             if (terminalEnergy > transCost) {
                                 if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
-                                    Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
                                     dealMade = true;
 
                                     return false;
@@ -497,7 +496,6 @@ class RoomBase extends RoomEngine {
                                 amount = Math.floor(amount * terminalEnergy / transCost);
                                 if (amount > 0) {
                                     if (terminal.send(resourceResource, amount, otherRoomName) === OK) {
-                                        Cache.log.events.push(`Sending ${amount} ${resourceResource} from ${roomName} to ${otherRoomName}`);
                                         dealMade = true;
 
                                         return false;
@@ -513,6 +511,7 @@ class RoomBase extends RoomEngine {
                 }
 
                 // Sell what we have in excess.
+                // TODO: For catalyzed resources, if over 5005, don't sell under 5000.
                 if (!dealMade) {
                     const terminalMinerals = _.filter(_.map(terminalStore, (s, k) => ({resource: k, amount: Math.min(s, s - (reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))})), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
@@ -549,6 +548,7 @@ class RoomBase extends RoomEngine {
                 }
 
                 // Find an order to flip if we haven't made a deal and we have enough energy.
+                // TODO: Only buy up to 5000 extra for the room.
                 if (!dealMade && storage && maxEnergy > Memory.marketEnergy && (!Memory.buy || _.filter(Game.rooms, (r) => r.memory.buyQueue).length === 0)) {
                     const filteredOrders = Market.getFilteredOrders();
 
@@ -583,7 +583,8 @@ class RoomBase extends RoomEngine {
                         }
 
                         if (index === 0) {
-                            Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`);
+                            // TODO: Notify of best flip.
+                            // Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`);
                         }
 
                         // Determine how much energy we need for the deal.
@@ -813,7 +814,6 @@ class RoomBase extends RoomEngine {
         }
 
         // storageCollectMinerals
-        // TODO: Things.
         if (controller && rcl >= 6) {
             if (storage && labsInUse) {
                 _.forEach(_.filter(labsInUse, (l) => {

@@ -40,7 +40,7 @@ class RoomEngine {
      */
     checkSpawn(Role, canSpawn) {
         const {room, room: {name: roomName}} = this,
-            {log: {rooms: {[roomName]: roomLog}}, creeps: {[roomName]: creeps}} = Cache;
+            {creeps: {[roomName]: creeps}} = Cache;
         let canBoost = false,
             labsToBoostWith, spawnToUse;
 
@@ -52,12 +52,13 @@ class RoomEngine {
             count = creeps && creeps[checkSettings.name] ? creeps[checkSettings.name].length : 0;
 
         // Output creep count in the report.
-        if (roomLog && (checkSettings.max > 0 || count > 0)) {
-            roomLog.creeps.push({
-                role: checkSettings.name,
-                count,
-                max: checkSettings.max
-            });
+        if (checkSettings.max > 0 || count > 0) {
+            // TODO: Notify creep count in log
+            // roomLog.creeps.push({
+            //     role: checkSettings.name,
+            //     count,
+            //     max: checkSettings.max
+            // });
         }
 
         // Bail if we're not spawning anything.

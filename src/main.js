@@ -79,8 +79,7 @@ class Main {
      */
     static loop() {
         const {cpu: gameCpu} = Game,
-            {bucket} = gameCpu,
-            {logCpu} = Memory;
+            {bucket} = gameCpu;
 
         if (bucket < gameCpu.tickLimit) {
             Game.notify(`Bucket at ${bucket.toFixed(0)}, aborting! ${Game.time.toFixed(0)}`);
@@ -89,131 +88,26 @@ class Main {
         }
 
         const loop = () => {
-            let log = "",
-                lastCpu, thisCpu;
-
-            if (logCpu) {
-                lastCpu = gameCpu.getUsed();
-                log = `Started at ${lastCpu.toFixed(2)}`;
-            }
-
             this.init();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}init took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.minerals();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}minerals took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.baseMatrixes();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}baseMatrixes took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.deserializeCreeps();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}deserializeCreeps took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.deserializeRooms();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}deserializeRooms took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.deserializeArmies();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}deserializeArmies took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.balanceEnergy();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}balanceEnergy took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
-            if (Memory.log) {
-                this.log();
-
-                if (logCpu) {
-                    thisCpu = gameCpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}log took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
-            }
-
             this.rooms();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}rooms took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.army();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}army took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
-
             this.creeps();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}creeps took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
 
             if (Memory.debug) {
                 this.debug();
-
-                if (logCpu) {
-                    thisCpu = gameCpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}debug took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    lastCpu = thisCpu;
-                }
             }
 
             if (Memory.visualizations) {
                 this.drawGlobal();
-
-                if (logCpu) {
-                    thisCpu = gameCpu.getUsed();
-                    log += `${log.length > 0 ? " - " : ""}drawGlobal took ${(thisCpu - lastCpu).toFixed(2)}`;
-                    Cache.log.events.push(log);
-                }
             }
 
             this.finalize();
-
-            if (logCpu) {
-                thisCpu = gameCpu.getUsed();
-                log += `${log.length > 0 ? " - " : ""}finalize took ${(thisCpu - lastCpu).toFixed(2)}`;
-                lastCpu = thisCpu;
-            }
         };
 
         if (Memory.profiling) {
@@ -245,7 +139,7 @@ class Main {
         // Detect a system reset.
         if (!this.reset) {
             this.reset = true;
-            Cache.log.events.push("System reset.");
+            // TODO: Notify of system reset.
         }
 
         // Set and unset Memory.buy.
@@ -863,201 +757,13 @@ class Main {
                     transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoomName, roomName);
 
                     otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), roomName);
-                    Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoomName} to ${roomName}`);
+                    // TODO: Notify of energy transfer.
+                    // Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoomName} to ${roomName}`);
                 }
 
                 return true;
             });
         }
-    }
-
-    // ##
-    //  #
-    //  #     ##    ###
-    //  #    #  #  #  #
-    //  #    #  #   ##
-    // ###    ##   #
-    //              ###
-    /**
-     * Create a log.
-     * @return {void}
-     */
-    static log() {
-        Cache.log.creeps = _.map(Game.creeps, (c) => ({
-            creepId: c.id,
-            name: c.name,
-            creepType: c.memory.role,
-            home: c.memory.home,
-            army: c.memory.army,
-            room: c.pos.roomName,
-            x: c.pos.x,
-            y: c.pos.y,
-            spawning: c.spawning,
-            ttl: c.ticksToLive,
-            carryCapacity: c.carryCapacity,
-            carry: c.carry,
-            hits: c.hits,
-            hitsMax: c.hitsMax
-        }));
-
-        _.forEach(Cache.armies, (army) => {
-            // Log army data.
-            Cache.log.army[army.name] = {
-                directive: army.directive,
-                scheduled: army.scheduled,
-                portals: army.portals,
-                boostRoom: army.boostRoom,
-                buildRoom: army.buildRoom,
-                stageRoom: army.stageRoom,
-                attackRoom: army.attackRoom,
-                dismantle: army.dismantle.length,
-                creeps: []
-            };
-
-            if (Game.rooms[army.attackRoom]) {
-                ({length: Cache.log.army[army.name].structures} = _.filter(Game.rooms[army.attackRoom].find(FIND_HOSTILE_STRUCTURES), (s) => !(s.structureType === STRUCTURE_CONTROLLER) && !(s.structureType === STRUCTURE_RAMPART) && !(s.structureType === STRUCTURE_KEEPER_LAIR)));
-                ({length: Cache.log.army[army.name].constructionSites} = Game.rooms[army.attackRoom].find(FIND_HOSTILE_CONSTRUCTION_SITES));
-            }
-        });
-
-        Cache.log.spawns = _.map(Game.spawns, (s) => ({
-            spawnId: s.id,
-            name: s.name,
-            room: s.room.name,
-            spawningName: s.spawning ? s.spawning.name : void 0,
-            spawningNeedTime: s.spawning ? s.spawning.needTime : void 0,
-            spawningRemainingTime: s.spawning ? s.spawning.remainingTime : void 0
-        }));
-
-        _.forEach(Array.prototype.concat.apply([], [_.filter(Game.rooms), this.unobservableRooms]), (room) => {
-            const {name: roomName} = room,
-                {rooms: {[roomName]: roomMemory}} = Memory,
-                type = roomMemory && roomMemory.roomType && roomMemory.roomType.type ? roomMemory.roomType.type : "unknown";
-            let repairableStructures, constructionSites, towers, labs, nukers, powerSpawns;
-
-            // Log room data.
-            if (room.unobservable) {
-                Cache.log.rooms[roomName] = {
-                    type,
-                    supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : void 0,
-                    region: roomMemory ? roomMemory.region : void 0,
-                    unobservable: true,
-                    store: {},
-                    labs: [],
-                    source: [],
-                    creeps: []
-                };
-            } else {
-                const {controller} = room;
-
-                if (Game.time % 10 === 0) {
-                    repairableStructures = Cache.repairableStructuresInRoom(room);
-                }
-                constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
-                towers = Cache.towersInRoom(room);
-                labs = Cache.labsInRoom(room);
-                nukers = Cache.nukersInRoom(room);
-                powerSpawns = Cache.powerSpawnsInRoom(room);
-
-                Cache.log.rooms[roomName] = {
-                    type,
-                    supportRoom: roomMemory && roomMemory.roomType ? roomMemory.roomType.supportRoom : void 0,
-                    region: roomMemory ? roomMemory.region : void 0,
-                    unobservable: false,
-                    controller: !!controller,
-                    store: {},
-                    labs: [],
-                    source: [],
-                    creeps: []
-                };
-
-                const {log: {rooms: {[roomName]: roomLog}}} = Cache;
-
-                if (roomLog.controller) {
-                    ({level: roomLog.rcl, progress: roomLog.progress, progressTotal: roomLog.progressTotal, ticksToDowngrade: roomLog.ttd} = controller);
-                    if (controller.owner) {
-                        ({owner: {username: roomLog.ownerUsername}} = controller);
-                    }
-                }
-
-                if (controller && controller.reservation) {
-                    ({reservation: {username: roomLog.reservedUsername, ticksToEnd: roomLog.tte}} = controller);
-                }
-
-                if (Game.time % 10 === 0) {
-                    roomLog.lowestWall = Math.min(..._.map(_.filter(repairableStructures, (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits));
-                } else {
-                    roomLog.lowestWall = Memory.console && Memory.console.rooms && Memory.console.rooms[roomName] && Memory.console.rooms[roomName].lowestWall || null;
-                }
-
-                if (room.energyCapacityAvailable && room.energyCapacityAvailable > 0) {
-                    ({energyAvailable: roomLog.energyAvailable, energyCapacityAvailable: roomLog.energyCapacityAvailable} = room);
-                }
-
-                roomLog.constructionProgress = _.sum(_.map(constructionSites, (c) => c.progress));
-                roomLog.constructionProgressTotal = _.sum(_.map(constructionSites, (c) => c.progressTotal));
-
-                roomLog.towerEnergy = _.sum(_.map(towers, (t) => t.energy));
-                roomLog.towerEnergyCapacity = _.sum(_.map(towers, (t) => t.energyCapacity));
-
-                roomLog.labEnergy = _.sum(_.map(labs, (l) => l.energy));
-                roomLog.labEnergyCapacity = _.sum(_.map(labs, (l) => l.energyCapacity));
-
-                roomLog.nukerEnergy = _.sum(_.map(nukers, (n) => n.energy));
-                roomLog.nukerEnergyCapacity = _.sum(_.map(nukers, (n) => n.energyCapacity));
-
-                roomLog.nukerGhodium = _.sum(_.map(nukers, (n) => n.ghodium));
-                roomLog.nukerGhodiumCapacity = _.sum(_.map(nukers, (n) => n.ghodiumCapacity));
-
-                roomLog.powerSpawnEnergy = _.sum(_.map(powerSpawns, (s) => s.energy));
-                roomLog.powerSpawnEnergyCapacity = _.sum(_.map(powerSpawns, (s) => s.energyCapacity));
-
-                roomLog.powerSpawnPower = _.sum(_.map(powerSpawns, (s) => s.power));
-                roomLog.powerSpawnPowerCapacity = _.sum(_.map(powerSpawns, (s) => s.powerCapacity));
-
-                if (room.storage) {
-                    roomLog.store.storage = _.map(room.storage.store, (s, k) => ({resource: k, amount: s}));
-                }
-
-                if (room.terminal) {
-                    roomLog.store.terminal = _.map(room.terminal.store, (s, k) => ({resource: k, amount: s}));
-                }
-
-                roomLog.labs = _.map(labs, (l) => ({resource: l.mineralType, amount: l.mineralAmount}));
-
-                ({labQueue: roomLog.labQueue, buyQueue: roomLog.buyQueue} = roomMemory);
-
-                _.forEach(room.find(FIND_SOURCES), (s) => {
-                    roomLog.source.push({
-                        sourceId: s.id,
-                        resource: RESOURCE_ENERGY,
-                        amount: s.energy,
-                        capacity: s.energyCapacity,
-                        ttr: s.ticksToRegeneration
-                    });
-                });
-
-                _.forEach(room.find(FIND_MINERALS), (m) => {
-                    roomLog.source.push({
-                        sourceId: m.id,
-                        resource: m.mineralType,
-                        amount: m.mineralAmount,
-                        ttr: m.ticksToRegeneration
-                    });
-                });
-
-                Cache.log.hostiles = Array.prototype.concat.apply([], [Cache.log.hostiles, _.map(Cache.hostilesInRoom(room), (h) => ({
-                    creepId: h.id,
-                    ownerUsername: h.owner.username,
-                    room: roomName,
-                    x: h.pos.x,
-                    y: h.pos.y,
-                    ttl: h.ticksToLive,
-                    hits: h.hits,
-                    hitsMax: h.hitsMax
-                }))]);
-            }
-        });
     }
 
     // ###    ##    ##   # #    ###
@@ -1522,11 +1228,10 @@ class Main {
         Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
 
         // Update CPU
-        Cache.log.cpuUsed = Game.cpu.getUsed();
         Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
 
         // CPU
-        Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Cache.log.cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
+        Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Game.cpu.getUsed() > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
     }
 
     //   #    #                ##     #
@@ -1540,12 +1245,9 @@ class Main {
      * @return {void}
      */
     static finalize() {
-        const {log} = Cache;
-
-        ({time: log.tick, gcl: {level: log.gcl, progress: log.progress, progressTotal: log.progressTotal}, cpu: {limit: log.limit, tickLimit: log.tickLimit, bucket: log.bucket}, market: {credits: log.credits}} = Game);
-        log.cpuUsed = Game.cpu.getUsed();
-        log.date = new Date();
-        Memory.console = log;
+        // TODO: Write statistics to memory
+        // log.cpuUsed = Game.cpu.getUsed();
+        // log.date = new Date();
     }
 }
 

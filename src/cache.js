@@ -52,17 +52,6 @@ class Cache {
         this.spawning = {};
         this.rooms = {};
 
-        // Cache for log.
-        this.log = {
-            events: [],
-            hostiles: [],
-            creeps: [],
-            spawns: [],
-            structures: [],
-            rooms: {},
-            army: {}
-        };
-
         // Cache for credits.
         ({market: {credits: this.credits}} = Game);
 

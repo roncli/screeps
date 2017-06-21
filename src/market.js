@@ -80,16 +80,13 @@ class Market {
                     Cache.credits -= order.amount * order.price;
                 }
                 if (order.amount <= amount) {
-                    Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} sold out ${order.id}`);
                     _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
                     _.remove(Market.orders, (m) => m.id === orderId);
                 } else {
                     order.amount -= amount;
-                    Cache.log.events.push(`${yourRoomName} ${order.resourceType} x${amount} @ ${order.price} completed, ${order.type} ${order.amount} remaining on ${order.id}`);
                 }
             }
         } else if (order) {
-            Cache.log.events.push(`${yourRoomName} failed to process order ID ${orderId}: ${ret}`);
             _.remove(Market.filteredOrders[order.type][order.resourceType], (m) => m.id === orderId);
             _.remove(Market.orders, (m) => m.id === orderId);
         }

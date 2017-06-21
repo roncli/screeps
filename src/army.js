@@ -206,16 +206,16 @@ class Army {
      */
     checkSpawn(role, max, successCallback) {
         const {name: armyName} = this,
-            {length: count} = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300),
-            {log: {army: {[armyName]: armyLog}}} = Cache;
+            {length: count} = _.filter(Cache.creeps[armyName] && Cache.creeps[armyName][role] || [], (c) => c.spawning || c.ticksToLive > 300);
 
         if (count < max) {
             successCallback();
         }
 
         // Output creep count in the report.
-        if (armyLog && (max > 0 || count > 0)) {
-            armyLog.creeps.push({role, count, max});
+        if (max > 0 || count > 0) {
+            // TODO: Notify creep count in log
+            // armyLog.creeps.push({role, count, max});
         }
     }
 

@@ -89,7 +89,8 @@ class Army {
             const {boostRoom: boostRoomName} = this;
 
             if (boostRoomName) {
-                const {rooms: {[boostRoomName]: {storage: {store: boostRoomStorageStore}}}} = Game;
+                const {rooms: {[boostRoomName]: boostedRoom}} = Game,
+                    {storage: {store: boostRoomStorageStore}} = boostedRoom;
 
                 if (!boostRoomStorageStore ||
                     (boostRoomStorageStore[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] || 0) >= 30 * 5 * (dismantler.maxCreeps + melee.maxCreeps + ranged.maxCreeps + healer.maxCreeps) &&

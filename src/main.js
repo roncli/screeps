@@ -741,8 +741,7 @@ class Main {
         if (rooms.length > 1) {
             energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
             _.forEach(rooms, (room, index) => {
-                const otherIndex = rooms.length - index - 1,
-                    {[otherIndex]: {name: otherRoomName, storage: {store: {[RESOURCE_ENERGY]: otherRoomStorageEnergy}}, terminal: otherRoomTerminal, terminal: {store: {[RESOURCE_ENERGY]: otherRoomTerminalEnergy}}}} = rooms,
+                const {[rooms.length - index - 1]: {name: otherRoomName, storage: {store: {[RESOURCE_ENERGY]: otherRoomStorageEnergy}}, terminal: otherRoomTerminal, terminal: {store: {[RESOURCE_ENERGY]: otherRoomTerminalEnergy}}}} = rooms,
                     {name: roomName, storage: {store: {[RESOURCE_ENERGY]: roomStorageEnergy}}} = room;
                 let transCost;
 

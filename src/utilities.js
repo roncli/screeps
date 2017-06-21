@@ -356,32 +356,28 @@ class Utilities {
             return objects;
         }
 
-        const objList = _.map(objects, (o) => {
-            const {id: oId} = o;
-            let {ranges} = Memory,
-                range;
+        const {ranges, ranges: {[id]: thisRange}} = Memory,
+            objList = _.map(objects, (o) => {
+                const {id: oId} = o;
+                let range;
 
-            if (ranges && ranges[id] && ranges[id][oId]) {
-                ({[id]: {[oId]: range}} = ranges);
-            } else {
-                range = obj.pos.getRangeTo(o);
-                if (!(o instanceof Creep) && !(obj instanceof Creep)) {
-                    if (!ranges) {
-                        Memory.ranges = {};
-                        ({ranges} = Memory);
+                if (ranges && ranges[id] && ranges[id][oId]) {
+                    ({[oId]: range} = thisRange);
+                } else {
+                    range = obj.pos.getRangeTo(o);
+                    if (!(o instanceof Creep) && !(obj instanceof Creep)) {
+                        if (!ranges[id]) {
+                            ranges[id] = {};
+                        }
+                        ranges[id][oId] = range;
                     }
-                    if (!ranges[id]) {
-                        ranges[id] = {};
-                    }
-                    ranges[id][oId] = range;
                 }
-            }
 
-            return {
-                object: o,
-                distance: range
-            };
-        });
+                return {
+                    object: o,
+                    distance: range
+                };
+            });
 
         objList.sort((a, b) => a.distance - b.distance);
 

@@ -207,6 +207,9 @@ class Main {
         if (!Memory.paths) {
             Memory.paths = {};
         }
+        if (!Memory.ranges) {
+            Memory.ranges = {};
+        }
 
         // this.paths = new Segment(4);
         // if (!this.paths.memory) {

@@ -474,7 +474,7 @@ class RoomBase extends RoomEngine {
 
                         _.forEach(_.filter(_.map(terminalStore, (s, k) => ({
                             resource: k,
-                            amount: Math.min(reserveMinerals ? s + storageStore[k] - (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) : 0, s),
+                            amount: Math.min(reserveMinerals ? s + (storageStore[k] || 0) - (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) : 0, s),
                             otherRoomAmount: (otherRoom.terminal.store[k] || 0) + (otherRoomStorage && otherRoomStorage.store[k] || 0),
                             needed: reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0
                         })), (r) => {
@@ -511,7 +511,6 @@ class RoomBase extends RoomEngine {
                 }
 
                 // Sell what we have in excess.
-                // TODO: For catalyzed resources, if over 5005, don't sell under 5000.
                 if (!dealMade) {
                     const terminalMinerals = _.filter(_.map(terminalStore, (s, k) => ({resource: k, amount: Math.min(s, s - (reserveMinerals ? (k.startsWith("X") && k.length === 5 ? reserveMinerals[k] - 5000 : reserveMinerals[k]) || 0 : 0) + (storageStore[k] || 0))})), (s) => s.resource !== RESOURCE_ENERGY && s.amount > 0);
 
@@ -522,16 +521,17 @@ class RoomBase extends RoomEngine {
                                 {0: bestOrder} = _.filter(Market.getFilteredOrders().buy[resource] || [], (o) => topResource.amount >= 5005 && Cache.credits < Memory.minimumCredits || mineralPrice && o.price > mineralPrice.value);
 
                             if (bestOrder) {
-                                const {amount: bestAmount} = bestOrder,
-                                    transCost = market.calcTransactionCost(Math.min(topResource.amount, bestAmount), roomName, bestOrder.roomName);
+                                const {amount: bestAmount} = bestOrder;
+                                let amount = Math.min(topResource.amount >= 5005 ? topResource.amount - 5000 : topResource.amount, bestAmount);
+                                const transCost = market.calcTransactionCost(amount, roomName, bestOrder.roomName);
 
                                 if (terminalEnergy > transCost) {
-                                    Market.deal(bestOrder.id, Math.min(topResource.amount, bestAmount), roomName);
+                                    Market.deal(bestOrder.id, amount, roomName);
                                     dealMade = true;
 
                                     return false;
                                 } else if (terminalEnergy > 0) {
-                                    const amount = Math.floor(Math.min(topResource.amount, bestAmount) * terminalEnergy / transCost);
+                                    amount = Math.floor(amount * terminalEnergy / transCost);
 
                                     if (amount > 0) {
                                         Market.deal(bestOrder.id, amount, roomName);
@@ -548,18 +548,22 @@ class RoomBase extends RoomEngine {
                 }
 
                 // Find an order to flip if we haven't made a deal and we have enough energy.
-                // TODO: Only buy up to 5000 extra for the room.
                 if (!dealMade && storage && maxEnergy > Memory.marketEnergy && (!Memory.buy || _.filter(Game.rooms, (r) => r.memory.buyQueue).length === 0)) {
                     const filteredOrders = Market.getFilteredOrders();
 
                     _.forEach(Minerals, (children, resource) => {
+                        // Energy and tokens are not to be traded.
+                        if ([RESOURCE_ENERGY, SUBSCRIPTION_TOKEN].indexOf(resource) !== -1) {
+                            return;
+                        }
+
                         // Only flip what we are full on.
                         if (!storageStore || (storageStore[resource] || 0) < reserveMinerals[resource]) {
                             return;
                         }
 
-                        // Energy and tokens are not to be traded.
-                        if ([RESOURCE_ENERGY, SUBSCRIPTION_TOKEN].indexOf(resource) !== -1) {
+                        // Do not flip anything we have too much of.
+                        if ((terminalStore[resource] || 0) >= 5000) {
                             return;
                         }
 
@@ -574,9 +578,9 @@ class RoomBase extends RoomEngine {
                     });
 
                     _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
-                        const {sell, buy} = flip,
+                        const {sell, buy, resource} = flip,
                             {price: sellPrice} = sell;
-                        let amount = Math.min(buy.amount, sell.amount, 5000);
+                        let amount = Math.min(buy.amount, sell.amount, 5000 - terminalStore[resource]);
 
                         if (amount * sellPrice > Cache.credits) {
                             amount = Math.floor(Cache.credits / sellPrice);

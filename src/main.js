@@ -1269,7 +1269,7 @@ class Main {
             };
         }
 
-        const {lastTime} = Memory,
+        const {survey: {lastTime}} = Memory,
             now = new Date();
 
         if (now.getMinutes() === lastTime.getMinutes() && now.getHours() === lastTime.getHours() && now.getDate() === lastTime.getDate() && now.getMonth() === lastTime.getMonth() && now.getFullYear === lastTime.getFullYear()) {

@@ -557,8 +557,8 @@ class RoomBase extends RoomEngine {
                             return;
                         }
 
-                        // Only flip what we are full on.
-                        if (!storageStore || (storageStore[resource] || 0) < reserveMinerals[resource]) {
+                        // Only flip what we are full on and deal in.
+                        if (!storageStore || !reserveMinerals[resource] || (storageStore[resource] || 0) < reserveMinerals[resource]) {
                             return;
                         }
 

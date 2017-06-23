@@ -1273,7 +1273,7 @@ class Main {
             lastTime = new Date(survey.lastTime),
             now = new Date();
 
-        if (now.getMinutes() === lastTime.getMinutes() && now.getHours() === lastTime.getHours() && now.getDate() === lastTime.getDate() && now.getMonth() === lastTime.getMonth() && now.getFullYear === lastTime.getFullYear()) {
+        if (now.getMinutes() === lastTime.getMinutes() && now.getHours() === lastTime.getHours() && now.getDate() === lastTime.getDate() && now.getMonth() === lastTime.getMonth() && now.getFullYear() === lastTime.getFullYear()) {
             return;
         }
 

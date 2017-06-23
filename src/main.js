@@ -1320,14 +1320,14 @@ class Main {
                 name,
                 type,
                 unobservable,
-                controller: {
+                controller: controller && {
                     reservation: controller.reservation,
                     level: controller.level,
                     ticksToDowngrade: controller.ticksToDowngrade,
                     progress: controller.progress,
                     progressTotal: controller.progressTotal,
                     owner: controller.owner
-                },
+                } || [],
                 energyCapacity: r.energyCapacity,
                 energyCapacityAvailable: r.energyCapacityAvailable,
                 towers: !unobservable && type === "base" ? _.map(Cache.towersInRoom(r), (t) => ({
@@ -1357,10 +1357,10 @@ class Main {
                 labQueue: memory.labQueue,
                 storage: r.storage ? r.storage.store : {},
                 terminal: r.terminal ? r.terminal.store : {},
-                constructionSites: r.unobservable ? [] : _.map(r.find(FIND_MY_CONSTRUCTION_SITES), (s) => ({
+                constructionSites: !r.unobservable && _.map(r.find(FIND_MY_CONSTRUCTION_SITES), (s) => ({
                     progress: s.progress,
                     progressTotal: s.progressTotal
-                })),
+                })) || [],
                 lowestWall: !unobservable && Math.min(..._.map(_.filter(Cache.repairableStructuresInRoom(r), (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits)) || void 0,
                 sources: !unobservable && _.map(Array.prototype.concat.apply([], [r.find(FIND_SOURCES)], [r.find(FIND_MINERALS)]), (s) => ({
                     resource: s.mineralType || RESOURCE_ENERGY,

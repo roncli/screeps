@@ -580,7 +580,7 @@ class RoomBase extends RoomEngine {
                     _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
                         const {sell, buy, resource} = flip,
                             {price: sellPrice} = sell;
-                        let amount = Math.min(buy.amount, sell.amount, 5000 - terminalStore[resource]);
+                        let amount = Math.min(buy.amount, sell.amount, 5000 - (terminalStore[resource] || 0));
 
                         if (amount * sellPrice > Cache.credits) {
                             amount = Math.floor(Cache.credits / sellPrice);

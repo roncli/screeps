@@ -53,12 +53,10 @@ class RoomEngine {
 
         // Output creep count in the report.
         if (checkSettings.max > 0 || count > 0) {
-            // TODO: Notify creep count in log
-            // roomLog.creeps.push({
-            //     role: checkSettings.name,
-            //     count,
-            //     max: checkSettings.max
-            // });
+            if (!Memory.creepCount[roomName]) {
+                Memory.creepCount[roomName] = [];
+            }
+            Memory.creepCount[roomName].push({role: checkSettings.name, count, max: checkSettings.max});
         }
 
         // Bail if we're not spawning anything.

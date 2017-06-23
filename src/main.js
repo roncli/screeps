@@ -107,7 +107,7 @@ class Main {
                 this.drawGlobal();
             }
 
-            // this.survey();
+            this.survey();
         };
 
         if (Memory.profiling) {
@@ -144,11 +144,10 @@ class Main {
         // Detect a system reset.
         if (!this.reset) {
             this.reset = true;
-            // TODO:
-            // Memory.messages.push({
-            //     tick: Game.time,
-            //     message: "System reset."
-            // });
+            Memory.messages.push({
+                tick: Game.time,
+                message: "System reset."
+            });
         }
 
         // Set and unset Memory.buy.
@@ -249,9 +248,14 @@ class Main {
         if (!Memory.stats.gclProgress) {
             Memory.stats.gclProgress = [];
         }
-
         if (!Memory.allies) {
             Memory.allies = [];
+        }
+        if (!Memory.mineralUsage) {
+            Memory.mineralUsage = [];
+        }
+        if (!Memory.creepCount) {
+            Memory.creepCount = {};
         }
 
         // Clear old memory every 10 ticks.
@@ -1348,9 +1352,6 @@ class Main {
         // Log armies.
         ({army: data.army} = Memory);
 
-        // Log mineral usage.
-        // TODO: Log mineral usage in a room.
-
         // Log terminal and market.
         data.market = {
             incomingTransactions: _.filter(Game.market.incomingTransactions, (t) => t.time >= survey.lastPoll),
@@ -1358,11 +1359,22 @@ class Main {
             orders: Game.market.orders
         };
 
+        // Log and purge mineral usage.
+        data.mineralUsage = _.cloneDeep(Memory.mineralUsage);
+        Memory.mineralUsage = [];
+
+        // Log and purge messages.
+        data.messages = _.cloneDeep(Memory.messages);
+        Memory.messages = [];
+
         // Log game data.
         ({time: survey.lastPoll} = Game);
         survey.lastTime = new Date();
 
         // Finalize CPU here.
+        const cpuUsed = Game.cpu.getUsed();
+
+        Memory.stats.cpu[Memory.stats.cpu.length - 1] = cpuUsed;
     }
 }
 

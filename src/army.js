@@ -215,8 +215,10 @@ class Army {
 
         // Output creep count in the report.
         if (max > 0 || count > 0) {
-            // TODO: Notify creep count in log
-            // armyLog.creeps.push({role, count, max});
+            if (!Memory.creepCount[armyName]) {
+                Memory.creepCount[armyName] = [];
+            }
+            Memory.creepCount[armyName].push({role, count, max});
         }
     }
 

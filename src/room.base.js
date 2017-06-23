@@ -587,11 +587,10 @@ class RoomBase extends RoomEngine {
                         }
 
                         if (index === 0) {
-                            // TODO:
-                            // Memory.messages.push({
-                            //     tick: Game.time,
-                            //     message: `Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`
-                            // });
+                            Memory.messages.push({
+                                tick: Game.time,
+                                message: `Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`
+                            });
                         }
 
                         // Determine how much energy we need for the deal.
@@ -1011,6 +1010,13 @@ class RoomBase extends RoomEngine {
                 if (sourceLab0.mineralType === children[0] && sourceLab1.mineralType === children[1]) {
                     _.forEach(_.filter(labs, (l) => sourceLabs.indexOf(l.id) === -1 && (!labsInUse || _.map(_.filter(labsInUse, (liu) => liu.resource !== labQueue.resource), (liu) => liu.id).indexOf(l.id) === -1)), (lab) => {
                         if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
+                            Memory.mineralUsage.push({
+                                tick: Game.time,
+                                room: room.name,
+                                type: "reaction",
+                                minerals: [sourceLab0.mineralType, sourceLab1.mineralType],
+                                amount: 5
+                            });
                             labQueue.amount -= 5;
                         }
                     });
@@ -1033,6 +1039,13 @@ class RoomBase extends RoomEngine {
                 }
                 if (lab.runReaction(sourceLab0, sourceLab1) === OK) {
                     labQueue.amount -= 5;
+                    Memory.mineralUsage.push({
+                        tick: Game.time,
+                        room: room.name,
+                        type: "reaction",
+                        minerals: [sourceLab0.mineralType, sourceLab1.mineralType],
+                        amount: 5
+                    });
                 }
             });
 
@@ -1066,7 +1079,7 @@ class RoomBase extends RoomEngine {
      * @return {void}
      */
     labsInUse() {
-        const {room: {memory: {labsInUse}}} = this,
+        const {room, room: {memory: {labsInUse}}} = this,
             boosted = [];
 
         _.forEach(labsInUse, (queue) => {
@@ -1090,6 +1103,13 @@ class RoomBase extends RoomEngine {
 
                 if (lab.pos.getRangeTo(creep) <= 1 && lab.mineralType === queue.resource && lab.mineralAmount >= queue.amount) {
                     if (lab.boostCreep(creep) === OK) {
+                        Memory.mineralUsage.push({
+                            tick: Game.time,
+                            room: room.name,
+                            type: "reaction",
+                            minerals: [queue.resource],
+                            amount: queue.amount
+                        });
                         _.remove(creep.memory.labs, (l) => l === queue.id);
                         if (!status || queue.oldAmount === 0) {
                             boosted.push(queue);

@@ -576,15 +576,18 @@ class RoomBase extends RoomEngine {
                     _.forEach(flips.sort((a, b) => a.sell.price - a.buy.price - (b.sell.price - b.buy.price)), (flip, index) => {
                         const {sell, buy} = flip,
                             {price: sellPrice} = sell;
-                        let amount = Math.min(buy.amount, sell.amount);
+                        let amount = Math.min(buy.amount, sell.amount, 5000);
 
                         if (amount * sellPrice > Cache.credits) {
                             amount = Math.floor(Cache.credits / sellPrice);
                         }
 
                         if (index === 0) {
-                            // TODO: Notify of best flip.
-                            // Cache.log.events.push(`Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`);
+                            // TODO:
+                            // Memory.messages.push({
+                            //     tick: Game.time,
+                            //     message: `Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`
+                            // });
                         }
 
                         // Determine how much energy we need for the deal.

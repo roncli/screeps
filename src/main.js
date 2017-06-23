@@ -107,7 +107,7 @@ class Main {
                 this.drawGlobal();
             }
 
-            this.finalize();
+            // this.survey();
         };
 
         if (Memory.profiling) {
@@ -136,10 +136,19 @@ class Main {
         // Reset the cache.
         Cache.reset();
 
+        // Init the messages.
+        if (!Memory.messages) {
+            Memory.messages = [];
+        }
+
         // Detect a system reset.
         if (!this.reset) {
             this.reset = true;
-            // TODO: Notify of system reset.
+            // TODO:
+            // Memory.messages.push({
+            //     tick: Game.time,
+            //     message: "System reset."
+            // });
         }
 
         // Set and unset Memory.buy.
@@ -761,8 +770,6 @@ class Main {
                     transCost = Game.market.calcTransactionCost(otherRoomTerminalEnergy, otherRoomName, roomName);
 
                     otherRoomTerminal.send(RESOURCE_ENERGY, Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost))), roomName);
-                    // TODO: Notify of energy transfer.
-                    // Cache.log.events.push(`Sending ${Math.floor(otherRoomTerminalEnergy * (otherRoomTerminalEnergy / (otherRoomTerminalEnergy + transCost)))} energy from ${otherRoomName} to ${roomName}`);
                 }
 
                 return true;
@@ -1215,10 +1222,6 @@ class Main {
         });
 
         // Stat logging for graphs
-        Memory.stats.cpu.push(Game.cpu.getUsed());
-        while (Memory.stats.cpu.length > 100) {
-            Memory.stats.cpu.shift();
-        }
         Memory.stats.bucket.push(Game.cpu.bucket);
         while (Memory.stats.bucket.length > 100) {
             Memory.stats.bucket.shift();
@@ -1227,31 +1230,139 @@ class Main {
         while (Memory.stats.gclProgress.length > 100) {
             Memory.stats.gclProgress.shift();
         }
+        Memory.stats.cpu.push(Game.cpu.getUsed());
+        while (Memory.stats.cpu.length > 100) {
+            Memory.stats.cpu.shift();
+        }
 
         // Graphs
         Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
 
         // Update CPU
-        Memory.stats.cpu[Memory.stats.cpu.length - 1] = Game.cpu.getUsed();
+        const cpuUsed = Game.cpu.getUsed();
+
+        Memory.stats.cpu[Memory.stats.cpu.length - 1] = cpuUsed;
 
         // CPU
-        Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, Game.cpu.getUsed(), Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: Game.cpu.getUsed() > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
+        Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});
     }
 
-    //   #    #                ##     #
-    //  # #                     #
-    //  #    ##    ###    ###   #    ##    ####   ##
-    // ###    #    #  #  #  #   #     #      #   # ##
-    //  #     #    #  #  # ##   #     #     #    ##
-    //  #    ###   #  #   # #  ###   ###   ####   ##
+    //  ###   #  #  ###   # #    ##   #  #
+    // ##     #  #  #  #  # #   # ##  #  #
+    //   ##   #  #  #     # #   ##     # #
+    // ###     ###  #      #     ##     #
+    //                                 #
     /**
-     * Finalize log data and write it to memory.
+     * Perform a survey of the game data.
      * @return {void}
      */
-    static finalize() {
-        // TODO: Write statistics to memory
-        // log.cpuUsed = Game.cpu.getUsed();
-        // log.date = new Date();
+    static survey() {
+        if (!Memory.survey) {
+            Memory.survey = {
+                lastPoll: Game.time,
+                lastTime: new Date(),
+                data: {}
+            };
+        }
+
+        const {lastTime} = Memory,
+            now = new Date();
+
+        if (now.getMinutes() === lastTime.getMinutes() && now.getHours() === lastTime.getHours() && now.getDate() === lastTime.getDate() && now.getMonth() === lastTime.getMonth() && now.getFullYear === lastTime.getFullYear()) {
+            return;
+        }
+
+        const {survey, survey: {data}} = Memory;
+
+        // Log global data, such as date, GCL and credits.
+        data.global = {
+            gcl: Game.gcl,
+            cpu: {
+                bucket: Game.cpu.bucket,
+                limit: Game.cpu.limit,
+                tickLimit: Game.cpu.tickLimit
+            },
+            credits: Cache.credits
+        };
+
+        // Log creeps.
+        data.creeps = _.map(Game.creeps, (c) => ({
+            name: c.name,
+            hits: c.hits,
+            hitsMax: c.hitsMax,
+            pos: c.pos,
+            home: c.memory.home,
+            army: c.memory.army,
+            role: c.memory.role,
+            spawning: c.memory.spawning,
+            ttl: c.ticksToLive
+        }));
+
+        // Log spawns.
+        data.spawns = _.map(Game.spawns, (s) => ({
+            room: s.room.name,
+            spawningName: s.spawning ? s.spawning.name : void 0,
+            spawningNeedTime: s.spawning ? s.spawning.needTime : void 0,
+            spawningRemainingTime: s.spawning ? s.spawning.remainingTime : void 0
+        }));
+
+        // Log rooms.
+        data.rooms = _.map(Array.prototype.concat.apply([], [_.filter(Game.rooms), this.unobservableRooms]), (r) => {
+            const {name, unobservable} = r,
+                {rooms: {[name]: memory}} = Memory,
+                type = memory && memory.roomType ? memory.roomType.type : "unknown";
+
+            return {
+                name,
+                type,
+                unobservable,
+                controller: r.controller,
+                energyCapacity: r.energyCapacity,
+                energyCapacityAvailable: r.energyCapacityAvailable,
+                towers: !unobservable && type === "base" ? Cache.towersInRoom(r) : [],
+                labs: !unobservable && type === "base" ? Cache.labsInRoom(r) : [],
+                nukers: !unobservable && type === "base" ? Cache.nukersInRoom(r) : [],
+                powerSpawns: !unobservable && type === "base" ? Cache.powerSpawnsInRoom(r) : [],
+                buyQueue: memory.buyQueue,
+                labQueue: memory.labQueue,
+                storage: r.storage ? r.storage.store : {},
+                terminal: r.terminal ? r.terminal.store : {},
+                constructionSites: !r.unobservable && r.find(FIND_MY_CONSTRUCTION_SITES) || [],
+                lowestWall: !unobservable && Math.min(..._.map(_.filter(Cache.repairableStructuresInRoom(r), (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits)) || void 0,
+                sources: !unobservable && _.map(Array.prototype.concat.apply([], [r.find(FIND_SOURCES)], [r.find(FIND_MINERALS)]), (s) => ({
+                    resource: s.mineralType || RESOURCE_ENERGY,
+                    amount: s.mineralAmount || s.energy,
+                    capacity: s.energyCapacity,
+                    ttr: s.ticksToRegeneration
+                })) || [],
+                hostiles: !unobservable && _.map(Cache.hostilesInRoom(r), (h) => ({
+                    ownerUsername: h.owner.username,
+                    pos: h.pos,
+                    ttl: h.ticksToLive,
+                    hits: h.hits,
+                    hitsMax: h.hitsMax
+                })) || []
+            };
+        });
+
+        // Log armies.
+        ({army: data.army} = Memory);
+
+        // Log mineral usage.
+        // TODO: Log mineral usage in a room.
+
+        // Log terminal and market.
+        data.market = {
+            incomingTransactions: _.filter(Game.market.incomingTransactions, (t) => t.time >= survey.lastPoll),
+            outgoingTransactions: _.filter(Game.market.outgoingTransactions, (t) => t.time >= survey.lastPoll),
+            orders: Game.market.orders
+        };
+
+        // Log game data.
+        ({time: survey.lastPoll} = Game);
+        survey.lastTime = new Date();
+
+        // Finalize CPU here.
     }
 }
 

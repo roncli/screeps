@@ -1312,7 +1312,7 @@ class Main {
 
         // Log rooms.
         data.rooms = _.map(Array.prototype.concat.apply([], [_.filter(Game.rooms), this.unobservableRooms]), (r) => {
-            const {name, unobservable} = r,
+            const {name, unobservable, controller} = r,
                 {rooms: {[name]: memory}} = Memory,
                 type = memory && memory.roomType ? memory.roomType.type : "unknown";
 
@@ -1320,18 +1320,47 @@ class Main {
                 name,
                 type,
                 unobservable,
-                controller: r.controller,
+                controller: {
+                    reservation: controller.reservation,
+                    level: controller.level,
+                    ticksToDowngrade: controller.ticksToDowngrade,
+                    progress: controller.progress,
+                    progressTotal: controller.progressTotal,
+                    owner: controller.owner
+                },
                 energyCapacity: r.energyCapacity,
                 energyCapacityAvailable: r.energyCapacityAvailable,
-                towers: !unobservable && type === "base" ? Cache.towersInRoom(r) : [],
-                labs: !unobservable && type === "base" ? Cache.labsInRoom(r) : [],
-                nukers: !unobservable && type === "base" ? Cache.nukersInRoom(r) : [],
-                powerSpawns: !unobservable && type === "base" ? Cache.powerSpawnsInRoom(r) : [],
+                towers: !unobservable && type === "base" ? _.map(Cache.towersInRoom(r), (t) => ({
+                    energy: t.energy,
+                    energyCapacity: t.energyCapacity
+                })) : [],
+                labs: !unobservable && type === "base" ? _.map(Cache.labsInRoom(r), (l) => ({
+                    energy: l.energy,
+                    energyCapacity: l.energyCapacity,
+                    mineralAmount: l.mineralAmount,
+                    mineralCapacity: l.mineralCapacity,
+                    mineralType: l.mineralType
+                })) : [],
+                nukers: !unobservable && type === "base" ? _.map(Cache.nukersInRoom(r), (n) => ({
+                    energy: n.energy,
+                    energyCapacity: n.energyCapacity,
+                    ghodium: n.ghodium,
+                    ghodiumCapacity: n.ghodiumCapacity
+                })) : [],
+                powerSpawns: !unobservable && type === "base" ? _.map(Cache.powerSpawnsInRoom(r), (p) => ({
+                    energy: p.energy,
+                    energyCapacity: p.energyCapacity,
+                    power: p.power,
+                    powerCapacity: p.powerCapacity
+                })) : [],
                 buyQueue: memory.buyQueue,
                 labQueue: memory.labQueue,
                 storage: r.storage ? r.storage.store : {},
                 terminal: r.terminal ? r.terminal.store : {},
-                constructionSites: !r.unobservable && r.find(FIND_MY_CONSTRUCTION_SITES) || [],
+                constructionSites: r.unobservable ? [] : _.map(r.find(FIND_MY_CONSTRUCTION_SITES), (s) => ({
+                    progress: s.progress,
+                    progressTotal: s.progressTotal
+                })),
                 lowestWall: !unobservable && Math.min(..._.map(_.filter(Cache.repairableStructuresInRoom(r), (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits)) || void 0,
                 sources: !unobservable && _.map(Array.prototype.concat.apply([], [r.find(FIND_SOURCES)], [r.find(FIND_MINERALS)]), (s) => ({
                     resource: s.mineralType || RESOURCE_ENERGY,

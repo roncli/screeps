@@ -1,6 +1,8 @@
-var WebSocket = require("ws"),
+const WebSocket = require("ws"),
+    wss = new WebSocket.Server({port: 8081}),
     Screeps = require("screeps-api"),
     config = require("./config"),
+    screeps = new Screeps(config),
     readline = require("readline"),
     express = require("express"),
     rl = readline.createInterface({
@@ -9,149 +11,151 @@ var WebSocket = require("ws"),
         prompt: ">_ "
     });
 
-(() => {
-    "use strict";
+class Index {
+    static main() {
+        const app = express();
+        let lastTick = 0;
 
-    var lastTick = 0,
-        screeps = new Screeps(config),
-        wss = new WebSocket.Server({port: 8081}),
-        app = express(),
-        server,
+        wss.broadcast = (message) => {
+            message = JSON.stringify(message);
 
-        socketOpen = () => {
-            screeps.ws.on("close", () => {
-                console.log("Screeps socket closed.  Reconnecting...");
-                screeps.socket(socketOpen);
-            });
-
-            screeps.ws.on("error", (err) => {
-                if (err.code === "ECONNREFUSED") {
-                    console.log("Connection refused.  Reconnecting...");
-                    screeps.socket(socketOpen);
-                } else {
-                    wss.broadcast({
-                        message: "error",
-                        type: "socket",
-                        data: err
-                    });
-                }
+            wss.clients.forEach((client) => {
+                client.send(message);
             });
         };
 
+        screeps.socket(Index.socketOpen);
 
-    wss.broadcast = (message) => {
-        message = JSON.stringify(message);
-
-        wss.clients.forEach((client) => {
-            client.send(message);
+        screeps.on("message", (msg) => {
+            if (msg.startsWith("auth ok")) {
+                screeps.subscribe("/console");
+                console.log("Starting!");
+                rl.prompt();
+            }
         });
-    };
 
-    screeps.socket(socketOpen);
+        screeps.on("console", (msg) => {
+            const {1: data} = msg;
 
-    screeps.on("message", (msg) => {
-        if (msg.startsWith("auth ok")) {
-            screeps.subscribe("/console");
-            console.log("Starting!");
-            rl.prompt();
-        }
-    });
+            Promise.resolve().then(() => screeps.memory.get("console"))
+                .then((memory) => {
+                    if (memory.tick > lastTick) {
+                        ({tick: lastTick} = memory);
+                        wss.broadcast({
+                            message: "data",
+                            data: memory
+                        });
+                    }
+                })
+                .catch((err) => {
+                    wss.broadcast({
+                        message: "error",
+                        type: "api",
+                        data: err
+                    });
+                });
 
-    screeps.on("console", (msg) => {
-        var [user, data] = msg;
+            if (data.messages && data.messages.results) {
+                data.messages.results.forEach((l) => console.log(l));
+            }
 
-        Promise.resolve().then(() => screeps.memory.get("console")).then((memory) => {
-            if (memory.tick > lastTick) {
-                lastTick = memory.tick;
+            if (data.messages && data.messages.log) {
+                data.messages.log.forEach((l) => console.log(l));
+            }
+
+            if (data.error) {
                 wss.broadcast({
-                    message: "data",
-                    data: memory
+                    message: "error",
+                    type: "console",
+                    data: data.error
+                });
+
+                console.log(data.error);
+            }
+        });
+
+        rl.on("line", (line) => {
+            line = line.trim();
+            if (line === "exit") {
+                process.exit();
+
+                return;
+            }
+            screeps.console(line);
+        });
+
+        // Allow for static content in the public directory.
+        app.use(express.static("public", {index: "index.htm"}));
+
+        // jQuery.
+        app.get("/js/jquery.min.js", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/jquery/dist/jquery.min.js`);
+        });
+
+        // Bootstrap.
+        app.get("/js/bootstrap.min.js", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/js/bootstrap.min.js`);
+        });
+        app.get("/css/bootstrap.min.css", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/css/bootstrap.min.css`);
+        });
+        app.get("/fonts/glyphicons-halflings-regular.eot", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot`);
+        });
+        app.get("/fonts/glyphicons-halflings-regular.svg", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg`);
+        });
+        app.get("/fonts/glyphicons-halflings-regular.ttf", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf`);
+        });
+        app.get("/fonts/glyphicons-halflings-regular.woff", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff`);
+        });
+        app.get("/fonts/glyphicons-halflings-regular.woff2", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2`);
+        });
+
+        // Angular.
+        app.get("/js/angular.min.js", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/angular/angular.min.js`);
+        });
+
+        // Moment.
+        app.get("/js/moment.min.js", (req, res) => {
+            res.sendFile(`${__dirname}/node_modules/moment/min/moment.min.js`);
+        });
+
+        // Create the server.
+        const server = app.listen(8080);
+
+        // Force quit Screeps entirely.
+        app.get("/quit", (req, res) => {
+            res.status(200).send("The application has quit.  You will need to restart the server to continue.");
+            server.close();
+            process.exit();
+        });
+
+    }
+
+    static socketOpen() {
+        screeps.ws.on("close", () => {
+            console.log("Screeps socket closed.  Reconnecting...");
+            screeps.socket(Index.socketOpen);
+        });
+
+        screeps.ws.on("error", (err) => {
+            if (err.code === "ECONNREFUSED") {
+                console.log("Connection refused.  Reconnecting...");
+                screeps.socket(Index.socketOpen);
+            } else {
+                wss.broadcast({
+                    message: "error",
+                    type: "socket",
+                    data: err
                 });
             }
-        }).catch((err) => {
-            wss.broadcast({
-                message: "error",
-                type: "api",
-                data: err
-            });
         });
+    }
+}
 
-        if (data.messages && data.messages.results) {
-            data.messages.results.forEach((l) => console.log(l));
-        }
-
-        if (data.messages && data.messages.log) {
-            data.messages.log.forEach((l) => console.log(l));
-        }
-
-        if (data.error) {
-            wss.broadcast({
-                message: "error",
-                type: "console",
-                data: data.error
-            });
-
-            console.log(data.error);
-        }
-    });
-
-    rl.on("line", (line) => {
-        line = line.trim();
-        if (line === "exit") {
-            process.exit();
-            return;
-        }
-        screeps.console(line);
-    });
-
-    // Allow for static content in the public directory.
-    app.use(express.static("public", {index: "index.htm"}));
-    
-    // jQuery.
-    app.get("/js/jquery.min.js", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/jquery/dist/jquery.min.js");
-    });
-
-    // Bootstrap.
-    app.get("/js/bootstrap.min.js", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/js/bootstrap.min.js");
-    });
-    app.get("/css/bootstrap.min.css", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/css/bootstrap.min.css");
-    });
-    app.get("/fonts/glyphicons-halflings-regular.eot", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.eot");
-    });
-    app.get("/fonts/glyphicons-halflings-regular.svg", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.svg");
-    });
-    app.get("/fonts/glyphicons-halflings-regular.ttf", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf");
-    });
-    app.get("/fonts/glyphicons-halflings-regular.woff", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff");
-    });
-    app.get("/fonts/glyphicons-halflings-regular.woff2", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2");
-    });
-
-    // Angular.
-    app.get("/js/angular.min.js", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/angular/angular.min.js");
-    });
-
-    // Moment.
-    app.get("/js/moment.min.js", (req, res) => {
-        res.sendFile(__dirname + "/node_modules/moment/min/moment.min.js");
-    });
-    
-    // Force quit Screeps entirely.
-    app.get("/quit", (req, res) => {
-        res.status(200).send("The application has quit.  You will need to restart the server to continue.");
-        server.close();
-        cluster.worker.kill();
-    });
-
-    // Create the server.
-    server = app.listen(8080);
-})();
+Index.main();

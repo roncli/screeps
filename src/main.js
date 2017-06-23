@@ -254,9 +254,8 @@ class Main {
         if (!Memory.mineralUsage) {
             Memory.mineralUsage = [];
         }
-        if (!Memory.creepCount) {
-            Memory.creepCount = {};
-        }
+
+        Memory.creepCount = {};
 
         // Clear old memory every 10 ticks.
         if (Game.time % 10 === 0) {

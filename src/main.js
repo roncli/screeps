@@ -1269,14 +1269,15 @@ class Main {
             };
         }
 
-        const {survey: {lastTime}} = Memory,
+        const {survey} = Memory,
+            lastTime = new Date(survey.lastTime),
             now = new Date();
 
         if (now.getMinutes() === lastTime.getMinutes() && now.getHours() === lastTime.getHours() && now.getDate() === lastTime.getDate() && now.getMonth() === lastTime.getMonth() && now.getFullYear === lastTime.getFullYear()) {
             return;
         }
 
-        const {survey, survey: {data}} = Memory;
+        const {data} = survey;
 
         // Log global data, such as date, GCL and credits.
         data.global = {

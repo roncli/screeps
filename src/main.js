@@ -1385,7 +1385,9 @@ class Main {
         data.market = {
             incomingTransactions: _.filter(Game.market.incomingTransactions, (t) => t.time >= survey.lastPoll),
             outgoingTransactions: _.filter(Game.market.outgoingTransactions, (t) => t.time >= survey.lastPoll),
-            orders: Game.market.orders
+            orders: Game.market.orders,
+            buy: _.map(Game.cmd.Market.getFilteredOrders().buy, (orders, resource) => ({resource, price: Math.max(..._.map(orders, (o) => o.price))})),
+            sell: _.map(Game.cmd.Market.getFilteredOrders().sell, (orders, resource) => ({resource, price: Math.min(..._.map(orders, (o) => o.price))}))
         };
 
         // Log and purge mineral usage.

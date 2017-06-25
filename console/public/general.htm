@@ -1,72 +1,69 @@
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div style="display: flex;">
-            <div style="width: max-content; white-space: nowrap;">
-                <b>GCL</b> {{data.memory.gcl}}
-            </div>
-            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{data.memory.progress.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{data.memory.progressTotal.toFixed(0)}}" style="width: {{(100 * data.memory.progress / data.memory.progressTotal).toFixed(3)}}%; white-space: nowrap; color: black;">
-                    {{data.memory.progress.toFixed(0)}}/{{data.memory.progressTotal.toFixed(0)}} ({{(100 * data.memory.progress / data.memory.progressTotal).toFixed(3)}}%) {{(data.memory.progressTotal - data.memory.progress).toFixed(0)}} to go
-                    <span ng-if="data.memory.progress > data.start.gcl.progress">ETA {{moment(data.memory.date).add((data.memory.progressTotal - data.memory.progress) / ((data.memory.progress - data.start.gcl.progress) / moment(data.memory.date).diff(data.start.gcl.date)), "ms").format("M/D/YYYY h:mm:ss a")}}</span>
-                </div>
-            </div>
-        </div>
-        <div style="display: flex;">
-            <div class="progress" style="width: 200px; margin: 0; break-after: always;">
-                <div ng-class="{'progress-bar': true, 'progress-bar-success': data.memory.cpuUsed <= data.memory.limit, 'progress-bar-danger': data.memory.cpuUsed > data.memory.limit}" role="progressbar" aria-valuenow="{{data.memory.cpuUsed.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{data.memory.limit.toFixed(0)}}" style="width: {{Math.min((100 * data.memory.cpuUsed / data.memory.limit).toFixed(3), 100)}}%; white-space: nowrap; color: black;">
-                    <b>CPU</b> {{data.memory.cpuUsed.toFixed(2)}}/{{data.memory.limit.toFixed(0)}}
-                </div>
-            </div>
-            <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
-                <div ng-class="{'progress-bar': true, 'progress-bar-info': data.memory.bucket >= 9990, 'progress-bar-success': data.memory.bucket >= 9000 && data.memory.bucket < 9990, 'progress-bar-warning': data.memory.bucket >= 5000 && data.memory.bucket < 9000, 'progress-bar-danger': data.memory.bucket < 5000}" role="progressbar" aria-valuenow="{{data.memory.bucket.toFixed(0)}}" aria-valuemin="0" aria-valuemax="10000" style="width: {{Math.min((100 * data.memory.bucket / 10000).toFixed(3), 100)}}%; white-space: nowrap; color: black;">
-                    <b>Bucket</b> {{data.memory.bucket.toFixed(0)}}
-                </div>
-            </div>
-            <div style="width: max-content; white-space: nowrap;">
-                <b>Tick Limit</b> {{data.memory.tickLimit}}
-            </div>
-        </div>
-        <div style="display: flex;">
-            <div style="width: 50%;">
-                <b>Credits</b> {{data.memory.credits.toFixed(2)}}
-            </div>
-            <div style="width: 50%; text-align: right;">
-                {{moment(data.memory.date).format("M/D/YYYY h:mm:ss a")}}
-                <b>Tick</b> {{data.memory.tick}}
-            </div>
-        </div>
-        <div>&nbsp;</div>
-        <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'base' && room.rcl">
+<template id="general">
+    <div class="panel panel-default">
+        <div class="panel-body">
             <div style="display: flex;">
-                <div ng-if="room.unobservable">Unobservable</div>
-                <div ng-if="room.rcl" style="width: max-content; white-space: nowrap;">
-                    <b>{{name}} RCL</b> {{room.rcl}}
+                <div style="width: max-content; white-space: nowrap;">
+                    <b>GCL</b> <span id="gcl" />
                 </div>
-                <div ng-if="room.store && room.store.storage && room.store.storage[0]" style="margin: 0 5px; white-space: nowrap;">
-                    <b>S</b> {{room.store.storage[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{room.store.storage[0].resource}}.png" />
-                </div>
-                <div ng-if="room.store && room.store.terminal && room.store.terminal[0]" style="white-space: nowrap;">
-                    <b>T</b> {{room.store.terminal[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{room.store.terminal[0].resource}}.png" />
-                </div>
-                <div ng-if="room.reservedUsername">
-                    <b>Reserved</b> {{room.reservedUsername}}
-                    <b>TTE</b> {{room.tte}}
-                </div>
-                <div ng-if="room.controller && !room.rcl">
-                    <b>Unowned</b>
-                </div>
-                <div ng-if="room.progressTotal" class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
-                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{room.progress.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{room.progressTotal.toFixed(0)}}" style="width: {{(100 * room.progress / room.progressTotal).toFixed(3)}}%; white-space: nowrap; color: black;">
-                        {{room.progress.toFixed(0)}}/{{room.progressTotal.toFixed(0)}} ({{(100 * room.progress / room.progressTotal).toFixed(3)}}%) {{(room.progressTotal - room.progress).toFixed(0)}} to go
-                        <span ng-if="room.progress > data.start[name].progress">ETA {{moment(data.memory.date).add((room.progressTotal - room.progress) / ((room.progress - data.start[name].progress) / moment(data.memory.date).diff(data.start[name].date)), "ms").format("M/D/YYYY h:mm:ss a")}}</span>
+                <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                    <div id="gcl-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                        <span class="gcl-progress" />
+                        <span class="gcl-eta" />
                     </div>
                 </div>
-                <div ng-if="!room.progressTotal" style="width: 100%;"></div>
-                <div ng-if="room.ttd" style="width: max-content; white-space: nowrap;">
-                    <b>TTD</b> {{room.ttd}}
+            </div>
+            <div style="display: flex;">
+                <div class="progress" style="width: 200px; margin: 0; break-after: always;">
+                    <div id="cpu-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                        <b>CPU</b> <span id="cpu" />
+                    </div>
+                </div>
+                <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
+                    <div id="bucket-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="10000" style="white-space: nowrap; color: black;">
+                        <b>Bucket</b> <span id="bucket" />
+                    </div>
+                </div>
+                <div style="width: max-content; white-space: nowrap;">
+                    <b>Tick Limit</b> <span id="tick-limit" />
                 </div>
             </div>
+            <div style="display: flex;">
+                <div style="width: 50%;">
+                    <b>Credits</b> <span id="credits" />
+                </div>
+                <div style="width: 50%; text-align: right;">
+                    <span id="date" />
+                    <b>Tick</b> <span id="tick" />
+                </div>
+            </div>
+            <div>&nbsp;</div>
+            <div id="general-rooms"></div>
+            <b>Creeps</b> <span id="creeps-count" />
         </div>
-        <b>Creeps</b> {{data.memory.creeps.length}}
+    </div>
+</template>
+
+<template id="general-room">
+    <div style="display: flex;">
+        <div id="room-summary-unobservable">Unobservable</div>
+        <div id="room-summary-rcl" style="width: max-content; white-space: nowrap;">
+            <b><span id="room-summary-name" /> RCL</b> <span id="room-summary-level" />
+        </div>
+        <div id="room-summary-storage" style="margin: 0 5px; white-space: nowrap;">
+            <b>S</b> <span id="room-summary-storage-energy" /> <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/energy.png" />
+        </div>
+        <div id="room-summary-terminal" style="white-space: nowrap;">
+            <b>T</b> <span id="room-summary-terminal-energy" /> <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/energy.png" />
+        </div>
+        <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
+            <div id="room-summary-rcl-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                <span class="room-summary-rcl-progress" />
+                <span class="room-summary-rcl-eta" />
+            </div>
+        </div>
+        <div id="room-summary-separator" style="width: 100%;"></div>
+        <div id="room-summary-ttd" style="width: max-content; white-space: nowrap;">
+            <b>TTD</b> <span id="room-summary-ticks">
+        </div>
     </div>
 </div>

@@ -37,15 +37,45 @@ class Index {
         screeps.on("console", (msg) => {
             const {1: data} = msg;
 
-            Promise.resolve().then(() => screeps.memory.get("console"))
-                .then((memory) => {
-                    if (memory.tick > lastTick) {
-                        ({tick: lastTick} = memory);
+            Promise.resolve().then(() => screeps.memory.get("survey"))
+                .then((survey) => {
+                    if (survey.lastPoll > lastTick) {
+                        ({lastPoll: lastTick} = survey);
                         wss.broadcast({
-                            message: "data",
-                            data: memory
+                            message: "survey",
+                            survey
                         });
+
+                        Promise.resolve().then(() => screeps.memory.get("creepCount"))
+                            .then((creepCount) => {
+                                wss.broadcast({
+                                    message: "creepCount",
+                                    creepCount
+                                });
+                            })
+                            .catch((err) => {
+                                wss.broadcast({
+                                    message: "error",
+                                    type: "api",
+                                    data: err
+                                });
+                            });
                     }
+                })
+                .catch((err) => {
+                    wss.broadcast({
+                        message: "error",
+                        type: "api",
+                        data: err
+                    });
+                });
+
+            Promise.resolve().then(() => screeps.memory.get("stats"))
+                .then((stats) => {
+                    wss.broadcast({
+                        message: "stats",
+                        stats
+                    });
                 })
                 .catch((err) => {
                     wss.broadcast({
@@ -113,11 +143,6 @@ class Index {
         });
         app.get("/fonts/glyphicons-halflings-regular.woff2", (req, res) => {
             res.sendFile(`${__dirname}/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2`);
-        });
-
-        // Angular.
-        app.get("/js/angular.min.js", (req, res) => {
-            res.sendFile(`${__dirname}/node_modules/angular/angular.min.js`);
         });
 
         // Moment.

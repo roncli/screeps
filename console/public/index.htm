@@ -1,29 +1,18 @@
-<html ng-app="screeps" ng-controller="screeps">
+<html>
 <head>
     <script src="/js/hacktimer.min.js"></script>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/angular.min.js"></script>
     <script src="/js/moment.min.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/screeps.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="import" href="general.htm" />
 </head>
 <body>
     <div class="container-fluid">
         <div class="col-xs-12">
-            <offline ng-if="data.offline"></offline>
-            <error ng-if="data.error"></error>
-            <waiting ng-if="!data.memory"></waiting>
-            <div ng-if="!data.offline && !data.error && data.memory" class="small">
-                <general></general>
-                <bases></bases>
-                <mines></mines>
-                <cleanups></cleanups>
-                <unknowns></unknowns>
-                <armies></armies>
-                <events></events>
-            </div>
+
         </div>
     </div>
 </body>

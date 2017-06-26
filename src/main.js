@@ -103,6 +103,8 @@ class Main {
                 this.debug();
             }
 
+            this.stats();
+
             if (Memory.visualizations) {
                 this.drawGlobal();
             }
@@ -1178,6 +1180,34 @@ class Main {
         });
     }
 
+    //         #           #
+    //         #           #
+    //  ###   ###    ###  ###    ###
+    // ##      #    #  #   #    ##
+    //   ##    #    # ##   #      ##
+    // ###      ##   # #    ##  ###
+    /**
+     * Record CPU and GCL stats.
+     * @return {void}
+     */
+    static stats() {
+        const {stats: {bucket, gclProgress, cpu: statsCpu}} = Memory,
+            {cpu} = Game;
+
+        bucket.push(cpu.bucket);
+        while (bucket.length > 100) {
+            bucket.shift();
+        }
+        gclProgress.push(Game.gcl.progress);
+        while (gclProgress.length > 100) {
+            gclProgress.shift();
+        }
+        statsCpu.push(cpu.getUsed());
+        while (statsCpu.length > 100) {
+            statsCpu.shift();
+        }
+    }
+
     //    #                     ##   ##          #           ##
     //    #                    #  #   #          #            #
     //  ###  ###    ###  #  #  #      #     ##   ###    ###   #
@@ -1224,27 +1254,11 @@ class Main {
             }
         });
 
-        // Stat logging for graphs
-        Memory.stats.bucket.push(Game.cpu.bucket);
-        while (Memory.stats.bucket.length > 100) {
-            Memory.stats.bucket.shift();
-        }
-        Memory.stats.gclProgress.push(Game.gcl.progress);
-        while (Memory.stats.gclProgress.length > 100) {
-            Memory.stats.gclProgress.shift();
-        }
-        Memory.stats.cpu.push(Game.cpu.getUsed());
-        while (Memory.stats.cpu.length > 100) {
-            Memory.stats.cpu.shift();
-        }
-
         // Graphs
         Drawing.sparkline(Cache.globalVisual, 23.5, 1, 18, 2, _.map(Memory.stats.cpu, (v, i) => ({cpu: Memory.stats.cpu[i], bucket: Memory.stats.bucket[i], limit: Game.cpu.limit})), [{key: "limit", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#c0c0c0", opacity: 0.25}, {key: "cpu", min: Game.cpu.limit * 0.5, max: Game.cpu.limit * 1.5, stroke: "#ffff00", opacity: 0.5}, {key: "bucket", min: 0, max: 10000, stroke: "#00ffff", opacity: 0.5, font: "0.5 Arial"}]);
 
         // Update CPU
         const cpuUsed = Game.cpu.getUsed();
-
-        Memory.stats.cpu[Memory.stats.cpu.length - 1] = cpuUsed;
 
         // CPU
         Drawing.progressBar(Cache.globalVisual, 23.5, -0.4, 10, 0.5, cpuUsed, Game.cpu.limit, {label: "CPU", background: "#808080", valueDecimals: 2, bar: cpuUsed > Game.cpu.limit ? "#ff0000" : "#00ff00", color: "#ffffff", font: "0.5 Arial"});

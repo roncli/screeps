@@ -953,7 +953,7 @@ class Assign {
             const {memory: {escortedBy: id}} = creep,
                 escort = Game.getObjectById(id);
 
-            if (!escort || escort.pos.roomName === creep.pos.roomName && creep.pos.getRangeTo(escort) <= 1) {
+            if (!escort || escort.pos.roomName !== creep.pos.roomName || escort.pos.roomName === creep.pos.roomName && creep.pos.getRangeTo(escort) <= 1) {
                 return;
             }
 

@@ -72,12 +72,17 @@ class Screeps {
                     ({survey: data.survey} = message);
 
                     Screeps.loadGeneral();
+                    Screeps.loadBases();
 
                     break;
                 case "stats":
                     ({stats: data.stats} = message);
 
                     Screeps.loadGeneral();
+
+                    break;
+                case "creepCounts":
+                    ({creepCounts: data.creepCounts} = message);
 
                     break;
                 case "error":
@@ -114,6 +119,7 @@ class Screeps {
             .css({width: `${100 * gcl.progress / gcl.progressTotal}%`});
 
         $general.find("#gcl-progress").text(`${gcl.progress.toFixed(0)}/${gcl.progressTotal.toFixed(0)} (${(100 * gcl.progress / gcl.progressTotal).toFixed(3)}%) ${(gcl.progressTotal - gcl.progress).toFixed(0)} to go`);
+        // TODO: GCL ETA.
 
         $general.find("#cpu-progress-bar").attr({
             "aria-valuenow": currentCpu,
@@ -150,6 +156,7 @@ class Screeps {
             $generalRoom.find("#room-summary-terminal").css({display: room.terminal && room.terminal.energy !== void 0 ? "initial" : "none"});
             $generalRoom.find("#room-summary-terminal-energy").text(room.terminal.energy);
             $generalRoom.find("#room-summary-rcl-progress-div").css({display: room.controller && room.controller.progress ? "initial" : "none"});
+
             if (room.controller && room.controller.progress) {
                 $generalRoom.find("#room-summary-rcl-progress-bar").attr({
                     "aria-valuenow": room.controller.progress,
@@ -157,8 +164,11 @@ class Screeps {
                     "aria-valuemax": room.controller.progressTotal
                 })
                     .css({width: `${100 * room.controller.progress / room.controller.progressTotal}%`});
+
                 $generalRoom.find("#room-summary-rcl-progress").text(`${room.controller.progress.toFixed(0)}/${room.controller.progressTotal.toFixed(0)} (${(100 * room.controller.progress / room.controller.progressTotal).toFixed(3)}%) ${(room.controller.progressTotal - room.controller.progress).toFixed(0)} to go`);
+                // TODO: RCL ETA
             }
+
             $generalRoom.find("#room-summary-separator").css({display: room.controller && room.controller.progress ? "none" : "initial"});
             $generalRoom.find("#room-summary-ttd").css({display: room.controller && room.controller.ticksToDowngrade ? "initial" : "none"});
             $generalRoom.find("#room-summary-ticks").text(room.controller && room.controller.ticksToDowngrade);
@@ -168,6 +178,17 @@ class Screeps {
 
         $("#general").empty()
             .append($general);
+    }
+
+    static loadBases() {
+        if (!data.survey || !data.creepCounts) {
+            return;
+        }
+
+        const {stats: {cpu: cpuHistory, bucket: bucketHistory}, survey, survey: {data: surveyData, data: {global, global: {gcl, cpu}, rooms}}} = data,
+            $base = $(document.importNode($($($("#base-import")[0].import).find("#base-template")[0].content)[0], true));
+
+        
     }
 }
 

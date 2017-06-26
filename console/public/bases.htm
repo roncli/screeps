@@ -1,7 +1,9 @@
-<b>Base Rooms</b>
-<div style="white-space: nowrap; overflow-x: scroll;">
-    <div ng-repeat="(name, room) in data.memory.rooms" ng-if="room.type === 'base'" ng-class="{panel: true, 'panel-primary': !room.unobservable && room.rcl && room.ttd > 1000, 'panel-warning': room.ttd <= 1000, 'panel-danger': room.unobservable || !room.rcl}" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
-        <div class="panel-heading">{{name}} ({{room.region}})</div>
+<template id="base-template">
+    <div class="panel panel-primary" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+        <div class="panel-heading">
+            <span id="room-name"></span>
+            <span id="room-region"></span>
+        </div>
         <div class="panel-body">
             <div ng-repeat="(store, storage) in room.store">
                 <b>{{store}}</b> {{storage[0].amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{storage[0].resource}}.png" /> <span ng-class="{glyphicon: true, 'glyphicon-plus': !expanded[name][store], 'glyphicon-minus': expanded[name][store]}" ng-click="expanded[name][store] = !expanded[name][store]" style="cursor: pointer;" />
@@ -9,26 +11,26 @@
                     {{resource.amount}} <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{resource.resource}}.png" />
                 </div>
             </div>
-            <div ng-if="room.energyCapacityAvailable">
+            <div id="room-energy">
                 <div style="display: flex;">
                     <div style="width: max-content; white-space: nowrap;">
                         <b>Energy</b>
                     </div>
                     <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{room.energyAvailable.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{room.energyCapacityAvailable.toFixed(0)}}" style="width: {{(100 * room.energyAvailable / room.energyCapacityAvailable).toFixed(3)}}%; white-space: nowrap; color: black;">
-                            {{room.energyAvailable.toFixed(0)}}/{{room.energyCapacityAvailable.toFixed(0)}}
+                        <div id="room-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                            <span id="room-energy-progress"></span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div ng-if="room.towerEnergyCapacity">
+            <div id="room-towers">
                 <div style="display: flex;">
                     <div style="width: max-content; white-space: nowrap;">
                         <b>Towers</b>
                     </div>
                     <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{room.towerEnergy.toFixed(0)}}" aria-valuemin="0" aria-valuemax="{{room.towerEnergyCapacity.toFixed(0)}}" style="width: {{(100 * room.towerEnergy / room.towerEnergyCapacity).toFixed(3)}}%; white-space: nowrap; color: black;">
-                            {{room.towerEnergy.toFixed(0)}}/{{room.towerEnergyCapacity.toFixed(0)}}
+                        <div id="room-tower-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                            <span id="room-tower-progress"></span>
                         </div>
                     </div>
                 </div>
@@ -126,4 +128,4 @@
             </div>
         </div>
     </div>
-</div>
+</template>

@@ -127,7 +127,7 @@ class RoleArmyDismantler {
      */
     static assignStagingTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -153,7 +153,7 @@ class RoleArmyDismantler {
         const {name: armyName, attackRoom: attackRoomName} = army,
             {creeps: {[armyName]: creeps}} = Cache,
             dismantlerCreeps = creeps && creeps.armyDismantler || [],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -195,7 +195,7 @@ class RoleArmyDismantler {
         const {name: armyName, attackRoom: attackRoomName} = army,
             {creeps: {[armyName]: creeps}} = Cache,
             dismantlerCreeps = creeps && creeps.armyDismantler || [],
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
         if (creepsWithNoTask.length === 0) {
             return;

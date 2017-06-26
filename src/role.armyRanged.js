@@ -135,7 +135,7 @@ class RoleArmyRanged {
      */
     static assignStagingTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -169,7 +169,7 @@ class RoleArmyRanged {
         const {creeps: {[army.name]: creeps}} = Cache,
             rangedCreeps = creeps && creeps.armyRanged || [],
             {attackRoom: attackRoomName} = army,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -228,7 +228,7 @@ class RoleArmyRanged {
         const {creeps: {[army.name]: creeps}} = Cache,
             rangedCreeps = creeps && creeps.armyRanged || [],
             {attackRoom: attackRoomName} = army,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(rangedCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
         if (creepsWithNoTask.length === 0) {
             return;

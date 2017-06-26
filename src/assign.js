@@ -933,6 +933,34 @@ class Assign {
         });
     }
 
+    //   #    #             #  ####                            #
+    //  # #                 #  #                               #
+    //  #    ##    ###    ###  ###    ###    ##    ##   ###   ###
+    // ###    #    #  #  #  #  #     ##     #     #  #  #  #   #
+    //  #     #    #  #  #  #  #       ##   #     #  #  #      #
+    //  #    ###   #  #   ###  ####  ###     ##    ##   #       ##
+    /**
+     * Assigns creeps to find their escort.
+     * @param {Creep[]} creeps The creeps to assign this task to.
+     * @param {string} say Text to say on successful assignment.
+     * @return {void}
+     */
+    static findEscort(creeps, say) {
+        _.forEach(_.filter(creeps, (c) => c.memory.escortedBy), (creep) => {
+            const {memory: {escortedBy: id}} = creep,
+                escort = Game.getObjectById(id);
+
+            if (!escort || escort.pos.roomName === creep.pos.roomName && creep.pos.getRangeTo(escort) <= 1) {
+                return;
+            }
+
+            if (new TaskRally(id, "id").canAssign(creep)) {
+                ({time: creep.memory.currentTask.priority} = Game);
+                creep.say(say);
+            }
+        });
+    }
+
     //   #   ##
     //  # #   #
     //  #     #     ##    ##
@@ -1001,9 +1029,7 @@ class Assign {
                 return;
             }
 
-            const task = new TaskRally(id, "id");
-
-            if (task.canAssign(creep)) {
+            if (new TaskRally(id, "id").canAssign(creep)) {
                 ({time: creep.memory.currentTask.priority} = Game);
                 creep.say(say);
             }

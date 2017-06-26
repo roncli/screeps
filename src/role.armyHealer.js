@@ -66,13 +66,13 @@ class RoleArmyHealer {
      */
     static assignTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            armyHealers = creeps && creeps.armyHealer || [];
+            armyHealer = creeps && creeps.armyHealer || [];
 
         // If not yet boosted, go get boosts.
-        Assign.getBoost(_.filter(armyHealers, (c) => !c.spawning), "Boosting");
+        Assign.getBoost(_.filter(armyHealer, (c) => !c.spawning), "Boosting");
 
         // Assign tasks for escorts.
-        Assign.escort(_.filter(armyHealers, (c) => !c.memory.labs || c.memory.labs.length === 0), "Healing");
+        Assign.escort(_.filter(armyHealer, (c) => !c.memory.labs || c.memory.labs.length === 0), "Healing");
 
         switch (army.directive) {
             case "building":

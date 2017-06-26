@@ -64,10 +64,14 @@ class RoleArmyDismantler {
      * @return {void}
      */
     static assignTasks(army) {
-        const {creeps: {[army.name]: creeps}} = Cache;
+        const {creeps: {[army.name]: creeps}} = Cache,
+            armyDismantler = creeps && creeps.armyDismantler || [];
 
         // If not yet boosted, go get boosts.
-        Assign.getBoost(_.filter(creeps && creeps.armyDismantler || [], (c) => !c.spawning), "Boosting");
+        Assign.getBoost(_.filter(armyDismantler, (c) => !c.spawning), "Boosting");
+
+        // Assign tasks for escortees.
+        Assign.findEscort(_.filter(armyDismantler, (c) => !c.memory.labs || c.memory.labs.length === 0), "Escort!");
 
         switch (army.directive) {
             case "building":

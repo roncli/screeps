@@ -1,0 +1,46 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html">
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html">
+
+<dom-module id="general-rooms">
+    <template is="dom-repeat" items="[[rooms]]" as="room">
+        <div style="display: flex;">
+            <div style="width: max-content; white-space: nowrap;">
+                <b>[[room.name]] RCL</b> [[room.controller.level]]
+            </div>
+            <template is="dom-if" if="[[room.storage && room.storage.energy !== void 0]]">
+                <div style="margin: 0 5px; white-space: nowrap;">
+                    <b>S</b> [[room.storage && room.storage.energy !== void 0 ? room.storage.energy : 0]] <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/energy.png" />
+                </div>
+            </template>
+            <template is="dom-if" if="[[room.terminal && room.terminal.energy !== void 0]]">
+                <div style="white-space: nowrap;">
+                    <b>T</b> [[room.terminal && room.terminal.energy !== void 0 ? room.terminal.energy : 0]] <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/energy.png" />
+                </div>
+            </template>
+            <template is="dom-if" if="[[room.controller.level < 8]]">
+                <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.controller.progress]]" aria-valuemin="0" aria-valuemax="[[room.controller.progressTotal]]" style="width: [[room.controller.progressTotal ? 100 * room.controller.progress / room.controller.progressTotal : 100]]%; white-space: nowrap; color: black;">
+                        [[room.controller.progress.toFixed(0)]]/[[room.controller.progressTotal.toFixed(0)]] ([[(100 * room.controller.progress / room.controller.progressTotal).toFixed(3)]]%) [[(room.controller.progressTotal - room.controller.progress).toFixed(0)]] to go
+                        <span id="room-summary-rcl-eta"></span>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[room.controller.level === 8]]">
+                <div style="width: 100%;"></div>
+            </template>
+            <div style="width: max-content; white-space: nowrap;">
+                <b>TTD</b> [[room.controller.ticksToDowngrade]]
+            </div>
+        </div>
+    </template>
+
+    <script>
+        class GeneralRooms extends Polymer.Element {
+            static get is() {
+                return "general-rooms";
+            }
+        }
+
+        customElements.define(GeneralRoom.is, GeneralRoom);
+    </script>
+</dom-module>

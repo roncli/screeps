@@ -24,7 +24,7 @@ class Index {
             });
         };
 
-        screeps.socket(Index.socketOpen);
+        // screeps.socket(Index.socketOpen);
 
         screeps.on("message", (msg) => {
             if (msg.startsWith("auth ok")) {

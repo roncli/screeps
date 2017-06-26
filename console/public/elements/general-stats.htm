@@ -1,0 +1,58 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html">
+
+<dom-module id="general-stats">
+    <template>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div style="display: flex;">
+                    <div style="width: max-content; white-space: nowrap;">
+                        <b>GCL</b> [[gcl.level]]
+                    </div>
+                    <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                            <span id="gcl-progress"></span>
+                            <span id="gcl-eta"></span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex;">
+                    <div class="progress" style="width: 200px; margin: 0; break-after: always;">
+                        <div id="cpu-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                            <b>CPU</b> <span id="cpu"></span>
+                        </div>
+                    </div>
+                    <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
+                        <div id="bucket-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="10000" style="white-space: nowrap; color: black;">
+                            <b>Bucket</b> <span id="bucket"></span>
+                        </div>
+                    </div>
+                    <div style="width: max-content; white-space: nowrap;">
+                        <b>Tick Limit</b> <span id="tick-limit"></span>
+                    </div>
+                </div>
+                <div style="display: flex;">
+                    <div style="width: 50%;">
+                        <b>Credits</b> <span id="credits"></span>
+                    </div>
+                    <div style="width: 50%; text-align: right;">
+                        <span id="date"></span>
+                        <b>Tick</b> <span id="tick"></span>
+                    </div>
+                </div>
+                <div>&nbsp;</div>
+                <div id="general-rooms"></div>
+                <b>Creeps</b> <span id="creeps-count"></span>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        class GeneralStats extends Polymer.Element {
+            static get is() {
+                return "general-stats";
+            }
+        }
+
+        customElements.define(GeneralStats.is, GeneralStats);
+    </script>
+</dom-module>

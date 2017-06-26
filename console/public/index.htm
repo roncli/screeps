@@ -6,16 +6,16 @@
     <script src="/js/moment.min.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/screeps.js"></script>
+    <script src="https://polygit.org/webcomponentsjs+1.0.0-rc.5/components/webcomponentsjs/webcomponents-loader.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css"/>
-    <link id="general-import" rel="import" href="general.htm" />
-    <link id="base-import" rel="import" href="bases.htm" />
+    <link rel="import" href="elements/general-stats.htm">
 </head>
 <body>
     <div class="container-fluid">
         <div class="col-xs-12">
-            <div id="general"></div>
-            <b>Base Rooms</b>
-            <div id="bases" style="white-space: nowrap; overflow-x: scroll;"></div>
+            <general-stats></general-stats>
+            <!--<b>Base Rooms</b>
+            <div id="bases" style="white-space: nowrap; overflow-x: scroll;"></div>-->
         </div>
     </div>
 </body>

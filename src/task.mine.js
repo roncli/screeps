@@ -81,10 +81,8 @@ class TaskMine {
 
         if (containerPosX !== creepPosX || containerPosY !== creepPosY || containerPosRoomName !== creepPosRoomName) {
             Pathing.moveTo(creep, container, 0);
-        }
-
-        // If we are at the container, get the source closest to the creep and attempt to harvest it.  Save it for future use.
-        if (containerPosX === creepPosX && containerPosY === creepPosY && containerPosRoomName === creepPosRoomName) {
+        } else {
+            // Get the source closest to the creep and attempt to harvest it.
             const {containerSource: {[containerId]: containerSourceId}} = Memory;
             let source;
 

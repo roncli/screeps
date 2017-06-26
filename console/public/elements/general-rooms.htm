@@ -1,4 +1,5 @@
 <link rel="import" href="https://polygit.org/components/polymer/polymer-element.html">
+<!--<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-if.html">-->
 <link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html">
 
 <dom-module id="general-rooms">
@@ -39,8 +40,17 @@
             static get is() {
                 return "general-rooms";
             }
+
+            static get properties() {
+                return {
+                    rooms: {
+                        type: Object,
+                        value: {}
+                    }
+                };
+            }
         }
 
-        customElements.define(GeneralRoom.is, GeneralRoom);
+        customElements.define(GeneralRooms.is, GeneralRooms);
     </script>
 </dom-module>

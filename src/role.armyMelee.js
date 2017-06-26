@@ -99,7 +99,7 @@ class RoleArmyMelee {
      */
     static assignBuildingTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyMelee || []), (c) => !c.spawning);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyMelee || []), (c) => !c.spawning && !c.memory.labs || c.memory.labs.length === 0);
 
         if (creepsWithNoTask.length === 0) {
             return;

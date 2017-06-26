@@ -104,7 +104,7 @@ class RoleArmyHealer {
      */
     static assignBuildingTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyHealer || []), (c) => !c.spawning && !c.memory.escorting);
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyHealer || []), (c) => !c.spawning && !c.memory.escorting && !c.memory.labs || c.memory.labs.length === 0);
 
         if (creepsWithNoTask.length === 0) {
             return;

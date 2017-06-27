@@ -1,0 +1,114 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-if.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="format-to-fixed.htm" />
+
+<dom-module id="general-room">
+    <template>
+        <div style="display: flex;">
+            <div style="width: max-content; white-space: nowrap;">
+                <b>[[room.name]] RCL</b> [[room.controller.level]]
+            </div>
+            <template is="dom-if" if="[[hasStorage]]">
+                <div style="margin: 0 5px; white-space: nowrap;">
+                    <b>S</b> [[storageEnergy]] <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/energy.png" />
+                </div>
+            </template>
+            <template is="dom-if" if="[[hasTerminal]]">
+                <div style="white-space: nowrap;">
+                    <b>T</b> [[terminalEnergy]] <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/energy.png" />
+                </div>
+            </template>
+            <template is="dom-if" if="[[!isRcl8]]">
+                <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
+                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.controller.progress]]" aria-valuemin="0" aria-valuemax="[[room.controller.progressTotal]]" style$="width: [[rclProgressPercent]]%; white-space: nowrap; color: black;">
+                        <format-to-fixed value="[[room.controller.progress]]"></format-to-fixed>/<format-to-fixed value="[[room.controller.progressTotal]]"></format-to-fixed>
+                        (<format-to-fixed value="[[rclProgressPercent]]" digits="3"></format-to-fixed>%) <format-to-fixed value="[[rclRemaining]]"></format-to-fixed> to go
+                        <span id="room-summary-rcl-eta"></span>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[isRcl8]]">
+                <div style="width: 100%;"></div>
+            </template>
+            <div style="width: max-content; white-space: nowrap;">
+                <b>TTD</b> [[room.controller.ticksToDowngrade]]
+            </div>
+        </div>
+    </template>
+
+    <script>
+        class GeneralRoom extends Polymer.Element {
+            static get is() {
+                return "general-room";
+            }
+
+            static get properties() {
+                return {
+                    room: {
+                        type: Object,
+                        value: {}
+                    },
+                    hasStorage: {
+                        type: Boolean,
+                        computed: "getHasStorage(room)"
+                    },
+                    hasTerminal: {
+                        type: Boolean,
+                        computed: "getHasTerminal(room)"
+                    },
+                    isRcl8: {
+                        type: Boolean,
+                        computed: "getIsRcl8(room)"
+                    },
+                    rclProgressPercent: {
+                        type: Number,
+                        computed: "getRclProgressPercent(room)"
+                    },
+                    rclRemaining: {
+                        type: Number,
+                        computed: "getRclRemaining(room)"
+                    },
+                    storageEnergy: {
+                        type: Number,
+                        computed: "getStorageEnergy(room)"
+                    },
+                    terminalEnergy: {
+                        type: Number,
+                        computed: "getTerminalEnergy(room)"
+                    }
+                };
+            }
+
+            getHasStorage(room) {
+                return room.storage && room.storage.energy !== void 0;
+            }
+
+            getHasTerminal(room) {
+                return room.terminal && room.terminal.energy !== void 0;
+            }
+
+            getIsRcl8(room) {
+                return room.controller.level === 8;
+            }
+
+            getRclProgressPercent(room) {
+                return room.controller.progressTotal ? 100 * room.controller.progress / room.controller.progressTotal : 0;
+            }
+
+            getRclRemaining(room) {
+                return room.controller.progressTotal - room.controller.progress;
+            }
+
+            getStorageEnergy(room) {
+                return room.storage && room.storage.energy !== void 0 ? room.storage.energy : 0;
+            }
+
+            getTerminalEnergy(room) {
+                return room.terminal && room.terminal.energy !== void 0 ? room.terminal.energy : 0;
+            }
+        }
+
+        customElements.define(GeneralRoom.is, GeneralRoom);
+    </script>
+</dom-module>

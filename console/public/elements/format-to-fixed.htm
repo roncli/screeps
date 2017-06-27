@@ -1,0 +1,35 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+
+<dom-module id="format-to-fixed">
+    <template>[[output]]</template>
+    <script>
+        class FormatToFixed extends Polymer.Element {
+            static get is() {
+                return "format-to-fixed";
+            }
+
+            static get properties() {
+                return {
+                    value: {
+                        type: Number,
+                        value: 0
+                    },
+                    digits: {
+                        type: Number,
+                        value: 0
+                    },
+                    output: {
+                        type: String,
+                        computed: "getOutput(value, digits)"
+                    }
+                }
+            }
+
+            getOutput(value, digits) {
+                return value ? value.toFixed(digits) : "";
+            }
+        }
+
+        customElements.define(FormatToFixed.is, FormatToFixed);
+    </script>
+</dom-module>

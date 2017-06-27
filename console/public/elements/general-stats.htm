@@ -1,8 +1,10 @@
-<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html">
-<link rel="import" href="general-rooms.htm">
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="general-rooms.htm" />
+<link rel="import" href="format-to-fixed.htm" />
 
 <dom-module id="general-stats">
     <template>
+        <style>@import "/css/bootstrap.min.css";</style>
         <div class="panel panel-default">
             <div class="panel-body">
                 <div style="display: flex;">
@@ -10,20 +12,22 @@
                         <b>GCL</b> [[gcl.level]]
                     </div>
                     <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[gcl.progress]]" aria-valuemin="0" aria-valuemax="[[gcl.progressTotal]]" style="width: [[100 * gcl.progress / gcl.progressTotal]]%; white-space: nowrap; color: black;">
-                            [[gcl.progress.toFixed(0)]]/[[gcl.progressTotal.toFixed(0)]] ([[(100 * gcl.progress / gcl.progressTotal).toFixed(3)]]%) [[(gcl.progressTotal - gcl.progress).toFixed(0)]] to go
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[gcl.progress]]" aria-valuemin="0" aria-valuemax="[[gcl.progressTotal]]" style$="width: [[gclPercent]]%; white-space: nowrap; color: black;">
+                            <format-to-fixed value="[[gcl.progress]]"></format-to-fixed>/<format-to-fixed value="[[gcl.progressTotal]]"></format-to-fixed>
+                            (<format-to-fixed value="[[gclPercent]]" digits="3"></format-to-fixed>%)
+                            <format-to-fixed value="[[gclRemaining]]"></format-to-fixed> to go
                             <span id="gcl-eta"></span>
                         </div>
                     </div>
                 </div>
                 <div style="display: flex;">
                     <div class="progress" style="width: 200px; margin: 0; break-after: always;">
-                        <div class="progress-bar [[currentCpu < cpu.limit ? "progress-bar-success" : "progress-bar-danger"]]" role="progressbar" aria-valuenow="[[currentCpu]]" aria-valuemin="0" aria-valuemax="[[cpu.limit]]" style="width: [[Math.min(100 * currentCpu / cpu.limit, 100)]]%; white-space: nowrap; color: black;">
-                            <b>CPU</b> [[currentCpu.toFixed(2)]]/[[cpu.limit.toFixed(0)]]
+                        <div class$="progress-bar [[cpuStatus]]" role="progressbar" aria-valuenow="[[currentCpu]]" aria-valuemin="0" aria-valuemax="[[cpu.limit]]" style$="width: [[cpuPercent]]%; white-space: nowrap; color: black;">
+                            <b>CPU</b> <format-to-fixed value="[[currentCpu]]" digits="2"></format-to-fixed>/[[cpu.limit]]
                         </div>
                     </div>
                     <div class="progress" style="width: 100%; margin: 0 5px; break-after: always;">
-                        <div class="progress-bar [[currentBucket > 9990 ? "progress-bar-info" : currentBucket > 9000 ? "progress-bar-success" : currentBucket > 5000 ? "progress-bar-warning" : "progress-bar-danger"]]" role="progressbar" aria-valuenow="[[currentBucket]]" aria-valuemin="0" aria-valuemax="10000" style="width: [[currentBucket / 100]]%; white-space: nowrap; color: black;">
+                        <div class$="progress-bar [[bucketStatus]]" role="progressbar" aria-valuenow="[[currentBucket]]" aria-valuemin="0" aria-valuemax="10000" style$="width: [[bucketPercent]]%; white-space: nowrap; color: black;">
                             <b>Bucket</b> [[currentBucket]]
                         </div>
                     </div>
@@ -33,14 +37,14 @@
                 </div>
                 <div style="display: flex;">
                     <div style="width: 50%;">
-                        <b>Credits</b> [[global.credits.toFixed(2)]]
+                        <b>Credits</b> <format-to-fixed value="[[global.credits]]" digits="2"></format-to-fixed>
                     </div>
                     <div style="width: 50%; text-align: right;">
-                        [[moment(survey.lastTime).format("M/D/YYYY h:mm:ss a")]]
+                        [[lastTime]]
                         <b>Tick</b> [[survey.lastPoll]]
                     </div>
                 </div>
-                <general-rooms rooms="[[rooms]]"></general-rooms>
+                <general-rooms rooms="[[baseRooms]]"></general-rooms>
                 <b>Creeps</b> [[survey.data.creeps.length]]
             </div>
         </div>
@@ -77,8 +81,72 @@
                     survey: {
                         type: Object,
                         value: {}
+                    },
+                    baseRooms: {
+                        type: Array,
+                        computed: "getBaseRooms(survey)"
+                    },
+                    bucketPercent: {
+                        type: Number,
+                        computed: "getBucketPercent(currentBucket)"
+                    },
+                    bucketStatus: {
+                        type: String,
+                        computed: "getBucketStatus(currentBucket)"
+                    },
+                    cpuPercent: {
+                        type: Number,
+                        computed: "getCpuPercent(currentCpu, cpu)"
+                    },
+                    cpuStatus: {
+                        type: String,
+                        computed: "getCpuStatus(currentCpu, cpu)"
+                    },
+                    gclPercent: {
+                        type: Number,
+                        computed: "getGclPercent(gcl)"
+                    },
+                    gclRemaining: {
+                        type: Number,
+                        computed: "getGclRemaining(gcl)"
+                    },
+                    lastTime: {
+                        type: String,
+                        computed: "getLastTime(survey)"
                     }
                 };
+            }
+
+            getBaseRooms(survey) {
+                return survey.data && survey.data.rooms ? survey.data.rooms.filter((r) => r.type === "base") : [];
+            }
+
+            getBucketPercent(currentBucket) {
+                return currentBucket / 100;
+            }
+
+            getBucketStatus(currentBucket) {
+                return currentBucket > 9990 ? "progress-bar-info" : currentBucket > 9000 ? "progress-bar-success" : currentBucket > 5000 ? "progress-bar-warning" : "progress-bar-danger";
+            }
+
+            getCpuPercent(currentCpu, cpu) {
+                return Math.min(100 * currentCpu / cpu.limit, 100);
+            }
+            
+            getCpuStatus(currentCpu, cpu) {
+                return currentCpu < cpu.limit ? "progress-bar-success" : "progress-bar-danger"                
+            }
+
+            getGclPercent(gcl) {
+                return gcl.progressTotal ? 100 * gcl.progress / gcl.progressTotal : 0;
+            }
+
+            getGclRemaining(gcl) {
+                return gcl.progressTotal - gcl.progress;
+            }
+
+            getLastTime(survey) {
+                return moment(survey.lastTime).format("M/D/YYYY h:mm:ss a");
             }
         }
 

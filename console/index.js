@@ -24,7 +24,15 @@ class Index {
             });
         };
 
-        // screeps.socket(Index.socketOpen);
+        wss.on("connection", (socket, request) => {
+            socket.on("message", (data) => {
+                if (data === "init") {
+                    lastTick = 0;
+                }
+            });
+        });
+
+        screeps.socket(Index.socketOpen);
 
         screeps.on("message", (msg) => {
             if (msg.startsWith("auth ok")) {

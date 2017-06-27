@@ -53,6 +53,7 @@ class Screeps {
 
         ws.onopen = function() {
             connected = true;
+            ws.send("init");
         };
 
         ws.onclose = function() {
@@ -105,7 +106,15 @@ class Screeps {
             return;
         }
 
-        const {stats: {cpu: cpuHistory, bucket: bucketHistory}, survey, survey: {data: {global, global: {gcl, cpu}, rooms}}} = data;
+        const {0: general} = $("#general"),
+            {stats: {cpu: cpuHistory, bucket: bucketHistory}, survey, survey: {data: {global, global: {gcl, cpu}, rooms}}} = data;
+        
+        general.cpu = cpu;
+        ({[bucketHistory.length - 1]: general.currentBucket} = bucketHistory);
+        ({[cpuHistory.length - 1]: general.currentCpu} = cpuHistory);
+        general.gcl = gcl;
+        general.global = global;
+        general.survey = survey;
     }
 
     static loadBases() {

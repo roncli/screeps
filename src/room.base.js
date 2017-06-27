@@ -85,7 +85,9 @@ class RoomBase extends RoomEngine {
 
         // Check to see if we can do a deal in the terminal.
         if (terminal && !terminal.cooldown) {
-            this.terminal();
+            if (Game.cpu.bucket >= 5000) {
+                this.terminal();
+            }
         }
 
         // Get the tasks needed for this room.

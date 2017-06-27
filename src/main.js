@@ -1353,7 +1353,6 @@ class Main {
                     energy: l.energy,
                     energyCapacity: l.energyCapacity,
                     mineralAmount: l.mineralAmount,
-                    mineralCapacity: l.mineralCapacity,
                     mineralType: l.mineralType
                 })) : [],
                 nukers: !unobservable && type === "base" ? _.map(Cache.nukersInRoom(r), (n) => ({

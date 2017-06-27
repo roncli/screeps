@@ -27,7 +27,7 @@
                         <div class="terminal-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
                     </template>
                 </template>
-                <div id="room-energy">
+                <template is="dom-if" if="[[room.energyCapacityAvailable]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
                             <b>Energy</b>
@@ -38,8 +38,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="room-towers">
+                </template>
+                <template is="dom-if" if="[[room.towers.length]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
                             <b>Towers</b>
@@ -50,85 +50,101 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="room-labs">
+                </template>
+                <template is="dom-if" if="[[room.labs.length]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
                             <b>Labs</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div id="room-labs-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-labs-energy"></span>
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[labEnergy]]" aria-valuemin="0" aria-valuemax="[[labEnergyCapacity]]" style$="width: [[labEnergyPercent]]%; white-space: nowrap; color: black;">
+                                [[labEnergy]]/[[labEnergyCapacity]]
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="room-nukers">
+                </template>
+                <template is="dom-if" if="[[room.nukers.length]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
                             <b>Nuker</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div id="room-nukers-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-nukers-energy"></span>
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[nukerEnergy]]" aria-valuemin="0" aria-valuemax="[[nukerEnergyCapacity]]" style$="width: [[nukerEnergyPercent]]%; white-space: nowrap; color: black;">
+                                [[nukerEnergy]]/[[nukerEnergyCapacity]]
                             </div>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div id="room-nukers-ghodium-progress-bar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-nukers-ghodium"></span>
+                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="[[nukerGhodium]]" aria-valuemin="0" aria-valuemax="[[nukerGhodiumCapacity]]" style$="width: [[nukerGhodiumPercent]]%; white-space: nowrap; color: black;">
+                                [[nukerGhodium]]/[[nukerGhodiumCapacity]]
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="room-power-spawns">
+                </template>
+                <template is="dom-if" if="[[room.powerSpawns.length]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
                             <b>Power Spawn</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div id="room-power-spawns-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-power-spawns-energy"></span>
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[powerSpawnEnergy]]" aria-valuemin="0" aria-valuemax="[[powerSpawnEnergyCapacity]]" style$="width: [[powerSpawnEnergyPercent]]%; white-space: nowrap; color: black;">
+                                [[powerSpawnEnergy]]/[[powerSpawnEnergyCapacity]]
                             </div>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div id="room-power-spawns-power-progress-bar" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-power-spawns-power"></span>
+                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="[[powerSpawnPower]]" aria-valuemin="0" aria-valuemax="[[powerSpawnPowerCapacity]]" style$="width: [[powerSpawnPowerPercent]]%; white-space: nowrap; color: black;">
+                                [[powerSpawnPower]]/[[powerSpawnPowerCapacity]]
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="room-buy-queue" style="margin-left: 10px;">
-                    <b>Buy</b> <span id="room-buy-queue-resource">
-                </div>
-                <div id="room-lab-queue" style="margin-left: 10px;">
-                    <b>Create</b> <span id="room-lab-queue-resource">
-                </div>
-                <div id="room-labs-status" style="margin-left: 10px;">
-                </div>
-                <div id="room-construction">
+                </template>
+                <template is="dom-if" if="[[room.buyQueue]]">
+                    <div style="margin-left: 10px;">
+                        <b>Buy</b> [[room.buyQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.buyQueue.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                    </div>
+                </template>
+                <template is="dom-if" if="[[room.labQueue]]">
+                    <div style="margin-left: 10px;">
+                        <b>Create</b> [[room.labQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.labQueue.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                    </div>
+                </template>
+                <template is="dom-if" if="[[room.labs.length]]">
+                    <template is="dom-repeat" items="[[room.labs]]" as="lab">
+                        <div style="display: inline-block; margin-right: 5px;">
+                            [[lab.mineralAmount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[lab.mineralType]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                        </div>
+                    </template>
+                </template>
+                <template is="dom-if" if="[[room.constructionSites.length]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
                             <b>Construction</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div id="room-construction-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-construction-progress"></span>
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[siteProgress]]" aria-valuemin="0" aria-valuemax="[[siteProgressTotal]]" style$="width: [[siteProgressPercent]]%; white-space: nowrap; color: black;">
+                                [[siteProgress]]/[[siteProgressTotal]]
                             </div>
                         </div>
                     </div>
-                </div>
-                <div div="room-lowest-wall">
-                    <b>Lowest Wall</b> <span id="room-lowest-wall-size"></span>
-                </div>
-                <div ng-repeat="source in room.source">
-                    <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{source.resource}}.png" /> {{source.amount}}<span ng-if="source.capacity">/{{source.capacity}}</span>
-                    <span style="width: max-content; white-space: nowrap;" ng-if="source.ttr">
-                        <b>TTR</b> {{source.ttr}}
-                    </span>
-                </div>
-                <div ng-repeat="creeps in room.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
-                    <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
-                </div>
+                </template>
+                <template is="dom-if" if="[[room.lowestWall]]">
+                    <div div="room-lowest-wall">
+                        <b>Lowest Wall</b> [[room.lowestWall]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[room.sources.length]]">
+                    <template is="dom-repeat" items="[[room.sources]]" as="source">
+                        <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{source.resource}}.png" />
+                        [[source.amount]]<template is="dom-if" if="[[source.capacity]]">/[[source.capacity]]</span>
+                        <template is="dom-if" if="[[source.ttr]]">
+                            <b>TTR</b> {{source.ttr}}
+                        </template>
+                    </template>
+                </template>
+                <template is="dom-repeat" items="[[creepRoles]]" as="role">
+                    <div ng-class$="[[roleStatus(role.count, role.max)]]">
+                        <b>{{role.role}}</b> {{role.count}}/{{role.max}}
+                    </div>
+                </template>
                 <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
                     <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
                 </div>
@@ -141,6 +157,7 @@
             </div>
         </div>
     </template>
+
     <script>
         class BaseRoom extends Polymer.Element {
             static get is() {
@@ -153,13 +170,89 @@
                         type: Object,
                         value: {}
                     },
+                    creepRoles: {
+                        type: Array,
+                        value: []
+                    },
                     energyAvailablePercent: {
                         type: Number,
                         computed: "getEnergyAvailablePercent(room)"
                     },
+                    labEnergy: {
+                        type: Number,
+                        computed: "getLabEnergy(room)"
+                    },
+                    labEnergyCapacity: {
+                        type: Number,
+                        computed: "getLabEnergyCapacity(room)"
+                    },
+                    labEnergyPercent: {
+                        type: Number,
+                        computed: "getLabEnergyPercent(labEnergy, labEnergyCapacity)"
+                    },
+                    nukerEnergy: {
+                        type: Number,
+                        computed: "getNukerEnergy(room)"
+                    },
+                    nukerEnergyCapacity: {
+                        type: Number,
+                        computed: "getNukerEnergyCapacity(room)"
+                    },
+                    nukerEnergyPercent: {
+                        type: Number,
+                        computed: "getNukerEnergyPercent(nukerEnergy, nukerEnergyCapacity)"
+                    },
+                    nukerGhodium: {
+                        type: Number,
+                        computed: "getNukerGhodium(room)"
+                    },
+                    nukerGhodiumCapacity: {
+                        type: Number,
+                        computed: "getNukerGhodiumCapacity(room)"
+                    },
+                    nukerGhodiumPercent: {
+                        type: Number,
+                        computed: "getNukerGhodiumPercent(nukerGhodium, nukerGhodiumCapacity)"
+                    },
+                    powerSpawnEnergy: {
+                        type: Number,
+                        computed: "getPowerSpawnEnergy(room)"
+                    },
+                    powerSpawnEnergyCapacity: {
+                        type: Number,
+                        computed: "getPowerSpawnEnergyCapacity(room)"
+                    },
+                    powerSpawnEnergyPercent: {
+                        type: Number,
+                        computed: "getPowerSpawnEnergyPercent(powerSpawnEnergy, powerSpawnEnergyCapacity)"
+                    },
+                    powerSpawnPower: {
+                        type: Number,
+                        computed: "getPowerSpawnPower(room)"
+                    },
+                    powerSpawnPowerCapacity: {
+                        type: Number,
+                        computed: "getPowerSpawnPowerCapacity(room)"
+                    },
+                    powerSpawnPowerPercent: {
+                        type: Number,
+                        computed: "getPowerSpawnPowerPercent(powerSpawnPower, powerSpawnPowerCapacity)"
+                    },
                     roomStore: {
                         type: Array,
                         computed: "getRoomStore(room)"
+                    },
+                    siteProgress: {
+                        type: Number,
+                        computed: "getSiteProgress(room)"
+                    },
+                    siteProgressPercent: {
+                        type: Number,
+                        computed: "getSiteProgressPercent(siteProgress, siteProgressTotal)"
+                    },
+                    siteProgressTotal: {
+                        type: Number,
+                        computed: "getSiteProgressTotal(room)"
                     },
                     terminalStore: {
                         type: Array,
@@ -184,8 +277,80 @@
                 return room.energyAvailable / room.energyCapacityAvailable;
             }
 
+            getLabEnergy(room) {
+                return room.labs.reduce((acc, val) => acc + val.energy, 0);
+            }
+
+            getLabEnergyCapacity(room) {
+                return room.labs.reduce((acc, val) => acc + val.energyCapacity, 0);
+            }
+
+            getLabEnergyPercent(labEnergy, labEnergyCapacity) {
+                return labEnergy / labEnergyCapacity;
+            }
+
+            getNukerEnergy(room) {
+                return room.nukers.reduce((acc, val) => acc + val.energy, 0);
+            }
+
+            getNukerEnergyCapacity(room) {
+                return room.nukers.reduce((acc, val) => acc + val.energyCapacity, 0);
+            }
+
+            getNukerEnergyPercent(nukerEnergy, nukerEnergyCapacity) {
+                return nukerEnergy / nukerEnergyCapacity;
+            }
+
+            getNukerGhodium(room) {
+                return room.nukers.reduce((acc, val) => acc + val.ghodium, 0);
+            }
+
+            getNukerGhodiumCapacity(room) {
+                return room.nukers.reduce((acc, val) => acc + val.ghodiumCapacity, 0);
+            }
+
+            getNukerGhodiumPercent(nukerGhodium, nukerGhodiumCapacity) {
+                return nukerGhodium / nukerGhodiumCapacity;
+            }
+
+            getPowerSpawnEnergy(room) {
+                return room.powerSpawns.reduce((acc, val) => acc + val.energy, 0);
+            }
+
+            getPowerSpawnEnergyCapacity(room) {
+                return room.powerSpawns.reduce((acc, val) => acc + val.energyCapacity, 0);
+            }
+
+            getPowerSpawnEnergyPercent(powerSpawnEnergy, powerSpawnEnergyCapacity) {
+                return powerSpawnEnergy / powerSpawnEnergyCapacity;
+            }
+
+            getPowerSpawnPower(room) {
+                return room.powerSpawns.reduce((acc, val) => acc + val.power, 0);
+            }
+
+            getPowerSpawnPowerCapacity(room) {
+                return room.powerSpawns.reduce((acc, val) => acc + val.powerCapacity, 0);
+            }
+
+            getPowerSpawnPowerPercent(powerSpawnPower, powerSpawnPowerCapacity) {
+                return powerSpawnPower / powerSpawnPowerCapacity;
+            }
+
             getRoomStore(room) {
                 return Object.keys(room.storage).map((resource) => ({resource, amount: room.storage[resource]}));
+            }
+
+            getSiteProgress(room) {
+                return room.constructionSites.reduce((acc, val) => acc + val.progress, 0);
+            }
+
+            getSiteProgressPercent(siteProgress, siteProgressTotal) {
+                return siteProgress / siteProgressPercent;
+            }
+
+            getSiteProgressTotal(room) {
+                return room.constructionSites.reduce((acc, val) => acc + val.progressTotal, 0);
             }
 
             getTerminalStore(room) {
@@ -202,6 +367,20 @@
 
             getTowerEnergyPercent(towerEnergy, towerEnergyCapacity) {
                 return towerEnergy / towerEnergyCapacity;
+            }
+
+            roleStatus(count, max) {
+                if (max === 0) {
+                    return;
+                }
+
+                if (count === 0) {
+                    return "text-danger";
+                }
+
+                if (count < max) {
+                    return "text-warning";
+                }
             }
         }
 

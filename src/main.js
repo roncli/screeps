@@ -1332,6 +1332,7 @@ class Main {
 
             return {
                 name,
+                region: memory.region,
                 type,
                 unobservable,
                 controller: controller && {

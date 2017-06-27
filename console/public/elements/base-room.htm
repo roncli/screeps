@@ -1,0 +1,186 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-if.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="format-to-fixed.htm" />
+
+<dom-module id="base-room">
+    <template>
+        <div class="panel panel-primary" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+            <div class="panel-heading">
+                [[room.name]]
+                ([[room.region]])
+            </div>
+            <div class="panel-body">
+                <template is="dom-repeat" items="[[roomStore]]" as="resource">
+                    <template is="dom-if" if="[[!index]]">
+                        <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                    </template>
+                    <template is="dom-if" if="[[index]]">
+                        <div class="storage-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                    </template>
+                </template>
+                <template is="dom-repeat" items="[[roomTerminal]]" as="resource">
+                    <template is="dom-if" if="[[!index]]">
+                        <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus terminal-resources-toggle" style="cursor: pointer;"></span>
+                    </template>
+                    <template is="dom-if" if="[[index]]">
+                        <div class="terminal-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                    </template>
+                </template>
+                <div id="room-energy">
+                    <div style="display: flex;">
+                        <div style="width: max-content; white-space: nowrap;">
+                            <b>Energy</b>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.energyAvailable]]" aria-valuemin="0" aria-valuemax="[[room.energyCapacityAvailable]]" style$="width: [[energyAvailablePercent]]%white-space: nowrap; color: black;">
+                                [[room.energyAvailable]]/[[room.energyCapacityAvailable]]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="room-towers">
+                    <div style="display: flex;">
+                        <div style="width: max-content; white-space: nowrap;">
+                            <b>Towers</b>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-towers-progress"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="room-labs">
+                    <div style="display: flex;">
+                        <div style="width: max-content; white-space: nowrap;">
+                            <b>Labs</b>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div id="room-labs-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-labs-energy"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="room-nukers">
+                    <div style="display: flex;">
+                        <div style="width: max-content; white-space: nowrap;">
+                            <b>Nuker</b>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div id="room-nukers-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-nukers-energy"></span>
+                            </div>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div id="room-nukers-ghodium-progress-bar" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-nukers-ghodium"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="room-power-spawns">
+                    <div style="display: flex;">
+                        <div style="width: max-content; white-space: nowrap;">
+                            <b>Power Spawn</b>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div id="room-power-spawns-energy-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-power-spawns-energy"></span>
+                            </div>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div id="room-power-spawns-power-progress-bar" class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-power-spawns-power"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="room-buy-queue" style="margin-left: 10px;">
+                    <b>Buy</b> <span id="room-buy-queue-resource">
+                </div>
+                <div id="room-lab-queue" style="margin-left: 10px;">
+                    <b>Create</b> <span id="room-lab-queue-resource">
+                </div>
+                <div id="room-labs-status" style="margin-left: 10px;">
+                </div>
+                <div id="room-construction">
+                    <div style="display: flex;">
+                        <div style="width: max-content; white-space: nowrap;">
+                            <b>Construction</b>
+                        </div>
+                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                            <div id="room-construction-progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
+                                <span id="room-construction-progress"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div div="room-lowest-wall">
+                    <b>Lowest Wall</b> <span id="room-lowest-wall-size"></span>
+                </div>
+                <div ng-repeat="source in room.source">
+                    <img src="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{source.resource}}.png" /> {{source.amount}}<span ng-if="source.capacity">/{{source.capacity}}</span>
+                    <span style="width: max-content; white-space: nowrap;" ng-if="source.ttr">
+                        <b>TTR</b> {{source.ttr}}
+                    </span>
+                </div>
+                <div ng-repeat="creeps in room.creeps" ng-class="{'text-danger': creeps.count === 0, 'text-warning': creeps.count < creeps.max}">
+                    <b>{{creeps.role}}</b> {{creeps.count}}/{{creeps.max}}
+                </div>
+                <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
+                    <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
+                </div>
+                <div ng-repeat="spawn in data.memory.spawns" ng-if="spawn.room === name && spawn.spawningName">
+                    <b>Spawning</b> {{spawn.spawningName}} {{spawn.spawningRemainingTime}}/{{spawn.spawningNeedTime}}
+                </div>
+                <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" ng-class="{'text-warning': hostile.ownerUsername === 'Invader', 'text-danger': hostile.ownerUsername !== 'Invader'}">
+                    <b>{{hostile.ownerUsername}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
+                </div>
+            </div>
+        </div>
+    </template>
+    <script>
+        class BaseRoom extends Polymer.Element {
+            static get is() {
+                return "base-room";
+            }
+
+            static get properties() {
+                return {
+                    room: {
+                        type: Object,
+                        value: {}
+                    },
+                    energyAvailablePercent: {
+                        type: Number,
+                        computed: "getEnergyAvailablePercent(room)"
+                    },
+                    roomStore: {
+                        type: Array,
+                        computed: "getRoomStore(room)"
+                    },
+                    terminalStore: {
+                        type: Array,
+                        computed: "getTerminalStore(room)"
+                    }
+                };
+            }
+
+            getEnergyAvailablePercent(room) {
+                return room.energyAvailable / room.energyCapacityAvailable;
+            }
+
+            getRoomStore(room) {
+                return Object.keys(room.storage).map((resource) => ({resource, amount: room.storage[resource]}));
+            }
+
+            getTerminalStore(room) {
+                return Object.keys(room.terminal).map((resource) => ({resource, amount: room.terminal[resource]}));
+            }
+        }
+
+        customElements.define(BaseRoom.is, BaseRoom);
+    </script>
+</dom-module>

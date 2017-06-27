@@ -1,20 +1,20 @@
 <link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
 <link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
-<link rel="import" href="general-room.htm" />
+<link rel="import" href="base-room.htm" />
 
-<dom-module id="general-rooms">
+<dom-module id="base-rooms">
     <template>
         <template is="dom-repeat" items="{{rooms}}" as="room">
-            <div>
-                <general-room room="[[room]]"></general-room>
+            <div id="bases" style="white-space: nowrap; overflow-x: scroll;">
+                <base-room room="[[room]]"></base-room>
             </div>
         </template>
     </template>
 
     <script>
-        class GeneralRooms extends Polymer.Element {
+        class BaseRooms extends Polymer.Element {
             static get is() {
-                return "general-rooms";
+                return "base-rooms";
             }
 
             static get properties() {
@@ -27,6 +27,6 @@
             }
         }
 
-        customElements.define(GeneralRooms.is, GeneralRooms);
+        customElements.define(BaseRooms.is, BaseRooms);
     </script>
 </dom-module>

@@ -142,7 +142,7 @@
             }
 
             getGclRemaining(gcl) {
-                return gcl.progressTotal - gcl.progress;
+                return gcl.progressTotal && gcl.progress ? +gcl.progressTotal.toFixed(0) - +gcl.progress.toFixed(0) : 0;
             }
 
             getLastTime(survey) {

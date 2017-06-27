@@ -34,7 +34,7 @@ class RoleRemoteDismantler {
         }
 
         const {room} = engine,
-            max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length - 1, 8) : 1;
+            max = !room.unobservable && engine.type === "cleanup" ? Math.min(room.find(FIND_STRUCTURES).length - 1, 4) : 1;
 
         if (!canSpawn) {
             return {

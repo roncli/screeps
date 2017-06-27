@@ -1343,7 +1343,7 @@ class Main {
                     progressTotal: controller.progressTotal,
                     owner: controller.owner
                 } || [],
-                energyCapacity: r.energyCapacity,
+                energyAvailable: r.energyAvaialble,
                 energyCapacityAvailable: r.energyCapacityAvailable,
                 towers: !unobservable && type === "base" ? _.map(Cache.towersInRoom(r), (t) => ({
                     energy: t.energy,

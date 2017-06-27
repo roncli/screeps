@@ -45,8 +45,8 @@
                             <b>Towers</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="white-space: nowrap; color: black;">
-                                <span id="room-towers-progress"></span>
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[towerEnergy]]" aria-valuemin="0" aria-valuemax="[[towerEnergyCapacity]]" style$="width: [[towerEnergyPercent]]; white-space: nowrap; color: black;">
+                                [[towerEnergy]]/[[towerEnergyCapacity]]
                             </div>
                         </div>
                     </div>
@@ -164,6 +164,18 @@
                     terminalStore: {
                         type: Array,
                         computed: "getTerminalStore(room)"
+                    },
+                    towerEnergy: {
+                        type: Number,
+                        computed: "getTowerEnergy(room)"
+                    },
+                    towerEnergyCapacity: {
+                        type: Number,
+                        computed: "getTowerEnergyCapacity(room)"
+                    },
+                    towerEnergyPercent: {
+                        type: Number,
+                        computed: "getTowerEnergyPercent(towerEnergy, towerEnergyCapacity)"
                     }
                 };
             }
@@ -178,6 +190,18 @@
 
             getTerminalStore(room) {
                 return Object.keys(room.terminal).map((resource) => ({resource, amount: room.terminal[resource]}));
+            }
+
+            getTowerEnergy(room) {
+                return room.towers.reduce((acc, val) => acc + val.energy, 0);
+            }
+
+            getTowerEnergyCapacity(room) {
+                return room.towers.reduce((acc, val) => acc + val.energyCapacity, 0);
+            }
+
+            getTowerEnergyPercent(towerEnergy, towerEnergyCapacity) {
+                return towerEnergy / towerEnergyCapacity;
             }
         }
 

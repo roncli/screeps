@@ -1376,7 +1376,7 @@ class Main {
                     progressTotal: s.progressTotal
                 })) || [],
                 lowestWall: !unobservable && Math.min(..._.map(_.filter(Cache.repairableStructuresInRoom(r), (s) => s.structureType === STRUCTURE_WALL || s.structureType === STRUCTURE_RAMPART), (s) => s.hits)) || void 0,
-                sources: !unobservable && _.map(Array.prototype.concat.apply([], [r.find(FIND_SOURCES)], [r.find(FIND_MINERALS)]), (s) => ({
+                sources: !unobservable && _.map(Array.prototype.concat.apply([], [r.find(FIND_SOURCES), r.find(FIND_MINERALS)]), (s) => ({
                     resource: s.mineralType || RESOURCE_ENERGY,
                     amount: s.mineralAmount || s.energy,
                     capacity: s.energyCapacity,

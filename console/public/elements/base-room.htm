@@ -12,26 +12,30 @@
                 ([[room.region]])
             </div>
             <div class="panel-body">
-                <template if="[[hasStorage]]">
+                <template is="dom-if" if="[[hasStorage]]">
                     <div>
                         <template is="dom-repeat" items="[[roomStore]]" as="resource">
                             <template is="dom-if" if="[[!index]]">
-                                <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                                <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus" on-click="toggleStorage" style="cursor: pointer;"></span>
                             </template>
                             <template is="dom-if" if="[[index]]">
-                                <div class="storage-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                                <template is="dom-if" if="[[!hideStorage]]">
+                                    <div class="storage-resources" style="margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                                </template>
                             </template>
                         </template>
                     </div>
                 </template>
-                <template if="[[hasTerminal]]">
+                <template is="dom-if" if="[[hasTerminal]]">
                     <div>
                         <template is="dom-repeat" items="[[roomTerminal]]" as="resource">
                             <template is="dom-if" if="[[!index]]">
-                                <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus terminal-resources-toggle" style="cursor: pointer;"></span>
+                                <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus" on-click="toggleTerminal" style="cursor: pointer;"></span>
                             </template>
                             <template is="dom-if" if="[[index]]">
-                                <div class="terminal-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                                <template is="dom-if" if="[[!hideTerminal]]">
+                                    <div class="terminal-resources" style="margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                                </template>
                             </template>
                         </template>
                     </div>
@@ -195,6 +199,14 @@
                     creeps: {
                         type: Array,
                         value: []
+                    },
+                    hideStorage: {
+                        type: Boolean,
+                        value: true
+                    },
+                    hideTerminal: {
+                        type: Boolean,
+                        value: true
                     },
                     room: {
                         type: Object,
@@ -455,6 +467,34 @@
                 if (count < max) {
                     return "text-warning";
                 }
+            }
+
+            toggleStorage(ev) {
+                const $target = $(ev.target),
+                    $resources = $(".storage-resources");
+
+                if ($target.hasClass("glyphicon-plus")) {
+                    $target.removeClass("glyphicon-plus").addClass("glyphicon-minus");
+                } else {
+                    $target.removeClass("glyphicon-minus").addClass("glyphicon-plus");
+                }
+
+                this.hideStorage = !this.hideStorage
+            }
+
+            toggleTerminal(ev) {
+                const $target = $(ev.target),
+                    $resources = $(".terminal-resources");
+
+                if ($target.hasClass("glyphicon-plus")) {
+                    $target.removeClass("glyphicon-plus").addClass("glyphicon-minus");
+                    $resources.removeClass("hidden");
+                } else {
+                    $target.removeClass("glyphicon-minus").addClass("glyphicon-plus");
+                    $resources.addClass("hidden");
+                }
+
+                this.hideTerminal = !this.hideTerminal;
             }
         }
 

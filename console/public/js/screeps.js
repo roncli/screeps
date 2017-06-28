@@ -82,8 +82,10 @@ class Screeps {
                     Screeps.loadGeneral();
 
                     break;
-                case "creepCounts":
-                    ({creepCounts: data.creepCounts} = message);
+                case "creepCount":
+                    ({creepCount: data.creepCount} = message);
+
+                    Screeps.loadBases();
 
                     break;
                 case "error":
@@ -107,8 +109,8 @@ class Screeps {
         }
 
         const {0: general} = $("#general"),
-            {stats: {cpu: cpuHistory, bucket: bucketHistory}, survey, survey: {data: {global, global: {gcl, cpu}, rooms}}} = data;
-        
+            {stats: {cpu: cpuHistory, bucket: bucketHistory}, survey, survey: {data: {global, global: {gcl, cpu}}}} = data;
+
         general.cpu = cpu;
         ({[bucketHistory.length - 1]: general.currentBucket} = bucketHistory);
         ({[cpuHistory.length - 1]: general.currentCpu} = cpuHistory);
@@ -118,14 +120,17 @@ class Screeps {
     }
 
     static loadBases() {
-        if (!data.survey || !data.creepCounts) {
+        if (!data.survey || !data.creepCount) {
             return;
         }
 
-        const {stats: {cpu: cpuHistory, bucket: bucketHistory}, survey, survey: {data: surveyData, data: {global, global: {gcl, cpu}, rooms}}} = data,
-            $base = $(document.importNode($($($("#base-import")[0].import).find("#base-template")[0].content)[0], true));
+        const {0: bases} = $("#bases"),
+            {survey: {data: {rooms, creeps, spawns}}, creepCount} = data;
 
-        
+        bases.rooms = rooms.filter((r) => r.type === "base");
+        bases.creeps = creeps.filter((c) => c.hits < c.hitsMax && bases.rooms.map((r) => r.name).indexOf(c.home) !== -1);
+        bases.creepCount = creepCount;
+        bases.spawns = spawns.filter((s) => s.spawningName);
     }
 }
 

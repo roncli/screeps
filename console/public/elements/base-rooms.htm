@@ -4,11 +4,15 @@
 
 <dom-module id="base-rooms">
     <template>
-        <template is="dom-repeat" items="{{rooms}}" as="room">
-            <div id="bases" style="white-space: nowrap; overflow-x: scroll;">
-                <base-room room="[[room]]"></base-room>
-            </div>
-        </template>
+        <style>@import "/css/bootstrap.min.css";</style>
+        <b>Bases</b>
+        <div id="bases" style="white-space: nowrap; overflow-x: scroll;">
+            <template is="dom-repeat" items="[[rooms]]" as="room">
+                <div style="display: inline-block; vertical-align: top;">
+                    <base-room room="[[room]]" creepcount="[[creepCountForRoom(creepCount, room)]]" creeps="[[creepsForRoom(creeps, room)]]" spawns="[[spawnsForRoom(spawns, room)]]"></base-room>
+                </div>
+            </template>
+        </div>
     </template>
 
     <script>
@@ -19,11 +23,35 @@
 
             static get properties() {
                 return {
+                    creepCount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    },
                     rooms: {
+                        type: Array,
+                        value: []
+                    },
+                    spawns: {
                         type: Array,
                         value: []
                     }
                 };
+            }
+
+            creepCountForRoom(counts, room) {
+                return counts[room.name];
+            }
+
+            creepsForRoom(creeps, room) {
+                return creeps.filter((c) => c.home === room.name);
+            }
+
+            spawnsForRoom(spawns, room) {
+                return spawns.filter((s) => s.room === room.name);
             }
         }
 

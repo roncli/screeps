@@ -24,7 +24,7 @@ class Index {
             });
         };
 
-        wss.on("connection", (socket, request) => {
+        wss.on("connection", (socket) => {
             socket.on("message", (data) => {
                 if (data === "init") {
                     lastTick = 0;

@@ -5,27 +5,36 @@
 
 <dom-module id="base-room">
     <template>
-        <div class="panel panel-primary" style="display: inline-block; width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+        <style>@import "/css/bootstrap.min.css";</style>
+        <div class="panel panel-primary small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
             <div class="panel-heading">
                 [[room.name]]
                 ([[room.region]])
             </div>
             <div class="panel-body">
-                <template is="dom-repeat" items="[[roomStore]]" as="resource">
-                    <template is="dom-if" if="[[!index]]">
-                        <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
-                    </template>
-                    <template is="dom-if" if="[[index]]">
-                        <div class="storage-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
-                    </template>
+                <template if="[[hasStorage]]">
+                    <div>
+                        <template is="dom-repeat" items="[[roomStore]]" as="resource">
+                            <template is="dom-if" if="[[!index]]">
+                                <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                            </template>
+                            <template is="dom-if" if="[[index]]">
+                                <div class="storage-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                            </template>
+                        </template>
+                    </div>
                 </template>
-                <template is="dom-repeat" items="[[roomTerminal]]" as="resource">
-                    <template is="dom-if" if="[[!index]]">
-                        <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus terminal-resources-toggle" style="cursor: pointer;"></span>
-                    </template>
-                    <template is="dom-if" if="[[index]]">
-                        <div class="terminal-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
-                    </template>
+                <template if="[[hasTerminal]]">
+                    <div>
+                        <template is="dom-repeat" items="[[roomTerminal]]" as="resource">
+                            <template is="dom-if" if="[[!index]]">
+                                <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus terminal-resources-toggle" style="cursor: pointer;"></span>
+                            </template>
+                            <template is="dom-if" if="[[index]]">
+                                <div class="terminal-resources" style="display: none; margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                            </template>
+                        </template>
+                    </div>
                 </template>
                 <template is="dom-if" if="[[room.energyCapacityAvailable]]">
                     <div style="display: flex;">
@@ -33,7 +42,7 @@
                             <b>Energy</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.energyAvailable]]" aria-valuemin="0" aria-valuemax="[[room.energyCapacityAvailable]]" style$="width: [[energyAvailablePercent]]%white-space: nowrap; color: black;">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.energyAvailable]]" aria-valuemin="0" aria-valuemax="[[room.energyCapacityAvailable]]" style$="width: [[energyAvailablePercent]]%; white-space: nowrap; color: black;">
                                 [[room.energyAvailable]]/[[room.energyCapacityAvailable]]
                             </div>
                         </div>
@@ -45,7 +54,7 @@
                             <b>Towers</b>
                         </div>
                         <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[towerEnergy]]" aria-valuemin="0" aria-valuemax="[[towerEnergyCapacity]]" style$="width: [[towerEnergyPercent]]; white-space: nowrap; color: black;">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[towerEnergy]]" aria-valuemin="0" aria-valuemax="[[towerEnergyCapacity]]" style$="width: [[towerEnergyPercent]]%; white-space: nowrap; color: black;">
                                 [[towerEnergy]]/[[towerEnergyCapacity]]
                             </div>
                         </div>
@@ -99,18 +108,23 @@
                 </template>
                 <template is="dom-if" if="[[room.buyQueue]]">
                     <div style="margin-left: 10px;">
-                        <b>Buy</b> [[room.buyQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.buyQueue.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                        <b>Buy</b> [[room.buyQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.buyQueue.resource]].png" />
                     </div>
                 </template>
                 <template is="dom-if" if="[[room.labQueue]]">
                     <div style="margin-left: 10px;">
-                        <b>Create</b> [[room.labQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.labQueue.resource]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                        <b>Create</b> [[room.labQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.labQueue.resource]].png" />
                     </div>
                 </template>
                 <template is="dom-if" if="[[room.labs.length]]">
                     <template is="dom-repeat" items="[[room.labs]]" as="lab">
                         <div style="display: inline-block; margin-right: 5px;">
-                            [[lab.mineralAmount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[lab.mineralType]].png" /> <span class="glyphicon glyphicon-plus storage-resources-toggle" style="cursor: pointer;"></span>
+                            <template is="dom-if" if="[[lab.mineralAmount]]">
+                                [[lab.mineralAmount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[lab.mineralType]].png" />
+                            </template>
+                            <template is="dom-if" if="[[!lab.mineralAmount]]">
+                                Empty
+                            </template>
                         </div>
                     </template>
                 </template>
@@ -133,27 +147,35 @@
                 </template>
                 <template is="dom-if" if="[[room.sources.length]]">
                     <template is="dom-repeat" items="[[room.sources]]" as="source">
-                        <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/{{source.resource}}.png" />
-                        [[source.amount]]<template is="dom-if" if="[[source.capacity]]">/[[source.capacity]]</span>
-                        <template is="dom-if" if="[[source.ttr]]">
-                            <b>TTR</b> {{source.ttr}}
-                        </template>
+                        <div>
+                            <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[source.resource]].png" />
+                            [[source.amount]]<template is="dom-if" if="[[source.capacity]]">/[[source.capacity]]</template>
+                            <template is="dom-if" if="[[source.ttr]]">
+                                <b>TTR</b> [[source.ttr]]
+                            </template>
+                        </div>
                     </template>
                 </template>
-                <template is="dom-repeat" items="[[creepRoles]]" as="role">
+                <template is="dom-repeat" items="[[creepcount]]" as="role">
                     <div ng-class$="[[roleStatus(role.count, role.max)]]">
-                        <b>{{role.role}}</b> {{role.count}}/{{role.max}}
+                        <b>[[role.role]]</b> [[role.count]]/[[role.max]]
                     </div>
                 </template>
-                <div ng-repeat="creep in data.memory.creeps" ng-if="creep.room === name && creep.hits < creep.hitsMax" ng-class="{'text-warning': creep.hits / creep.hitsMax >= 0.8, 'text-danger': creep.hits / creep.hitsMax < 0.8}">
-                    <b>{{creep.name}}</b> {{creep.x}},{{creep.y}} {{creep.hits}}/{{creep.hitsMax}} {{(100 * creep.hits / creep.hitsMax).toFixed(0)}}%
-                </div>
-                <div ng-repeat="spawn in data.memory.spawns" ng-if="spawn.room === name && spawn.spawningName">
-                    <b>Spawning</b> {{spawn.spawningName}} {{spawn.spawningRemainingTime}}/{{spawn.spawningNeedTime}}
-                </div>
-                <div ng-repeat="hostile in data.memory.hostiles" ng-if="hostile.room === name" ng-class="{'text-warning': hostile.ownerUsername === 'Invader', 'text-danger': hostile.ownerUsername !== 'Invader'}">
-                    <b>{{hostile.ownerUsername}}</b> {{hostile.x}},{{hostile.y}} {{hostile.hits}}/{{hostile.hitsMax}} {{(100 * hostile.hits / hostile.hitsMax).toFixed(0)}}%
-                </div>
+                <template is="dom-repeat" items="[[creeps]]" as="creep">
+                    <div class="[[creepStatus(creep)]]">
+                        <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
+                    </div>
+                </template>
+                <template is="dom-repeat" items="[[spawns]]" as="spawn">
+                    <div>
+                        <b>Spawning</b> [[spawn.spawningName]] [[spawn.spawningRemainingTime]]/[[spawn.spawningNeedTime]]
+                    </div>
+                </template>
+                <template is="dom-repeat" items="[[room.hostiles]]" as="hostile">
+                    <div class="[[hostileStatus(hostile)]]">
+                        <b>[[hostile.ownerUsername]]</b> [[hostile.pos.x]],[[hostile.pos.y]] [[hostile.hits]]/[[hostile.hitsMax]] <format-to-fixed value="[[creepPercent(hostile.hits, hostile.hitsMax)]]"></format-to-fixed>%
+                    </div>
+                </template>
             </div>
         </div>
     </template>
@@ -166,17 +188,33 @@
 
             static get properties() {
                 return {
+                    creepcount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    },
                     room: {
                         type: Object,
                         value: {}
                     },
-                    creepRoles: {
+                    spawns: {
                         type: Array,
                         value: []
                     },
                     energyAvailablePercent: {
                         type: Number,
                         computed: "getEnergyAvailablePercent(room)"
+                    },
+                    hasStorage: {
+                        type: Boolean,
+                        computed: "getHasStorage(room)"
+                    },
+                    hasTerminal: {
+                        type: Boolean,
+                        computed: "getHasTerminal(room)"
                     },
                     labEnergy: {
                         type: Number,
@@ -242,6 +280,10 @@
                         type: Array,
                         computed: "getRoomStore(room)"
                     },
+                    roomTerminal: {
+                        type: Array,
+                        computed: "getRoomTerminal(room)"
+                    },
                     siteProgress: {
                         type: Number,
                         computed: "getSiteProgress(room)"
@@ -274,7 +316,15 @@
             }
 
             getEnergyAvailablePercent(room) {
-                return room.energyAvailable / room.energyCapacityAvailable;
+                return 100 * room.energyAvailable / room.energyCapacityAvailable;
+            }
+
+            getHasStorage(room) {
+                return room.storage && room.storage.energy !== void 0;
+            }
+
+            getHasTerminal(room) {
+                return room.terminal && room.terminal.energy !== void 0;
             }
 
             getLabEnergy(room) {
@@ -286,7 +336,7 @@
             }
 
             getLabEnergyPercent(labEnergy, labEnergyCapacity) {
-                return labEnergy / labEnergyCapacity;
+                return 100 * labEnergy / labEnergyCapacity;
             }
 
             getNukerEnergy(room) {
@@ -298,7 +348,7 @@
             }
 
             getNukerEnergyPercent(nukerEnergy, nukerEnergyCapacity) {
-                return nukerEnergy / nukerEnergyCapacity;
+                return 100 * nukerEnergy / nukerEnergyCapacity;
             }
 
             getNukerGhodium(room) {
@@ -310,7 +360,7 @@
             }
 
             getNukerGhodiumPercent(nukerGhodium, nukerGhodiumCapacity) {
-                return nukerGhodium / nukerGhodiumCapacity;
+                return 100 * nukerGhodium / nukerGhodiumCapacity;
             }
 
             getPowerSpawnEnergy(room) {
@@ -322,7 +372,7 @@
             }
 
             getPowerSpawnEnergyPercent(powerSpawnEnergy, powerSpawnEnergyCapacity) {
-                return powerSpawnEnergy / powerSpawnEnergyCapacity;
+                return 100 * powerSpawnEnergy / powerSpawnEnergyCapacity;
             }
 
             getPowerSpawnPower(room) {
@@ -334,11 +384,15 @@
             }
 
             getPowerSpawnPowerPercent(powerSpawnPower, powerSpawnPowerCapacity) {
-                return powerSpawnPower / powerSpawnPowerCapacity;
+                return 100 * powerSpawnPower / powerSpawnPowerCapacity;
             }
 
             getRoomStore(room) {
                 return Object.keys(room.storage).map((resource) => ({resource, amount: room.storage[resource]}));
+            }
+
+            getRoomTerminal(room) {
+                return Object.keys(room.terminal).map((resource) => ({resource, amount: room.terminal[resource]}));
             }
 
             getSiteProgress(room) {
@@ -346,7 +400,7 @@
             }
 
             getSiteProgressPercent(siteProgress, siteProgressTotal) {
-                return siteProgress / siteProgressPercent;
+                return 100 * siteProgress / siteProgressTotal;
             }
 
             getSiteProgressTotal(room) {
@@ -366,7 +420,27 @@
             }
 
             getTowerEnergyPercent(towerEnergy, towerEnergyCapacity) {
-                return towerEnergy / towerEnergyCapacity;
+                return 100 * towerEnergy / towerEnergyCapacity;
+            }
+
+            creepPercent(hits, hitsMax) {
+                return hits / hitsMax;
+            }
+
+            creepStatus(creep) {
+                if (creep.hits / creep.hitsMax >= 0.8) {
+                    return "text-warning";
+                } else {
+                    return "text-danger";
+                }
+            }
+
+            hostileStatus(hostile) {
+                if (hostile.ownerUsername === "Invader") {
+                    return "text-warning";
+                } else {
+                    return "text-danger";
+                }
             }
 
             roleStatus(count, max) {

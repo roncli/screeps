@@ -4,6 +4,7 @@
 
 <dom-module id="general-rooms">
     <template>
+        <style>@import "/css/bootstrap.min.css";</style>
         <template is="dom-repeat" items="{{rooms}}" as="room">
             <div>
                 <general-room room="[[room]]"></general-room>

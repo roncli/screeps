@@ -482,7 +482,7 @@ class RoomBase extends RoomEngine {
                         })), (r) => {
                             const {otherRoomAmount, needed, amount} = r;
 
-                            return reserveMinerals[r.resource] && otherRoomAmount < needed && amount > 0 && needed - otherRoomAmount > 0 && Math.min(amount, needed - otherRoomAmount) >= 100;
+                            return reserveMinerals[r.resource] && otherRoomAmount < needed && amount > 0 && Math.min(amount, needed - otherRoomAmount) >= 100;
                         }), (resource) => {
                             const {resource: resourceResource} = resource;
                             let amount = Math.min(resource.amount, resource.needed - resource.otherRoomAmount);

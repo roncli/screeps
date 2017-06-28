@@ -1,0 +1,52 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="army-group.htm" />
+
+<dom-module id="army-groups">
+    <template>
+        <style>@import "/css/bootstrap.min.css";</style>
+        <b>Armies</b>
+        <div id="armies" style="white-space: nowrap; overflow-x: scroll;">
+            <template is="dom-repeat" items="[[armies]]" as="army">
+                <div style="display: inline-block; vertical-align: top;">
+                    <army-group army="[[army]]" creepcount="[[creepCountForArmy(creepCount, army)]]" creeps="[[creepsForArmy(creeps, army)]]"></army-groups>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        class ArmyGroups extends Polymer.Element {
+            static get is() {
+                return "army-groups";
+            }
+
+            static get properties() {
+                return {
+                    creepCount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    },
+                    armies: {
+                        type: Array,
+                        value: []
+                    }
+                };
+            }
+
+            creepCountForArmy(counts, army) {
+                return counts[army.name] || [];
+            }
+
+            creepsForArmy(creeps, army) {
+                return creeps.filter((c) => c.army === army.name);
+            }
+        }
+
+        customElements.define(ArmyGroups.is, ArmyGroups);
+    </script>
+</dom-module>

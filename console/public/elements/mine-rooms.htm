@@ -1,0 +1,52 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="mine-room.htm" />
+
+<dom-module id="mine-rooms">
+    <template>
+        <style>@import "/css/bootstrap.min.css";</style>
+        <b>Mines</b>
+        <div id="mines" style="white-space: nowrap; overflow-x: scroll;">
+            <template is="dom-repeat" items="[[rooms]]" as="room">
+                <div style="display: inline-block; vertical-align: top;">
+                    <mine-room room="[[room]]" creepcount="[[creepCountForRoom(creepCount, room)]]" creeps="[[creepsForRoom(creeps, room)]]"></mine-room>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        class MineRooms extends Polymer.Element {
+            static get is() {
+                return "mine-rooms";
+            }
+
+            static get properties() {
+                return {
+                    creepCount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    },
+                    rooms: {
+                        type: Array,
+                        value: []
+                    }
+                };
+            }
+
+            creepCountForRoom(counts, room) {
+                return counts[room.name];
+            }
+
+            creepsForRoom(creeps, room) {
+                return creeps.filter((c) => c.home === room.name);
+            }
+        }
+
+        customElements.define(MineRooms.is, MineRooms);
+    </script>
+</dom-module>

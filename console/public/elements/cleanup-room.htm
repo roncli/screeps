@@ -3,191 +3,178 @@
 <link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
 <link rel="import" href="format-to-fixed.htm" />
 
-<dom-module id="base-room">
+<dom-module id="cleanup-room">
     <template>
         <style>@import "/css/bootstrap.min.css";</style>
-        <div class="panel panel-primary small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
-            <div class="panel-heading">
-                [[room.name]]
-                ([[room.region]])
+        <template is="dom-if" if="[[room.unobservable]]">
+            <div class="panel panel-danger small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+                <div class="panel-heading">
+                    [[room.name]]
+                    ([[room.region]])
+                </div>
+                <div class="panel-body">
+                    Unobservable
+                </div>
             </div>
-            <div class="panel-body">
-                <template is="dom-if" if="[[hasStorage]]">
-                    <div>
-                        <template is="dom-repeat" items="[[roomStore]]" as="resource">
-                            <template is="dom-if" if="[[!index]]">
-                                <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus" on-click="toggleStorage" style="cursor: pointer;"></span>
-                            </template>
-                            <template is="dom-if" if="[[index]]">
-                                <template is="dom-if" if="[[!hideStorage]]">
-                                    <div class="storage-resources" style="margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
-                                </template>
-                            </template>
-                        </template>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[hasTerminal]]">
-                    <div>
-                        <template is="dom-repeat" items="[[roomTerminal]]" as="resource">
-                            <template is="dom-if" if="[[!index]]">
-                                <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus" on-click="toggleTerminal" style="cursor: pointer;"></span>
-                            </template>
-                            <template is="dom-if" if="[[index]]">
-                                <template is="dom-if" if="[[!hideTerminal]]">
-                                    <div class="terminal-resources" style="margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
-                                </template>
-                            </template>
-                        </template>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.energyCapacityAvailable]]">
-                    <div style="display: flex;">
-                        <div style="width: max-content; white-space: nowrap;">
-                            <b>Energy</b>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.energyAvailable]]" aria-valuemin="0" aria-valuemax="[[room.energyCapacityAvailable]]" style$="width: [[energyAvailablePercent]]%; white-space: nowrap; color: black;">
-                                [[room.energyAvailable]]/[[room.energyCapacityAvailable]]
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.towers.length]]">
-                    <div style="display: flex;">
-                        <div style="width: max-content; white-space: nowrap;">
-                            <b>Towers</b>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[towerEnergy]]" aria-valuemin="0" aria-valuemax="[[towerEnergyCapacity]]" style$="width: [[towerEnergyPercent]]%; white-space: nowrap; color: black;">
-                                [[towerEnergy]]/[[towerEnergyCapacity]]
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.labs.length]]">
-                    <div style="display: flex;">
-                        <div style="width: max-content; white-space: nowrap;">
-                            <b>Labs</b>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[labEnergy]]" aria-valuemin="0" aria-valuemax="[[labEnergyCapacity]]" style$="width: [[labEnergyPercent]]%; white-space: nowrap; color: black;">
-                                [[labEnergy]]/[[labEnergyCapacity]]
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.nukers.length]]">
-                    <div style="display: flex;">
-                        <div style="width: max-content; white-space: nowrap;">
-                            <b>Nuker</b>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[nukerEnergy]]" aria-valuemin="0" aria-valuemax="[[nukerEnergyCapacity]]" style$="width: [[nukerEnergyPercent]]%; white-space: nowrap; color: black;">
-                                [[nukerEnergy]]/[[nukerEnergyCapacity]]
-                            </div>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="[[nukerGhodium]]" aria-valuemin="0" aria-valuemax="[[nukerGhodiumCapacity]]" style$="width: [[nukerGhodiumPercent]]%; white-space: nowrap; color: black;">
-                                [[nukerGhodium]]/[[nukerGhodiumCapacity]]
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.powerSpawns.length]]">
-                    <div style="display: flex;">
-                        <div style="width: max-content; white-space: nowrap;">
-                            <b>Power Spawn</b>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[powerSpawnEnergy]]" aria-valuemin="0" aria-valuemax="[[powerSpawnEnergyCapacity]]" style$="width: [[powerSpawnEnergyPercent]]%; white-space: nowrap; color: black;">
-                                [[powerSpawnEnergy]]/[[powerSpawnEnergyCapacity]]
-                            </div>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="[[powerSpawnPower]]" aria-valuemin="0" aria-valuemax="[[powerSpawnPowerCapacity]]" style$="width: [[powerSpawnPowerPercent]]%; white-space: nowrap; color: black;">
-                                [[powerSpawnPower]]/[[powerSpawnPowerCapacity]]
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.buyQueue]]">
-                    <div style="margin-left: 10px;">
-                        <b>Buy</b> [[room.buyQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.buyQueue.resource]].png" />
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.labQueue]]">
-                    <div style="margin-left: 10px;">
-                        <b>Create</b> [[room.labQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.labQueue.resource]].png" />
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.labs.length]]">
-                    <template is="dom-repeat" items="[[room.labs]]" as="lab">
-                        <div style="display: inline-block; margin-right: 5px;">
-                            <template is="dom-if" if="[[lab.mineralAmount]]">
-                                [[lab.mineralAmount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[lab.mineralType]].png" />
-                            </template>
-                            <template is="dom-if" if="[[!lab.mineralAmount]]">
-                                Empty
-                            </template>
-                        </div>
-                    </template>
-                </template>
-                <template is="dom-if" if="[[room.constructionSites.length]]">
-                    <div style="display: flex;">
-                        <div style="width: max-content; white-space: nowrap;">
-                            <b>Construction</b>
-                        </div>
-                        <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[siteProgress]]" aria-valuemin="0" aria-valuemax="[[siteProgressTotal]]" style$="width: [[siteProgressPercent]]%; white-space: nowrap; color: black;">
-                                [[siteProgress]]/[[siteProgressTotal]]
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.lowestWall]]">
-                    <div div="room-lowest-wall">
-                        <b>Lowest Wall</b> [[room.lowestWall]]
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.sources.length]]">
-                    <template is="dom-repeat" items="[[room.sources]]" as="source">
+        </template>
+        <template is="dom-if" if="[[!room.unobservable]]">
+            <div class="panel panel-primary small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+                <div class="panel-heading">
+                    [[room.name]]
+                    ([[room.region]])
+                </div>
+                <div class="panel-body">
+                    <template is="dom-if" if="[[hasStorage]]">
                         <div>
-                            <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[source.resource]].png" />
-                            [[source.amount]]<template is="dom-if" if="[[source.capacity]]">/[[source.capacity]]</template>
-                            <template is="dom-if" if="[[source.ttr]]">
-                                <b>TTR</b> [[source.ttr]]
+                            <template is="dom-repeat" items="[[roomStore]]" as="resource">
+                                <template is="dom-if" if="[[!index]]">
+                                    <b>Storage</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus" on-click="toggleStorage" style="cursor: pointer;"></span>
+                                </template>
+                                <template is="dom-if" if="[[index]]">
+                                    <template is="dom-if" if="[[!hideStorage]]">
+                                        <div class="storage-resources" style="margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                                    </template>
+                                </template>
                             </template>
                         </div>
                     </template>
-                </template>
-                <template is="dom-repeat" items="[[creepcount]]" as="role">
-                    <div class$="[[roleStatus(role.count, role.max)]]">
-                        <b>[[role.role]]</b> [[role.count]]/[[role.max]]
-                    </div>
-                </template>
-                <template is="dom-repeat" items="[[creeps]]" as="creep">
-                    <div class="[[creepStatus(creep)]]">
-                        <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
-                    </div>
-                </template>
-                <template is="dom-repeat" items="[[spawns]]" as="spawn">
-                    <div>
-                        <b>Spawning</b> [[spawn.spawningName]] [[spawn.spawningRemainingTime]]/[[spawn.spawningNeedTime]]
-                    </div>
-                </template>
-                <template is="dom-repeat" items="[[room.hostiles]]" as="hostile">
-                    <div class="[[hostileStatus(hostile)]]">
-                        <b>[[hostile.ownerUsername]]</b> [[hostile.pos.x]],[[hostile.pos.y]] [[hostile.hits]]/[[hostile.hitsMax]] <format-to-fixed value="[[creepPercent(hostile.hits, hostile.hitsMax)]]"></format-to-fixed>%
-                    </div>
-                </template>
+                    <template is="dom-if" if="[[hasTerminal]]">
+                        <div>
+                            <template is="dom-repeat" items="[[roomTerminal]]" as="resource">
+                                <template is="dom-if" if="[[!index]]">
+                                    <b>Terminal</b> [[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /> <span class="glyphicon glyphicon-plus" on-click="toggleTerminal" style="cursor: pointer;"></span>
+                                </template>
+                                <template is="dom-if" if="[[index]]">
+                                    <template is="dom-if" if="[[!hideTerminal]]">
+                                        <div class="terminal-resources" style="margin-left: 50px;">[[resource.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[resource.resource]].png" /></div>
+                                    </template>
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.energyCapacityAvailable]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Energy</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[room.energyAvailable]]" aria-valuemin="0" aria-valuemax="[[room.energyCapacityAvailable]]" style$="width: [[energyAvailablePercent]]%; white-space: nowrap; color: black;">
+                                    [[room.energyAvailable]]/[[room.energyCapacityAvailable]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.towers.length]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Towers</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[towerEnergy]]" aria-valuemin="0" aria-valuemax="[[towerEnergyCapacity]]" style$="width: [[towerEnergyPercent]]%; white-space: nowrap; color: black;">
+                                    [[towerEnergy]]/[[towerEnergyCapacity]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.labs.length]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Labs</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[labEnergy]]" aria-valuemin="0" aria-valuemax="[[labEnergyCapacity]]" style$="width: [[labEnergyPercent]]%; white-space: nowrap; color: black;">
+                                    [[labEnergy]]/[[labEnergyCapacity]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.nukers.length]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Nuker</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[nukerEnergy]]" aria-valuemin="0" aria-valuemax="[[nukerEnergyCapacity]]" style$="width: [[nukerEnergyPercent]]%; white-space: nowrap; color: black;">
+                                    [[nukerEnergy]]/[[nukerEnergyCapacity]]
+                                </div>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="[[nukerGhodium]]" aria-valuemin="0" aria-valuemax="[[nukerGhodiumCapacity]]" style$="width: [[nukerGhodiumPercent]]%; white-space: nowrap; color: black;">
+                                    [[nukerGhodium]]/[[nukerGhodiumCapacity]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.powerSpawns.length]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Power Spawn</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[powerSpawnEnergy]]" aria-valuemin="0" aria-valuemax="[[powerSpawnEnergyCapacity]]" style$="width: [[powerSpawnEnergyPercent]]%; white-space: nowrap; color: black;">
+                                    [[powerSpawnEnergy]]/[[powerSpawnEnergyCapacity]]
+                                </div>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="[[powerSpawnPower]]" aria-valuemin="0" aria-valuemax="[[powerSpawnPowerCapacity]]" style$="width: [[powerSpawnPowerPercent]]%; white-space: nowrap; color: black;">
+                                    [[powerSpawnPower]]/[[powerSpawnPowerCapacity]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.labs.length]]">
+                        <template is="dom-repeat" items="[[room.labs]]" as="lab">
+                            <div style="display: inline-block; margin-right: 5px;">
+                                <template is="dom-if" if="[[lab.mineralAmount]]">
+                                    [[lab.mineralAmount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[lab.mineralType]].png" />
+                                </template>
+                                <template is="dom-if" if="[[!lab.mineralAmount]]">
+                                    Empty
+                                </template>
+                            </div>
+                        </template>
+                    </template>
+                    <template is="dom-if" if="[[room.constructionSites.length]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Construction</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[siteProgress]]" aria-valuemin="0" aria-valuemax="[[siteProgressTotal]]" style$="width: [[siteProgressPercent]]%; white-space: nowrap; color: black;">
+                                    [[siteProgress]]/[[siteProgressTotal]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.lowestWall]]">
+                        <div div="room-lowest-wall">
+                            <b>Lowest Wall</b> [[room.lowestWall]]
+                        </div>
+                    </template>
+                    <template is="dom-repeat" items="[[creepcount]]" as="role">
+                        <div class$="[[roleStatus(role.count, role.max)]]">
+                            <b>[[role.role]]</b> [[role.count]]/[[role.max]]
+                        </div>
+                    </template>
+                    <template is="dom-repeat" items="[[creeps]]" as="creep">
+                        <div class="[[creepStatus(creep)]]">
+                            <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
+                        </div>
+                    </template>
+                    <template is="dom-repeat" items="[[room.hostiles]]" as="hostile">
+                        <div class="[[hostileStatus(hostile)]]">
+                            <b>[[hostile.ownerUsername]]</b> [[hostile.pos.x]],[[hostile.pos.y]] [[hostile.hits]]/[[hostile.hitsMax]] <format-to-fixed value="[[creepPercent(hostile.hits, hostile.hitsMax)]]"></format-to-fixed>%
+                        </div>
+                    </template>
+                </div>
             </div>
-        </div>
+        </template>
     </template>
 
     <script>
-        class BaseRoom extends Polymer.Element {
+        class CleanupRoom extends Polymer.Element {
             static get is() {
-                return "base-room";
+                return "cleanup-room";
             }
 
             static get properties() {
@@ -494,6 +481,6 @@
             }
         }
 
-        customElements.define(BaseRoom.is, BaseRoom);
+        customElements.define(CleanupRoom.is, CleanupRoom);
     </script>
 </dom-module>

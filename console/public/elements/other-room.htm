@@ -3,15 +3,24 @@
 <link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
 <link rel="import" href="format-to-fixed.htm" />
 
-<dom-module id="base-room">
+<dom-module id="other-room">
     <template>
         <style>@import "/css/bootstrap.min.css";</style>
         <div class="panel panel-primary small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
             <div class="panel-heading">
                 [[room.name]]
-                ([[room.region]])
             </div>
             <div class="panel-body">
+                <template is="dom-if" if="[[room.controller.reservation]]">
+                    <div>
+                        <b>Reservation</b> [[room.controller.reservation.username]] TTE [[room.controller.reservation.ticksToEnd]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[room.controller.level]]">
+                    <div>
+                        <b>Owned</b> [[room.controller.owner.username]] RCL [[room.controller.level]]
+                    </div>
+                </template>
                 <template is="dom-if" if="[[hasStorage]]">
                     <div>
                         <template is="dom-repeat" items="[[roomStore]]" as="resource">
@@ -110,28 +119,6 @@
                         </div>
                     </div>
                 </template>
-                <template is="dom-if" if="[[room.buyQueue]]">
-                    <div style="margin-left: 10px;">
-                        <b>Buy</b> [[room.buyQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.buyQueue.resource]].png" />
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.labQueue]]">
-                    <div style="margin-left: 10px;">
-                        <b>Create</b> [[room.labQueue.amount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[room.labQueue.resource]].png" />
-                    </div>
-                </template>
-                <template is="dom-if" if="[[room.labs.length]]">
-                    <template is="dom-repeat" items="[[room.labs]]" as="lab">
-                        <div style="display: inline-block; margin-right: 5px;">
-                            <template is="dom-if" if="[[lab.mineralAmount]]">
-                                [[lab.mineralAmount]] <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[lab.mineralType]].png" />
-                            </template>
-                            <template is="dom-if" if="[[!lab.mineralAmount]]">
-                                Empty
-                            </template>
-                        </div>
-                    </template>
-                </template>
                 <template is="dom-if" if="[[room.constructionSites.length]]">
                     <div style="display: flex;">
                         <div style="width: max-content; white-space: nowrap;">
@@ -160,19 +147,9 @@
                         </div>
                     </template>
                 </template>
-                <template is="dom-repeat" items="[[creepcount]]" as="role">
-                    <div class$="[[roleStatus(role.count, role.max)]]">
-                        <b>[[role.role]]</b> [[role.count]]/[[role.max]]
-                    </div>
-                </template>
                 <template is="dom-repeat" items="[[creeps]]" as="creep">
                     <div class="[[creepStatus(creep)]]">
                         <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
-                    </div>
-                </template>
-                <template is="dom-repeat" items="[[spawns]]" as="spawn">
-                    <div>
-                        <b>Spawning</b> [[spawn.spawningName]] [[spawn.spawningRemainingTime]]/[[spawn.spawningNeedTime]]
                     </div>
                 </template>
                 <template is="dom-repeat" items="[[room.hostiles]]" as="hostile">
@@ -185,17 +162,13 @@
     </template>
 
     <script>
-        class BaseRoom extends Polymer.Element {
+        class OtherRoom extends Polymer.Element {
             static get is() {
-                return "base-room";
+                return "other-room";
             }
 
             static get properties() {
                 return {
-                    creepcount: {
-                        type: Array,
-                        value: []
-                    },
                     creeps: {
                         type: Array,
                         value: []
@@ -211,10 +184,6 @@
                     room: {
                         type: Object,
                         value: {}
-                    },
-                    spawns: {
-                        type: Array,
-                        value: []
                     },
                     energyAvailablePercent: {
                         type: Number,
@@ -494,6 +463,6 @@
             }
         }
 
-        customElements.define(BaseRoom.is, BaseRoom);
+        customElements.define(OtherRoom.is, OtherRoom);
     </script>
 </dom-module>

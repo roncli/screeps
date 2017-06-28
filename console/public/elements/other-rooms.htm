@@ -1,0 +1,60 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="other-room.htm" />
+
+<dom-module id="other-rooms">
+    <template>
+        <style>@import "/css/bootstrap.min.css";</style>
+        <b>Other Rooms</b>
+        <div id="others" style="white-space: nowrap; overflow-x: scroll;">
+            <template is="dom-repeat" items="[[rooms]]" as="room">
+                <div style="display: inline-block; vertical-align: top;">
+                    <other-room room="[[room]]" creeps="[[creepsForRoom(creeps, room)]]"></other-room>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        class OtherRooms extends Polymer.Element {
+            static get is() {
+                return "other-rooms";
+            }
+
+            static get properties() {
+                return {
+                    creepCount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    },
+                    rooms: {
+                        type: Array,
+                        value: []
+                    },
+                    spawns: {
+                        type: Array,
+                        value: []
+                    }
+                };
+            }
+
+            creepCountForRoom(counts, room) {
+                return counts[room.name];
+            }
+
+            creepsForRoom(creeps, room) {
+                return creeps.filter((c) => c.home === room.name);
+            }
+
+            spawnsForRoom(spawns, room) {
+                return spawns.filter((s) => s.room === room.name);
+            }
+        }
+
+        customElements.define(OtherRooms.is, OtherRooms);
+    </script>
+</dom-module>

@@ -1,0 +1,159 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-if.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="format-to-fixed.htm" />
+
+<dom-module id="mine-room">
+    <template>
+        <style>@import "/css/bootstrap.min.css";</style>
+        <template is="dom-if" if="[[room.unobservable]]">
+            <div class="panel panel-danger small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+                <div class="panel-heading">
+                    [[room.name]]
+                    ([[room.region]])
+                </div>
+                <div class="panel-body">
+                    Unobservable
+                </div>
+            </div>
+        </template>
+        <template is="dom-if" if="[[!room.unobservable]]">
+            <div class="panel panel-primary small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+                <div class="panel-heading">
+                    [[room.name]]
+                    ([[room.region]])
+                </div>
+                <div class="panel-body">
+                    <template is="dom-if" if="[[room.controller.reservation]]">
+                        <div>
+                            <b>Reservation</b> [[room.controller.reservation.username]] TTE [[room.controller.reservation.ticksToEnd]]
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.constructionSites.length]]">
+                        <div style="display: flex;">
+                            <div style="width: max-content; white-space: nowrap;">
+                                <b>Construction</b>
+                            </div>
+                            <div class="progress" style="width: 100%; margin: 0 0 0 5px; break-after: always;">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="[[siteProgress]]" aria-valuemin="0" aria-valuemax="[[siteProgressTotal]]" style$="width: [[siteProgressPercent]]%; white-space: nowrap; color: black;">
+                                    [[siteProgress]]/[[siteProgressTotal]]
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[room.sources.length]]">
+                        <template is="dom-repeat" items="[[room.sources]]" as="source">
+                            <div>
+                                <img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[source.resource]].png" />
+                                [[source.amount]]<template is="dom-if" if="[[source.capacity]]">/[[source.capacity]]</template>
+                                <template is="dom-if" if="[[source.ttr]]">
+                                    <b>TTR</b> [[source.ttr]]
+                                </template>
+                            </div>
+                        </template>
+                    </template>
+                    <template is="dom-repeat" items="[[creepcount]]" as="role">
+                        <div class$="[[roleStatus(role.count, role.max)]]">
+                            <b>[[role.role]]</b> [[role.count]]/[[role.max]]
+                        </div>
+                    </template>
+                    <template is="dom-repeat" items="[[creeps]]" as="creep">
+                        <div class$="[[creepStatus(creep)]]">
+                            <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
+                        </div>
+                    </template>
+                    <template is="dom-repeat" items="[[room.hostiles]]" as="hostile">
+                        <div class$="[[hostileStatus(hostile)]]">
+                            <b>[[hostile.ownerUsername]]</b> [[hostile.pos.x]],[[hostile.pos.y]] [[hostile.hits]]/[[hostile.hitsMax]] <format-to-fixed value="[[creepPercent(hostile.hits, hostile.hitsMax)]]"></format-to-fixed>%
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template
+    </template>
+
+    <script>
+        class MineRoom extends Polymer.Element {
+            static get is() {
+                return "mine-room";
+            }
+
+            static get properties() {
+                return {
+                    creepcount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    },
+                    room: {
+                        type: Object,
+                        value: {}
+                    },
+                    siteProgress: {
+                        type: Number,
+                        computed: "getSiteProgress(room)"
+                    },
+                    siteProgressPercent: {
+                        type: Number,
+                        computed: "getSiteProgressPercent(siteProgress, siteProgressTotal)"
+                    },
+                    siteProgressTotal: {
+                        type: Number,
+                        computed: "getSiteProgressTotal(room)"
+                    }
+                };
+            }
+
+            getSiteProgress(room) {
+                return room.constructionSites.reduce((acc, val) => acc + val.progress, 0);
+            }
+
+            getSiteProgressPercent(siteProgress, siteProgressTotal) {
+                return 100 * siteProgress / siteProgressTotal;
+            }
+
+            getSiteProgressTotal(room) {
+                return room.constructionSites.reduce((acc, val) => acc + val.progressTotal, 0);
+            }
+
+            creepPercent(hits, hitsMax) {
+                return 100 * hits / hitsMax;
+            }
+
+            creepStatus(creep) {
+                if (creep.hits / creep.hitsMax >= 0.8) {
+                    return "text-warning";
+                } else {
+                    return "text-danger";
+                }
+            }
+
+            hostileStatus(hostile) {
+                if (hostile.ownerUsername === "Invader") {
+                    return "text-warning";
+                } else {
+                    return "text-danger";
+                }
+            }
+
+            roleStatus(count, max) {
+                if (max === 0) {
+                    return;
+                }
+
+                if (count === 0) {
+                    return "text-danger";
+                }
+
+                if (count < max) {
+                    return "text-warning";
+                }
+            }
+        }
+
+        customElements.define(MineRoom.is, MineRoom);
+    </script>
+</dom-module>

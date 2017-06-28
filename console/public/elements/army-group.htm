@@ -1,0 +1,136 @@
+<link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-if.html" />
+<link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
+<link rel="import" href="format-to-fixed.htm" />
+
+<dom-module id="army-group">
+    <template>
+        <style>@import "/css/bootstrap.min.css";</style>
+        <div class="panel panel-primary small" style="width: 300px; margin-right: 10px; vertical-align: top; white-space: normal;">
+            <div class="panel-heading">
+                [[army.name]]
+                ([[army.region]])
+                [[army.directive]]
+            </div>
+            <div class="panel-body">
+                <template is="dom-if" if="[[army.success]]">
+                    <div>
+                        <b>Army successful!</b>
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.scheduled]]">
+                    <div>
+                        <b>Scheduled</b> [[army.scheduled]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.portals]]">
+                    <div>
+                        <b>Portals</b> [[armyPortals(army)]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.boostRoom]]">
+                    <div>
+                        <b>Boost Room</b> [[army.boostRoom]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.buildRoom]]">
+                    <div>
+                        <b>Build Room</b> [[army.buildRoom]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.stageRoom]]">
+                    <div>
+                        <b>Staging Room</b> [[army.stageRoom]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.attackRoom]]">
+                    <div>
+                        <b>Attack Room</b> [[army.attackRoom]]
+                    </div>
+                </template>
+                <template is="dom-if" if="[[army.dismantle]]">
+                    <div>
+                        <b>Initial structures to dismantle:</b> [[army.dismantle.length]]
+                    </div>
+                </template>
+                <template is="dom-repeat" items="[[creepcount]]" as="role">
+                    <div class$="[[roleStatus(role.count, role.max)]]">
+                        <b>[[role.role]]</b> [[role.count]]/[[role.max]]
+                    </div>
+                </template>
+                <template is="dom-repeat" items="[[creeps]]" as="creep">
+                    <div class="[[creepStatus(creep)]]">
+                        <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+    
+    <script>
+        class ArmyGroup extends Polymer.Element {
+            static get is() {
+                return "army-group";
+            }
+
+            static get properties() {
+                return {
+                    army: {
+                        type: Object,
+                        value: {}
+                    },
+                    creepcount: {
+                        type: Array,
+                        value: []
+                    },
+                    creeps: {
+                        type: Array,
+                        value: []
+                    }
+                }
+            }
+            
+            armyPortals(army) {
+                return army.portals.join(",");
+            }
+
+            creepPercent(hits, hitsMax) {
+                return 100 * hits / hitsMax;
+            }
+
+            creepStatus(creep) {
+                if (creep.hits === creep.hitsMax) {
+                    return ""
+                } else if (creep.hits / creep.hitsMax >= 0.8) {
+                    return "text-warning";
+                } else {
+                    return "text-danger";
+                }
+            }
+
+            hostileStatus(hostile) {
+                if (hostile.ownerUsername === "Invader") {
+                    return "text-warning";
+                } else {
+                    return "text-danger";
+                }
+            }
+
+            roleStatus(count, max) {
+                if (max === 0) {
+                    return;
+                }
+
+                if (count === 0) {
+                    return "text-danger";
+                }
+
+                if (count < max) {
+                    return "text-warning";
+                }
+            }
+        }
+
+        customElements.define(ArmyGroup.is, ArmyGroup);
+    </script>
+</dom-module>

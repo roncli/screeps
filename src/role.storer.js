@@ -90,6 +90,7 @@ class RoleStorer {
         settings = {
             name: "storer",
             spawn: _.filter(storers, (c) => c.spawning || c.ticksToLive >= 300).length < max,
+            spawnFromRegion: storers.length === 0,
             max,
             rcl
         };

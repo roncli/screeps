@@ -313,7 +313,8 @@ class Army {
                 safeMode: this.safeMode,
                 scheduled: this.scheduled,
                 stageRoom: this.stageRoom,
-                success: this.success
+                success: this.success,
+                super: this.super
             };
         }
     }

@@ -60,7 +60,7 @@
                 </template>
                 <template is="dom-repeat" items="[[creeps]]" as="creep">
                     <div class="[[creepStatus(creep)]]">
-                        <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>%
+                        <b>[[creep.name]]</b> [[creep.pos.x]],[[creep.pos.y]],[[creep.pos.roomName]] [[creep.hits]]/[[creep.hitsMax]] <format-to-fixed value="[[creepPercent(creep.hits, creep.hitsMax)]]"></format-to-fixed>% TTL [[creep.ttl]]
                     </div>
                 </template>
             </div>

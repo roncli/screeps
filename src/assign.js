@@ -1099,6 +1099,10 @@ class Assign {
         _.forEach(creeps, (creep) => {
             let task;
 
+            if (creep.memory.portals && creep.memory.portals.length > 0) {
+                return;
+            }
+
             ({0: mostHurtCreep} = creepsToHeal);
 
             if (creep.id === mostHurtCreep.id && creepsToHeal.length >= 2) {

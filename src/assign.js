@@ -954,6 +954,10 @@ class Assign {
      */
     static findEscort(creeps, say) {
         _.forEach(_.filter(creeps, (c) => c.memory.escortedBy), (creep) => {
+            if (creep.memory.portals && creep.memory.portals.length > 0) {
+                return;
+            }
+
             const {memory: {escortedBy: id}} = creep,
                 escort = Game.getObjectById(id);
 

@@ -1,33 +1,36 @@
 <link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
 <link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
-<link rel="import" href="general-room.htm" />
 
-<dom-module id="general-rooms">
+<dom-module id="game-messages">
     <template>
         <style>@import "/css/bootstrap.min.css";</style>
-        <template is="dom-repeat" items="[[rooms]]" as="room">
+        <template is="dom-repeat" items="[[messages]]" as="message">
             <div>
-                <general-room room="[[room]]"></general-room>
+                [[formatMessage(message)]]
             </div>
         </template>
     </template>
 
     <script>
-        class GeneralRooms extends Polymer.Element {
+        class GameMessages extends Polymer.Element {
             static get is() {
-                return "general-rooms";
+                return "game-messages";
             }
 
             static get properties() {
                 return {
-                    rooms: {
+                    messages: {
                         type: Array,
                         value: []
                     }
                 };
             }
+
+            formatMessage(message) {
+                return `${message.tick} ${message.message}`;
+            }
         }
 
-        customElements.define(GeneralRooms.is, GeneralRooms);
+        customElements.define(GameMessages.is, GameMessages);
     </script>
 </dom-module>

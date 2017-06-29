@@ -72,12 +72,17 @@ class Screeps {
                 case "survey":
                     ({survey: data.survey} = message);
 
+                    data.messages.push(...data.survey.data.messages);
+
+                    data.messages = data.messages.slice(Math.max(data.messages.length - 100, 1));
+
                     Screeps.loadGeneral();
                     Screeps.loadBases();
                     Screeps.loadMines();
                     Screeps.loadCleanups();
                     Screeps.loadOthers();
                     Screeps.loadArmies();
+                    Screeps.loadMessages();
 
                     break;
                 case "stats":
@@ -139,15 +144,15 @@ class Screeps {
         bases.creepCount = creepCount;
         bases.spawns = spawns.filter((s) => s.spawningName);
     }
-    
+
     static loadMines() {
         if (!data.survey || !data.creepCount) {
             return;
         }
-        
+
         const {0: mines} = $("#mines"),
             {survey: {data: {rooms, creeps}}, creepCount} = data;
-        
+
         mines.rooms = rooms.filter((r) => ["mine", "source"].indexOf(r.type) !== -1);
         mines.creeps = creeps.filter((c) => c.hits < c.hitsMax && mines.rooms.map((r) => r.name).indexOf(c.home) !== -1);
         mines.creepCount = creepCount;
@@ -157,10 +162,10 @@ class Screeps {
         if (!data.survey || !data.creepCount) {
             return;
         }
-        
+
         const {0: cleanups} = $("#cleanups"),
             {survey: {data: {rooms, creeps}}, creepCount} = data;
-        
+
         cleanups.rooms = rooms.filter((r) => r.type === "cleanup");
         cleanups.creeps = creeps.filter((c) => c.hits < c.hitsMax && cleanups.rooms.map((r) => r.name).indexOf(c.home) !== -1);
         cleanups.creepCount = creepCount;
@@ -170,31 +175,41 @@ class Screeps {
         if (!data.survey) {
             return;
         }
-        
+
         const {0: others} = $("#others"),
             {survey: {data: {rooms, creeps}}} = data;
-        
+
         others.rooms = rooms.filter((r) => ["base", "mine", "source", "cleanup"].indexOf(r.type) === -1);
         others.creeps = creeps.filter((c) => c.hits < c.hitsMax && others.rooms.map((r) => r.name).indexOf(c.home) !== -1);
     }
-    
+
     static loadArmies() {
         if (!data.survey || !data.creepCount) {
             return;
         }
-        
+
         const {0: armies} = $("#armies"),
             {survey: {data: {army, creeps}}, creepCount} = data;
-        
+
         armies.armies = Object.keys(army).map((name) => {
-            const currentArmy = army[name];
-            
+            const {[name]: currentArmy} = army;
+
             currentArmy.name = name;
-            
+
             return currentArmy;
         });
         armies.creeps = creeps.filter((c) => c.army);
         armies.creepCount = creepCount;
+    }
+
+    static loadMessages() {
+        if (!data.messages) {
+            return;
+        }
+
+        const {0: messages} = $("#messages");
+
+        ({messages: messages.messages} = data);
     }
 }
 

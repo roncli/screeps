@@ -590,6 +590,7 @@ class RoomBase extends RoomEngine {
 
                         if (index === 0) {
                             Memory.messages.push({
+                                date: new Date(),
                                 tick: Game.time,
                                 message: `Biggest flip: ${flip.resource} x${amount} ${sellPrice.toFixed(2)} to ${buy.price.toFixed(2)}`
                             });

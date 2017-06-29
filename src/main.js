@@ -147,6 +147,7 @@ class Main {
         if (!this.reset) {
             this.reset = true;
             Memory.messages.push({
+                date: new Date(),
                 tick: Game.time,
                 message: "System reset."
             });

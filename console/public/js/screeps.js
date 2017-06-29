@@ -42,7 +42,11 @@ const Minerals =
         XGH2O: {name: "Catalyzed Ghodium Acid", description: ""},
         XGHO2: {name: "Catalyzed Ghodium Alkalide", description: ""}
     },
-    data = {messages: []};
+    data = {
+        messages: [],
+        incomingTransactions: [],
+        outgoingTransactions: []
+    };
 let ws;
 
 class Screeps {
@@ -73,8 +77,13 @@ class Screeps {
                     ({survey: data.survey} = message);
 
                     data.messages.push(...data.survey.data.messages);
+                    data.messages = data.messages.slice(Math.max(data.messages.length - 100, 0));
 
-                    data.messages = data.messages.slice(Math.max(data.messages.length - 100, 1));
+                    data.incomingTransactions.push(...data.survey.data.market.incomingTransactions);
+                    data.incomingTransactions = data.incomingTransactions.slice(Math.max(data.messages.length - 100, 0));
+
+                    data.outgoingTransactions.push(...data.survey.data.market.outgoingTransactions);
+                    data.outgoingTransactions = data.outgoingTransactions.slice(Math.max(data.messages.length - 100, 0));
 
                     Screeps.loadGeneral();
                     Screeps.loadBases();
@@ -83,6 +92,8 @@ class Screeps {
                     Screeps.loadOthers();
                     Screeps.loadArmies();
                     Screeps.loadMessages();
+                    Screeps.loadPrices();
+                    Screeps.loadTransactions();
 
                     break;
                 case "stats":
@@ -203,13 +214,40 @@ class Screeps {
     }
 
     static loadMessages() {
-        if (!data.messages) {
-            return;
-        }
-
         const {0: messages} = $("#messages");
 
         ({messages: messages.messages} = data);
+    }
+
+    static loadPrices() {
+        if (!data.survey) {
+            return;
+        }
+
+        const {0: prices} = $("#prices"),
+            {survey: {data: {market: {buy, sell}}}} = data,
+            priceList = {};
+
+        buy.forEach((order) => {
+            priceList[order.resource] = {buy: order.price}
+        });
+
+        sell.forEach((order) => {
+            if (priceList[order.resource]) {
+                ({price: priceList[order.resource].sell} = order);
+            } else {
+                priceList[order.resource] = {sell: order.price}
+            }
+        });
+
+        prices.prices = priceList;
+    }
+
+    static loadTransactions() {
+        const {0: incoming} = $("#incomingTransactions"),
+            {0: outgoing} = $("#outgoingTransactions");
+
+        ({incomingTransactions: incoming.transactions, outgoingTransactions: outgoing.transactions} = data);
     }
 }
 

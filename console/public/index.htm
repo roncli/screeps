@@ -15,6 +15,8 @@
     <link rel="import" href="elements/other-rooms.htm" />
     <link rel="import" href="elements/army-groups.htm" />
     <link rel="import" href="elements/game-messages.htm" />
+    <link rel="import" href="elements/market-prices.htm" />
+    <link rel="import" href="elements/terminal-transactions.htm" />
 </head>
 <body>
     <div class="container-fluid">
@@ -25,7 +27,18 @@
             <cleanup-rooms id="cleanups"></cleanup-rooms>
             <other-rooms id="others"></other-rooms>
             <army-groups id="armies"></army-groups>
+        </div>
+        <div class="col-xs-6">
             <game-messages id="messages"></game-messages>
+        </div>
+        <div class="col-xs-6">
+            <market-prices id="prices"></market-prices>
+        </div>
+        <div class="col-xs-6">
+            <terminal-transactions id="incomingTransactions" type="Incoming"></terminal-transactions>
+        </div>
+        <div class="col-xs-6">
+            <terminal-transactions id="outgoingTransactions" type="Outgoing"></terminal-transactions>
         </div>
     </div>
 </body>

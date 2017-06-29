@@ -1,17 +1,17 @@
 <link rel="import" href="https://polygit.org/components/polymer/polymer-element.html" />
 <link rel="import" href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html" />
 
-<dom-module id="game-messages">
+<dom-module id="terminal-transactions">
     <template>
         <style>@import "/css/bootstrap.min.css";</style>
         <div class="panel panel-primary small">
             <div class="panel-heading">
-                Messages
+                [[type]] Transactions
             </div>
             <div class="panel-body small">
-                <template is="dom-repeat" items="[[messages]]" as="message">
+                <template is="dom-repeat" items="[[transactions]]" as="transaction">
                     <div>
-                        [[formatMessage(message)]]
+                        [[formatTransaction(transaction)]]
                     </div>
                 </template>
             </div>
@@ -19,25 +19,25 @@
     </template>
 
     <script>
-        class GameMessages extends Polymer.Element {
+        class TerminalTransactions extends Polymer.Element {
             static get is() {
-                return "game-messages";
+                return "terminal-transactions";
             }
 
             static get properties() {
                 return {
-                    messages: {
+                    transactions: {
                         type: Array,
                         value: []
                     }
                 };
             }
 
-            formatMessage(message) {
-                return `${moment(message.date).format("M/D/YYYY h:mm:ss a")} - ${message.tick} - ${message.message}`
+            formatTransaction(transaction) {
+                return JSON.stringify(transaction);
             }
         }
 
-        customElements.define(GameMessages.is, GameMessages);
+        customElements.define(TerminalTransactions.is, TerminalTransactions);
     </script>
 </dom-module>

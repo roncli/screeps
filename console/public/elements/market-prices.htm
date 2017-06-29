@@ -13,14 +13,14 @@
                     <thead>
                         <tr>
                             <th>Resource</th>
-                            <th>Buy</th>
-                            <th>Sell</th>
+                            <th style="text-align: right;">Buy</th>
+                            <th style="text-align: right;">Sell</th>
                         </tr>
                     </thead>
                     <tbody>
                         <template is="dom-repeat" items="[[prices]]" as="price">
                             <tr class$="[[priceStatus(price)]]">
-                                <td>[[price.resource]]</td>
+                                <td><img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[price.resource]].png" /></td>
                                 <td style="text-align: right;"><format-to-fixed value="[[price.buy]]" digits="3"></format-to-fixed></td>
                                 <td style="text-align: right;"><format-to-fixed value="[[price.sell]]" digits="3"></format-to-fixed></td>
                             </tr>

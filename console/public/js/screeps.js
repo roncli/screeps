@@ -87,7 +87,7 @@ class Screeps {
                     data.outgoingTransactions = data.outgoingTransactions.slice(Math.max(data.messages.length - 100, 0));
 
                     data.ownTransactions.push(...data.survey.data.market.incomingTransactions.filter((t) => t.sender && t.recipient && t.sender.username === t.recipient.username));
-                    data.ownTransactions = data.outgoingTransactions.slice(Math.max(data.messages.length - 100, 0));
+                    data.ownTransactions = data.ownTransactions.slice(Math.max(data.messages.length - 100, 0));
 
                     Screeps.loadGeneral();
                     Screeps.loadBases();
@@ -266,10 +266,12 @@ class Screeps {
 
     static loadTransactions() {
         const {0: incoming} = $("#incomingTransactions"),
-            {0: outgoing} = $("#outgoingTransactions");
+            {0: outgoing} = $("#outgoingTransactions"),
+            {0: own} = $("#ownTransactions");
 
         incoming.transactions = data.incomingTransactions.sort((a, b) => b.time - a.time);
         outgoing.transactions = data.outgoingTransactions.sort((a, b) => b.time - a.time);
+        own.transactions = data.ownTransactions.sort((a, b) => b.time - a.time);
     }
 }
 

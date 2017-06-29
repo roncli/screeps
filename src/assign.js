@@ -1270,6 +1270,7 @@ class Assign {
                 if (portals[0] === creep.room.name) {
                     creep.memory.portaling = true;
                     task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos, "position");
+                    task.range = 0;
                 } else {
                     task = new TaskRally(portals[0], "room");
                     task.range = 20;

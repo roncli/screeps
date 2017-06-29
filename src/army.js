@@ -306,6 +306,7 @@ class Army {
                 dismantler: this.dismantler,
                 healer: this.healer,
                 melee: this.melee,
+                portals: this.portals,
                 ranged: this.ranged,
                 region: this.region,
                 reinforce: this.reinforce,

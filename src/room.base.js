@@ -906,7 +906,7 @@ class RoomBase extends RoomEngine {
 
         // links
         if (links.length > 1 && spawns.length > 0) {
-            tasks.links = Utilities.objectsClosestToObj(links, spawns[0]);
+            tasks.links = [Utilities.objectsClosestToObj(links, spawns[0])[0]];
         }
     }
 

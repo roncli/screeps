@@ -4,16 +4,29 @@
 <dom-module id="market-prices">
     <template>
         <style>@import "/css/bootstrap.min.css";</style>
-        <div class="panel panel-primary small">
-            <div class="panel-heading">
+        <div class="panel panel-primary">
+            <div class="panel-heading small">
                 Prices
             </div>
-            <div class="panel-body small">
-                <template is="dom-repeat" items="[[prices]]" as="price">
-                    <div>
-                        [[formatPrice(price)]]
-                    </div>
-                </template>
+            <div class="panel-body">
+                <table class="table table-striped table-condensed small">
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Buy</th>
+                            <th>Sell</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template is="dom-repeat" items="[[prices]]" as="price">
+                            <tr class$="[[priceStatus(price)]]">
+                                <td>[[price.resource]]</td>
+                                <td style="text-align: right;"><format-to-fixed value="[[price.buy]]" digits="3"></format-to-fixed></td>
+                                <td style="text-align: right;"><format-to-fixed value="[[price.sell]]" digits="3"></format-to-fixed></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
         </div>
     </template>
@@ -33,8 +46,8 @@
                 };
             }
 
-            formatPrice(price) {
-                return JSON.stringify(price);
+            priceStatus(price) {
+                return price.buy > price.sell ? "danger" : "";
             }
         }
 

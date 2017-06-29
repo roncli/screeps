@@ -45,7 +45,8 @@ const Minerals =
     data = {
         messages: [],
         incomingTransactions: [],
-        outgoingTransactions: []
+        outgoingTransactions: [],
+        ownTransactions: []
     };
 let ws;
 
@@ -79,11 +80,14 @@ class Screeps {
                     data.messages.push(...data.survey.data.messages);
                     data.messages = data.messages.slice(Math.max(data.messages.length - 100, 0));
 
-                    data.incomingTransactions.push(...data.survey.data.market.incomingTransactions);
+                    data.incomingTransactions.push(...data.survey.data.market.incomingTransactions.filter((t) => !t.sender || !t.recipient || t.sender.username !== t.recipient.username));
                     data.incomingTransactions = data.incomingTransactions.slice(Math.max(data.messages.length - 100, 0));
 
-                    data.outgoingTransactions.push(...data.survey.data.market.outgoingTransactions);
+                    data.outgoingTransactions.push(...data.survey.data.market.outgoingTransactions.filter((t) => !t.sender || !t.recipient || t.sender.username !== t.recipient.username));
                     data.outgoingTransactions = data.outgoingTransactions.slice(Math.max(data.messages.length - 100, 0));
+
+                    data.ownTransactions.push(...data.survey.data.market.incomingTransactions.filter((t) => t.sender && t.recipient && t.sender.username === t.recipient.username));
+                    data.ownTransactions = data.outgoingTransactions.slice(Math.max(data.messages.length - 100, 0));
 
                     Screeps.loadGeneral();
                     Screeps.loadBases();
@@ -216,7 +220,7 @@ class Screeps {
     static loadMessages() {
         const {0: messages} = $("#messages");
 
-        ({messages: messages.messages} = data);
+        messages.messages = data.messages.sort((a, b) => b.tick - a.tick);
     }
 
     static loadPrices() {
@@ -236,18 +240,36 @@ class Screeps {
             if (priceList[order.resource]) {
                 ({price: priceList[order.resource].sell} = order);
             } else {
-                priceList[order.resource] = {sell: order.price}
+                priceList[order.resource] = {sell: order.price};
             }
         });
 
-        prices.prices = priceList;
+        prices.prices = Object.keys(priceList).map((p) => ({resource: p, buy: priceList[p].buy, sell: priceList[p].sell}))
+            .sort((a, b) => {
+                if (["token", "energy", "power"].indexOf(a.resource) === -1 && ["token", "energy", "power"].indexOf(b.resource) !== -1) {
+                    return 1;
+                }
+
+                if (["token", "energy", "power"].indexOf(a.resource) !== -1 && ["token", "energy", "power"].indexOf(b.resource) === -1) {
+                    return -1;
+                }
+
+                if (["token", "energy", "power"].indexOf(a.resource) === -1 && ["token", "energy", "power"].indexOf(b.resource) === -1) {
+                    if (a.resource.length !== b.resource.length) {
+                        return a.resource.length - b.resource.length;
+                    }
+                }
+
+                return a.resource.localeCompare(b.resource);
+            });
     }
 
     static loadTransactions() {
         const {0: incoming} = $("#incomingTransactions"),
             {0: outgoing} = $("#outgoingTransactions");
 
-        ({incomingTransactions: incoming.transactions, outgoingTransactions: outgoing.transactions} = data);
+        incoming.transactions = data.incomingTransactions.sort((a, b) => b.time - a.time);
+        outgoing.transactions = data.outgoingTransactions.sort((a, b) => b.time - a.time);
     }
 }
 

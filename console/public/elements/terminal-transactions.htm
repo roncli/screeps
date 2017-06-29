@@ -8,7 +8,7 @@
             <div class="panel-heading">
                 [[type]] Transactions
             </div>
-            <div class="panel-body small">
+            <div class="panel-body">
                 <template is="dom-repeat" items="[[transactions]]" as="transaction">
                     <div>
                         [[formatTransaction(transaction)]]
@@ -29,6 +29,10 @@
                     transactions: {
                         type: Array,
                         value: []
+                    },
+                    type: {
+                        type: String,
+                        value: ""
                     }
                 };
             }

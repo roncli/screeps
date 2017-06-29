@@ -687,6 +687,10 @@ class Assign {
      */
     static escort(creeps, say) {
         _.forEach(_.filter(creeps, (c) => !c.spawning && c.memory.escorting), (creep) => {
+            if (creeps.memory.portals && creeps.memory.portals.length > 0) {
+                return;
+            }
+
             const escorting = Game.getObjectById(creep.memory.escorting);
 
             // If the escortee is dead, this creep is no longer escorting anyone.

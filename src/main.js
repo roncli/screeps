@@ -1017,9 +1017,9 @@ class Main {
             }
 
             // Army creeps know who their friends are.
-            if (army && Cache.armies[army] && creepRoom === Cache.armies[army].attackRoom) {
-                creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][time % 35], true);
-            }
+            // if (army && Cache.armies[army] && creepRoom === Cache.armies[army].attackRoom) {
+            //     creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][time % 35], true);
+            // }
 
             // Happy new million!
             switch (time % 1000000) {

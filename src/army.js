@@ -111,7 +111,7 @@ class Army {
             }
         }
 
-        // Directive is "staging" until the creeps are in the attack room.
+        // Directive is "staging" until the creeps are in the stage room.
         if (this.directive === "staging") {
             if (_.filter(allCreepsInArmy, (c) => c.room.name !== this.stageRoom).length === 0) {
                 this.directive = "dismantle";
@@ -168,7 +168,7 @@ class Army {
             });
         }
 
-        // Go after hostiles in the attack room during "dismantle" and "attack" directives, but only within 3 squares if we're dismantling.
+        // Go after hostiles in the attack room during non-attack directives, but only within 3 squares if we're dismantling.
         if (attackRoom) {
             switch (this.directive) {
                 case "attack":

@@ -245,10 +245,21 @@ class Army {
         }
 
         // Fail if we're supposed to boost, but can't.
-        if (this.boostRoom) {
+        if (this.boostRoom === "any") {
+            _.forEach(_.uniq(spawns.map((s) => s.room)), (room) => {
+                ({memory: {labsInUse}} = room);
+
+                return !boostRoom || !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length));
+            });
+
+            if (!labsToBoostWith) {
+                return false;
+            }
+        } else if (this.boostRoom) {
             ({rooms: {[this.boostRoom]: boostRoom}} = Game);
             ({memory: {labsInUse}} = boostRoom);
-            if (boostRoom && !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length))) {
+
+            if (!boostRoom || !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length))) {
                 return false;
             }
         }

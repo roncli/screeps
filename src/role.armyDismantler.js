@@ -70,9 +70,6 @@ class RoleArmyDismantler {
         // If not yet boosted, go get boosts.
         Assign.getBoost(_.filter(armyDismantler, (c) => !c.spawning), "Boosting");
 
-        // Assign tasks for escortees.
-        Assign.findEscort(_.filter(armyDismantler, (c) => !c.memory.labs || c.memory.labs.length === 0), "Escort!");
-
         switch (army.directive) {
             case "building":
                 this.assignBuildingTasks(army);
@@ -127,7 +124,11 @@ class RoleArmyDismantler {
      */
     static assignStagingTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyDismantler || []), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
+            armyDismantler = creeps && creeps.armyDismantler || [],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(armyDismantler), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
+
+        // Assign tasks for escortees.
+        Assign.findEscort(_.filter(armyDismantler, (c) => !c.memory.labs || c.memory.labs.length === 0), "Escort!");
 
         if (creepsWithNoTask.length === 0) {
             return;

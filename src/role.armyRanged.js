@@ -70,9 +70,6 @@ class RoleArmyRanged {
         // If not yet boosted, go get boosts.
         Assign.getBoost(_.filter(armyRanged, (c) => !c.spawning), "Boosting");
 
-        // Assign tasks for escortees.
-        Assign.findEscort(_.filter(armyRanged, (c) => !c.memory.labs || c.memory.labs.length === 0), "Escort!");
-
         switch (army.directive) {
             case "building":
                 this.assignBuildingTasks(army);
@@ -103,7 +100,11 @@ class RoleArmyRanged {
      */
     static assignBuildingTasks(army) {
         const {creeps: {[army.name]: creeps}} = Cache,
-            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(creeps && creeps.armyRanged || []), (c) => !c.spawning && (!c.memory.labs || c.memory.labs.length === 0) && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
+            armyRanged = creeps && creeps.armyRanged || [],
+            creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(armyRanged), (c) => !c.spawning && (!c.memory.labs || c.memory.labs.length === 0) && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
+
+        // Assign tasks for escortees.
+        Assign.findEscort(_.filter(armyRanged, (c) => !c.memory.labs || c.memory.labs.length === 0), "Escort!");
 
         if (creepsWithNoTask.length === 0) {
             return;

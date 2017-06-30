@@ -701,7 +701,7 @@ class Assign {
             }
 
             // Determine who to heal.  If self, rally.  If escortee, heal.
-            if (escorting.hitsMax - escorting.hits === 0 || escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
+            if (escorting.hits / escorting.hitsMax > creep.hits / creep.hitsMax || !new TaskHeal(escorting.id).canAssign(creep)) {
                 const task = new TaskRally(escorting.pos, "position");
 
                 task.range = 0;

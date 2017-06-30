@@ -29,7 +29,7 @@ class RoleArmyRanged {
      */
     static spawnSettings(army) {
         const {ranged: {units}} = army,
-            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH];
+            body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH];
         let boosts;
 
         body.push(...Array(units).fill(RANGED_ATTACK));
@@ -37,7 +37,7 @@ class RoleArmyRanged {
 
         if (army.boostRoom) {
             boosts = {};
-            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
+            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = army.super ? 10 : 5;
             boosts[RESOURCE_CATALYZED_KEANIUM_ALKALIDE] = units;
             if (army.super) {
                 boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;

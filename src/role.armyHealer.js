@@ -29,7 +29,7 @@ class RoleArmyHealer {
      */
     static spawnSettings(army) {
         const {healer: {units}} = army,
-            body = [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH];
+            body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH];
         let boosts;
 
         body.push(...Array(units - 1).fill(HEAL));
@@ -38,7 +38,7 @@ class RoleArmyHealer {
 
         if (army.boostRoom) {
             boosts = {};
-            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = 5;
+            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = army.super ? 10 : 5;
             boosts[RESOURCE_CATALYZED_LEMERGIUM_ALKALIDE] = units;
             if (army.super) {
                 boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;

@@ -160,6 +160,11 @@ class RoleArmyDismantler {
             {creeps: {[armyName]: creeps}} = Cache,
             dismantlerCreeps = creeps && creeps.armyDismantler || [],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
+Memory.messages.push({
+    date: new Date(),
+    tick: Game.time,
+    message: "role.armyDismantler.assignDismantleTasks"
+});
 
         if (creepsWithNoTask.length === 0) {
             return;
@@ -172,6 +177,11 @@ class RoleArmyDismantler {
         if (creepsWithNoTask.length === 0) {
             return;
         }
+Memory.messages.push({
+    date: new Date(),
+    tick: Game.time,
+    message: "Not retreating."
+});
 
         // Dismantle a target if it can be seen.
         Assign.dismantleArmyTarget(creepsWithNoTask, attackRoomName, army.dismantle, "Dismantle");
@@ -180,6 +190,12 @@ class RoleArmyDismantler {
         if (creepsWithNoTask.length === 0) {
             return;
         }
+
+Memory.messages.push({
+    date: new Date(),
+    tick: Game.time,
+    message: "Not dismantling."
+});
 
         // Rally to army's attack location.
         Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");

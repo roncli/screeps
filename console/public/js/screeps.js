@@ -89,6 +89,11 @@ class Screeps {
                     data.ownTransactions.push(...data.survey.data.market.incomingTransactions.filter((t) => t.sender && t.recipient && t.sender.username === t.recipient.username));
                     data.ownTransactions = data.ownTransactions.slice(Math.max(data.messages.length - 100, 0));
 
+                    data.incomingTransactions = data.incomingTransactions.slice(Math.max(data.incomingTransactions.length - 100, 0));
+                    data.outgoingTransactions = data.outgoingTransactions.slice(Math.max(data.outgoingTransactions.length - 100, 0));
+                    data.ownTransactions = data.ownTransactions.slice(Math.max(data.ownTransactions.length - 100, 0));
+                    data.messages = data.messages.slice(Math.max(data.messages.length - 100, 0));
+
                     Screeps.loadGeneral();
                     Screeps.loadBases();
                     Screeps.loadMines();
@@ -125,8 +130,6 @@ class Screeps {
 
                     break;
             }
-
-            data.messages = data.messages.slice(Math.max(data.messages.length - 100, 0));
         };
     }
 

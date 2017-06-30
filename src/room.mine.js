@@ -296,7 +296,7 @@ class RoomMine extends RoomEngine {
             hostiles = Cache.hostilesInRoom(room),
             {armies: {[armyName]: army}} = Cache;
 
-        if (_.filter(hostiles, (h) => h.owner && h.owner.username !== "Invader").length > 0 && threat && threat > 0) {
+        if (_.filter(hostiles, (h) => h.owner && ["Invader", "Source Keeper"].indexOf(h.owner.username) === -1).length > 0 && threat && threat > 0) {
             const maxCreeps = Math.ceil(threat / (BODYPART_COST[ATTACK] * 300));
 
             if (army) {

@@ -1623,6 +1623,12 @@ class Assign {
      * @return {void}
      */
     static retreatArmyUnit(creeps, healers, stageRoomName, attackRoomName, minHealthPercent, say) {
+Memory.messages.push({
+    date: new Date(),
+    tick: Game.time,
+    message: `Healers: ${healers.length} Rooms: ${stageRoom} ${attackRoom}`
+});
+
         // Bail if there are no healers.
         if (!healers || healers.length === 0) {
             return;

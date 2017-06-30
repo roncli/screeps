@@ -1644,63 +1644,6 @@ class Assign {
         }
     }
 
-    //              #                       #     ##                     #  #         #     #     ##         #  #                    ###         #  #              ##
-    //              #                       #    #  #                    #  #               #    #  #        ####                     #          #  #               #
-    // ###    ##   ###   ###    ##    ###  ###   #  #  ###   # #   #  #  #  #  ###   ##    ###   #  #  ###   ####   ##   # #    ##    #     ##   ####   ##    ###   #     ##   ###
-    // #  #  # ##   #    #  #  # ##  #  #   #    ####  #  #  ####  #  #  #  #  #  #   #     #    #  #  #  #  #  #  #  #  # #   # ##   #    #  #  #  #  # ##  #  #   #    # ##  #  #
-    // #     ##     #    #     ##    # ##   #    #  #  #     #  #   # #  #  #  #  #   #     #    #  #  #     #  #  #  #  # #   ##     #    #  #  #  #  ##    # ##   #    ##    #
-    // #      ##     ##  #      ##    # #    ##  #  #  #     #  #    #    ##   #  #  ###     ##   ##   #     #  #   ##    #     ##    #     ##   #  #   ##    # #  ###    ##   #
-    //                                                              #
-    /**
-     * Assigns an army unit to retreat when hurt or move to a healer if too far from one.
-     * @param {Creep[]} creeps The creeps to assign this task to.
-     * @param {Creep[]} healers The healers to check against.
-     * @param {string} stageRoomName The name of the staging room.
-     * @param {string} attackRoomName The name of the attack room.
-     * @param {number} minHealthPercent The minimum amount a health a unit must have to not retreat.
-     * @param {string} say Text to say on successful assignment for retreating only.
-     * @return {void}
-     */
-    static retreatArmyUnitOrMoveToHealer(creeps, healers, stageRoomName, attackRoomName, minHealthPercent, say) {
-        // Bail if there are no healers.
-        if (!healers || healers.length === 0) {
-            return;
-        }
-
-        // Only retreat if there is somewhere to retreat to.
-        if (stageRoomName !== attackRoomName) {
-            const task = new TaskRally(stageRoomName, "room");
-
-            // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
-            _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 2 || c.pos.x >= 47 || c.pos.y <= 2 || c.pos.y >= 47) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
-                if (task.canAssign(creep)) {
-                    ({time: creep.memory.currentTask.priority} = Game);
-                    if (say) {
-                        creep.say(say);
-                    }
-                }
-            });
-        }
-
-        // Only move towards a healer if there are any not escorting other creeps.
-        const healersNotEscorting = _.filter(healers, (h) => !h.memory.escorting);
-
-        if (healersNotEscorting.length > 0) {
-            _.forEach(creeps, (creep) => {
-                const closest = Utilities.objectsClosestToObj(healersNotEscorting, creep);
-                let task;
-
-                // Check to see if the closest healer is further than 2 squares away, rally to it if so.
-                if (closest[0].pos.getRangeTo(creep) > 2) {
-                    task = new TaskRally(closest[0].pos, "position");
-                    if (task.canAssign(creep)) {
-                        ({time: creep.memory.currentTask.priority} = Game);
-                    }
-                }
-            });
-        }
-    }
-
     //         #
     //         #
     //  ###   ###    ##   # #   ###

@@ -292,7 +292,7 @@ class RoomBase extends RoomEngine {
                         exits = Game.map.describeExits(roomName);
 
                     if (attackTicks >= 500) {
-                        army.boostRoom = roomName;
+                        army.boostRoom = "any";
 
                         if (attackTicks >= 2000) {
                             const rooms = _.filter(Game.rooms, (r) => {
@@ -306,7 +306,7 @@ class RoomBase extends RoomEngine {
                                     remoteArmyName = `${remoteRoomName}-defense-for-${roomName}`;
 
                                 if (!Memory.army[`${remoteRoomName}-defense`] && !Memory.army[remoteArmyName]) {
-                                    Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}});
+                                    Commands.createArmy(remoteArmyName, {reinforce: false, region: roomMemory.region, boostRoom: "any", buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}});
                                 }
                             });
 
@@ -316,7 +316,7 @@ class RoomBase extends RoomEngine {
                                         remoteArmyName = `${remoteRoomName}-defense-for-${roomName}`;
 
                                     if (Memory.army[remoteArmyName]) {
-                                        Memory.army[remoteArmyName].boostRoom = remoteRoomName;
+                                        Memory.army[remoteArmyName].boostRoom = "any";
                                     }
                                 });
                             }
@@ -328,14 +328,14 @@ class RoomBase extends RoomEngine {
                         const dirArmyName = `${roomName}-${dir.toString()}-border-defense`;
 
                         if (!Memory.army[dirArmyName] && edgeTicks[dir] >= 50) {
-                            Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}});
+                            Commands.createArmy(dirArmyName, {reinforce: false, region: roomMemory.region, boostRoom: "any", buildRoom: roomName, stageRoom: roomName, attackRoom: exits[dir], dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}});
                         }
                     });
 
                     // TODO: Test army casualties taken.  If 4 or more units are lost, reduce army size, defend with ranged only, and queue & respect base matrix.
                 } else {
                     Game.notify(`Warning! ${roomName} is under attack!`);
-                    Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: roomName, buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}, creepCount: 0});
+                    Commands.createArmy(armyName, {reinforce: false, region: roomMemory.region, boostRoom: "any", buildRoom: roomName, stageRoom: roomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: armySize, units: 17}, melee: {maxCreeps: 0, units: 20}, ranged: {maxCreeps: armySize, units: 20}, creepCount: 0});
                 }
             }
         } else if (army) {

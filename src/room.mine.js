@@ -300,7 +300,7 @@ class RoomMine extends RoomEngine {
             const maxCreeps = Math.ceil(threat / (BODYPART_COST[ATTACK] * 300));
 
             if (army) {
-                army.boostRoom = supportRoomName;
+                army.boostRoom = "any";
                 army.healer.maxCreeps = 2 * maxCreeps;
                 army.melee.maxCreeps = maxCreeps;
                 army.melee.escort = true;
@@ -309,14 +309,14 @@ class RoomMine extends RoomEngine {
                 army.success = false;
                 army.reinforce = true;
             } else {
-                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: supportRoomName, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: maxCreeps * 2, units: 20}, melee: {maxCreeps, units: 20, escort: true}, ranged: {maxCreeps, units: 20, escort: true}});
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: "any", buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: maxCreeps * 2, units: 20}, melee: {maxCreeps, units: 20, escort: true}, ranged: {maxCreeps, units: 20, escort: true}});
             }
         } else if (_.filter(hostiles, (h) => h.owner && h.owner.username === "Invader").length > 0) {
             // If there are invaders in the room, spawn an army if we don't have one.
             if (!army) {
                 const {energyCapacityAvailable} = supportRoom;
 
-                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
+                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: this.type === "source" ? 2 : 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 300), 20)}, melee: {maxCreeps: this.type === "source" ? 2 : 1, units: Math.min(Math.floor((energyCapacityAvailable - 300) / 130), 20)}, ranged: {maxCreeps: 0, units: 20}});
             }
         } else if (army) {
             // Cancel army if invaders are gone.

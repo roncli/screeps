@@ -105,33 +105,6 @@ class RoomSource extends RoomMine {
         super.stage1AssignTasks(this);
     }
 
-    //    #          #                  #
-    //    #         # #                 #
-    //  ###   ##    #     ##   ###    ###
-    // #  #  # ##  ###   # ##  #  #  #  #
-    // #  #  ##     #    ##    #  #  #  #
-    //  ###   ##    #     ##   #  #   ###
-    /**
-     * Defends the room from invaders.
-     * @return {void}
-     */
-    defend() {
-        const {room, room: {name: roomName}, supportRoom: {name: supportRoomName}} = this,
-            armyName = `${roomName}-defense`,
-            {army: {[armyName]: army}} = Memory;
-
-        if (_.filter(Cache.hostilesInRoom(room), (h) => h.owner && h.owner.username === "Invader").length > 0) {
-            // If there are invaders in the room, spawn an army if we don't have one.
-            if (!army) {
-                Commands.createArmy(armyName, {reinforce: false, region: room.memory.region, boostRoom: void 0, buildRoom: supportRoomName, stageRoom: supportRoomName, attackRoom: roomName, dismantle: [], dismantler: {maxCreeps: 0, units: 20}, healer: {maxCreeps: 2, units: 17}, melee: {maxCreeps: 2, units: 20}, ranged: {maxCreeps: 0, units: 20}});
-            }
-        } else if (army) {
-            // Cancel army if invaders are gone.
-            army.directive = "attack";
-            army.success = true;
-        }
-    }
-
     //         #                       ##   ###                #
     //         #                      #  #   #                 #
     //  ###   ###    ###   ###   ##      #   #     ###   ###   # #    ###

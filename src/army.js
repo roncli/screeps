@@ -88,7 +88,7 @@ class Army {
         if (this.directive === "preparing") {
             const {boostRoom: boostRoomName} = this;
 
-            if (boostRoomName) {
+            if (boostRoomName && boostRoomName !== "any") {
                 const {rooms: {[boostRoomName]: boostedRoom}} = Game,
                     {storage: {store: boostRoomStorageStore}} = boostedRoom;
 
@@ -248,8 +248,9 @@ class Army {
         if (this.boostRoom === "any") {
             _.forEach(_.uniq(spawns.map((s) => s.room)), (room) => {
                 ({memory: {labsInUse}} = room);
+                boostRoom = room;
 
-                return !boostRoom || !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length));
+                return !room || !(labsToBoostWith = Utilities.getLabToBoostWith(boostRoom, Object.keys(settings.boosts).length));
             });
 
             if (!labsToBoostWith) {

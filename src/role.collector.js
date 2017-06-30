@@ -123,11 +123,20 @@ class RoleCollector {
         const energy = Math.min(checkSettings.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,
+            workUnits = units + (remainder >= 150 ? 1 : 0),
+            carryUnits = units + (remainder >= 100 && remainder < 150 ? 1 : 0),
+            moveUnits = units + (remainder >= 50 ? 1 : 0),
             body = [];
 
-        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
-        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
-        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+        for (let count = 0; count < workUnits; count++) {
+            body.push(WORK);
+        }
+        for (let count = 0; count < carryUnits; count++) {
+            body.push(CARRY);
+        }
+        for (let count = 0; count < moveUnits; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

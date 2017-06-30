@@ -79,10 +79,16 @@ class RoleScientist {
         const energy = Math.min(checkSettings.energyCapacityAvailable, 2500),
             units = Math.floor(energy / 150),
             remainder = energy % 150,
+            carryUnits = units * 2 + (remainder >= 100 ? 1 : 0),
+            moveUnits = units + (remainder >= 50 ? 1 : 0),
             body = [];
 
-        body.push(...Array(units * 2 + (remainder >= 100 ? 1 : 0)).fill(CARRY));
-        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+        for (let count = 0; count < carryUnits; count++) {
+            body.push(CARRY);
+        }
+        for (let count = 0; count < moveUnits; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

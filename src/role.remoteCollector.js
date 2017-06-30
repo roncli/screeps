@@ -78,10 +78,15 @@ class RoleRemoteCollector {
     static spawnSettings(checkSettings) {
         const energy = Math.min(checkSettings.energyCapacityAvailable, 2400),
             units = Math.floor(energy / 150),
+            carryUnits = 2 * units,
             body = [];
 
-        body.push(...Array(units * 2).fill(CARRY));
-        body.push(...Array(units).fill(MOVE));
+        for (let count = 0; count < carryUnits; count++) {
+            body.push(CARRY);
+        }
+        for (let count = 0; count < units; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

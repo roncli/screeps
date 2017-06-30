@@ -113,12 +113,21 @@ class RoleWorker {
             {storage} = room,
             {store} = storage,
             spawns = Cache.spawnsInRoom(room),
+            workUnits = units + (remainder >= 150 ? 1 : 0),
+            carryUnits = units + (remainder >= 100 && remainder < 150 ? 1 : 0),
+            moveUnits = units + (remainder >= 50 ? 1 : 0),
             body = [],
             boosts = {};
 
-        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
-        body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
-        body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+        for (let count = 0; count < workUnits; count++) {
+            body.push(WORK);
+        }
+        for (let count = 0; count < carryUnits; count++) {
+            body.push(CARRY);
+        }
+        for (let count = 0; count < moveUnits; count++) {
+            body.push(MOVE);
+        }
 
         if (storage && Cache.labsInRoom(room).length > 0) {
             if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {

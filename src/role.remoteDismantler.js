@@ -81,8 +81,12 @@ class RoleRemoteDismantler {
             units = Math.floor(energy / 150),
             body = [];
 
-        body.push(...Array(units).fill(WORK));
-        body.push(...Array(units).fill(MOVE));
+        for (let count = 0; count < units; count++) {
+            body.push(WORK);
+        }
+        for (let count = 0; count < units; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

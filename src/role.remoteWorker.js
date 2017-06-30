@@ -118,11 +118,20 @@ class RoleRemoteWorker {
             secondUnits = Math.floor(Math.max(energy - 2000, 0) / 150),
             remainder = Math.min(energy, 2000) % 200,
             secondRemainder = Math.max(energy - 2000, 0) % 150,
+            workUnits = units + (remainder >= 150 ? 1 : 0),
+            carryUnits = units + secondUnits * 2 + (remainder >= 100 && remainder < 150 ? 1 : 0) + (secondRemainder > 100 ? 1 : 0),
+            moveUnits = units + secondUnits + (remainder >= 50 ? 1 : 0) + (secondRemainder >= 50 ? 1 : 0),
             body = [];
 
-        body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
-        body.push(...Array(units + secondUnits * 2 + (remainder >= 100 && remainder < 150 ? 1 : 0) + (secondRemainder > 100 ? 1 : 0)).fill(CARRY));
-        body.push(...Array(units + secondUnits + (remainder >= 50 ? 1 : 0) + (secondRemainder >= 50 ? 1 : 0)).fill(MOVE));
+        for (let count = 0; count < workUnits; count++) {
+            body.push(WORK);
+        }
+        for (let count = 0; count < carryUnits; count++) {
+            body.push(CARRY);
+        }
+        for (let count = 0; count < moveUnits; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

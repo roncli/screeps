@@ -139,17 +139,36 @@ class RoleUpgrader {
             units = Math.floor((energy - carryUnits * 50) / 250);
             remainder = (energy - carryUnits * 50) % 250;
 
-            body.push(...Array(units * 2 + (remainder >= 150 ? 1 : 0)).fill(WORK));
-            body.push(...Array(carryUnits).fill(CARRY));
-            body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+            const workUnits = units * 2 + (remainder >= 150 ? 1 : 0),
+                moveUnits = units + (remainder >= 50 ? 1 : 0);
+
+            for (let count = 0; count < workUnits; count++) {
+                body.push(WORK);
+            }
+            for (let count = 0; count < carryUnits; count++) {
+                body.push(CARRY);
+            }
+            for (let count = 0; count < moveUnits; count++) {
+                body.push(MOVE);
+            }
         } else {
             energy = Math.min(energy, controller.level === 8 ? 3000 : 3300);
             units = Math.floor(energy / 200);
             remainder = energy % 200;
 
-            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(WORK));
-            body.push(...Array(units + (remainder >= 100 && remainder < 150 ? 1 : 0)).fill(CARRY));
-            body.push(...Array(units + (remainder >= 50 ? 1 : 0)).fill(MOVE));
+            const workUnits = units + (remainder >= 150 ? 1 : 0),
+                carryUnits = units + (remainder >= 100 && remainder < 150 ? 1 : 0),
+                moveUnits = units + (remainder >= 50 ? 1 : 0);
+
+            for (let count = 0; count < workUnits; count++) {
+                body.push(WORK);
+            }
+            for (let count = 0; count < carryUnits; count++) {
+                body.push(CARRY);
+            }
+            for (let count = 0; count < moveUnits; count++) {
+                body.push(MOVE);
+            }
         }
 
         if (storage && Cache.labsInRoom(room).length > 0) {

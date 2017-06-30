@@ -80,8 +80,12 @@ class RoleHealer {
             units = Math.floor(energy / 300),
             body = [];
 
-        body.push(...Array(units).fill(MOVE));
-        body.push(...Array(units).fill(HEAL));
+        for (let count = 0; count < units; count++) {
+            body.push(MOVE);
+        }
+        for (let count = 0; count < units; count++) {
+            body.push(HEAL);
+        }
 
         return {
             body,

@@ -138,10 +138,16 @@ class RoleRemoteMiner {
         if (checkSettings.isMineralHarvester) {
             const energy = Math.min(checkSettings.energyCapacityAvailable, 4500),
                 units = Math.floor(energy / 450),
-                remainder = energy % 450;
+                remainder = energy % 450,
+                moveUnits = units + (remainder >= 150 ? 1 : 0),
+                workUnits = units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0);
 
-            body.push(...Array(units + (remainder >= 150 ? 1 : 0)).fill(MOVE));
-            body.push(...Array(units * 4 + (remainder >= 150 ? 1 : 0) + (remainder >= 250 ? 1 : 0) + (remainder >= 350 ? 1 : 0)).fill(WORK));
+            for (let count = 0; count < moveUnits; count++) {
+                body.push(MOVE);
+            }
+            for (let count = 0; count < workUnits; count++) {
+                body.push(WORK);
+            }
         } else {
             body = checkSettings.isSourceRoom ? [MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, WORK] : [MOVE, MOVE, MOVE, WORK, WORK, WORK, WORK, WORK];
         }

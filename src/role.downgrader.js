@@ -95,10 +95,15 @@ class RoleDowngrader {
     static spawnSettings(checkSettings) {
         const energy = Math.min(checkSettings.energyCapacityAvailable, 24400),
             units = Math.floor(energy / 3050),
+            claimUnits = units * 5,
             body = [];
 
-        body.push(...Array(units * 5).fill(CLAIM));
-        body.push(...Array(units).fill(MOVE));
+        for (let count = 0; count < claimUnits; count++) {
+            body.push(CLAIM);
+        }
+        for (let count = 0; count < units; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

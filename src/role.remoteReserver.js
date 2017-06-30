@@ -114,8 +114,12 @@ class RoleRemoteReserver {
             units = Math.floor(energy / 650),
             body = [];
 
-        body.push(...Array(units).fill(CLAIM));
-        body.push(...Array(units).fill(MOVE));
+        for (let count = 0; count < units; count++) {
+            body.push(CLAIM);
+        }
+        for (let count = 0; count < units; count++) {
+            body.push(MOVE);
+        }
 
         return {
             body,

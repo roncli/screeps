@@ -29,11 +29,16 @@ class RoleArmyMelee {
      */
     static spawnSettings(army) {
         const {melee: {units}} = army,
-            body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH];
+            body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            moveUnits = army.super ? 10 : units + 5;
         let boosts;
 
-        body.push(...Array(units).fill(ATTACK));
-        body.push(...Array(army.super ? 10 : units + 5).fill(MOVE));
+        for (let count = 0; count < units; count++) {
+            body.push(ATTACK);
+        }
+        for (let count = 0; count < moveUnits; count++) {
+            body.push(MOVE);
+        }
 
         if (army.boostRoom) {
             boosts = {};

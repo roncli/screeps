@@ -28,11 +28,17 @@ class RoleArmyHealer {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(army) {
-        const {healer: {units}} = army,
+        const {healer: {units, tough}} = army,
             body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             healUnits = units - 1,
             moveUnits = army.super ? 10 : units + 5;
         let boosts;
+
+        if (tough) {
+            for (let count = 0; count < tough; count++) {
+                body.push(TOUGH);
+            }
+        }
 
         for (let count = 0; count < healUnits; count++) {
             body.push(HEAL);

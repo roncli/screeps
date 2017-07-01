@@ -28,10 +28,16 @@ class RoleArmyDismantler {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(army) {
-        const {dismantler: {units}} = army,
+        const {dismantler: {units, tough}} = army,
             body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             moveUnits = army.super ? 10 : units + 5;
         let boosts;
+
+        if (tough) {
+            for (let count = 0; count < tough; count++) {
+                body.push(TOUGH);
+            }
+        }
 
         for (let count = 0; count < units; count++) {
             body.push(WORK);

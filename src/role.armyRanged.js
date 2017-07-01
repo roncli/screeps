@@ -28,10 +28,16 @@ class RoleArmyRanged {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(army) {
-        const {ranged: {units}} = army,
+        const {ranged: {units, tough}} = army,
             body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             moveUnits = army.super ? 10 : units + 5;
         let boosts;
+
+        if (tough) {
+            for (let count = 0; count < tough; count++) {
+                body.push(TOUGH);
+            }
+        }
 
         for (let count = 0; count < units; count++) {
             body.push(RANGED_ATTACK);

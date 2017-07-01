@@ -1626,7 +1626,7 @@ class Assign {
 Memory.messages.push({
     date: new Date(),
     tick: Game.time,
-    message: `Healers: ${healers.length} Rooms: ${stageRoom} ${attackRoom}`
+    message: `Healers: ${healers.length} Rooms: ${stageRoomName} ${attackRoomName}`
 });
 
         // Bail if there are no healers.

@@ -160,15 +160,6 @@ class RoleArmyDismantler {
             {creeps: {[armyName]: creeps}} = Cache,
             dismantlerCreeps = creeps && creeps.armyDismantler || [],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
-Memory.messages.push({
-    date: new Date(),
-    tick: Game.time,
-    message: "role.armyDismantler.assignDismantleTasks"
-});
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
 
         // Run to a healer, or return to army's staging location if under 80% health.
         Assign.retreatArmyUnit(dismantlerCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.9, "Ouch!");
@@ -177,11 +168,6 @@ Memory.messages.push({
         if (creepsWithNoTask.length === 0) {
             return;
         }
-Memory.messages.push({
-    date: new Date(),
-    tick: Game.time,
-    message: "Not retreating."
-});
 
         // Dismantle a target if it can be seen.
         Assign.dismantleArmyTarget(creepsWithNoTask, attackRoomName, army.dismantle, "Dismantle");
@@ -190,12 +176,6 @@ Memory.messages.push({
         if (creepsWithNoTask.length === 0) {
             return;
         }
-
-Memory.messages.push({
-    date: new Date(),
-    tick: Game.time,
-    message: "Not dismantling."
-});
 
         // Rally to army's attack location.
         Assign.moveToRoom(creepsWithNoTask, attackRoomName, "Attacking");
@@ -218,10 +198,6 @@ Memory.messages.push({
             {creeps: {[armyName]: creeps}} = Cache,
             dismantlerCreeps = creeps && creeps.armyDismantler || [],
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(dismantlerCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
 
         // Return to army's staging location if under 80% health.
         Assign.retreatArmyUnit(dismantlerCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.9, "Ouch!");

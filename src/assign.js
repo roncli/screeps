@@ -1623,12 +1623,6 @@ class Assign {
      * @return {void}
      */
     static retreatArmyUnit(creeps, healers, stageRoomName, attackRoomName, minHealthPercent, say) {
-Memory.messages.push({
-    date: new Date(),
-    tick: Game.time,
-    message: `Healers: ${healers.length} Rooms: ${stageRoomName} ${attackRoomName}`
-});
-
         // Bail if there are no healers.
         if (!healers || healers.length === 0) {
             return;
@@ -1640,17 +1634,7 @@ Memory.messages.push({
 
             // Creeps will retreat if they are in the attack room or within 2 squares of a room edge.  They must be below the minimum health percentage to retreat.
             _.forEach(_.filter(creeps, (c) => (c.room.name === attackRoomName || c.pos.x <= 1 || c.pos.x >= 48 || c.pos.y <= 1 || c.pos.y >= 48) && c.hits / c.hitsMax < minHealthPercent), (creep) => {
-Memory.messages.push({
-    date: new Date(),
-    tick: Game.time,
-    message: `${creep.name} ${creep.hits}/${creep.hitsMax}`
-});
                 if (task.canAssign(creep)) {
-Memory.messages.push({
-    date: new Date(),
-    tick: Game.time,
-    message: "Assigned."
-});
                     ({time: creep.memory.currentTask.priority} = Game);
                     if (say) {
                         creep.say(say);

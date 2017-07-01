@@ -177,10 +177,6 @@ class RoleArmyMelee {
             {attackRoom: attackRoomName} = army,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(meleeCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
 
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
         // Run to a healer, or return to army's staging location if under 80% health.
         Assign.retreatArmyUnit(meleeCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.9, "Ouch!");
 
@@ -235,10 +231,6 @@ class RoleArmyMelee {
             meleeCreeps = creeps && creeps.armyMelee || [],
             {attackRoom: attackRoomName} = army,
             creepsWithNoTask = _.filter(Utilities.creepsWithNoTask(meleeCreeps), (c) => !c.spawning && (!c.memory.currentTask || c.memory.currentTask.priority !== Game.time));
-
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
 
         // Return to army's staging location if under 80% health.
         Assign.retreatArmyUnit(meleeCreeps, creeps && creeps.armyHealer || [], army.stageRoom, attackRoomName, 0.9, "Ouch!");

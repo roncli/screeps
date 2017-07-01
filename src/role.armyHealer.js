@@ -29,12 +29,13 @@ class RoleArmyHealer {
      */
     static spawnSettings(army) {
         const {healer: {units, tough}} = army,
-            body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             healUnits = units - 1,
             moveUnits = army.super ? 10 : units + 5;
-        let boosts;
+        let body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
         if (tough) {
+            body = [];
             for (let count = 0; count < tough; count++) {
                 body.push(TOUGH);
             }

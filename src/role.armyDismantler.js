@@ -29,11 +29,12 @@ class RoleArmyDismantler {
      */
     static spawnSettings(army) {
         const {dismantler: {units, tough}} = army,
-            body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
             moveUnits = army.super ? 10 : units + 5;
-        let boosts;
+        let body = army.super ? [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH] : [TOUGH, TOUGH, TOUGH, TOUGH, TOUGH],
+            boosts;
 
         if (tough) {
+            body = [];
             for (let count = 0; count < tough; count++) {
                 body.push(TOUGH);
             }

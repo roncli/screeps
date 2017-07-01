@@ -23,10 +23,12 @@
                     <tbody>
                         <template is="dom-repeat" items="[[transactions]]" as="transaction">
                             <tr>
-                                <td style="text-align: right;">[[transaction.time]]
+                                <td style="text-align: right;">[[transaction.time]]</td>
                                 <td><img src$="https://s3.amazonaws.com/static.screeps.com/upload/mineral-icons/[[transaction.resourceType]].png" /></td>
-                                <td style="text-align: right;">[[transaction.amount]]
-                                <td style="text-align: right;">[[transaction.price]]
+                                <td style="text-align: right;">[[transaction.amount]]</td>
+                                <td style="text-align: right;">
+                                    <format-to-fixed value="[[transaction.order.price]]" digits="3"></format-to-fixed>
+                                </td>
                                 <td>
                                     [[transaction.from]]
                                     <template is="dom-if" if="[[transaction.sender]]">([[transaction.sender.username]])</template>

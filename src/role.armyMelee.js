@@ -49,7 +49,7 @@ class RoleArmyMelee {
 
         if (army.boostRoom) {
             boosts = {};
-            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = army.super ? 10 : 5;
+            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = tough ? tough : army.super ? 10 : 5;
             boosts[RESOURCE_CATALYZED_UTRIUM_ACID] = units;
             if (army.super) {
                 boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;

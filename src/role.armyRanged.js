@@ -49,7 +49,7 @@ class RoleArmyRanged {
 
         if (army.boostRoom) {
             boosts = {};
-            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = army.super ? 10 : 5;
+            boosts[RESOURCE_CATALYZED_GHODIUM_ALKALIDE] = tough ? tough : army.super ? 10 : 5;
             boosts[RESOURCE_CATALYZED_KEANIUM_ALKALIDE] = units;
             if (army.super) {
                 boosts[RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE] = 10;

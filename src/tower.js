@@ -42,9 +42,11 @@ class Tower {
         }
 
         // Check for tower repairs.
-        if (tasks.criticalRepairableStructures.length > 0) {
+        const towerRepairableStructures = _.filter(tasks.criticalRepairableStructures, (s) => s.hits < 10000);
+
+        if (towerRepairableStructures.length > 0) {
             _.forEach(towers, (tower) => {
-                tower.repair(tasks.criticalRepairableStructures[0]);
+                tower.repair(towerRepairableStructures[0]);
             });
 
             return;

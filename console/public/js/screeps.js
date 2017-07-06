@@ -78,16 +78,9 @@ class Screeps {
                     ({survey: data.survey} = message);
 
                     data.messages.push(...data.survey.data.messages);
-                    data.messages = data.messages.slice(Math.max(data.messages.length - 100, 0));
-
                     data.incomingTransactions.push(...data.survey.data.market.incomingTransactions.filter((t) => !t.sender || !t.recipient || t.sender.username !== t.recipient.username));
-                    data.incomingTransactions = data.incomingTransactions.slice(Math.max(data.messages.length - 100, 0));
-
                     data.outgoingTransactions.push(...data.survey.data.market.outgoingTransactions.filter((t) => !t.sender || !t.recipient || t.sender.username !== t.recipient.username));
-                    data.outgoingTransactions = data.outgoingTransactions.slice(Math.max(data.messages.length - 100, 0));
-
                     data.ownTransactions.push(...data.survey.data.market.incomingTransactions.filter((t) => t.sender && t.recipient && t.sender.username === t.recipient.username));
-                    data.ownTransactions = data.ownTransactions.slice(Math.max(data.messages.length - 100, 0));
 
                     data.incomingTransactions = data.incomingTransactions.slice(Math.max(data.incomingTransactions.length - 100, 0));
                     data.outgoingTransactions = data.outgoingTransactions.slice(Math.max(data.outgoingTransactions.length - 100, 0));

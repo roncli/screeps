@@ -687,7 +687,7 @@ class Assign {
      */
     static escort(creeps, say) {
         _.forEach(_.filter(creeps, (c) => !c.spawning && c.memory.escorting), (creep) => {
-            if (creep.memory.portals && creep.memory.portals.length > 0) {
+            if (creep.memory.marchPath && creep.memory.marchPath.length > 0) {
                 return;
             }
 
@@ -954,7 +954,7 @@ class Assign {
      */
     static findEscort(creeps, say) {
         _.forEach(_.filter(creeps, (c) => c.memory.escortedBy), (creep) => {
-            if (creep.memory.portals && creep.memory.portals.length > 0) {
+            if (creep.memory.marchPath && creep.memory.marchPath.length > 0) {
                 return;
             }
 
@@ -1099,7 +1099,7 @@ class Assign {
         _.forEach(creeps, (creep) => {
             let task;
 
-            if (creep.memory.portals && creep.memory.portals.length > 0) {
+            if (creep.memory.marchPath && creep.memory.marchPath.length > 0) {
                 return;
             }
 
@@ -1259,7 +1259,7 @@ class Assign {
     // #  #  #  #  # #   ##     #    #  #  # #   #  #  #  #  #  #
     // #  #   ##    #     ##    #     ##   #  #   ##    ##   #  #
     /**
-     * Assigns all creeps to rally to a room.  Will go through portals if specified.
+     * Assigns all creeps to rally to a room.  Will follow marchPath if specified.
      * @param {Creep[]} creeps The creeps to assign this task to.
      * @param {string} roomName The name of the room to rally to.
      * @param {string} say Text to say on successful assignment.
@@ -1269,22 +1269,29 @@ class Assign {
         _.forEach(creeps, (creep) => {
             let task;
 
-            const {memory: {portals}} = creep;
+            const {memory: {marchPath}} = creep;
 
-            // If the creep was trying to go through a portal and is no longer in origin room, assume the portal was successful and remove the origin room from the portals array.
-            if (creep.memory.portaling && portals[0] !== creep.room.name) {
-                portals.shift();
-            }
+            // Rally towards the march path if there's one in memory, or the destination room otherwise.
+            if (marchPath && marchPath.length > 0) {
+                let {0: nextRoom} = marchPath;
 
-            // Rally towards a portal if there's one in memory, or the destination room otherwise.
-            if (portals && portals.length > 0) {
-                // If we're in the portal's origin room, rally to the portal.  Otherwise, rally to the origin room.
-                if (portals[0] === creep.room.name) {
-                    creep.memory.portaling = true;
-                    task = new TaskRally(Cache.portalsInRoom(creep.room)[0].pos, "position");
-                    task.range = 0;
+                if (creep.pos.roomName === nextRoom) {
+                    marchPath.shift();
+                    ({0: nextRoom} = marchPath);
+                }
+
+                if (nextRoom) {
+                    const {0: portal} = Cache.portalsInRoom(creep.room);
+
+                    if (portal && portal.destination.roomName === nextRoom) {
+                        task = new TaskRally(portal.pos, "position");
+                        task.range = 20;
+                    } else {
+                        task = new TaskRally(nextRoom, "room");
+                        task.range = 20;
+                    }
                 } else {
-                    task = new TaskRally(portals[0], "room");
+                    task = new TaskRally(roomName, "room");
                     task.range = 20;
                 }
             } else {

@@ -266,7 +266,7 @@ class Army {
         }
 
         // Create the creep from the first listed spawn that is available.
-        const name = spawns[0].createCreep(settings.body, `${settings.name}-${this.name}-${Game.time.toFixed(0).substring(4)}`, {role: settings.name, army: this.name, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], portals: this.portals});
+        const name = spawns[0].createCreep(settings.body, `${settings.name}-${this.name}-${Game.time.toFixed(0).substring(4)}`, {role: settings.name, army: this.name, labs: boostRoom ? _.map(labsToBoostWith, (l) => l.id) : [], marchPath: this.marchPath});
 
         Cache.spawning[spawns[0].id] = typeof name !== "number";
 
@@ -317,8 +317,8 @@ class Army {
                 dismantle: this.dismantle,
                 dismantler: this.dismantler,
                 healer: this.healer,
+                marchPath: this.marchPath,
                 melee: this.melee,
-                portals: this.portals,
                 ranged: this.ranged,
                 region: this.region,
                 reinforce: this.reinforce,

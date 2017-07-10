@@ -1114,7 +1114,10 @@ class RoomBase extends RoomEngine {
                             minerals: [queue.resource],
                             amount: queue.amount
                         });
+                        
                         _.remove(creep.memory.labs, (l) => l === queue.id);
+                        creep.memory.boosted = true;
+
                         if (!status || queue.oldAmount === 0) {
                             boosted.push(queue);
                         } else {

@@ -359,33 +359,33 @@ class Main {
         if (Game.time % 10 === 0 || Game.cpu.bucket >= Memory.marketBucket) {
             // Determine the minerals we need.
             Memory.mineralPrices = [
-                {resource: RESOURCE_HYDROGEN, amount: 15000, priority: 1},
-                {resource: RESOURCE_OXYGEN, amount: 15000, priority: 1},
-                {resource: RESOURCE_ZYNTHIUM, amount: 15000, priority: 1},
-                {resource: RESOURCE_KEANIUM, amount: 15000, priority: 1},
-                {resource: RESOURCE_UTRIUM, amount: 15000, priority: 1},
-                {resource: RESOURCE_LEMERGIUM, amount: 15000, priority: 1},
-                {resource: RESOURCE_CATALYST, amount: 15000, priority: 1},
-                {resource: RESOURCE_HYDROXIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 15000, priority: 1},
-                {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 15000, priority: 1},
-                {resource: RESOURCE_GHODIUM, amount: 15000, priority: 1},
-                {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_KEANIUM_OXIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_ZYNTHIUM_OXIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_GHODIUM_OXIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_UTRIUM_ACID, amount: 15000, priority: 1},
-                {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_LEMERGIUM_ACID, amount: 15000, priority: 1},
-                {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_ZYNTHIUM_ACID, amount: 15000, priority: 1},
-                {resource: RESOURCE_ZYNTHIUM_ALKALIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_GHODIUM_ACID, amount: 15000, priority: 1},
-                {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 15000, priority: 1},
+                {resource: RESOURCE_HYDROGEN, amount: 15000, priority: 6},
+                {resource: RESOURCE_OXYGEN, amount: 15000, priority: 6},
+                {resource: RESOURCE_ZYNTHIUM, amount: 15000, priority: 6},
+                {resource: RESOURCE_KEANIUM, amount: 15000, priority: 6},
+                {resource: RESOURCE_UTRIUM, amount: 15000, priority: 6},
+                {resource: RESOURCE_LEMERGIUM, amount: 15000, priority: 6},
+                {resource: RESOURCE_CATALYST, amount: 15000, priority: 6},
+                {resource: RESOURCE_HYDROXIDE, amount: 15000, priority: 6},
+                {resource: RESOURCE_ZYNTHIUM_KEANITE, amount: 15000, priority: 5},
+                {resource: RESOURCE_UTRIUM_LEMERGITE, amount: 15000, priority: 5},
+                {resource: RESOURCE_GHODIUM, amount: 15000, priority: 4},
+                {resource: RESOURCE_UTRIUM_HYDRIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_KEANIUM_OXIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_LEMERGIUM_HYDRIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_LEMERGIUM_OXIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_ZYNTHIUM_HYDRIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_ZYNTHIUM_OXIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_GHODIUM_HYDRIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_GHODIUM_OXIDE, amount: 15000, priority: 3},
+                {resource: RESOURCE_UTRIUM_ACID, amount: 15000, priority: 2},
+                {resource: RESOURCE_KEANIUM_ALKALIDE, amount: 15000, priority: 2},
+                {resource: RESOURCE_LEMERGIUM_ACID, amount: 15000, priority: 2},
+                {resource: RESOURCE_LEMERGIUM_ALKALIDE, amount: 15000, priority: 2},
+                {resource: RESOURCE_ZYNTHIUM_ACID, amount: 15000, priority: 2},
+                {resource: RESOURCE_ZYNTHIUM_ALKALIDE, amount: 15000, priority: 2},
+                {resource: RESOURCE_GHODIUM_ACID, amount: 15000, priority: 2},
+                {resource: RESOURCE_GHODIUM_ALKALIDE, amount: 15000, priority: 2},
                 {resource: RESOURCE_CATALYZED_UTRIUM_ACID, amount: 15000, priority: 1},
                 {resource: RESOURCE_CATALYZED_KEANIUM_ALKALIDE, amount: 15000, priority: 1},
                 {resource: RESOURCE_CATALYZED_LEMERGIUM_ACID, amount: 15000, priority: 1},
@@ -394,7 +394,7 @@ class Main {
                 {resource: RESOURCE_CATALYZED_ZYNTHIUM_ALKALIDE, amount: 15000, priority: 1},
                 {resource: RESOURCE_CATALYZED_GHODIUM_ACID, amount: 15000, priority: 1},
                 {resource: RESOURCE_CATALYZED_GHODIUM_ALKALIDE, amount: 15000, priority: 1},
-                {resource: RESOURCE_POWER, amount: 15000, priority: 2}
+                {resource: RESOURCE_POWER, amount: 15000, priority: 7}
             ];
 
             Memory.reserveMinerals = {};
@@ -476,7 +476,7 @@ class Main {
 
                     memory.buyQueue = {
                         resource: mineral.resource,
-                        amount: mineral.amount - mineral.amountInRoom,
+                        amount: Math.min(mineral.amount - mineral.amountInRoom, 3000),
                         price: mineral.marketPrice,
                         start: Game.time
                     };
@@ -1016,10 +1016,10 @@ class Main {
                 }
             }
 
-            // Army creeps know who their friends are.
-            // if (army && Cache.armies[army] && creepRoom === Cache.armies[army].attackRoom) {
-            //     creep.say(["All", "my", "friends", "are", "heathens,", "take", "it", "slow.", "", "Wait", "for", "them", "to", "ask", "you", "who", "you", "know.", "", "Please", "don't", "make", "any", "sudden", "moves.", "", "You", "don't", "know", "the", "half", "of", "the", "abuse.", ""][time % 35], true);
-            // }
+            // Army creeps are too young and need more training.
+            if (army && Cache.armies[army] && creepRoom === Cache.armies[army].attackRoom) {
+                creep.say(["They told", "me I was", "too young.", "They told", "me I,", "needed", "more", "training.", "I told", "them, I'm", "already", "dead.", "What's the", "worst that", "can", "happen?", ""][time % 17], true);
+            }
 
             // Happy new million!
             switch (time % 1000000) {

@@ -459,7 +459,7 @@ class Main {
                 });
 
                 // Buy the most needed resource.
-                const mostNeededMineralsToBuy = _.filter(roomMinerals, (m) => m.marketPrice !== Infinity && m.value !== Infinity && m.marketPrice <= m.value).sort((a, b) => {
+                const mostNeededMineralsToBuy = _.filter(roomMinerals, (m) => m.marketPrice !== Infinity && m.value !== Infinity && m.marketPrice <= m.value && m.amount - m.amountInRoom > 100).sort((a, b) => {
                     const priority = a.priority - b.priority;
 
                     if (priority) {

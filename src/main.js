@@ -488,7 +488,7 @@ class Main {
                         const {resource} = m,
                             {[resource]: mineralResource} = Minerals;
 
-                        if ((memory.buyQueue || !Memory.buy) && memory.buyQueue.resource === resource || !mineralResource || mineralResource.length === 0) {
+                        if (memory.buy && memory.buyQueue && memory.buyQueue.resource === resource || !mineralResource || mineralResource.length === 0) {
                             return false;
                         }
 

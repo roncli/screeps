@@ -83,7 +83,7 @@ class RoleRemoteStorer {
             const length = lengthToContainer[containerId] ? lengthToContainer[containerId][supportRoomName] : 0;
 
             // Calculate number of storers needed.
-            count += Math.max(Math.ceil(length / [18, 18, 18, 18, 30, 44, 54, 62, 62][supportRoomRcl]), 0);
+            count += Math.max(Math.ceil(length / [20, 20, 20, 20, 34, 48, 60, 70, 70][supportRoomRcl]), 0);
             max += count;
 
             // If we don't have enough remote storers for this container, spawn one.

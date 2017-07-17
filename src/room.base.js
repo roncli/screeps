@@ -711,7 +711,7 @@ class RoomBase extends RoomEngine {
         if (powerSpawn) {
             if (powerSpawn.power / powerSpawn.powerCapacity < 0.5) {
                 tasks.powerSpawnResourcesNeeded[RESOURCE_POWER] = powerSpawn.powerCapacity - powerSpawn.power;
-            } else if (scientists.length > 0 && scientists[0].memory.currentTask.type === "fillMinerals" && scientists[0].memory.currentTask.id === powerSpawn.id) {
+            } else if (scientists.length > 0 && scientists[0].memory.currentTask && scientists[0].memory.currentTask.type === "fillMinerals" && scientists[0].memory.currentTask.id === powerSpawn.id) {
                 delete scientists[0].memory.currentTask;
             }
         }

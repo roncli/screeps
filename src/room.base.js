@@ -647,7 +647,9 @@ class RoomBase extends RoomEngine {
             labAmount = labQueue ? labQueue.amount : void 0,
             {reserveMinerals} = Memory,
             links = Cache.linksInRoom(room),
-            spawns = Cache.spawnsInRoom(room);
+            spawns = Cache.spawnsInRoom(room),
+            {creeps: {[roomName]: creeps}} = Cache,
+            scientists = creeps && creeps.scientist || [];
         let status, sourceLabs, lab0, lab1;
 
         this.tasks = {
@@ -706,8 +708,14 @@ class RoomBase extends RoomEngine {
         }
 
         // powerSpawnResourcesNeeded
-        if (powerSpawn.power / powerSpawn.powerCapacity < 0.5) {
-            tasks.powerSpawnResourcesNeeded[RESOURCE_POWER] = powerSpawn.powerCapacity - powerSpawn.power;
+        if (powerSpawn) {
+            if (powerSpawn.power / powerSpawn.powerCapacity < 0.5) {
+                tasks.powerSpawnResourcesNeeded[RESOURCE_POWER] = powerSpawn.powerCapacity - powerSpawn.power;
+            } else {
+                if (scientists.length > 0 && scientists[0].memory.currentTask.type === "fillMinerals" && scientsts[0].memory.currentTask.id === powerSpawn.id) {
+                    delete scientists[0].memory.currentTask;
+                }
+            }
         }
 
         // labsCollectMinerals

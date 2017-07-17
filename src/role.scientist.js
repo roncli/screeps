@@ -194,7 +194,7 @@ class RoleScientist {
         }
 
         // Check for unfilled power spawns.
-        Assign.fillWithEnergy(creepsWithNoTask, Cache.powerSpawnsInRoom(room), "PwrEnergy");
+        Assign.fillWithEnergy(creepsWithNoTask, _.filter(Cache.powerSpawnsInRoom(room), (s) => s.energy / s.energyCapacity < 0.5), "PwrEnergy");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

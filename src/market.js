@@ -45,7 +45,7 @@ class Market {
      */
     static getFilteredOrders() {
         if (!Market.filteredOrders) {
-            Market.filteredOrders = Utilities.nest(_.filter(Market.getAllOrders(), (o) => o.amount > 0), [(d) => d.type, (d) => d.resourceType]);
+            Market.filteredOrders = Utilities.nest(_.filter(Market.getAllOrders(), (o) => o.amount >= 10), [(d) => d.type, (d) => d.resourceType]);
             _.forEach(Market.filteredOrders.sell, (orders, resource) => {
                 Market.filteredOrders.sell[resource].sort((a, b) => a.price - b.price);
             });

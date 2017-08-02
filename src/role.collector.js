@@ -68,11 +68,20 @@ class RoleCollector {
             };
         }
 
-        const {creeps: {[room.name]: creeps}} = Cache,
+        const spawns = Cache.spawnsInRoom(room),
+            {creeps: {[room.name]: creeps}} = Cache,
             collectors = creeps && creeps.collector || [];
+        
+        if (spawns.length === 0) {
+            return {
+                name: "collector",
+                spawn: false,
+                max
+            };
+        }
 
         // Loop through sources to see if we have anything we need to spawn.
-        _.forEach(Utilities.objectsClosestToObj(sources, Cache.spawnsInRoom(room)[0]), (source, index) => {
+        _.forEach(Utilities.objectsClosestToObj(sources, spawns[0]), (source, index) => {
             // Skip the first source, it is for workers instead of collectors.
             if (index === 0) {
                 return true;

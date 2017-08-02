@@ -63,7 +63,7 @@ class RoleWorker {
                 return memory && roomType && roomType.type === "base" && memory.region === room.memory.region && gameRoom.name !== roomName && controller && controller.level < 6;
             }), (otherRoom) => {
                 const {name: otherRoomName} = otherRoom,
-                    {creeps: {[otherRoom.name]: otherCreeps}} = Cache;
+                    {creeps: {[otherRoomName]: otherCreeps}} = Cache;
 
                 if (_.filter(otherCreeps && otherCreeps.worker || [], (c) => {
                     const {memory} = c;
@@ -71,7 +71,11 @@ class RoleWorker {
                     return memory.supportRoom !== memory.home;
                 }).length === 0) {
                     roomToSpawnFor = otherRoomName;
+
+                    return false;
                 }
+
+                return true;
             });
         }
 
@@ -133,7 +137,7 @@ class RoleWorker {
             body.push(MOVE);
         }
 
-        if ((!Memory.survey || !Memory.survey.data.rooms.find((r) => r.name === checkSettings.home) || Memory.survey.data.rooms.find((r) => r.name === "E37N11") < 200000000) && storage && Cache.labsInRoom(room).length > 0) {
+        if ((!Memory.survey || !Memory.survey.data.rooms.find((r) => r.name === checkSettings.home) || Memory.survey.data.rooms.find((r) => r.name === checkSettings.home) < 200000000) && storage && Cache.labsInRoom(room).length > 0) {
             if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
                 boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
             } else if (store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {

@@ -30,7 +30,7 @@ class RoleUpgrader {
      */
     static checkSpawnSettings(engine, canSpawn) {
         let settings = engine.checkSpawnSettingsCache("upgrader"),
-            max, spawnForRoom;
+            max, roomToSpawnFor;
 
         if (settings) {
             return settings;
@@ -61,11 +61,11 @@ class RoleUpgrader {
             upgraders = creeps && creeps.upgrader || [];
 
         if (max > 0 && (controller && controller.level < 8 && storage && storageEnergy > 900000 || _.filter(upgraders, (c) => c.spawning || c.ticksToLive >= 150).length < max)) {
-            spawnForRoom = roomName;
+            roomToSpawnFor = roomName;
         }
 
         // Support smaller rooms in the region.
-        if (!spawnForRoom) {
+        if (!roomToSpawnFor) {
             _.forEach(_.filter(Game.rooms, (gameRoom) => {
                 const {memory, controller: gameRoomController} = gameRoom,
                     {roomType} = memory;
@@ -80,7 +80,7 @@ class RoleUpgrader {
 
                     return memory.supportRoom !== memory.home;
                 }).length === 0) {
-                    spawnForRoom = otherRoomName;
+                    roomToSpawnFor = otherRoomName;
 
                     return false;
                 }
@@ -91,10 +91,10 @@ class RoleUpgrader {
 
         settings = {
             name: "upgrader",
-            spawn: !!spawnForRoom,
+            spawn: !!roomToSpawnFor,
             max,
             spawnFromRegion: controller.level < 6,
-            spawnForRoom
+            roomToSpawnFor
         };
 
         if (upgraders.length > 0) {

@@ -93,7 +93,7 @@ class TaskUpgrade {
 
         // Move to the controller and upgrade it.
         Pathing.moveTo(creep, controller, Math.max(Math.min(pos.getRangeTo(controller) - 1, 3), 1));
-        creep.upgradeController(this.controller);
+        creep.upgradeController(controller);
 
         if (signs && signInRoom && (!sign || sign.username !== "roncli")) {
             creep.signController(controller, signInRoom);

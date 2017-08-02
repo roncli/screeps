@@ -1671,7 +1671,10 @@ class Assign {
         }
 
         _.forEach(creeps, (creep) => {
-            if (new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0].pos, "position").canAssign(creep)) {
+            const task = new TaskRally(Utilities.objectsClosestToObj(sites, creep)[0].pos, "position");
+
+            task.range = 0;
+            if (task.canAssign(creep)) {
                 ({time: creep.memory.currentTask.priority} = Game);
                 if (say) {
                     creep.say(say);

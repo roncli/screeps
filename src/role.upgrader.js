@@ -192,7 +192,7 @@ class RoleUpgrader {
                 role: "upgrader",
                 home: checkSettings.home,
                 supportRoom: checkSettings.supportRoom,
-                homeSource: spawns.length ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0]
+                homeSource: checkSettings.home === checkSettings.supportRoom ? spawns.length ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0] : void 0
             }
         };
     }

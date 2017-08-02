@@ -150,7 +150,7 @@ class RoleWorker {
                 role: "worker",
                 home: checkSettings.home,
                 supportRoom: checkSettings.supportRoom,
-                homeSource: spawns ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0]
+                homeSource: spawns.length ? Utilities.objectsClosestToObj(room.find(FIND_SOURCES), spawns[0])[0].id : room.find(FIND_SOURCES)[0]
             }
         };
     }

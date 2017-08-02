@@ -320,8 +320,16 @@ class RoleWorker {
             return;
         }
 
-        // Rally remaining creeps.
+        // Rally remaining creeps to home source.
         Assign.moveToHomeSource(creepsWithNoTask);
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Rally remaining creeps to home room.
+        Assign.moveToHomeRoom(creepsWithNoTask);
     }
 }
 

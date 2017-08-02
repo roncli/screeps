@@ -111,13 +111,17 @@ class RoleWorker {
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             {storage} = room,
-            {store} = storage,
             spawns = Cache.spawnsInRoom(room),
             workUnits = units + (remainder >= 150 ? 1 : 0),
             carryUnits = units + (remainder >= 100 && remainder < 150 ? 1 : 0),
             moveUnits = units + (remainder >= 50 ? 1 : 0),
             body = [],
             boosts = {};
+        let store;
+
+        if (storage) {
+            ({store} = storage);
+        }
 
         for (let count = 0; count < workUnits; count++) {
             body.push(WORK);

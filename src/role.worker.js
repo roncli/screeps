@@ -110,7 +110,7 @@ class RoleWorker {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        const {rooms: {[checkSettings.home]: room}} = Game,
+        const {rooms: {[checkSettings.supportRoom]: room}} = Game,
             energy = Math.min(room.energyCapacityAvailable, 3300),
             units = Math.floor(energy / 200),
             remainder = energy % 200,

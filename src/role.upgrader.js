@@ -120,7 +120,7 @@ class RoleUpgrader {
      * @return {object} The settings for spawning a creep.
      */
     static spawnSettings(checkSettings) {
-        const {rooms: {[checkSettings.home]: room}} = Game,
+        const {rooms: {[checkSettings.supportRoom]: room}} = Game,
             links = Cache.linksInRoom(room),
             {controller, storage} = room,
             spawns = Cache.spawnsInRoom(room),

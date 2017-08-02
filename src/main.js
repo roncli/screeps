@@ -1018,7 +1018,7 @@ class Main {
 
             // Army creeps are too young and need more training.
             if (army && Cache.armies[army] && creepRoom === Cache.armies[army].attackRoom) {
-                creep.say(["They told", "me I was", "too young.", "They told", "me I,", "needed", "more", "training.", "I told", "them, I'm", "already", "dead.", "What's the", "worst that", "can", "happen?", ""][time % 17], true);
+                creep.say(["They told", "me I was", "too young.", "They told", "me I", "needed", "more", "training.", "I told", "them, I'm", "already", "dead.", "What's the", "worst that", "can", "happen?", ""][time % 17], true);
             }
 
             // Happy new million!

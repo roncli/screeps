@@ -123,13 +123,17 @@ class RoleUpgrader {
         const {rooms: {[checkSettings.home]: room}} = Game,
             links = Cache.linksInRoom(room),
             {controller, storage} = room,
-            {store} = storage,
             spawns = Cache.spawnsInRoom(room),
             body = [],
             boosts = {};
         let {energyCapacityAvailable: energy} = room,
             units = Math.floor(energy / 200),
-            remainder = energy % 200;
+            remainder = energy % 200,
+            store;
+        
+        if (room.storage) {
+            ({store} = storage);
+        }
 
         // Check if we have a link in range of the controller and build the creep accordingly.
         if (links >= 2 && Utilities.objectsClosestToObj(links, controller)[0].pos.getRangeTo(controller) <= 2) {

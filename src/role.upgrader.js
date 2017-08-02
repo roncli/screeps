@@ -87,6 +87,10 @@ class RoleUpgrader {
 
                 return true;
             });
+
+            if (roomToSpawnFor) {
+                max = 1;
+            }
         }
 
         settings = {

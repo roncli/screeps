@@ -130,8 +130,8 @@ class RoleUpgrader {
             units = Math.floor(energy / 200),
             remainder = energy % 200,
             store;
-        
-        if (room.storage) {
+
+        if (storage) {
             ({store} = storage);
         }
 

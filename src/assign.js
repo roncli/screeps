@@ -987,7 +987,7 @@ class Assign {
     static flee(creeps, say) {
 
         _.forEach(creeps, (creep) => {
-            const hostiles = Cache.hostilesInRoom(creep.room);
+            const hostiles = _.filter(Cache.hostilesInRoom(creep.room), (h) => _.includes(h.body, ATTACK) || _.includes(h.body, RANGED_ATTACK));
 
             if (!hostiles || hostiles.length === 0) {
                 return;

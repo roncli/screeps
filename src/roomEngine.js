@@ -85,9 +85,9 @@ class RoomEngine {
 
         // Get the spawn to use.
         if (checkSettings.spawnFromRegion) {
-            ({0: spawnToUse} = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory.region === room.memory.region && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body)).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1)));
+            ({0: spawnToUse} = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory && s.room.memory.roomType && s.room.memory.roomType === "base" && s.room.memory.region === room.memory.region && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body)).sort((a, b) => (a.room.name === roomName ? 0 : 1) - (b.room.name === roomName ? 0 : 1)));
         } else {
-            ({0: spawnToUse} = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.name === supportRoomName && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body)));
+            ({0: spawnToUse} = _.filter(Game.spawns, (s) => !Cache.spawning[s.id] && !s.spawning && s.room.memory && s.room.memory.roomType && s.room.memory.roomType === "base" && s.room.name === supportRoomName && s.room.energyAvailable >= Utilities.getBodypartCost(spawnSettings.body)));
         }
 
         // Bail if a spawn is not available.

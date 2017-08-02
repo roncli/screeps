@@ -34,7 +34,7 @@ class RoleScientist {
         }
 
         const {room} = engine,
-            max = 1;
+            max = engine.room.controller && engine.room.controller.level >= 6 ? 1 : 0;
 
         if (!canSpawn) {
             return {

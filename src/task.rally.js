@@ -140,9 +140,6 @@ class TaskRally {
             if (rangedAttack) {
                 // Attack a creep at range.
                 creep.rangedAttack(Game.getObjectById(rangedAttack));
-            } else {
-                // Mass attack.
-                creep.rangedMassAttack();
             }
         }
     }

@@ -929,9 +929,15 @@ class RoomBase extends RoomEngine {
      */
     spawn(canSpawn) {
         const {room, tasks} = this,
-            {storage, storage: {store: {[RESOURCE_ENERGY]: energy}}, controller, name: roomName} = room,
+            {controller, name: roomName} = room,
             {level: rcl} = controller,
             {dismantle} = Memory;
+        let energy = 0,
+            storage;
+
+        if (room.storage) {
+            ({storage, storage: {store: {[RESOURCE_ENERGY]: energy}}} = room);
+        }
 
         this.checkSpawn(RoleWorker, canSpawn && (!storage || energy >= Memory.workerEnergy || controller.ticksToDowngrade < 3500 || room.find(FIND_MY_CONSTRUCTION_SITES).length > 0 || tasks.criticalRepairableStructures && tasks.criticalRepairableStructures.length > 0 || tasks.repairableStructures && _.filter(tasks.repairableStructures, (s) => [STRUCTURE_WALL, STRUCTURE_RAMPART].indexOf(s.structureType) !== 1 && s.hits < 1000000).length > 0));
         this.checkSpawn(RoleMiner, canSpawn);

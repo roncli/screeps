@@ -640,7 +640,7 @@ class RoomBase extends RoomEngine {
             extensionEnergyCapacity = rcl ? EXTENSION_ENERGY_CAPACITY[rcl] : 0,
             {0: nuker} = Cache.nukersInRoom(room),
             {0: powerSpawn} = Cache.powerSpawnsInRoom(room),
-            terminalEnergy = terminal ? terminal.store[RESOURCE_ENERGY] : 0,
+            terminalEnergy = terminal ? terminal.store[RESOURCE_ENERGY] || 0 : 0,
             store = storage ? storage.store : void 0,
             {labsInUse, labQueue} = roomMemory,
             labs = Cache.labsInRoom(room),

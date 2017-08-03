@@ -753,14 +753,15 @@ class Main {
      */
     static balanceEnergy() {
         // See if there is some energy balancing we can do.
-        const rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + a.terminal.store[RESOURCE_ENERGY] - (b.storage.store[RESOURCE_ENERGY] + b.terminal.store[RESOURCE_ENERGY]));
+        const rooms = _.filter(Game.rooms, (r) => r.memory && r.memory.roomType && r.memory.roomType.type === "base" && r.storage && r.storage.my && r.terminal && r.terminal.my).sort((a, b) => a.storage.store[RESOURCE_ENERGY] + (a.terminal.store[RESOURCE_ENERGY] || 0) - (b.storage.store[RESOURCE_ENERGY] + (b.terminal.store[RESOURCE_ENERGY] || 0)));
         let energyGoal;
 
         if (rooms.length > 1) {
-            energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + r.terminal.store[RESOURCE_ENERGY])) / rooms.length, 500000);
+            energyGoal = Math.min(_.sum(_.map(rooms, (r) => r.storage.store[RESOURCE_ENERGY] + (r.terminal.store[RESOURCE_ENERGY] || 0))) / rooms.length, 500000);
             _.forEach(rooms, (room, index) => {
                 const {[rooms.length - index - 1]: otherRoom} = rooms,
-                    {name: otherRoomName, storage: {store: {[RESOURCE_ENERGY]: otherRoomStorageEnergy}}, terminal: otherRoomTerminal, terminal: {store: {[RESOURCE_ENERGY]: otherRoomTerminalEnergy}}} = otherRoom,
+                    {name: otherRoomName, storage: {store: {[RESOURCE_ENERGY]: otherRoomStorageEnergy}}, terminal: otherRoomTerminal} = otherRoom,
+                    otherRoomTerminalEnergy = otherRoom.terminal.store[RESOURCE_ENERGY] || 0,
                     {name: roomName, storage: {store: {[RESOURCE_ENERGY]: roomStorageEnergy}}} = room;
                 let transCost;
 
@@ -768,7 +769,7 @@ class Main {
                     return true;
                 }
 
-                if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + room.terminal.store[RESOURCE_ENERGY] > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
+                if (roomStorageEnergy >= otherRoomStorageEnergy || roomStorageEnergy + (room.terminal.store[RESOURCE_ENERGY] || 0) > energyGoal || otherRoomStorageEnergy + otherRoomTerminalEnergy < energyGoal + 10000) {
                     return false;
                 }
 

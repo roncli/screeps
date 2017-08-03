@@ -137,7 +137,7 @@ class RoleWorker {
             body.push(MOVE);
         }
 
-        if ((!Memory.survey || !Memory.survey.data.rooms.find((r) => r.name === checkSettings.home) || Memory.survey.data.rooms.find((r) => r.name === checkSettings.home) < 200000000) && storage && Cache.labsInRoom(room).length > 0) {
+        if ((!Memory.survey || !Memory.survey.data.rooms.find((r) => r.name === checkSettings.home) || Memory.survey.data.rooms.find((r) => r.name === checkSettings.home).lowestWall < 200000000) && storage && Cache.labsInRoom(room).length > 0) {
             if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
                 boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
             } else if (store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {

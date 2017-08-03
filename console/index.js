@@ -1,8 +1,8 @@
 const WebSocket = require("ws"),
     wss = new WebSocket.Server({port: 8081}),
-    Screeps = require("screeps-api"),
+    {ScreepsAPI} = require("screeps-api"),
     config = require("./config"),
-    screeps = new Screeps(config),
+    screeps = new ScreepsAPI(config),
     readline = require("readline"),
     express = require("express"),
     rl = readline.createInterface({
@@ -12,7 +12,7 @@ const WebSocket = require("ws"),
     });
 
 class Index {
-    static main() {
+    static async main() {
         const app = express();
         let lastTick = 0;
 
@@ -32,21 +32,33 @@ class Index {
             });
         });
 
-        screeps.socket(Index.socketOpen);
+        await Index.connect();
 
-        screeps.on("message", (msg) => {
-            if (msg.startsWith("auth ok")) {
-                screeps.subscribe("/console");
-                console.log("Starting!");
-                rl.prompt();
+        screeps.socket.on("close", () => {
+            console.log("Screeps socket closed.  Reconnecting...");
+            Index.connect();
+        });
+
+        screeps.socket.on("error", (err) => {
+            if (err.code === "ECONNREFUSED") {
+                console.log("Connection refused.  Reconnecting...");
+                Index.connect();
+            } else {
+                wss.broadcast({
+                    message: "error",
+                    type: "socket",
+                    data: err
+                });
             }
         });
 
-        screeps.on("console", (msg) => {
-            const {1: data} = msg;
+        screeps.socket.subscribe("console", (ev) => {
+            const {data} = ev;
 
-            Promise.resolve().then(() => screeps.memory.get("survey"))
-                .then((survey) => {
+            screeps.memory.get("survey")
+                .then((data) => {
+                    const {data: survey} = data;
+
                     if (survey.lastPoll > lastTick) {
                         ({lastPoll: lastTick} = survey);
                         wss.broadcast({
@@ -54,8 +66,10 @@ class Index {
                             survey
                         });
 
-                        Promise.resolve().then(() => screeps.memory.get("creepCount"))
-                            .then((creepCount) => {
+                        screeps.memory.get("creepCount")
+                            .then((data) => {
+                                const {data: creepCount} = data;
+
                                 wss.broadcast({
                                     message: "creepCount",
                                     creepCount
@@ -78,8 +92,10 @@ class Index {
                     });
                 });
 
-            Promise.resolve().then(() => screeps.memory.get("stats"))
-                .then((stats) => {
+            screeps.memory.get("stats")
+                .then((data) => {
+                    const {data: stats} = data;
+
                     wss.broadcast({
                         message: "stats",
                         stats
@@ -111,6 +127,9 @@ class Index {
                 console.log(data.error);
             }
         });
+
+        console.log("Starting!");
+        rl.prompt();
 
         rl.on("line", (line) => {
             line = line.trim();
@@ -167,26 +186,24 @@ class Index {
             server.close();
             process.exit();
         });
-
     }
-
-    static socketOpen() {
-        screeps.ws.on("close", () => {
-            console.log("Screeps socket closed.  Reconnecting...");
-            screeps.socket(Index.socketOpen);
-        });
-
-        screeps.ws.on("error", (err) => {
-            if (err.code === "ECONNREFUSED") {
-                console.log("Connection refused.  Reconnecting...");
-                screeps.socket(Index.socketOpen);
-            } else {
-                wss.broadcast({
-                    message: "error",
-                    type: "socket",
-                    data: err
-                });
+    
+    static async connect() {
+        return new Promise(async (resolve) => {
+            let ok = 0;
+            
+            while (ok !== 1) {
+                ({ok} = await screeps.auth(config.email, config.password));
+                if (ok !== 1) {
+                    console.log("Unable to connect, retrying in 5 seconds...");
+                    await new Promise((resolve) => setTimeout(resolve, 5000));
+                }
             }
+    
+            await screeps.socket.connect();
+            console.log("Connected.");
+            
+            resolve();
         });
     }
 }

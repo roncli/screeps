@@ -198,14 +198,21 @@ class Index {
             let ok = 0;
             
             while (ok !== 1) {
-                ({ok} = await screeps.auth(config.email, config.password));
-                if (ok !== 1) {
+                try {
+                    ({ok} = await screeps.auth(config.email, config.password));
+                } finally {}
+                if (ok === 1) {
+                    try {
+                        await screeps.socket.connect();
+                    } catch (err) {
+                        ok = 0;
+                    }
+                } else {
                     console.log("Unable to connect, retrying in 5 seconds...");
                     await new Promise((resolve) => setTimeout(resolve, 5000));
                 }
             }
     
-            await screeps.socket.connect();
             console.log("Connected.");
             
             resolve();

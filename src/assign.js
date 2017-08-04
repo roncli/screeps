@@ -1388,7 +1388,7 @@ class Assign {
         }
 
         _.forEach(creeps, (creep) => {
-            _.forEach(_.filter(resources, (r) => r.amount > creep.pos.getRangeTo(r)), (resource) => {
+            _.forEach(_.filter(resources, (r) => Game.getObjectById(r) && r.amount > creep.pos.getRangeTo(r)), (resource) => {
                 if (_.filter(allCreeps, (c) => c.memory.currentTask && c.memory.currentTask.type === "pickupResource" && c.memory.currentTask.id === resource.id).length > 0) {
                     return true;
                 }

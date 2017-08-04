@@ -262,8 +262,14 @@ class Pathing {
      * @return {string} A serialized path.
      */
     static serializePath(start, path) {
-        return _.map(path, (pos, index) => {
+        let invalid = false;
+
+        const serializedPath = _.map(path, (pos, index) => {
             let startPos;
+
+            if (Memory.avoidRooms.indexOf(pos) !== -1) {
+                invalid = true;
+            }
 
             if (index === 0) {
                 startPos = start;
@@ -334,6 +340,12 @@ class Pathing {
 
             return "";
         }).join("");
+
+        if (invalid) {
+            Memory.messages.push(`Warning: Path generated through a room to avoid. Start: ${JSON.stringify(start)} End: ${JSON.stringify(path[path.length - 1])}`);
+        }
+
+        return serializedPath;
     }
 
     //                            #        ###          #    #

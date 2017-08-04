@@ -39,6 +39,11 @@ class Index {
             Index.connect();
         });
 
+        screeps.socket.on("unexpected-response", () => {
+            console.log("Unexpected response from screeps.  Reconnecting...");
+            Index.connect();
+        });
+
         screeps.socket.on("error", (err) => {
             if (err.code === "ECONNREFUSED") {
                 console.log("Connection refused.  Reconnecting...");

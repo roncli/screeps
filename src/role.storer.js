@@ -164,14 +164,6 @@ class RoleStorer {
             return;
         }
 
-        // Check for unfilled links.
-        Assign.fillWithEnergy(creepsWithNoTask, tasks.links, "Link");
-
-        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
-        if (creepsWithNoTask.length === 0) {
-            return;
-        }
-
         // Check for unfilled extensions.
         Assign.fillExtensions(creepsWithNoTask, allCreeps, room.controller.level, tasks.extensions, "Extension");
 
@@ -182,6 +174,14 @@ class RoleStorer {
 
         // Check for unfilled spawns.
         Assign.fillSpawns(creepsWithNoTask, allCreeps, tasks.spawns, "Spawn");
+
+        _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
+        if (creepsWithNoTask.length === 0) {
+            return;
+        }
+
+        // Check for unfilled links.
+        Assign.fillWithEnergy(creepsWithNoTask, tasks.links, "Link");
 
         _.remove(creepsWithNoTask, (c) => c.memory.currentTask && (!c.memory.currentTask.unimportant || c.memory.currentTask.priority === Game.time));
         if (creepsWithNoTask.length === 0) {

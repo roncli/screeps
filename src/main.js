@@ -812,7 +812,7 @@ class Main {
                     rooms.run();
                 }
 
-                if (type === rooms.type) {
+                if (type === rooms.type && roomMemory.roomType) {
                     rooms.toObj();
                 }
             }

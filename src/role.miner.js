@@ -44,6 +44,7 @@ class RoleMiner {
             return {
                 name: "miner",
                 spawn: false,
+                spawnFromRegion: false,
                 max: 0
             };
         }
@@ -52,6 +53,7 @@ class RoleMiner {
             return {
                 name: "miner",
                 spawn: false,
+                spawnFromRegion: false,
                 max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length
             };
         }
@@ -90,6 +92,7 @@ class RoleMiner {
         settings = {
             name: "miner",
             spawn: !!containerIdToMineOn,
+            spawnFromRegion: miners.length === 0,
             max: containers.length - _.filter(minerals, (m) => m.mineralAmount === 0).length,
             containerIdToMineOn,
             isMineralHarvester

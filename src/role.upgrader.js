@@ -129,6 +129,7 @@ class RoleUpgrader {
         let {energyCapacityAvailable: energy} = room,
             units = Math.floor(energy / 200),
             remainder = energy % 200,
+            workUnits,
             store;
 
         if (storage) {
@@ -143,8 +144,9 @@ class RoleUpgrader {
             units = Math.floor((energy - carryUnits * 50) / 250);
             remainder = (energy - carryUnits * 50) % 250;
 
-            const workUnits = units * 2 + (remainder >= 150 ? 1 : 0),
-                moveUnits = units + (remainder >= 50 ? 1 : 0);
+            const moveUnits = units + (remainder >= 50 ? 1 : 0);
+
+            workUnits = units * 2 + (remainder >= 150 ? 1 : 0);
 
             for (let count = 0; count < workUnits; count++) {
                 body.push(WORK);
@@ -160,9 +162,10 @@ class RoleUpgrader {
             units = Math.floor(energy / 200);
             remainder = energy % 200;
 
-            const workUnits = units + (remainder >= 150 ? 1 : 0),
-                carryUnits = units + (remainder >= 100 && remainder < 150 ? 1 : 0),
+            const carryUnits = units + (remainder >= 100 && remainder < 150 ? 1 : 0),
                 moveUnits = units + (remainder >= 50 ? 1 : 0);
+
+            workUnits = units + (remainder >= 150 ? 1 : 0);
 
             for (let count = 0; count < workUnits; count++) {
                 body.push(WORK);
@@ -176,12 +179,12 @@ class RoleUpgrader {
         }
 
         if (storage && Cache.labsInRoom(room).length > 0) {
-            if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
-                boosts[RESOURCE_CATALYZED_LEMERGIUM_ACID] = units;
-            } else if (store[RESOURCE_LEMERGIUM_ACID] >= 30 * units) {
-                boosts[RESOURCE_LEMERGIUM_ACID] = units;
-            } else if (store[RESOURCE_CATALYZED_LEMERGIUM_ACID] >= 30 * units) {
-                boosts[RESOURCE_LEMERGIUM_HYDRIDE] = units;
+            if (store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workUnits) {
+                boosts[RESOURCE_CATALYZED_GHODIUM_ACID] = workUnits;
+            } else if (store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workUnits) {
+                boosts[RESOURCE_CATALYZED_GHODIUM_ACID] = workUnits;
+            } else if (store[RESOURCE_CATALYZED_GHODIUM_ACID] >= 30 * workUnits) {
+                boosts[RESOURCE_CATALYZED_GHODIUM_ACID] = workUnits;
             }
         }
 

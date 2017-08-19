@@ -599,6 +599,10 @@ class Assign {
                 });
             };
 
+        if (!room) {
+            return;
+        }
+
         if (!dismantle || !dismantle[roomName] || !dismantle[roomName].length === 0) {
             convert();
 

@@ -675,7 +675,7 @@ class RoomBase extends RoomEngine {
 
         const {tasks} = this;
 
-        if (tasks.structuresWithEnergy.length > 0) {
+        if (tasks.structuresWithEnergy.length > 0 && Cache.creeps[roomName]) {
             _.forEach(Cache.creeps[roomName].storer, (storer) => {
                 storer.memory.lastCollectEnergyWasStorage = false;
             });
